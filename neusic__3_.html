@@ -2965,7 +2965,7 @@ function openDrawer(id){
   const tb=document.getElementById('tb-'+id);if(tb)tb.classList.add('active');
   buildSidebar();
   if(id==='mixer')updateMeterAnim();else cancelMeterAnim();
-  if(id==='rec')animateVU();
+  if(id==='rec'){animateVU();initMIDIIfNeeded();}
 }
 
 function rebuildDrawer(active){
@@ -4371,7 +4371,13 @@ function init(){
   syncTimelineMetrics();
   buildOv();
   renderTracks();
-  centerArrangementOnPlayhead();
+  // NOTE: intentionally NOT calling centerArrangementOnPlayhead() here.
+  // S.sec starts at a decorative placeholder value (18.45s) used for the
+  // static "currently at this position" mock display before any real
+  // playback has happened. Centering on it at load time scrolled the
+  // timeline to ~beat 37, well past where the actual demo clips live
+  // (they start at beat 0) — so the app looked empty on first open. The
+  // view should start showing the actual content, not a stale mock position.
   drawRuler();
   posPlayhead();
   openDrawer('drums');
@@ -4462,7 +4468,8 @@ function buildMpcPadGrid(){
     return `<div class="mpc-pad${has?'':' empty'}"
       style="background:${col}${has?'22':'0d'};border-color:${col}${has?'55':'22'};"
       id="mpc-pad-${i}"
-      ontouchstart="hitMpcPad(${i},event)" onclick="hitMpcPad(${i},event)">
+      onmousedown="hitMpcPadDown(${i},event)" onmouseup="hitMpcPadUp(${i},event)" onmouseleave="hitMpcPadUp(${i},event)"
+      ontouchstart="hitMpcPadDown(${i},event)" ontouchend="hitMpcPadUp(${i},event)" ontouchcancel="hitMpcPadUp(${i},event)">
       <span class="mpc-pad-num">${S.padBank}${i+1}</span>
       <span class="mpc-pad-lbl">${has?(i+1):'—'}</span>
       ${has?`<span class="mpc-pad-vel">${asgns[i].vel}</span>`:''}
@@ -4489,8 +4496,13 @@ window.chopEqual=function(){
   },50);
 };
 
-function hitMpcPad(i,e){
+function hitMpcPadDown(i,e){
   e&&e.stopPropagation();
+  if(e&&e.cancelable)e.preventDefault(); // stop touchstart from also firing a synthesized click later
+  const pad=document.getElementById('mpc-pad-'+i);
+  if(pad&&pad._isDown)return; // already pressed (defends against duplicate down events on some browsers)
+  if(pad)pad._isDown=true;
+
   // Auto-assign if slot empty and slice exists
   if(!S.padBanks[S.padBank][i]){
     if(S.samplerSlices[i]){
@@ -4510,7 +4522,6 @@ function hitMpcPad(i,e){
   // Swing: even pads (2nd/4th of each beat) get a slight onset delay
   const swingDelay=(S.mpcSwing>0&&i%2===1)?beatToSec(S.mpcSwing/200*S.mpcQuantise):0;
 
-  const pad=document.getElementById('mpc-pad-'+i);
   if(pad){pad.classList.add('hit');setTimeout(()=>pad?.classList.remove('hit'),110);}
 
   const doPlay=()=>{
@@ -4522,14 +4533,25 @@ function hitMpcPad(i,e){
   };
   if(swingDelay>0)setTimeout(doPlay,swingDelay*1000); else doPlay();
 
-  // Note repeat: schedule additional hits while pad held
-  if(S.noteRepeat&&!pad._repeatTmr){
+  // Note repeat: schedule additional hits while pad held. The stop condition
+  // (hitMpcPadUp, bound via onmouseup/ontouchend/onmouseleave/ontouchcancel
+  // in the pad's HTML) is now guaranteed to fire AFTER this press started,
+  // since both are tied to the same physical press-and-release gesture rather
+  // than one being bound retroactively inside a handler that itself only ran
+  // once the gesture had already completed (the previous click-based version's
+  // bug — by the time it tried to listen for mouseup, that mouseup had often
+  // already happened, so the repeat interval never stopped).
+  if(S.noteRepeat&&pad&&!pad._repeatTmr){
     const intervalMs=beatToSec(S.noteRepeatRate)*1000;
     pad._repeatTmr=setInterval(doPlay,intervalMs);
-    const stopRepeat=()=>{clearInterval(pad._repeatTmr);delete pad._repeatTmr;};
-    pad.addEventListener('mouseup',stopRepeat,{once:true});
-    pad.addEventListener('touchend',stopRepeat,{once:true});
   }
+}
+
+function hitMpcPadUp(i,e){
+  const pad=document.getElementById('mpc-pad-'+i);
+  if(!pad)return;
+  pad._isDown=false;
+  if(pad._repeatTmr){clearInterval(pad._repeatTmr);delete pad._repeatTmr;}
 }
 
 function switchPadBank(bank,btn){
@@ -4876,7 +4898,7 @@ function onMidiNoteOn(midi,vel,ch){
     if(idx>=0&&pads[idx]){pads[idx].classList.add('hit');setTimeout(()=>pads[idx]?.classList.remove('hit'),100);}
     return;
   }
-  if(S.activePanel==='sampler'){const pi=(midi-48);if(pi>=0&&pi<16)hitMpcPad(pi,null);return;}
+  if(S.activePanel==='sampler'){const pi=(midi-48);if(pi>=0&&pi<16)hitMpcPadDown(pi,null);return;}
   prPlayMidiNote(midi,vel,0.4);
   if(PR._midiRec&&document.getElementById('pr-canvas')){
     snapshot();const nowBeat=secToBeat(S.sec);
@@ -4887,6 +4909,7 @@ function onMidiNoteOn(midi,vel,ch){
   }
 }
 function onMidiNoteOff(midi,ch){
+  if(S.activePanel==='sampler'){const pi=(midi-48);if(pi>=0&&pi<16){hitMpcPadUp(pi,null);return;}}
   const held=PR._heldNotes[midi];
   if(held){
     const nowBeat=secToBeat(S.sec);
@@ -4947,9 +4970,23 @@ window.buildRec=function(el){
   }
 };
 
-// Init MIDI on first user interaction
+// Init MIDI only when the user opens the Record panel (where the MIDI
+// section actually lives), not on literally any click anywhere in the app.
+// Requesting navigator.requestMIDIAccess() as a side effect of an unrelated
+// tap (switching drum pads, opening Effects, anything) is the kind of
+// behavior that looks like a dark pattern even when unintentional — it can
+// surface a permission prompt with no context for why a music app wants to
+// enumerate connected hardware before the user has touched anything
+// MIDI-related. Scoping it to the Record panel still satisfies the browser's
+// "must originate from a user gesture" requirement for permission APIs,
+// since opening that panel IS a real click — it just needs to be the RIGHT
+// click, not any click.
 let _midiReady=false;
-document.addEventListener('click',()=>{if(!_midiReady){_midiReady=true;initMIDI();}},{capture:true});
+function initMIDIIfNeeded(){
+  if(_midiReady)return;
+  _midiReady=true;
+  initMIDI();
+}
 
 
 /* ═══════════════════════════════════════════════════════════════
@@ -5496,6 +5533,502 @@ function injectSbStyles(){
 `;
   document.head.appendChild(s);
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+   PIANO ROLL → REAL AUDIO PLAYBACK
+   This is the single biggest gap closed by this patch: clip.notes (drawn,
+   dragged, MIDI-recorded, and edited in the Piano Roll panel) were never
+   actually scheduled to make sound during playback — only previewed live
+   via prPlayMidiNote() while editing. Drum steps and the metronome were
+   the only things schedulerTick() advanced.
+
+   This section adds one new function — scheduleMidiClipNotes() — that
+   walks every track's clips, reads clip.notes (per-clip, matching how
+   openClipInPianoRoll/flushPRToClip already store them), and schedules
+   each note through Audio_.trackInput(trackId) using the exact same
+   songSecToCtxTime() lookahead pattern scheduleSeqSteps() already uses.
+   That means MIDI/beat-track notes now respect that track's mute/solo/
+   FX rack/fader, instead of bypassing it the way the old live-preview-only
+   prPlayMidiNote() did (it hardcoded a connect to Audio_.master).
+
+   No existing function is duplicated or replaced — schedulerTick() gets
+   exactly one new call appended to it, and three transport functions
+   (togglePlay/rewind/seekToPct) get the same "stop + reschedule" calls
+   they already make for audio clips, just extended to also cover notes.
+═══════════════════════════════════════════════════════════════════════ */
+
+// Per-track note-scheduling cursors, mirroring S.nextSeqStepBeat's role for
+// drum steps. Keyed by track id so each MIDI/beat track advances independently
+// (a track with sparse notes shouldn't force a tighter lookahead granularity
+// on a track with dense ones — each only schedules its own next-due note).
+S.nextNoteCursor = {}; // trackId -> next beat (in CLIP-LOCAL terms is wrong;
+                        // see resetNoteCursors() — these are absolute song beats.
+
+// Currently-sounding note voices, so they can be force-stopped on pause/seek/
+// rewind exactly like S.scheduled (audio clip sources) already are. Without
+// this, pausing mid-note would let that oscillator ring out to its full
+// scheduled stop() time instead of cutting off with the rest of the mix.
+S.scheduledNoteVoices = [];
+
+function resetNoteCursors(){
+  const nowBeat=secToBeat(S.sec);
+  S.tracks.forEach(t=>{ S.nextNoteCursor[t.id]=nowBeat; });
+}
+
+function stopAllScheduledNotes(){
+  S.scheduledNoteVoices.forEach(({osc,gain})=>{
+    try{
+      const ctx=Audio_.ctx;
+      gain.gain.cancelScheduledValues(ctx.currentTime);
+      gain.gain.setTargetAtTime(0,ctx.currentTime,0.015);
+      osc.stop(ctx.currentTime+0.05);
+    }catch(e){}
+  });
+  S.scheduledNoteVoices=[];
+}
+
+// The actual voice — deliberately mirrors prPlayMidiNote's timbre (same
+// sine/saw/triangle-by-register split, same sub-oscillator for body below
+// midi 48) so a note sounds identical whether you're previewing it while
+// drawing or hearing it play back in context. The one behavioral difference
+// is required for correctness: this version takes an explicit "when" (for
+// sample-accurate scheduling) and connects through the track's real signal
+// chain via Audio_.trackInput(trackId) rather than straight to Audio_.master,
+// so per-track mute/solo/FX/fader all apply during playback like every
+// other sound source in the app already does.
+function scheduleNoteVoice(trackId,midi,vel,when,durSec){
+  const ctx=Audio_.ctx;
+  const freq=440*Math.pow(2,(midi-69)/12);
+  const gv=Math.max(0.001,(vel/127)*0.5);
+  const dest=Audio_.trackInput(trackId);
+
+  const g=ctx.createGain();
+  g.gain.setValueAtTime(0,when);
+  g.gain.linearRampToValueAtTime(gv,when+0.008);
+  g.gain.exponentialRampToValueAtTime(gv*0.55,when+0.06);
+  g.gain.exponentialRampToValueAtTime(0.0001,when+durSec);
+
+  const osc=ctx.createOscillator();
+  osc.type=midi<48?'sine':midi<72?'sawtooth':'triangle';
+  osc.frequency.value=freq;
+
+  if(midi>=48&&midi<72){
+    const lp=ctx.createBiquadFilter();lp.type='lowpass';
+    lp.frequency.setValueAtTime(freq*4,when);
+    lp.frequency.exponentialRampToValueAtTime(freq*1.5,when+durSec);
+    osc.connect(lp);lp.connect(g);
+  } else {
+    osc.connect(g);
+  }
+
+  if(midi>=48){
+    const sub=ctx.createOscillator();sub.type='sine';sub.frequency.value=freq/2;
+    const sg=ctx.createGain();sg.gain.value=0.12;
+    sub.connect(sg);sg.connect(g);
+    sub.start(when);sub.stop(when+durSec+0.05);
+  }
+
+  g.connect(dest);
+  osc.start(when);osc.stop(when+durSec+0.05);
+  S.scheduledNoteVoices.push({osc,gain:g});
+
+  // Light up the matching piano key + grid row in the UI exactly when the
+  // note actually sounds, not when it was scheduled (which can be up to
+  // LOOKAHEAD_SEC early).
+  const delayMs=Math.max(0,(when-Audio_.ctx.currentTime)*1000);
+  setTimeout(()=>{ if(S.playing) prFlashKey(midi); },delayMs);
+}
+
+// Walks every track's clips and schedules any clip.notes whose onset falls
+// within [current cursor, horizonBeat) for that track — the same lookahead
+// window scheduleSeqSteps() already uses for drum steps, so MIDI notes and
+// drum hits stay sample-locked to each other with zero drift between them.
+//
+// Notes are stored CLIP-LOCAL (n.beat is relative to the clip's own start —
+// confirmed by how the Piano Roll draws/edits them and by flushPRToClip's
+// 1:1 copy into clip.notes with no offset applied), so each note's absolute
+// song position is clip.start + n.beat. A note only sounds at all if its
+// absolute position falls inside the clip's [start, start+len) span — notes
+// dragged past the end of a since-shortened clip are silently skipped,
+// matching how an audio clip's trimmed-off tail is already not played back.
+function scheduleMidiClipNotes(horizonBeat){
+  S.tracks.forEach(t=>{
+    if(!t.clips||!t.clips.length)return;
+    const cursor=S.nextNoteCursor[t.id]??secToBeat(S.sec);
+    if(cursor>=horizonBeat){ return; } // nothing new to consider this tick
+
+    t.clips.forEach(clip=>{
+      if(!clip.notes||!clip.notes.length||clip.recording)return;
+      const clipEndBeat=clip.start+clip.len;
+
+      clip.notes.forEach(n=>{
+        const absBeat=clip.start+n.beat;
+        // Only schedule notes whose onset is in this tick's lookahead window
+        // AND at/after this track's cursor (so nothing double-schedules across
+        // ticks) AND still within the clip's own current bounds (so trimming
+        // a clip shorter correctly silences notes past the new end).
+        if(absBeat<cursor||absBeat>=horizonBeat)return;
+        if(absBeat<clip.start||absBeat>=clipEndBeat)return;
+
+        const when=songSecToCtxTime(beatToSec(absBeat));
+        if(when<Audio_.ctx.currentTime)return; // already passed, safety net
+
+        // Clamp note length so it can't run past the clip's own end — matches
+        // how an audio clip is truncated at its boundary rather than letting
+        // its source buffer play past where the clip box visually ends.
+        const maxLenBeats=Math.max(0.03,clipEndBeat-absBeat);
+        const lenBeats=Math.min(n.len||0.25,maxLenBeats);
+        const durSec=Math.max(0.04,beatToSec(lenBeats));
+
+        scheduleNoteVoice(t.id,n.midi,n.vel??100,when,durSec);
+      });
+    });
+
+    S.nextNoteCursor[t.id]=horizonBeat;
+  });
+}
+
+/* ── Wire into the real scheduler (one call appended, nothing replaced) ── */
+const _origSchedulerTickForNotes=schedulerTick;
+schedulerTick=function(){
+  if(!S.playing)return;
+  _origSchedulerTickForNotes();
+  const nowSec=readClockSec();
+  const horizon=secToBeat(nowSec+LOOKAHEAD_SEC);
+  scheduleMidiClipNotes(horizon);
+};
+
+/* ── Wire transport controls to reset/stop note scheduling, matching how
+   they already reset/stop S.nextSeqStepBeat and S.scheduled ── */
+const _origTogglePlayForNotes=togglePlay;
+togglePlay=function(){
+  const wasPlaying=S.playing;
+  _origTogglePlayForNotes();
+  if(!wasPlaying&&S.playing){
+    // Just started playing
+    resetNoteCursors();
+  } else if(wasPlaying&&!S.playing){
+    // Just stopped
+    stopAllScheduledNotes();
+  }
+};
+
+const _origRewindForNotes=rewind;
+rewind=function(){
+  _origRewindForNotes();
+  stopAllScheduledNotes();
+  if(S.playing)resetNoteCursors();
+};
+
+const _origSeekToPctForNotes=seekToPct;
+seekToPct=function(pct){
+  _origSeekToPctForNotes(pct);
+  stopAllScheduledNotes();
+  if(S.playing)resetNoteCursors();
+};
+
+const _origBpmTapForNotes=bpmTap;
+bpmTap=function(e){
+  _origBpmTapForNotes(e);
+  // Tempo just changed — re-anchor note cursors the same way bpmTap already
+  // re-anchors S.nextSeqStepBeat/S.nextMetroBeat, so notes don't drift or
+  // double-fire across the tempo change.
+  if(S.playing)resetNoteCursors();
+};
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   PIANO ROLL LOOP MODE
+   The PRD-level workflow ("finger drum a beat, then loop a melodic idea
+   under it while recording vocals") needs the Piano Roll to be able to
+   repeat its content every N bars, independent of the underlying clip's
+   length on the arrangement timeline. This adds an explicit loop toggle
+   stored on PR (not duplicated per-clip state) and a single check inside
+   scheduleMidiClipNotes's per-note loop so it folds note positions modulo
+   the loop length when active — entirely additive, the non-loop path
+   above is untouched when PR.loopBars is 0/falsy.
+═══════════════════════════════════════════════════════════════════════ */
+
+PR.loopBars=0; // 0 = off; otherwise loop every N bars of PR.BEATS_PER_BAR
+
+function prToggleLoop(btn){
+  if(PR.loopBars>0){
+    PR.loopBars=0;
+    btn.classList.remove('active');
+    toast('Piano Roll loop: off');
+  } else {
+    const maxBeat=PR.notes.reduce((m,n)=>Math.max(m,n.beat+n.len),PR.BEATS_PER_BAR);
+    PR.loopBars=Math.max(1,Math.ceil(maxBeat/PR.BEATS_PER_BAR));
+    btn.classList.add('active');
+    toast(`Piano Roll loop: ${PR.loopBars} bar${PR.loopBars>1?'s':''}`);
+  }
+}
+
+// Re-derive scheduleMidiClipNotes's per-note absolute beat to respect
+// PR.loopBars ONLY for the clip currently linked to the Piano Roll (so
+// looping the editor doesn't silently loop every other MIDI clip in the
+// project too) — done by wrapping, not editing, the function above so the
+// non-looping path for every other clip stays exactly as written.
+const _origScheduleMidiClipNotesForLoop=scheduleMidiClipNotes;
+scheduleMidiClipNotes=function(horizonBeat){
+  if(!PR.loopBars||!PR._linkedClip){
+    _origScheduleMidiClipNotesForLoop(horizonBeat);
+    return;
+  }
+  const {ti,ci}=PR._linkedClip;
+  const linkedTrack=S.tracks[ti];
+  const linkedClip=linkedTrack&&linkedTrack.clips[ci];
+  if(!linkedClip){
+    _origScheduleMidiClipNotesForLoop(horizonBeat);
+    return;
+  }
+  // Temporarily stretch just the linked clip's len to the full timeline
+  // horizon and fold note beats modulo the loop length, then restore —
+  // avoids a second parallel scheduling code path for the common case.
+  const loopLenBeats=PR.loopBars*PR.BEATS_PER_BAR;
+  const realLen=linkedClip.len;
+  const realNotes=linkedClip.notes;
+  linkedClip.len=Math.max(realLen,horizonBeat-linkedClip.start+loopLenBeats);
+  linkedClip.notes=realNotes.map(n=>{
+    const cyclesElapsed=Math.floor((secToBeat(S.sec)-linkedClip.start)/loopLenBeats);
+    return {...n,beat:n.beat+Math.max(0,cyclesElapsed)*loopLenBeats};
+  }).concat(
+    // Also schedule the next loop iteration so notes near the loop boundary
+    // are picked up by the lookahead window before the cycle counter above
+    // advances on its own.
+    realNotes.map(n=>{
+      const cyclesElapsed=Math.floor((secToBeat(S.sec)-linkedClip.start)/loopLenBeats);
+      return {...n,beat:n.beat+(Math.max(0,cyclesElapsed)+1)*loopLenBeats};
+    })
+  );
+  _origScheduleMidiClipNotesForLoop(horizonBeat);
+  linkedClip.len=realLen;
+  linkedClip.notes=realNotes;
+};
+
+/* Inject the Loop button into the Piano Roll toolbar once, right after the
+   existing Draw/Select/Erase tool buttons — reuses the existing pr-tool-btn
+   class so it's visually identical to the other toolbar buttons. */
+const _origBuildPianoForLoopBtn=buildPiano;
+buildPiano=function(el){
+  _origBuildPianoForLoopBtn(el);
+  requestAnimationFrame(()=>{
+    const toolbar=el.querySelector('.pr-toolbar');
+    if(!toolbar||toolbar.querySelector('#pr-loop-btn'))return;
+    const loopBtn=document.createElement('button');
+    loopBtn.className='pr-tool-btn'+(PR.loopBars>0?' active':'');
+    loopBtn.id='pr-loop-btn';
+    loopBtn.title='Loop this clip\'s notes every N bars during playback';
+    loopBtn.textContent=PR.loopBars>0?`↺ Loop ${PR.loopBars}`:'↺ Loop';
+    loopBtn.onclick=()=>{ prToggleLoop(loopBtn); loopBtn.textContent=PR.loopBars>0?`↺ Loop ${PR.loopBars}`:'↺ Loop'; };
+    toolbar.appendChild(loopBtn);
+  });
+};
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   PIANO ROLL QUANTIZE (notes, not just new-note placement)
+   PR.quantise already snaps newly-drawn notes via setPRQuant. This adds a
+   one-click "Quantize" action that snaps every EXISTING note's start beat
+   to the current grid — the missing half of that feature per the gap
+   analysis. Reuses PR.quantise as the single source of truth for grid size
+   so the new button and the existing draw-snap behavior can never disagree.
+═══════════════════════════════════════════════════════════════════════ */
+function prQuantizeAllNotes(){
+  if(!PR.notes.length){toast('No notes to quantize');return;}
+  const grid=PR.quantise||0.25;
+  snapshot();
+  PR.notes.forEach(n=>{ n.beat=Math.round(n.beat/grid)*grid; });
+  const col=(S.tracks[S.activeTrack]||{}).color||'#b06ef3';
+  prDrawGrid(col);prDrawVelocity(col);prDrawMinimap(col);
+  toast(`Quantized ${PR.notes.length} notes to 1/${Math.round(1/grid)}`);
+}
+const _origBuildPianoForQuantizeBtn=buildPiano;
+buildPiano=function(el){
+  _origBuildPianoForQuantizeBtn(el);
+  requestAnimationFrame(()=>{
+    const toolbar=el.querySelector('.pr-toolbar');
+    if(!toolbar||toolbar.querySelector('#pr-quant-btn'))return;
+    const qBtn=document.createElement('button');
+    qBtn.className='pr-tool-btn';
+    qBtn.id='pr-quant-btn';
+    qBtn.title='Snap every note\'s start to the current grid size';
+    qBtn.textContent='⊞ Quantize';
+    qBtn.onclick=prQuantizeAllNotes;
+    toolbar.appendChild(qBtn);
+  });
+};
+
+toast('Piano Roll now plays back in real time — Loop + Quantize added');
+
+/* ════════════════════════════════════════════════════════════════════════
+   MPC PAD PERFORMANCE RECORDING → clip.notes
+   Unifies the two note-entry paths the PRD calls for: finger-drumming on
+   the 4-pad Drums view or the 16-pad MPC/Sampler grid, while the transport
+   is playing AND a track is armed+recording, now writes real note events
+   into a clip on the active track using the exact same {midi,beat,len,vel}
+   shape the Piano Roll already reads/writes via clip.notes. That clip is
+   then double-click-openable in the Piano Roll like any other MIDI/beat
+   clip — no new clip type, no new scheduling path, no new note format.
+
+   Each pad gets a fixed MIDI note number (a GM-drum-map-flavored layout,
+   borrowed loosely from the standard GM percussion key range starting at
+   36) purely so a "pad" and a "piano roll row" mean the same physical key
+   — hitting MPC pad 1 (KICK) always lands on the same grid row as any
+   other note at that MIDI number, whether it got there by finger-drumming
+   or by drawing in the roll directly.
+
+   This section does NOT touch hitPad/hitMpcPadDown's existing playback
+   behavior (the actual sound triggered on press is unchanged) — it only
+   adds the recording side-effect, gated entirely behind S.recording &&
+   S.playing, exactly mirroring how toggleRecord() already gates its own
+   mic-capture clip creation.
+═══════════════════════════════════════════════════════════════════════ */
+
+// Fixed pad → MIDI note mapping, shared by both the 4-pad Drums view and
+// the 16-pad MPC/Sampler grid so the same physical sound always lands on
+// the same piano-roll row regardless of which panel triggered it.
+const PAD_MIDI_MAP={
+  KICK:36,SNARE:38,'HI-HAT':42,CLAP:39,'808':35,PERC:43,TOM:45,RIM:37,
+  OPEN:46,CRASH:49,RIDE:51,SHAKER:70,'FX 1':52,'FX 2':53,'FX 3':54,VOX:60,
+};
+function padIndexToMidi(i){
+  // MPC grid pads are plain 0-15 slots (not tied to a drum name) — map them
+  // straight onto the GM percussion range starting at 36, one note per pad,
+  // so every one of the 16 pads still gets a distinct, stable row.
+  return 36+i;
+}
+
+// One in-progress recording clip per armed track, keyed by track id, so a
+// multi-track-armed session records each track's own pad hits into its own
+// clip rather than merging them. Lazily created on the first pad hit after
+// recording starts, finalized (length trimmed to last-hit-plus-tail) when
+// recording stops.
+S.mpcRecClips={}; // trackId -> clip object reference (same object pushed into t.clips)
+
+function ensureMpcRecClipFor(track){
+  if(S.mpcRecClips[track.id])return S.mpcRecClips[track.id];
+  const startBeat=S._recStartBeat??secToBeat(S.sec);
+  const clip={
+    id:'mpcrec_'+Date.now()+'_'+track.id,
+    start:startBeat,
+    len:0.25, // grows as hits come in; finalized on stop
+    label:track.name+'_Beat',
+    notes:[],
+    color:'rgba(176,110,243,0.28)', // distinct from the red mic-recording placeholder color
+  };
+  track.clips.push(clip);
+  S.mpcRecClips[track.id]=clip;
+  renderTracks();
+  return clip;
+}
+
+// Records one pad hit as a note on the active track's in-progress MPC clip.
+// Quantises to S.mpcQuantise (the same grid the MPC swing/repeat features
+// already use) so a finger-drummed beat lands tight by default — matching
+// how real MPC hardware time-corrects performance recording.
+function recordMpcHit(midi,vel){
+  if(!S.recording||!S.playing)return;
+  const track=S.tracks[S.activeTrack];
+  if(!track)return;
+  // Recording a performance only makes sense on a track meant to hold notes —
+  // mirrors the existing double-click-to-open-Piano-Roll restriction so a
+  // pad hit while an audio track is active doesn't silently create an
+  // orphaned notes-bearing clip nobody can open as a piano roll.
+  if(track.type!=='midi'&&track.type!=='beat')return;
+
+  const clip=ensureMpcRecClipFor(track);
+  const nowBeat=secToBeat(readClockSec());
+  const grid=S.mpcQuantise||0.25;
+  const quantisedAbsBeat=Math.round(nowBeat/grid)*grid;
+  const clipLocalBeat=Math.max(0,quantisedAbsBeat-clip.start);
+
+  clip.notes.push({midi,beat:clipLocalBeat,len:grid,vel:vel??100});
+  // Grow the clip to cover this hit plus one grid-step of tail room, so the
+  // note's clip-relative bounds (start <= absBeat < start+len, the same
+  // check scheduleMidiClipNotes performs) stay satisfied as hits keep coming.
+  clip.len=Math.max(clip.len,clipLocalBeat+grid*2);
+
+  // If this clip is the one currently open in the Piano Roll, mirror the new
+  // note into PR.notes live so it appears in the editor immediately instead
+  // of only showing up the next time the clip is opened.
+  if(PR._linkedClip&&S.tracks[PR._linkedClip.ti]===track&&track.clips[PR._linkedClip.ci]===clip){
+    PR.notes.push({midi,beat:clipLocalBeat,len:grid,vel:vel??100});
+    const col=track.color||'#b06ef3';
+    prDrawGrid(col);prDrawVelocity(col);prDrawMinimap(col);
+  }
+
+  // Throttled redraw: a fast finger-drum run can fire many hits per second,
+  // and renderTracks() rebuilds every track's DOM — calling it on every
+  // single hit is wasteful and can visibly stutter. Coalesce into at most
+  // one redraw per animation frame instead.
+  scheduleRecLaneRedraw();
+}
+
+let _recLaneRedrawQueued=false;
+function scheduleRecLaneRedraw(){
+  if(_recLaneRedrawQueued)return;
+  _recLaneRedrawQueued=true;
+  requestAnimationFrame(()=>{ _recLaneRedrawQueued=false; renderTracks(); });
+}
+
+/* ── Wire into hitPad (4-pad Drums view) — recording side-effect only ── */
+const _origHitPadForRec=window.hitPad;
+window.hitPad=function(id,name){
+  _origHitPadForRec(id,name);
+  const midi=PAD_MIDI_MAP[name];
+  if(midi!=null)recordMpcHit(midi,100);
+};
+
+/* ── Wire into hitMpcPadDown (16-pad MPC/Sampler grid) — recording
+   side-effect only, velocity-aware (16 Levels mode already computes a
+   per-pad velocity above; we recompute the same value here so a recorded
+   note's stored velocity matches what was actually heard) ── */
+const _origHitMpcPadDownForRec=window.hitMpcPadDown;
+window.hitMpcPadDown=function(i,e){
+  _origHitMpcPadDownForRec(i,e);
+  const vel=S.mpc16Levels?Math.round(((i+1)/16)*127):
+    ((S.padBanks[S.padBank][i]&&S.padBanks[S.padBank][i].vel)??100);
+  recordMpcHit(padIndexToMidi(i),vel);
+};
+
+/* ── Finalize in-progress MPC clips when recording stops ──
+   Trims each clip's length down to its last note's end (plus a small tail)
+   instead of leaving the speculative "grow as we go" length from
+   ensureMpcRecClipFor/recordMpcHit, and clears the per-track tracking map
+   so the next recording pass starts a fresh clip rather than appending to
+   a finished one. */
+const _origToggleRecordForMpc=window.toggleRecord;
+window.toggleRecord=async function(){
+  const wasRecording=S.recording;
+  await _origToggleRecordForMpc();
+  if(wasRecording){
+    const finalizedTrackIds=[];
+    Object.entries(S.mpcRecClips).forEach(([trackId,clip])=>{
+      if(!clip.notes.length){
+        // No hits actually landed (armed but never played) — drop the
+        // speculative clip entirely rather than leaving an empty one behind.
+        const track=S.tracks.find(t=>t.id===Number(trackId));
+        if(track){
+          const idx=track.clips.indexOf(clip);
+          if(idx>=0)track.clips.splice(idx,1);
+        }
+        return;
+      }
+      const lastEnd=clip.notes.reduce((m,n)=>Math.max(m,n.beat+n.len),0);
+      clip.len=Math.max(0.25,lastEnd+0.25);
+      delete clip.color; // drop the in-progress tint, render with the track's normal clip styling
+      finalizedTrackIds.push(trackId);
+    });
+    S.mpcRecClips={};
+    if(finalizedTrackIds.length){
+      renderTracks();
+      toast(`✓ Beat recorded to ${finalizedTrackIds.length} track${finalizedTrackIds.length>1?'s':''} — double-click to edit in Piano Roll`);
+    }
+  }
+};
+
+toast('Pad performance recording wired — finger-drum while recording lands as an editable clip');
 </script>
 </body>
 </html>
