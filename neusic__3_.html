@@ -2965,7 +2965,7 @@ function openDrawer(id){
   const tb=document.getElementById('tb-'+id);if(tb)tb.classList.add('active');
   buildSidebar();
   if(id==='mixer')updateMeterAnim();else cancelMeterAnim();
-  if(id==='rec'){animateVU();initMIDIIfNeeded();}
+  if(id==='rec')animateVU();
 }
 
 function rebuildDrawer(active){
@@ -4371,13 +4371,7 @@ function init(){
   syncTimelineMetrics();
   buildOv();
   renderTracks();
-  // NOTE: intentionally NOT calling centerArrangementOnPlayhead() here.
-  // S.sec starts at a decorative placeholder value (18.45s) used for the
-  // static "currently at this position" mock display before any real
-  // playback has happened. Centering on it at load time scrolled the
-  // timeline to ~beat 37, well past where the actual demo clips live
-  // (they start at beat 0) — so the app looked empty on first open. The
-  // view should start showing the actual content, not a stale mock position.
+  centerArrangementOnPlayhead();
   drawRuler();
   posPlayhead();
   openDrawer('drums');
@@ -4468,8 +4462,7 @@ function buildMpcPadGrid(){
     return `<div class="mpc-pad${has?'':' empty'}"
       style="background:${col}${has?'22':'0d'};border-color:${col}${has?'55':'22'};"
       id="mpc-pad-${i}"
-      onmousedown="hitMpcPadDown(${i},event)" onmouseup="hitMpcPadUp(${i},event)" onmouseleave="hitMpcPadUp(${i},event)"
-      ontouchstart="hitMpcPadDown(${i},event)" ontouchend="hitMpcPadUp(${i},event)" ontouchcancel="hitMpcPadUp(${i},event)">
+      ontouchstart="hitMpcPad(${i},event)" onclick="hitMpcPad(${i},event)">
       <span class="mpc-pad-num">${S.padBank}${i+1}</span>
       <span class="mpc-pad-lbl">${has?(i+1):'—'}</span>
       ${has?`<span class="mpc-pad-vel">${asgns[i].vel}</span>`:''}
@@ -4496,13 +4489,8 @@ window.chopEqual=function(){
   },50);
 };
 
-function hitMpcPadDown(i,e){
+function hitMpcPad(i,e){
   e&&e.stopPropagation();
-  if(e&&e.cancelable)e.preventDefault(); // stop touchstart from also firing a synthesized click later
-  const pad=document.getElementById('mpc-pad-'+i);
-  if(pad&&pad._isDown)return; // already pressed (defends against duplicate down events on some browsers)
-  if(pad)pad._isDown=true;
-
   // Auto-assign if slot empty and slice exists
   if(!S.padBanks[S.padBank][i]){
     if(S.samplerSlices[i]){
@@ -4522,6 +4510,7 @@ function hitMpcPadDown(i,e){
   // Swing: even pads (2nd/4th of each beat) get a slight onset delay
   const swingDelay=(S.mpcSwing>0&&i%2===1)?beatToSec(S.mpcSwing/200*S.mpcQuantise):0;
 
+  const pad=document.getElementById('mpc-pad-'+i);
   if(pad){pad.classList.add('hit');setTimeout(()=>pad?.classList.remove('hit'),110);}
 
   const doPlay=()=>{
@@ -4533,25 +4522,14 @@ function hitMpcPadDown(i,e){
   };
   if(swingDelay>0)setTimeout(doPlay,swingDelay*1000); else doPlay();
 
-  // Note repeat: schedule additional hits while pad held. The stop condition
-  // (hitMpcPadUp, bound via onmouseup/ontouchend/onmouseleave/ontouchcancel
-  // in the pad's HTML) is now guaranteed to fire AFTER this press started,
-  // since both are tied to the same physical press-and-release gesture rather
-  // than one being bound retroactively inside a handler that itself only ran
-  // once the gesture had already completed (the previous click-based version's
-  // bug — by the time it tried to listen for mouseup, that mouseup had often
-  // already happened, so the repeat interval never stopped).
-  if(S.noteRepeat&&pad&&!pad._repeatTmr){
+  // Note repeat: schedule additional hits while pad held
+  if(S.noteRepeat&&!pad._repeatTmr){
     const intervalMs=beatToSec(S.noteRepeatRate)*1000;
     pad._repeatTmr=setInterval(doPlay,intervalMs);
+    const stopRepeat=()=>{clearInterval(pad._repeatTmr);delete pad._repeatTmr;};
+    pad.addEventListener('mouseup',stopRepeat,{once:true});
+    pad.addEventListener('touchend',stopRepeat,{once:true});
   }
-}
-
-function hitMpcPadUp(i,e){
-  const pad=document.getElementById('mpc-pad-'+i);
-  if(!pad)return;
-  pad._isDown=false;
-  if(pad._repeatTmr){clearInterval(pad._repeatTmr);delete pad._repeatTmr;}
 }
 
 function switchPadBank(bank,btn){
@@ -4898,7 +4876,7 @@ function onMidiNoteOn(midi,vel,ch){
     if(idx>=0&&pads[idx]){pads[idx].classList.add('hit');setTimeout(()=>pads[idx]?.classList.remove('hit'),100);}
     return;
   }
-  if(S.activePanel==='sampler'){const pi=(midi-48);if(pi>=0&&pi<16)hitMpcPadDown(pi,null);return;}
+  if(S.activePanel==='sampler'){const pi=(midi-48);if(pi>=0&&pi<16)hitMpcPad(pi,null);return;}
   prPlayMidiNote(midi,vel,0.4);
   if(PR._midiRec&&document.getElementById('pr-canvas')){
     snapshot();const nowBeat=secToBeat(S.sec);
@@ -4909,7 +4887,6 @@ function onMidiNoteOn(midi,vel,ch){
   }
 }
 function onMidiNoteOff(midi,ch){
-  if(S.activePanel==='sampler'){const pi=(midi-48);if(pi>=0&&pi<16){hitMpcPadUp(pi,null);return;}}
   const held=PR._heldNotes[midi];
   if(held){
     const nowBeat=secToBeat(S.sec);
@@ -4970,23 +4947,9 @@ window.buildRec=function(el){
   }
 };
 
-// Init MIDI only when the user opens the Record panel (where the MIDI
-// section actually lives), not on literally any click anywhere in the app.
-// Requesting navigator.requestMIDIAccess() as a side effect of an unrelated
-// tap (switching drum pads, opening Effects, anything) is the kind of
-// behavior that looks like a dark pattern even when unintentional — it can
-// surface a permission prompt with no context for why a music app wants to
-// enumerate connected hardware before the user has touched anything
-// MIDI-related. Scoping it to the Record panel still satisfies the browser's
-// "must originate from a user gesture" requirement for permission APIs,
-// since opening that panel IS a real click — it just needs to be the RIGHT
-// click, not any click.
+// Init MIDI on first user interaction
 let _midiReady=false;
-function initMIDIIfNeeded(){
-  if(_midiReady)return;
-  _midiReady=true;
-  initMIDI();
-}
+document.addEventListener('click',()=>{if(!_midiReady){_midiReady=true;initMIDI();}},{capture:true});
 
 
 /* ═══════════════════════════════════════════════════════════════
@@ -5534,501 +5497,754 @@ function injectSbStyles(){
   document.head.appendChild(s);
 }
 
-/* ════════════════════════════════════════════════════════════════════════
-   PIANO ROLL → REAL AUDIO PLAYBACK
-   This is the single biggest gap closed by this patch: clip.notes (drawn,
-   dragged, MIDI-recorded, and edited in the Piano Roll panel) were never
-   actually scheduled to make sound during playback — only previewed live
-   via prPlayMidiNote() while editing. Drum steps and the metronome were
-   the only things schedulerTick() advanced.
+/* ════════════════════════════════════════════════════════════════
+   PHASE 7A — MIXER: SENDS / RETURNS / LUFS / MASTER LIMITER
+════════════════════════════════════════════════════════════════ */
+Object.assign(Audio_,{
+  returnGains:{},sendGains:{},masterLimiterNode:null,
+  lufsAnalyser:null,lufsBuffer:null,lufsValue:-70,
 
-   This section adds one new function — scheduleMidiClipNotes() — that
-   walks every track's clips, reads clip.notes (per-clip, matching how
-   openClipInPianoRoll/flushPRToClip already store them), and schedules
-   each note through Audio_.trackInput(trackId) using the exact same
-   songSecToCtxTime() lookahead pattern scheduleSeqSteps() already uses.
-   That means MIDI/beat-track notes now respect that track's mute/solo/
-   FX rack/fader, instead of bypassing it the way the old live-preview-only
-   prPlayMidiNote() did (it hardcoded a connect to Audio_.master).
-
-   No existing function is duplicated or replaced — schedulerTick() gets
-   exactly one new call appended to it, and three transport functions
-   (togglePlay/rewind/seekToPct) get the same "stop + reschedule" calls
-   they already make for audio clips, just extended to also cover notes.
-═══════════════════════════════════════════════════════════════════════ */
-
-// Per-track note-scheduling cursors, mirroring S.nextSeqStepBeat's role for
-// drum steps. Keyed by track id so each MIDI/beat track advances independently
-// (a track with sparse notes shouldn't force a tighter lookahead granularity
-// on a track with dense ones — each only schedules its own next-due note).
-S.nextNoteCursor = {}; // trackId -> next beat (in CLIP-LOCAL terms is wrong;
-                        // see resetNoteCursors() — these are absolute song beats.
-
-// Currently-sounding note voices, so they can be force-stopped on pause/seek/
-// rewind exactly like S.scheduled (audio clip sources) already are. Without
-// this, pausing mid-note would let that oscillator ring out to its full
-// scheduled stop() time instead of cutting off with the rest of the mix.
-S.scheduledNoteVoices = [];
-
-function resetNoteCursors(){
-  const nowBeat=secToBeat(S.sec);
-  S.tracks.forEach(t=>{ S.nextNoteCursor[t.id]=nowBeat; });
-}
-
-function stopAllScheduledNotes(){
-  S.scheduledNoteVoices.forEach(({osc,gain})=>{
-    try{
-      const ctx=Audio_.ctx;
-      gain.gain.cancelScheduledValues(ctx.currentTime);
-      gain.gain.setTargetAtTime(0,ctx.currentTime,0.015);
-      osc.stop(ctx.currentTime+0.05);
-    }catch(e){}
-  });
-  S.scheduledNoteVoices=[];
-}
-
-// The actual voice — deliberately mirrors prPlayMidiNote's timbre (same
-// sine/saw/triangle-by-register split, same sub-oscillator for body below
-// midi 48) so a note sounds identical whether you're previewing it while
-// drawing or hearing it play back in context. The one behavioral difference
-// is required for correctness: this version takes an explicit "when" (for
-// sample-accurate scheduling) and connects through the track's real signal
-// chain via Audio_.trackInput(trackId) rather than straight to Audio_.master,
-// so per-track mute/solo/FX/fader all apply during playback like every
-// other sound source in the app already does.
-function scheduleNoteVoice(trackId,midi,vel,when,durSec){
-  const ctx=Audio_.ctx;
-  const freq=440*Math.pow(2,(midi-69)/12);
-  const gv=Math.max(0.001,(vel/127)*0.5);
-  const dest=Audio_.trackInput(trackId);
-
-  const g=ctx.createGain();
-  g.gain.setValueAtTime(0,when);
-  g.gain.linearRampToValueAtTime(gv,when+0.008);
-  g.gain.exponentialRampToValueAtTime(gv*0.55,when+0.06);
-  g.gain.exponentialRampToValueAtTime(0.0001,when+durSec);
-
-  const osc=ctx.createOscillator();
-  osc.type=midi<48?'sine':midi<72?'sawtooth':'triangle';
-  osc.frequency.value=freq;
-
-  if(midi>=48&&midi<72){
-    const lp=ctx.createBiquadFilter();lp.type='lowpass';
-    lp.frequency.setValueAtTime(freq*4,when);
-    lp.frequency.exponentialRampToValueAtTime(freq*1.5,when+durSec);
-    osc.connect(lp);lp.connect(g);
-  } else {
-    osc.connect(g);
-  }
-
-  if(midi>=48){
-    const sub=ctx.createOscillator();sub.type='sine';sub.frequency.value=freq/2;
-    const sg=ctx.createGain();sg.gain.value=0.12;
-    sub.connect(sg);sg.connect(g);
-    sub.start(when);sub.stop(when+durSec+0.05);
-  }
-
-  g.connect(dest);
-  osc.start(when);osc.stop(when+durSec+0.05);
-  S.scheduledNoteVoices.push({osc,gain:g});
-
-  // Light up the matching piano key + grid row in the UI exactly when the
-  // note actually sounds, not when it was scheduled (which can be up to
-  // LOOKAHEAD_SEC early).
-  const delayMs=Math.max(0,(when-Audio_.ctx.currentTime)*1000);
-  setTimeout(()=>{ if(S.playing) prFlashKey(midi); },delayMs);
-}
-
-// Walks every track's clips and schedules any clip.notes whose onset falls
-// within [current cursor, horizonBeat) for that track — the same lookahead
-// window scheduleSeqSteps() already uses for drum steps, so MIDI notes and
-// drum hits stay sample-locked to each other with zero drift between them.
-//
-// Notes are stored CLIP-LOCAL (n.beat is relative to the clip's own start —
-// confirmed by how the Piano Roll draws/edits them and by flushPRToClip's
-// 1:1 copy into clip.notes with no offset applied), so each note's absolute
-// song position is clip.start + n.beat. A note only sounds at all if its
-// absolute position falls inside the clip's [start, start+len) span — notes
-// dragged past the end of a since-shortened clip are silently skipped,
-// matching how an audio clip's trimmed-off tail is already not played back.
-function scheduleMidiClipNotes(horizonBeat){
-  S.tracks.forEach(t=>{
-    if(!t.clips||!t.clips.length)return;
-    const cursor=S.nextNoteCursor[t.id]??secToBeat(S.sec);
-    if(cursor>=horizonBeat){ return; } // nothing new to consider this tick
-
-    t.clips.forEach(clip=>{
-      if(!clip.notes||!clip.notes.length||clip.recording)return;
-      const clipEndBeat=clip.start+clip.len;
-
-      clip.notes.forEach(n=>{
-        const absBeat=clip.start+n.beat;
-        // Only schedule notes whose onset is in this tick's lookahead window
-        // AND at/after this track's cursor (so nothing double-schedules across
-        // ticks) AND still within the clip's own current bounds (so trimming
-        // a clip shorter correctly silences notes past the new end).
-        if(absBeat<cursor||absBeat>=horizonBeat)return;
-        if(absBeat<clip.start||absBeat>=clipEndBeat)return;
-
-        const when=songSecToCtxTime(beatToSec(absBeat));
-        if(when<Audio_.ctx.currentTime)return; // already passed, safety net
-
-        // Clamp note length so it can't run past the clip's own end — matches
-        // how an audio clip is truncated at its boundary rather than letting
-        // its source buffer play past where the clip box visually ends.
-        const maxLenBeats=Math.max(0.03,clipEndBeat-absBeat);
-        const lenBeats=Math.min(n.len||0.25,maxLenBeats);
-        const durSec=Math.max(0.04,beatToSec(lenBeats));
-
-        scheduleNoteVoice(t.id,n.midi,n.vel??100,when,durSec);
-      });
-    });
-
-    S.nextNoteCursor[t.id]=horizonBeat;
-  });
-}
-
-/* ── Wire into the real scheduler (one call appended, nothing replaced) ── */
-const _origSchedulerTickForNotes=schedulerTick;
-schedulerTick=function(){
-  if(!S.playing)return;
-  _origSchedulerTickForNotes();
-  const nowSec=readClockSec();
-  const horizon=secToBeat(nowSec+LOOKAHEAD_SEC);
-  scheduleMidiClipNotes(horizon);
-};
-
-/* ── Wire transport controls to reset/stop note scheduling, matching how
-   they already reset/stop S.nextSeqStepBeat and S.scheduled ── */
-const _origTogglePlayForNotes=togglePlay;
-togglePlay=function(){
-  const wasPlaying=S.playing;
-  _origTogglePlayForNotes();
-  if(!wasPlaying&&S.playing){
-    // Just started playing
-    resetNoteCursors();
-  } else if(wasPlaying&&!S.playing){
-    // Just stopped
-    stopAllScheduledNotes();
-  }
-};
-
-const _origRewindForNotes=rewind;
-rewind=function(){
-  _origRewindForNotes();
-  stopAllScheduledNotes();
-  if(S.playing)resetNoteCursors();
-};
-
-const _origSeekToPctForNotes=seekToPct;
-seekToPct=function(pct){
-  _origSeekToPctForNotes(pct);
-  stopAllScheduledNotes();
-  if(S.playing)resetNoteCursors();
-};
-
-const _origBpmTapForNotes=bpmTap;
-bpmTap=function(e){
-  _origBpmTapForNotes(e);
-  // Tempo just changed — re-anchor note cursors the same way bpmTap already
-  // re-anchors S.nextSeqStepBeat/S.nextMetroBeat, so notes don't drift or
-  // double-fire across the tempo change.
-  if(S.playing)resetNoteCursors();
-};
-
-
-/* ════════════════════════════════════════════════════════════════════════
-   PIANO ROLL LOOP MODE
-   The PRD-level workflow ("finger drum a beat, then loop a melodic idea
-   under it while recording vocals") needs the Piano Roll to be able to
-   repeat its content every N bars, independent of the underlying clip's
-   length on the arrangement timeline. This adds an explicit loop toggle
-   stored on PR (not duplicated per-clip state) and a single check inside
-   scheduleMidiClipNotes's per-note loop so it folds note positions modulo
-   the loop length when active — entirely additive, the non-loop path
-   above is untouched when PR.loopBars is 0/falsy.
-═══════════════════════════════════════════════════════════════════════ */
-
-PR.loopBars=0; // 0 = off; otherwise loop every N bars of PR.BEATS_PER_BAR
-
-function prToggleLoop(btn){
-  if(PR.loopBars>0){
-    PR.loopBars=0;
-    btn.classList.remove('active');
-    toast('Piano Roll loop: off');
-  } else {
-    const maxBeat=PR.notes.reduce((m,n)=>Math.max(m,n.beat+n.len),PR.BEATS_PER_BAR);
-    PR.loopBars=Math.max(1,Math.ceil(maxBeat/PR.BEATS_PER_BAR));
-    btn.classList.add('active');
-    toast(`Piano Roll loop: ${PR.loopBars} bar${PR.loopBars>1?'s':''}`);
-  }
-}
-
-// Re-derive scheduleMidiClipNotes's per-note absolute beat to respect
-// PR.loopBars ONLY for the clip currently linked to the Piano Roll (so
-// looping the editor doesn't silently loop every other MIDI clip in the
-// project too) — done by wrapping, not editing, the function above so the
-// non-looping path for every other clip stays exactly as written.
-const _origScheduleMidiClipNotesForLoop=scheduleMidiClipNotes;
-scheduleMidiClipNotes=function(horizonBeat){
-  if(!PR.loopBars||!PR._linkedClip){
-    _origScheduleMidiClipNotesForLoop(horizonBeat);
-    return;
-  }
-  const {ti,ci}=PR._linkedClip;
-  const linkedTrack=S.tracks[ti];
-  const linkedClip=linkedTrack&&linkedTrack.clips[ci];
-  if(!linkedClip){
-    _origScheduleMidiClipNotesForLoop(horizonBeat);
-    return;
-  }
-  // Temporarily stretch just the linked clip's len to the full timeline
-  // horizon and fold note beats modulo the loop length, then restore —
-  // avoids a second parallel scheduling code path for the common case.
-  const loopLenBeats=PR.loopBars*PR.BEATS_PER_BAR;
-  const realLen=linkedClip.len;
-  const realNotes=linkedClip.notes;
-  linkedClip.len=Math.max(realLen,horizonBeat-linkedClip.start+loopLenBeats);
-  linkedClip.notes=realNotes.map(n=>{
-    const cyclesElapsed=Math.floor((secToBeat(S.sec)-linkedClip.start)/loopLenBeats);
-    return {...n,beat:n.beat+Math.max(0,cyclesElapsed)*loopLenBeats};
-  }).concat(
-    // Also schedule the next loop iteration so notes near the loop boundary
-    // are picked up by the lookahead window before the cycle counter above
-    // advances on its own.
-    realNotes.map(n=>{
-      const cyclesElapsed=Math.floor((secToBeat(S.sec)-linkedClip.start)/loopLenBeats);
-      return {...n,beat:n.beat+(Math.max(0,cyclesElapsed)+1)*loopLenBeats};
-    })
-  );
-  _origScheduleMidiClipNotesForLoop(horizonBeat);
-  linkedClip.len=realLen;
-  linkedClip.notes=realNotes;
-};
-
-/* Inject the Loop button into the Piano Roll toolbar once, right after the
-   existing Draw/Select/Erase tool buttons — reuses the existing pr-tool-btn
-   class so it's visually identical to the other toolbar buttons. */
-const _origBuildPianoForLoopBtn=buildPiano;
-buildPiano=function(el){
-  _origBuildPianoForLoopBtn(el);
-  requestAnimationFrame(()=>{
-    const toolbar=el.querySelector('.pr-toolbar');
-    if(!toolbar||toolbar.querySelector('#pr-loop-btn'))return;
-    const loopBtn=document.createElement('button');
-    loopBtn.className='pr-tool-btn'+(PR.loopBars>0?' active':'');
-    loopBtn.id='pr-loop-btn';
-    loopBtn.title='Loop this clip\'s notes every N bars during playback';
-    loopBtn.textContent=PR.loopBars>0?`↺ Loop ${PR.loopBars}`:'↺ Loop';
-    loopBtn.onclick=()=>{ prToggleLoop(loopBtn); loopBtn.textContent=PR.loopBars>0?`↺ Loop ${PR.loopBars}`:'↺ Loop'; };
-    toolbar.appendChild(loopBtn);
-  });
-};
-
-
-/* ════════════════════════════════════════════════════════════════════════
-   PIANO ROLL QUANTIZE (notes, not just new-note placement)
-   PR.quantise already snaps newly-drawn notes via setPRQuant. This adds a
-   one-click "Quantize" action that snaps every EXISTING note's start beat
-   to the current grid — the missing half of that feature per the gap
-   analysis. Reuses PR.quantise as the single source of truth for grid size
-   so the new button and the existing draw-snap behavior can never disagree.
-═══════════════════════════════════════════════════════════════════════ */
-function prQuantizeAllNotes(){
-  if(!PR.notes.length){toast('No notes to quantize');return;}
-  const grid=PR.quantise||0.25;
-  snapshot();
-  PR.notes.forEach(n=>{ n.beat=Math.round(n.beat/grid)*grid; });
-  const col=(S.tracks[S.activeTrack]||{}).color||'#b06ef3';
-  prDrawGrid(col);prDrawVelocity(col);prDrawMinimap(col);
-  toast(`Quantized ${PR.notes.length} notes to 1/${Math.round(1/grid)}`);
-}
-const _origBuildPianoForQuantizeBtn=buildPiano;
-buildPiano=function(el){
-  _origBuildPianoForQuantizeBtn(el);
-  requestAnimationFrame(()=>{
-    const toolbar=el.querySelector('.pr-toolbar');
-    if(!toolbar||toolbar.querySelector('#pr-quant-btn'))return;
-    const qBtn=document.createElement('button');
-    qBtn.className='pr-tool-btn';
-    qBtn.id='pr-quant-btn';
-    qBtn.title='Snap every note\'s start to the current grid size';
-    qBtn.textContent='⊞ Quantize';
-    qBtn.onclick=prQuantizeAllNotes;
-    toolbar.appendChild(qBtn);
-  });
-};
-
-toast('Piano Roll now plays back in real time — Loop + Quantize added');
-
-/* ════════════════════════════════════════════════════════════════════════
-   MPC PAD PERFORMANCE RECORDING → clip.notes
-   Unifies the two note-entry paths the PRD calls for: finger-drumming on
-   the 4-pad Drums view or the 16-pad MPC/Sampler grid, while the transport
-   is playing AND a track is armed+recording, now writes real note events
-   into a clip on the active track using the exact same {midi,beat,len,vel}
-   shape the Piano Roll already reads/writes via clip.notes. That clip is
-   then double-click-openable in the Piano Roll like any other MIDI/beat
-   clip — no new clip type, no new scheduling path, no new note format.
-
-   Each pad gets a fixed MIDI note number (a GM-drum-map-flavored layout,
-   borrowed loosely from the standard GM percussion key range starting at
-   36) purely so a "pad" and a "piano roll row" mean the same physical key
-   — hitting MPC pad 1 (KICK) always lands on the same grid row as any
-   other note at that MIDI number, whether it got there by finger-drumming
-   or by drawing in the roll directly.
-
-   This section does NOT touch hitPad/hitMpcPadDown's existing playback
-   behavior (the actual sound triggered on press is unchanged) — it only
-   adds the recording side-effect, gated entirely behind S.recording &&
-   S.playing, exactly mirroring how toggleRecord() already gates its own
-   mic-capture clip creation.
-═══════════════════════════════════════════════════════════════════════ */
-
-// Fixed pad → MIDI note mapping, shared by both the 4-pad Drums view and
-// the 16-pad MPC/Sampler grid so the same physical sound always lands on
-// the same piano-roll row regardless of which panel triggered it.
-const PAD_MIDI_MAP={
-  KICK:36,SNARE:38,'HI-HAT':42,CLAP:39,'808':35,PERC:43,TOM:45,RIM:37,
-  OPEN:46,CRASH:49,RIDE:51,SHAKER:70,'FX 1':52,'FX 2':53,'FX 3':54,VOX:60,
-};
-function padIndexToMidi(i){
-  // MPC grid pads are plain 0-15 slots (not tied to a drum name) — map them
-  // straight onto the GM percussion range starting at 36, one note per pad,
-  // so every one of the 16 pads still gets a distinct, stable row.
-  return 36+i;
-}
-
-// One in-progress recording clip per armed track, keyed by track id, so a
-// multi-track-armed session records each track's own pad hits into its own
-// clip rather than merging them. Lazily created on the first pad hit after
-// recording starts, finalized (length trimmed to last-hit-plus-tail) when
-// recording stops.
-S.mpcRecClips={}; // trackId -> clip object reference (same object pushed into t.clips)
-
-function ensureMpcRecClipFor(track){
-  if(S.mpcRecClips[track.id])return S.mpcRecClips[track.id];
-  const startBeat=S._recStartBeat??secToBeat(S.sec);
-  const clip={
-    id:'mpcrec_'+Date.now()+'_'+track.id,
-    start:startBeat,
-    len:0.25, // grows as hits come in; finalized on stop
-    label:track.name+'_Beat',
-    notes:[],
-    color:'rgba(176,110,243,0.28)', // distinct from the red mic-recording placeholder color
-  };
-  track.clips.push(clip);
-  S.mpcRecClips[track.id]=clip;
-  renderTracks();
-  return clip;
-}
-
-// Records one pad hit as a note on the active track's in-progress MPC clip.
-// Quantises to S.mpcQuantise (the same grid the MPC swing/repeat features
-// already use) so a finger-drummed beat lands tight by default — matching
-// how real MPC hardware time-corrects performance recording.
-function recordMpcHit(midi,vel){
-  if(!S.recording||!S.playing)return;
-  const track=S.tracks[S.activeTrack];
-  if(!track)return;
-  // Recording a performance only makes sense on a track meant to hold notes —
-  // mirrors the existing double-click-to-open-Piano-Roll restriction so a
-  // pad hit while an audio track is active doesn't silently create an
-  // orphaned notes-bearing clip nobody can open as a piano roll.
-  if(track.type!=='midi'&&track.type!=='beat')return;
-
-  const clip=ensureMpcRecClipFor(track);
-  const nowBeat=secToBeat(readClockSec());
-  const grid=S.mpcQuantise||0.25;
-  const quantisedAbsBeat=Math.round(nowBeat/grid)*grid;
-  const clipLocalBeat=Math.max(0,quantisedAbsBeat-clip.start);
-
-  clip.notes.push({midi,beat:clipLocalBeat,len:grid,vel:vel??100});
-  // Grow the clip to cover this hit plus one grid-step of tail room, so the
-  // note's clip-relative bounds (start <= absBeat < start+len, the same
-  // check scheduleMidiClipNotes performs) stay satisfied as hits keep coming.
-  clip.len=Math.max(clip.len,clipLocalBeat+grid*2);
-
-  // If this clip is the one currently open in the Piano Roll, mirror the new
-  // note into PR.notes live so it appears in the editor immediately instead
-  // of only showing up the next time the clip is opened.
-  if(PR._linkedClip&&S.tracks[PR._linkedClip.ti]===track&&track.clips[PR._linkedClip.ci]===clip){
-    PR.notes.push({midi,beat:clipLocalBeat,len:grid,vel:vel??100});
-    const col=track.color||'#b06ef3';
-    prDrawGrid(col);prDrawVelocity(col);prDrawMinimap(col);
-  }
-
-  // Throttled redraw: a fast finger-drum run can fire many hits per second,
-  // and renderTracks() rebuilds every track's DOM — calling it on every
-  // single hit is wasteful and can visibly stutter. Coalesce into at most
-  // one redraw per animation frame instead.
-  scheduleRecLaneRedraw();
-}
-
-let _recLaneRedrawQueued=false;
-function scheduleRecLaneRedraw(){
-  if(_recLaneRedrawQueued)return;
-  _recLaneRedrawQueued=true;
-  requestAnimationFrame(()=>{ _recLaneRedrawQueued=false; renderTracks(); });
-}
-
-/* ── Wire into hitPad (4-pad Drums view) — recording side-effect only ── */
-const _origHitPadForRec=window.hitPad;
-window.hitPad=function(id,name){
-  _origHitPadForRec(id,name);
-  const midi=PAD_MIDI_MAP[name];
-  if(midi!=null)recordMpcHit(midi,100);
-};
-
-/* ── Wire into hitMpcPadDown (16-pad MPC/Sampler grid) — recording
-   side-effect only, velocity-aware (16 Levels mode already computes a
-   per-pad velocity above; we recompute the same value here so a recorded
-   note's stored velocity matches what was actually heard) ── */
-const _origHitMpcPadDownForRec=window.hitMpcPadDown;
-window.hitMpcPadDown=function(i,e){
-  _origHitMpcPadDownForRec(i,e);
-  const vel=S.mpc16Levels?Math.round(((i+1)/16)*127):
-    ((S.padBanks[S.padBank][i]&&S.padBanks[S.padBank][i].vel)??100);
-  recordMpcHit(padIndexToMidi(i),vel);
-};
-
-/* ── Finalize in-progress MPC clips when recording stops ──
-   Trims each clip's length down to its last note's end (plus a small tail)
-   instead of leaving the speculative "grow as we go" length from
-   ensureMpcRecClipFor/recordMpcHit, and clears the per-track tracking map
-   so the next recording pass starts a fresh clip rather than appending to
-   a finished one. */
-const _origToggleRecordForMpc=window.toggleRecord;
-window.toggleRecord=async function(){
-  const wasRecording=S.recording;
-  await _origToggleRecordForMpc();
-  if(wasRecording){
-    const finalizedTrackIds=[];
-    Object.entries(S.mpcRecClips).forEach(([trackId,clip])=>{
-      if(!clip.notes.length){
-        // No hits actually landed (armed but never played) — drop the
-        // speculative clip entirely rather than leaving an empty one behind.
-        const track=S.tracks.find(t=>t.id===Number(trackId));
-        if(track){
-          const idx=track.clips.indexOf(clip);
-          if(idx>=0)track.clips.splice(idx,1);
-        }
-        return;
-      }
-      const lastEnd=clip.notes.reduce((m,n)=>Math.max(m,n.beat+n.len),0);
-      clip.len=Math.max(0.25,lastEnd+0.25);
-      delete clip.color; // drop the in-progress tint, render with the track's normal clip styling
-      finalizedTrackIds.push(trackId);
-    });
-    S.mpcRecClips={};
-    if(finalizedTrackIds.length){
-      renderTracks();
-      toast(`✓ Beat recorded to ${finalizedTrackIds.length} track${finalizedTrackIds.length>1?'s':''} — double-click to edit in Piano Roll`);
+  ensureReturn(retId){
+    this.ensure();
+    if(!this.returnGains[retId]){
+      const g=this.ctx.createGain();g.gain.value=0.85;
+      g.connect(this.masterLimiter());
+      this.returnGains[retId]=g;
     }
-  }
+    return this.returnGains[retId];
+  },
+  ensureSend(trackId,retId){
+    trackId=Number(trackId);this.ensure();
+    if(!this.sendGains[trackId])this.sendGains[trackId]={};
+    if(!this.sendGains[trackId][retId]){
+      const g=this.ctx.createGain();g.gain.value=0;
+      this.ensureTrackGain(trackId).connect(g);
+      g.connect(this.ensureReturn(retId));
+      this.sendGains[trackId][retId]=g;
+    }
+    return this.sendGains[trackId][retId];
+  },
+  setSend(trackId,retId,val){
+    this.ensureSend(trackId,retId).gain.setTargetAtTime(Math.max(0,Math.min(1,val)),this.ctx.currentTime,0.01);
+    if(!S.sends[trackId])S.sends[trackId]={};
+    S.sends[trackId][retId]=val;
+  },
+  masterLimiter(){
+    this.ensure();
+    if(!this.masterLimiterNode){
+      const comp=this.ctx.createDynamicsCompressor();
+      comp.threshold.value=-1;comp.knee.value=0;comp.ratio.value=20;
+      comp.attack.value=0.001;comp.release.value=0.05;
+      comp.connect(this.masterAnalyserLUFS());
+      this.masterLimiterNode=comp;
+      this.master.disconnect();this.master.connect(comp);
+    }
+    return this.masterLimiterNode;
+  },
+  masterAnalyserLUFS(){
+    this.ensure();
+    if(!this.lufsAnalyser){
+      const a=this.ctx.createAnalyser();a.fftSize=4096;
+      a.connect(this.ctx.destination);
+      this.lufsAnalyser=a;this.lufsBuffer=new Float32Array(a.fftSize);
+    }
+    return this.lufsAnalyser;
+  },
+  readLUFS(){
+    if(!this.lufsAnalyser)return -70;
+    this.lufsAnalyser.getFloatTimeDomainData(this.lufsBuffer);
+    let sum=0;for(let i=0;i<this.lufsBuffer.length;i++)sum+=this.lufsBuffer[i]**2;
+    const rms=Math.sqrt(sum/this.lufsBuffer.length);
+    const lufs=rms>0?20*Math.log10(rms)-0.691:-70;
+    this.lufsValue=this.lufsValue*0.92+lufs*0.08;
+    return Math.max(-70,Math.min(0,this.lufsValue));
+  },
+  setStereoWidth(val){
+    this.ensure();
+    if(!this._splitter){
+      const sp=this.ctx.createChannelSplitter(2);
+      const mg=this.ctx.createGain();const sg=this.ctx.createGain();
+      const merger=this.ctx.createChannelMerger(2);
+      this.master.disconnect();this.master.connect(sp);
+      sp.connect(mg,0);sp.connect(mg,1);sp.connect(sg,0);sp.connect(sg,1);
+      mg.connect(merger,0,0);mg.connect(merger,0,1);
+      sg.connect(merger,0,0);sg.connect(merger,0,1);
+      merger.connect(this.masterLimiter());
+      this._splitter={sp,mg,sg,merger};
+    }
+    const mid=1-Math.max(0,val-1);const side=Math.min(1,val);
+    this._splitter.mg.gain.value=mid;this._splitter.sg.gain.value=side;
+    S.stereoWidth=val;
+  },
+});
+
+Object.assign(S,{
+  sends:{},
+  returns:{
+    A:{name:'Reverb A',color:'#a78bfa',on:true},
+    B:{name:'Delay B', color:'#60a5fa',on:true},
+    C:{name:'Room C',  color:'#34d399',on:false},
+  },
+  limiterOn:true,stereoWidth:1.0,lufsTarget:-14,
+});
+
+window.buildMixer=function(el){
+  Audio_.ensure();Audio_.masterLimiter();
+  const tracks=S.tracks;const masterIdx=tracks.length;
+  const retIds=Object.keys(S.returns);
+
+  el.innerHTML=`<div class="pmx-wrap">
+    <div class="pmx-strips" id="pmx-strips">
+      ${tracks.map((t,i)=>{
+        const vol=(S.trackVol[t.id]??0.85);
+        return `<div class="pmx-ch" data-ti="${i}" data-tid="${t.id}">
+          <div class="pmx-ch-label" style="background:${t.color}22;border-top:2px solid ${t.color};">
+            <span class="pmx-ch-icon">${t.icon}</span><span class="pmx-ch-name">${t.name}</span>
+          </div>
+          <div class="pmx-sends">
+            ${retIds.map(rid=>!S.returns[rid].on?'':`
+              <div class="pmx-send-row">
+                <span class="pmx-send-lbl" style="color:${S.returns[rid].color}">${rid}</span>
+                <div class="pmx-send-knob-wrap"><canvas class="pmx-send-knob" width="28" height="28"
+                  data-tid="${t.id}" data-ret="${rid}" data-val="${S.sends[t.id]?.[rid]??0}"></canvas></div>
+                <span class="pmx-send-val" id="sv-${t.id}-${rid}">${Math.round((S.sends[t.id]?.[rid]??0)*100)}%</span>
+              </div>`).join('')}
+          </div>
+          <div class="pmx-pan-row">
+            <span class="pmx-pan-lbl">PAN</span>
+            <input type="range" class="pmx-pan" min="-100" max="100" value="0" data-tid="${t.id}" oninput="onPanChange(this)">
+          </div>
+          <div class="pmx-fader-zone">
+            <div class="pmx-meter-col">
+              <div class="pmx-meter-bar"><div class="pmx-meter-fill" id="pmf-${i}" style="background:${t.color}"></div></div>
+              <div class="pmx-meter-bar"><div class="pmx-meter-fill" id="pmf-${i}r" style="background:${t.color}"></div></div>
+            </div>
+            <div class="pmx-fader-col">
+              <div class="pmx-fader-track"><div class="pmx-fader-groove"></div>
+                <div class="pmx-thumb" id="pmth-${i}" style="top:${Math.round((1-vol)*86)}%" data-ti="${i}" data-tid="${t.id}"></div>
+              </div>
+              <div class="pmx-db" id="pmdb-${i}">${volToDb(vol)}</div>
+            </div>
+          </div>
+          <div class="pmx-ms">
+            <button class="pmx-ms-btn${t.m?' active red':''}" onclick="toggleM(${i})">M</button>
+            <button class="pmx-ms-btn${t.s?' active yel':''}" onclick="toggleS(${i})">S</button>
+          </div>
+        </div>`;
+      }).join('')}
+      <div class="pmx-ch pmx-master">
+        <div class="pmx-ch-label" style="background:#22c55e22;border-top:2px solid #22c55e;">
+          <span class="pmx-ch-icon">M</span><span class="pmx-ch-name">Master</span>
+        </div>
+        <div class="pmx-sends" style="min-height:20px;"></div>
+        <div style="display:flex;align-items:center;gap:5px;padding:3px 0;">
+          <button class="pmx-ms-btn${S.limiterOn?' active grn':''}" id="limiter-btn"
+            onclick="toggleLimiter(this)" style="font-size:9px;padding:2px 5px;border-radius:4px;">LIM</button>
+          <span style="font-size:9px;color:var(--txt2);">−1 dBFS</span>
+        </div>
+        <div class="pmx-pan-row">
+          <span class="pmx-pan-lbl">WIDTH</span>
+          <input type="range" class="pmx-pan" min="0" max="200" value="${Math.round(S.stereoWidth*100)}"
+            oninput="Audio_.setStereoWidth(this.value/100);document.getElementById('width-val').textContent=this.value+'%'">
+        </div>
+        <div class="pmx-fader-zone">
+          <div class="pmx-meter-col">
+            <div class="pmx-meter-bar"><div class="pmx-meter-fill" id="pmf-${masterIdx}" style="background:#22c55e"></div></div>
+            <div class="pmx-meter-bar"><div class="pmx-meter-fill" id="pmf-${masterIdx}r" style="background:#22c55e"></div></div>
+          </div>
+          <div class="pmx-fader-col">
+            <div class="pmx-fader-track"><div class="pmx-fader-groove"></div>
+              <div class="pmx-thumb" id="pmth-${masterIdx}" style="top:${Math.round((1-S.masterVol)*86)}%" data-is-master="true"></div>
+            </div>
+            <div class="pmx-db" id="pmdb-${masterIdx}">${volToDb(S.masterVol)}</div>
+          </div>
+        </div>
+        <div class="pmx-ms"><span id="width-val" style="font-size:9px;color:var(--txt2);">${Math.round(S.stereoWidth*100)}%</span></div>
+      </div>
+    </div>
+    <div class="pmx-returns">
+      <div class="pmx-ret-title">Return Buses</div>
+      ${retIds.map(rid=>{const r=S.returns[rid];return `
+        <div class="pmx-ret-bus${r.on?'':' pmx-ret-off'}" id="ret-${rid}">
+          <div class="pmx-ret-hdr" style="border-left:3px solid ${r.color};">
+            <span style="color:${r.color};font-size:10px;font-weight:700;">${rid}</span>
+            <span class="pmx-ret-name">${r.name}</span>
+            <button class="pmx-ms-btn${r.on?' active grn':''}" onclick="toggleReturn('${rid}',this)">${r.on?'ON':'OFF'}</button>
+          </div>
+          <div class="pmx-ret-meter"><div class="pmx-ret-fill" id="ret-fill-${rid}" style="background:${r.color}"></div></div>
+        </div>`;}).join('')}
+    </div>
+    <div class="pmx-lufs-row">
+      <div class="pmx-lufs-block"><div class="pmx-lufs-lbl">LUFS</div><div class="pmx-lufs-val" id="lufs-val">—</div>
+        <div class="pmx-lufs-target">target <strong>${S.lufsTarget}</strong></div></div>
+      <div class="pmx-lufs-block"><div class="pmx-lufs-lbl">PEAK</div><div class="pmx-lufs-val" id="peak-val" style="color:var(--grn)">—</div>
+        <div class="pmx-lufs-target">dBFS</div></div>
+      <div class="pmx-lufs-block" style="flex:1;"><canvas id="lufs-meter" height="22" style="width:100%;display:block;border-radius:4px;"></canvas>
+        <div style="font-size:9px;color:var(--txt2);margin-top:3px;text-align:center;">Integrated loudness</div></div>
+      <div class="pmx-lufs-block"><button class="chop-btn sec" style="padding:4px 9px;font-size:10px;" onclick="autoGain()">Auto Gain</button></div>
+    </div>
+  </div>`;
+
+  setupProFaderDrags();drawSendKnobs();startProMeterAnim();
+  tracks.forEach(t=>{retIds.forEach(rid=>{if(S.sends[t.id]?.[rid]!=null)Audio_.setSend(t.id,rid,S.sends[t.id][rid]);});});
 };
 
-toast('Pad performance recording wired — finger-drum while recording lands as an editable clip');
+function volToDb(v){if(v<=0)return '-∞';const db=20*Math.log10(v);return (db>=0?'+':'')+db.toFixed(1)+' dB';}
+function onPanChange(el){
+  const tid=Number(el.dataset.tid);const pan=el.value/100;Audio_.ensure();
+  Audio_.ensureTrackPanner(tid).pan.setTargetAtTime(pan,Audio_.ctx.currentTime,0.01);
+}
+function toggleLimiter(btn){
+  S.limiterOn=!S.limiterOn;btn.classList.toggle('active',S.limiterOn);btn.classList.toggle('grn',S.limiterOn);
+  if(Audio_.masterLimiterNode)Audio_.masterLimiterNode.ratio.value=S.limiterOn?20:1;
+  toast(S.limiterOn?'Master limiter ON':'Master limiter OFF');
+}
+function toggleReturn(rid,btn){
+  S.returns[rid].on=!S.returns[rid].on;
+  btn.classList.toggle('active',S.returns[rid].on);btn.classList.toggle('grn',S.returns[rid].on);
+  btn.textContent=S.returns[rid].on?'ON':'OFF';
+  document.getElementById('ret-'+rid)?.classList.toggle('pmx-ret-off',!S.returns[rid].on);
+  toast(`Return ${rid}: ${S.returns[rid].on?'on':'off'}`);
+}
+function drawSendKnobs(){
+  document.querySelectorAll('.pmx-send-knob').forEach(cvs=>{
+    const val=parseFloat(cvs.dataset.val)||0;
+    const ctx=cvs.getContext('2d'),w=cvs.width,h=cvs.height,cx=w/2,cy=h/2+2,r=10;
+    ctx.clearRect(0,0,w,h);
+    ctx.beginPath();ctx.arc(cx,cy,r,-0.75*Math.PI,0.75*Math.PI);
+    ctx.strokeStyle='rgba(255,255,255,0.12)';ctx.lineWidth=3;ctx.stroke();
+    const angle=-0.75*Math.PI+val*1.5*Math.PI;
+    ctx.beginPath();ctx.arc(cx,cy,r,-0.75*Math.PI,angle);
+    ctx.strokeStyle=S.returns[cvs.dataset.ret]?.color||'var(--acc)';ctx.lineWidth=3;ctx.stroke();
+    const dx=cx+r*Math.cos(angle),dy=cy+r*Math.sin(angle);
+    ctx.beginPath();ctx.arc(dx,dy,2.5,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();
+    if(!cvs._wired){
+      cvs._wired=true;let startY,startVal;
+      const onDown=e=>{
+        startY=e.touches?e.touches[0].clientY:e.clientY;startVal=parseFloat(cvs.dataset.val)||0;
+        const onMove=ev=>{
+          const cy2=ev.touches?ev.touches[0].clientY:ev.clientY;
+          const newVal=Math.max(0,Math.min(1,startVal-(cy2-startY)/80));
+          cvs.dataset.val=newVal;Audio_.setSend(Number(cvs.dataset.tid),cvs.dataset.ret,newVal);
+          const lbl=document.getElementById(`sv-${cvs.dataset.tid}-${cvs.dataset.ret}`);
+          if(lbl)lbl.textContent=Math.round(newVal*100)+'%';
+          drawSendKnobs();
+        };
+        const onUp=()=>{
+          window.removeEventListener('mousemove',onMove);window.removeEventListener('mouseup',onUp);
+          window.removeEventListener('touchmove',onMove);window.removeEventListener('touchend',onUp);
+        };
+        window.addEventListener('mousemove',onMove);window.addEventListener('mouseup',onUp);
+        window.addEventListener('touchmove',onMove,{passive:true});window.addEventListener('touchend',onUp);
+      };
+      cvs.addEventListener('mousedown',onDown);cvs.addEventListener('touchstart',onDown,{passive:true});
+    }
+  });
+}
+function setupProFaderDrags(){
+  document.querySelectorAll('.pmx-thumb').forEach(thumb=>{
+    const ti=thumb.dataset.ti!=null?parseInt(thumb.dataset.ti,10):-1;
+    const tid=thumb.dataset.tid!=null?Number(thumb.dataset.tid):null;
+    const isMaster=thumb.dataset.isMaster==='true';
+    const onDown=e=>{
+      e.stopPropagation();
+      const sy=e.touches?e.touches[0].clientY:e.clientY;const st=parseFloat(thumb.style.top)||0;
+      const onMove=ev=>{
+        const cy=ev.touches?ev.touches[0].clientY:ev.clientY;
+        const nt=Math.max(0,Math.min(86,st+(cy-sy)));thumb.style.top=nt+'%';
+        const g=Math.max(0,Math.min(1,(100-nt)/100));
+        if(isMaster){Audio_.setMasterVol(g);const db=document.getElementById('pmdb-'+S.tracks.length);if(db)db.textContent=volToDb(g);}
+        else{Audio_.setTrackFader(tid,g);const db=document.getElementById('pmdb-'+ti);if(db)db.textContent=volToDb(g);}
+      };
+      const onUp=()=>{
+        window.removeEventListener('mousemove',onMove);window.removeEventListener('mouseup',onUp);
+        window.removeEventListener('touchmove',onMove);window.removeEventListener('touchend',onUp);
+      };
+      window.addEventListener('mousemove',onMove);window.addEventListener('mouseup',onUp);
+      window.addEventListener('touchmove',onMove,{passive:true});window.addEventListener('touchend',onUp);
+    };
+    thumb.addEventListener('mousedown',onDown);thumb.addEventListener('touchstart',onDown,{passive:true});
+  });
+}
+let _proMeterRaf;
+function startProMeterAnim(){
+  cancelAnimationFrame(_proMeterRaf);
+  if(S.activePanel!=='mixer')return;
+  function tick(){
+    if(S.activePanel!=='mixer'){cancelAnimationFrame(_proMeterRaf);return;}
+    const masterIdx=S.tracks.length;
+    S.tracks.forEach((t,i)=>{
+      const a=S.playing?Audio_.ensureTrackAnalyser(t.id):null;
+      const lvl=a?Audio_.readLevel(a):0;const pct=Math.min(100,Math.max(0,lvl*200));
+      const lFill=document.getElementById('pmf-'+i);const rFill=document.getElementById('pmf-'+i+'r');
+      if(lFill){lFill.style.height=pct+'%';lFill.style.background=pct>85?'var(--red)':pct>70?'var(--yel)':t.color;}
+      if(rFill)rFill.style.height=Math.max(0,pct-5+Math.random()*8)+'%';
+    });
+    const masterLvl=S.playing?Audio_.readLevel(Audio_.ensureMasterAnalyser()):0;
+    const masterPct=Math.min(100,masterLvl*200);
+    const mf=document.getElementById('pmf-'+masterIdx);const mfr=document.getElementById('pmf-'+masterIdx+'r');
+    if(mf){mf.style.height=masterPct+'%';mf.style.background=masterPct>85?'var(--red)':masterPct>70?'var(--yel)':'#22c55e';}
+    if(mfr)mfr.style.height=Math.max(0,masterPct-3+Math.random()*6)+'%';
+    const lufs=Audio_.readLUFS();
+    const lufsEl=document.getElementById('lufs-val');
+    if(lufsEl){lufsEl.textContent=lufs.toFixed(1)+' LU';lufsEl.style.color=lufs>S.lufsTarget+3?'var(--red)':lufs>S.lufsTarget-1?'var(--yel)':'var(--grn)';}
+    const peakEl=document.getElementById('peak-val');
+    if(peakEl){const peak=Math.max(-70,20*Math.log10(Math.max(0.000001,masterLvl)));peakEl.textContent=peak.toFixed(1)+' dB';peakEl.style.color=peak>-1?'var(--red)':peak>-6?'var(--yel)':'var(--grn)';}
+    const mc=document.getElementById('lufs-meter');
+    if(mc){
+      mc.width=mc.offsetWidth||200;
+      const mctx=mc.getContext('2d'),mw=mc.width,mh=mc.height;
+      const pct=Math.max(0,Math.min(1,(lufs+70)/70));
+      mctx.clearRect(0,0,mw,mh);
+      const grad=mctx.createLinearGradient(0,0,mw,0);
+      grad.addColorStop(0,'#22c55e');grad.addColorStop(0.7,'#fbbf24');grad.addColorStop(1,'#f87171');
+      mctx.fillStyle='rgba(255,255,255,0.06)';mctx.fillRect(0,0,mw,mh);
+      mctx.fillStyle=grad;mctx.fillRect(0,2,pct*mw,mh-4);
+      const tx=((S.lufsTarget+70)/70)*mw;
+      mctx.strokeStyle='rgba(255,255,255,0.5)';mctx.lineWidth=1;
+      mctx.setLineDash([2,2]);mctx.beginPath();mctx.moveTo(tx,0);mctx.lineTo(tx,mh);mctx.stroke();mctx.setLineDash([]);
+    }
+    Object.keys(S.returns).forEach(rid=>{
+      if(!S.returns[rid].on)return;
+      const rg=Audio_.returnGains[rid];if(!rg)return;
+      const fill=document.getElementById('ret-fill-'+rid);if(fill)fill.style.width=(masterLvl*150)+'%';
+    });
+    _proMeterRaf=requestAnimationFrame(tick);
+  }
+  _proMeterRaf=requestAnimationFrame(tick);
+}
+function autoGain(){
+  const lufs=Audio_.readLUFS();
+  if(lufs<-65){toast('Play audio to measure before Auto Gain');return;}
+  const diff=S.lufsTarget-lufs;
+  const newVol=Math.max(0.1,Math.min(1.5,S.masterVol*Math.pow(10,diff/20)));
+  Audio_.setMasterVol(newVol);S.masterVol=newVol;
+  toast(`Auto Gain: ${diff>0?'+':''}${diff.toFixed(1)} LU → master ${volToDb(newVol)}`);
+}
+if(!document.getElementById('pmx-style')){
+  const s=document.createElement('style');s.id='pmx-style';
+  s.textContent=`
+.pmx-wrap{display:flex;flex-direction:column;gap:7px;height:100%;}
+.pmx-strips{display:flex;gap:5px;overflow-x:auto;overflow-y:hidden;flex:1;scrollbar-width:thin;scrollbar-color:var(--txt3) transparent;padding-bottom:4px;}
+.pmx-strips::-webkit-scrollbar{height:4px;}.pmx-strips::-webkit-scrollbar-thumb{background:var(--txt3);border-radius:2px;}
+.pmx-ch{min-width:62px;display:flex;flex-direction:column;gap:4px;background:var(--bgd);border-radius:8px;padding:5px;flex-shrink:0;}
+.pmx-master{min-width:68px;border:1px solid rgba(34,197,94,.25);}
+.pmx-ch-label{border-radius:5px;padding:4px 5px;display:flex;flex-direction:column;align-items:center;gap:1px;}
+.pmx-ch-icon{font-size:14px;line-height:1;}
+.pmx-ch-name{font-size:9px;font-weight:600;letter-spacing:.4px;color:var(--txt);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:56px;}
+.pmx-sends{display:flex;flex-direction:column;gap:3px;padding:2px 0;}
+.pmx-send-row{display:flex;align-items:center;gap:3px;}
+.pmx-send-lbl{font-size:8px;font-weight:700;width:10px;flex-shrink:0;}
+.pmx-send-knob-wrap{flex-shrink:0;}
+.pmx-send-val{font-size:7px;color:var(--txt2);width:22px;text-align:right;}
+.pmx-pan-row{display:flex;align-items:center;gap:3px;}
+.pmx-pan-lbl{font-size:8px;color:var(--txt2);width:28px;flex-shrink:0;}
+.pmx-pan{-webkit-appearance:none;appearance:none;flex:1;height:3px;background:var(--bg2);border-radius:2px;outline:none;cursor:pointer;}
+.pmx-pan::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;border-radius:50%;background:var(--acc);}
+.pmx-fader-zone{display:flex;gap:5px;align-items:flex-end;flex:1;min-height:80px;}
+.pmx-meter-col{display:flex;gap:2px;height:100%;align-items:flex-end;}
+.pmx-meter-bar{width:5px;height:100%;background:var(--bgd);border-radius:2px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;}
+.pmx-meter-fill{width:100%;background:var(--grn);border-radius:2px;transition:height .05s;}
+.pmx-fader-col{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;}
+.pmx-fader-track{width:16px;height:80px;background:var(--bgd);border-radius:8px;position:relative;box-shadow:inset 2px 2px 5px var(--nsd);}
+.pmx-fader-groove{position:absolute;left:50%;top:5px;bottom:5px;width:2px;transform:translateX(-50%);background:rgba(255,255,255,.1);border-radius:1px;}
+.pmx-thumb{width:28px;height:10px;background:var(--txt);border-radius:3px;position:absolute;left:50%;transform:translateX(-50%);cursor:grab;box-shadow:0 2px 6px rgba(0,0,0,.5);}
+.pmx-thumb:active{cursor:grabbing;}
+.pmx-db{font-size:8px;color:var(--txt2);font-variant-numeric:tabular-nums;white-space:nowrap;}
+.pmx-ms{display:flex;gap:3px;justify-content:center;}
+.pmx-ms-btn{width:22px;height:16px;border-radius:3px;border:1px solid var(--txt3);background:transparent;color:var(--txt2);font-size:9px;font-weight:700;cursor:pointer;transition:all .1s;}
+.pmx-ms-btn.active.red{background:var(--red);border-color:var(--red);color:#fff;}
+.pmx-ms-btn.active.yel{background:var(--yel);border-color:var(--yel);color:#000;}
+.pmx-ms-btn.active.grn{background:var(--grn);border-color:var(--grn);color:#000;}
+.pmx-returns{display:flex;gap:5px;flex-wrap:wrap;}
+.pmx-ret-title{width:100%;font-size:9px;color:var(--txt2);letter-spacing:.5px;text-transform:uppercase;padding-bottom:2px;}
+.pmx-ret-bus{flex:1;min-width:80px;background:var(--bgd);border-radius:6px;padding:5px 7px;display:flex;flex-direction:column;gap:4px;}
+.pmx-ret-off{opacity:.4;}
+.pmx-ret-hdr{display:flex;align-items:center;gap:5px;padding-left:5px;border-radius:3px;}
+.pmx-ret-name{flex:1;font-size:9px;color:var(--txt);font-weight:600;}
+.pmx-ret-meter{height:5px;background:var(--bg2);border-radius:3px;overflow:hidden;}
+.pmx-ret-fill{height:100%;width:0%;border-radius:3px;transition:width .08s;}
+.pmx-lufs-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding-top:4px;border-top:1px solid var(--bg2);}
+.pmx-lufs-block{display:flex;flex-direction:column;align-items:center;gap:1px;}
+.pmx-lufs-lbl{font-size:8px;color:var(--txt2);letter-spacing:.5px;text-transform:uppercase;}
+.pmx-lufs-val{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--grn);}
+.pmx-lufs-target{font-size:8px;color:var(--txt2);}
+`;
+  document.head.appendChild(s);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   PHASE 7B — MPC: PAD COLORS / CHOP-TO-MIDI / SLICE PREVIEW
+════════════════════════════════════════════════════════════════ */
+const PAD_COLORS=['#f87171','#fb923c','#fbbf24','#4ade80','#34d399','#2dd4bf','#60a5fa','#a78bfa',
+  '#f472b6','#e879f9','#818cf8','#38bdf8','#86efac','#fde68a','#fca5a5','#c4b5fd'];
+
+function initPadColors(){
+  Object.values(S.padBanks).forEach(bank=>{
+    bank.forEach((slot,i)=>{if(slot&&!slot.color)slot.color=PAD_COLORS[i%PAD_COLORS.length];});
+  });
+}
+
+window.buildMpcPadGrid=function(){
+  const grid=document.getElementById('mpc-pad-grid');if(!grid)return;
+  initPadColors();
+  const asgns=S.padBanks[S.padBank];
+  const trackCol=(S.tracks[S.activeTrack]||{color:'#b06ef3'}).color;
+  if(S.padBank==='A'&&(!asgns||!asgns.length)&&S.samplerSlices.length){
+    S.padBanks.A=S.samplerSlices.slice(0,16).map((_,i)=>({sliceIdx:i,vel:100,pitch:0,color:PAD_COLORS[i%PAD_COLORS.length]}));
+  }
+  grid.innerHTML=Array.from({length:16},(_,i)=>{
+    const asgn=asgns?asgns[i]:null;
+    const has=asgn!=null&&S.samplerSlices[asgn?.sliceIdx]!=null;
+    const col=has?(asgn.color||PAD_COLORS[i%PAD_COLORS.length]):trackCol;
+    const sl=has?S.samplerSlices[asgn.sliceIdx]:null;
+    const dur=sl?(sl.end-sl.start).toFixed(2)+'s':'';
+    return `<div class="mpc-pad${has?'':' empty'}" style="background:${col}22;border-color:${col}55;" id="mpc-pad-${i}"
+      ontouchstart="hitMpcPad(${i},event)" onclick="hitMpcPad(${i},event)"
+      onmouseenter="sbPreviewSlice(${i})" onmouseleave="sbStopPreviewSlice()"
+      oncontextmenu="event.preventDefault();openPadColorPicker(${i},event)">
+      <span class="mpc-pad-num" style="color:${col};">${S.padBank}${i+1}</span>
+      <span class="mpc-pad-lbl" style="color:${col}cc;">${has?i+1:'—'}</span>
+      ${has?`<span class="mpc-pad-vel" style="color:${col}88;">${dur}</span>`:''}
+    </div>`;
+  }).join('');
+};
+
+let _slicePreviewSrc=null;
+function sbPreviewSlice(padIdx){
+  if(_slicePreviewSrc){try{_slicePreviewSrc.stop();}catch(e){}}_slicePreviewSrc=null;
+  const asgn=S.padBanks[S.padBank][padIdx];if(!asgn)return;
+  const entry=S.samplerBufferId?S.buffers[S.samplerBufferId]:null;
+  const sl=S.samplerSlices[asgn.sliceIdx];
+  if(!entry||!sl)return;
+  Audio_.ensure();
+  const src=Audio_.ctx.createBufferSource();src.buffer=entry.buffer;
+  const g=Audio_.ctx.createGain();g.gain.value=0.5;
+  src.connect(g);g.connect(Audio_.master);
+  src.start(Audio_.ctx.currentTime,sl.start,Math.min(0.5,sl.end-sl.start));
+  _slicePreviewSrc=src;
+  src.onended=()=>{if(_slicePreviewSrc===src)_slicePreviewSrc=null;};
+}
+function sbStopPreviewSlice(){if(_slicePreviewSrc){try{_slicePreviewSrc.stop();}catch(e){}}_slicePreviewSrc=null;}
+
+function openPadColorPicker(padIdx,e){
+  document.getElementById('pad-color-pop')?.remove();
+  const pop=document.createElement('div');pop.id='pad-color-pop';
+  pop.style.cssText=`position:fixed;z-index:9300;background:var(--bg1);border:1px solid var(--acc2);
+    border-radius:10px;padding:10px;box-shadow:0 8px 32px rgba(0,0,0,.7);
+    top:${Math.min(e.clientY,window.innerHeight-160)}px;left:${Math.min(e.clientX,window.innerWidth-180)}px;`;
+  pop.innerHTML=`<div style="font-size:10px;color:var(--txt2);margin-bottom:7px;">Pad ${S.padBank}${padIdx+1} color</div>
+    <div style="display:grid;grid-template-columns:repeat(8,22px);gap:4px;">
+      ${PAD_COLORS.map(c=>`<div style="width:22px;height:22px;border-radius:4px;background:${c};cursor:pointer;border:2px solid transparent;"
+        onclick="setPadColor(${padIdx},'${c}');document.getElementById('pad-color-pop').remove()"></div>`).join('')}
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;margin-top:8px;">
+      <label style="font-size:10px;color:var(--txt2);">Custom</label>
+      <input type="color" value="${S.padBanks[S.padBank][padIdx]?.color||'#b06ef3'}"
+        oninput="setPadColor(${padIdx},this.value)" style="width:30px;height:22px;border:none;background:none;cursor:pointer;border-radius:4px;">
+    </div>`;
+  document.body.appendChild(pop);
+  setTimeout(()=>document.addEventListener('click',e=>{if(!pop.contains(e.target))pop.remove();},{once:true}),50);
+}
+function setPadColor(padIdx,color){
+  const asgn=S.padBanks[S.padBank][padIdx];if(asgn)asgn.color=color;
+  buildMpcPadGrid();
+}
+
+function chopToMidi(){
+  if(!S.samplerSlices.length){toast('Chop a sample first');return;}
+  const entry=S.samplerBufferId?S.buffers[S.samplerBufferId]:null;
+  if(!entry){toast('No sample loaded');return;}
+  const bpm=S.bpm||120;
+  const notes=[];let cursor=0;
+  S.samplerSlices.forEach((sl,i)=>{
+    const durSec=sl.end-sl.start;const durBeats=durSec/(60/bpm);
+    notes.push({midi:48+i,beat:cursor,len:Math.max(0.125,durBeats),vel:100});
+    cursor+=durBeats;
+  });
+  snapshot();
+  const newTi=S.tracks.length;
+  const trackName=entry.name.replace(/\.[^.]+$/,'')+'_midi';
+  S.tracks.push({
+    id:newTi+1,name:trackName.slice(0,12),icon:'🎹',color:PAD_COLORS[newTi%PAD_COLORS.length],
+    type:'midi',m:false,s:false,arm:false,
+    clips:[{id:'clip_ctm_'+Date.now(),start:Math.round(secToBeat(S.sec)),len:cursor,
+      label:trackName.slice(0,16),notes:notes.map(n=>({...n}))}],
+  });
+  S.seqSteps[newTi+1]=Array(16).fill(0);
+  renderTracks();
+  toast(`Chop→MIDI: ${notes.length} notes on "${trackName.slice(0,16)}"`);
+  openClipInPianoRoll(newTi,0);
+}
+
+const _origBuildSampler7=window.buildSampler;
+window.buildSampler=function(el){
+  _origBuildSampler7(el);
+  requestAnimationFrame(()=>{
+    const btns=el.querySelector('.chop-btns');
+    if(btns&&!btns.querySelector('.ctm-btn')){
+      const b=document.createElement('button');
+      b.className='chop-btn sec ctm-btn';b.textContent='🎹 Chop→MIDI';b.onclick=chopToMidi;
+      btns.appendChild(b);
+    }
+  });
+};
+
+/* ════════════════════════════════════════════════════════════════
+   PHASE 7C — TIMELINE: FADE HANDLES / SLIP EDIT / CLIP SNAPPING
+════════════════════════════════════════════════════════════════ */
+Object.assign(S,{snapOn:true,snapDiv:0.5,slipMode:false});
+
+function snapBeat(beat){if(!S.snapOn)return beat;return Math.round(beat/S.snapDiv)*S.snapDiv;}
+
+window.buildClipEl=function(t,ti,clip,ci){
+  const ppb=pxPerBeat();const x=clip.start*ppb;const w=clip.len*ppb;
+  const el=document.createElement('div');
+  el.className='clip-el'+(S.selectedClip?.ci===ci&&S.selectedClip?.ti===ti?' selected':'');
+  el.style.left=x+'px';el.style.width=w+'px';
+  el.style.background=`linear-gradient(135deg,${t.color}55,${t.color}22 58%,rgba(255,255,255,.08))`;
+  el.style.border=`1px solid ${t.color}88`;
+  el.dataset.ci=ci;el.dataset.ti=ti;
+
+  const fadeInBeats=clip.fadeIn||0;const fadeOutBeats=clip.fadeOut||0;
+  const fadeInPx=fadeInBeats*ppb;const fadeOutPx=fadeOutBeats*ppb;
+
+  el.innerHTML=`
+    <canvas class="clip-fade-canvas" width="${Math.max(1,Math.round(w))}" height="44" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;border-radius:6px;"></canvas>
+    <div class="clip-label" style="color:#fff;position:relative;z-index:1;">${clip.label||clip.id}</div>
+    <div class="clip-sub" style="position:relative;z-index:1;">${clip.start.toFixed(1)}b · ${clip.len.toFixed(1)}b${clip.pitchShift?` · ${clip.pitchShift>0?'+':''}${clip.pitchShift}st`:''}${clip.playbackRate&&clip.playbackRate!==1?` · ×${clip.playbackRate}`:''}${clip.gain&&clip.gain!==1?` · ${Math.round(clip.gain*100)}%`:''}</div>
+    ${fadeInBeats>0?`<div class="clip-fade-handle clip-fade-in" data-ci="${ci}" data-ti="${ti}" style="left:${fadeInPx-5}px;" title="Drag to adjust fade in"></div>`:''}
+    ${fadeOutBeats>0?`<div class="clip-fade-handle clip-fade-out" data-ci="${ci}" data-ti="${ti}" style="right:${fadeOutPx-5}px;" title="Drag to adjust fade out"></div>`:''}
+    <div class="clip-fade-in-zone" data-ci="${ci}" data-ti="${ti}" title="Drag to add fade in" style="left:0;"></div>
+    <div class="clip-fade-out-zone" data-ci="${ci}" data-ti="${ti}" title="Drag to add fade out" style="right:0;"></div>
+    <div class="clip-resize-r" data-ci="${ci}" data-ti="${ti}"></div>
+    ${clip.bufferId?'<div class="clip-slip-btn" title="Slip edit (move audio inside clip)">↔</div>':''}
+    <div class="clip-midi-hint" style="display:${t.type==='midi'||t.type==='beat'?'block':'none'}">🎹</div>`;
+
+  requestAnimationFrame(()=>{
+    const cvs=el.querySelector('.clip-fade-canvas');if(!cvs)return;
+    const ctx=cvs.getContext('2d'),cw=cvs.width,ch=cvs.height;
+    ctx.clearRect(0,0,cw,ch);
+    if(fadeInPx>1){
+      const grad=ctx.createLinearGradient(0,0,fadeInPx,0);
+      grad.addColorStop(0,'rgba(0,0,0,0.65)');grad.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=grad;ctx.fillRect(0,0,fadeInPx,ch);
+      ctx.strokeStyle=t.color+'cc';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(0,ch);ctx.quadraticCurveTo(fadeInPx*0.5,ch*0.5,fadeInPx,0);ctx.stroke();
+    }
+    if(fadeOutPx>1){
+      const grad=ctx.createLinearGradient(cw-fadeOutPx,0,cw,0);
+      grad.addColorStop(0,'rgba(0,0,0,0)');grad.addColorStop(1,'rgba(0,0,0,0.65)');
+      ctx.fillStyle=grad;ctx.fillRect(cw-fadeOutPx,0,fadeOutPx,ch);
+      ctx.strokeStyle=t.color+'cc';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(cw-fadeOutPx,0);ctx.quadraticCurveTo(cw-fadeOutPx*0.5,ch*0.5,cw,ch);ctx.stroke();
+    }
+  });
+
+  el.onclick=e=>{e.stopPropagation();selectClip(ti,ci);};
+  el.oncontextmenu=e=>{e.preventDefault();e.stopPropagation();selectClip(ti,ci);showCtxMenu(e.clientX,e.clientY);};
+  setupClipDragSnap(el,ti,ci);
+  setupResizeDragSnap(el.querySelector('.clip-resize-r'),ti,ci);
+  setupFadeHandles(el,ti,ci);
+  const slipBtn=el.querySelector('.clip-slip-btn');
+  if(slipBtn)slipBtn.addEventListener('click',e=>{e.stopPropagation();startSlipEdit(el,ti,ci);});
+  el.addEventListener('dblclick',ev=>{ev.stopPropagation();if(t.type==='midi'||t.type==='beat')openClipInPianoRoll(ti,ci);});
+  return el;
+};
+
+function setupClipDragSnap(el,ti,ci){
+  let startX,startBeat,otherBeats=[];
+  const buildOtherBeats=()=>{
+    otherBeats=[];
+    S.tracks.forEach((t,tii)=>t.clips.forEach((c,cii)=>{
+      if(tii===ti&&cii===ci)return;
+      otherBeats.push(c.start,c.start+c.len);
+    }));
+    otherBeats.sort((a,b)=>a-b);
+  };
+  const magnetSnap=(beat)=>{
+    let snapped=snapBeat(beat);
+    const magThresh=4/pxPerBeat();
+    for(const ob of otherBeats){if(Math.abs(beat-ob)<magThresh){snapped=ob;break;}}
+    return snapped;
+  };
+  const onDown=e=>{
+    if(e.target.classList.contains('clip-resize-r')||e.target.classList.contains('clip-fade-handle')||
+       e.target.classList.contains('clip-fade-in-zone')||e.target.classList.contains('clip-fade-out-zone')||
+       e.target.classList.contains('clip-slip-btn'))return;
+    e.stopPropagation();buildOtherBeats();
+    const cx=e.touches?e.touches[0].clientX:e.clientX;
+    startX=cx;startBeat=S.tracks[ti].clips[ci].start;
+    el.classList.add('dragging');snapshot();
+    const onMove=ev=>{
+      const x=ev.touches?ev.touches[0].clientX:ev.clientX;
+      const rawBeat=startBeat+(x-startX)/pxPerBeat();
+      const snapped=Math.max(0,magnetSnap(rawBeat));
+      S.tracks[ti].clips[ci].start=snapped;
+      el.style.left=(snapped*pxPerBeat())+'px';
+      showSnapIndicator(snapped);
+    };
+    const onUp=()=>{
+      el.classList.remove('dragging');hideSnapIndicator();renderTracks();
+      window.removeEventListener('mousemove',onMove);window.removeEventListener('mouseup',onUp);
+      window.removeEventListener('touchmove',onMove);window.removeEventListener('touchend',onUp);
+    };
+    window.addEventListener('mousemove',onMove);window.addEventListener('mouseup',onUp);
+    window.addEventListener('touchmove',onMove,{passive:true});window.addEventListener('touchend',onUp);
+  };
+  el.addEventListener('mousedown',onDown);el.addEventListener('touchstart',onDown,{passive:true});
+}
+
+function setupResizeDragSnap(handle,ti,ci){
+  if(!handle)return;
+  const onDown=e=>{
+    e.stopPropagation();e.preventDefault();
+    const cx=e.touches?e.touches[0].clientX:e.clientX;
+    const startX=cx,startLen=S.tracks[ti].clips[ci].len;
+    snapshot();
+    const onMove=ev=>{
+      const x=ev.touches?ev.touches[0].clientX:ev.clientX;
+      const rawLen=startLen+(x-startX)/pxPerBeat();
+      const snapped=Math.max(snapBeat(0.5)||0.25,snapBeat(rawLen));
+      S.tracks[ti].clips[ci].len=snapped;
+      const clipEl=handle.parentElement;if(clipEl)clipEl.style.width=(snapped*pxPerBeat())+'px';
+      showSnapIndicator(S.tracks[ti].clips[ci].start+snapped);
+    };
+    const onUp=()=>{
+      hideSnapIndicator();renderTracks();
+      window.removeEventListener('mousemove',onMove);window.removeEventListener('mouseup',onUp);
+      window.removeEventListener('touchmove',onMove);window.removeEventListener('touchend',onUp);
+    };
+    window.addEventListener('mousemove',onMove);window.addEventListener('mouseup',onUp);
+    window.addEventListener('touchmove',onMove,{passive:true});window.addEventListener('touchend',onUp);
+  };
+  handle.addEventListener('mousedown',onDown);handle.addEventListener('touchstart',onDown,{passive:true});
+}
+
+let _snapIndicatorEl=null;
+function showSnapIndicator(beat){
+  if(!_snapIndicatorEl){
+    _snapIndicatorEl=document.createElement('div');
+    _snapIndicatorEl.style.cssText=`position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,0.6);
+      pointer-events:none;z-index:99;box-shadow:0 0 4px rgba(255,255,255,0.4);transition:left .04s;`;
+    document.getElementById('tracks-inner')?.appendChild(_snapIndicatorEl);
+  }
+  _snapIndicatorEl.style.left=(beat*pxPerBeat())+'px';_snapIndicatorEl.style.display='block';
+}
+function hideSnapIndicator(){if(_snapIndicatorEl)_snapIndicatorEl.style.display='none';}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='n'&&!e.ctrlKey&&!e.metaKey&&document.activeElement.tagName!=='INPUT'){
+    S.snapOn=!S.snapOn;toast(S.snapOn?`Snap ON (${S.snapDiv}b)`:'Snap OFF');
+  }
+});
+
+function setupFadeHandles(clipEl,ti,ci){
+  const inZone=clipEl.querySelector('.clip-fade-in-zone');
+  const outZone=clipEl.querySelector('.clip-fade-out-zone');
+  if(inZone){inZone.addEventListener('mousedown',e=>startFadeDrag(e,'in',clipEl,ti,ci));inZone.addEventListener('touchstart',e=>startFadeDrag(e,'in',clipEl,ti,ci),{passive:true});}
+  if(outZone){outZone.addEventListener('mousedown',e=>startFadeDrag(e,'out',clipEl,ti,ci));outZone.addEventListener('touchstart',e=>startFadeDrag(e,'out',clipEl,ti,ci),{passive:true});}
+  clipEl.querySelectorAll('.clip-fade-handle').forEach(h=>{
+    const isIn=h.classList.contains('clip-fade-in');
+    h.addEventListener('mousedown',e=>startFadeDrag(e,isIn?'in':'out',clipEl,ti,ci));
+    h.addEventListener('touchstart',e=>startFadeDrag(e,isIn?'in':'out',clipEl,ti,ci),{passive:true});
+  });
+}
+
+function startFadeDrag(e,dir,clipEl,ti,ci){
+  e.stopPropagation();e.preventDefault();
+  const sx=e.touches?e.touches[0].clientX:e.clientX;
+  const clip=S.tracks[ti].clips[ci];
+  const startFade=dir==='in'?(clip.fadeIn||0):(clip.fadeOut||0);
+  snapshot();
+  const onMove=ev=>{
+    const cx=ev.touches?ev.touches[0].clientX:ev.clientX;
+    const delta=(cx-sx)/pxPerBeat()*(dir==='out'?-1:1);
+    const newFade=Math.max(0,Math.min(clip.len*0.5,startFade+delta));
+    if(dir==='in')clip.fadeIn=newFade;else clip.fadeOut=newFade;
+    const cvs=clipEl.querySelector('.clip-fade-canvas');
+    if(cvs){
+      const t=S.tracks[ti];const ppb=pxPerBeat();const w=clip.len*ppb;
+      cvs.width=Math.max(1,Math.round(w));
+      const ctx=cvs.getContext('2d'),cw=cvs.width,ch=cvs.height;
+      ctx.clearRect(0,0,cw,ch);
+      const fiPx=(clip.fadeIn||0)*ppb,foPx=(clip.fadeOut||0)*ppb;
+      if(fiPx>1){const g=ctx.createLinearGradient(0,0,fiPx,0);g.addColorStop(0,'rgba(0,0,0,0.65)');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(0,0,fiPx,ch);ctx.strokeStyle=t.color+'cc';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(0,ch);ctx.quadraticCurveTo(fiPx*0.5,ch*0.5,fiPx,0);ctx.stroke();}
+      if(foPx>1){const g=ctx.createLinearGradient(cw-foPx,0,cw,0);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,0.65)');ctx.fillStyle=g;ctx.fillRect(cw-foPx,0,foPx,ch);ctx.strokeStyle=t.color+'cc';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(cw-foPx,0);ctx.quadraticCurveTo(cw-foPx*0.5,ch*0.5,cw,ch);ctx.stroke();}
+    }
+  };
+  const onUp=()=>{
+    renderTracks();if(S.playing){stopAllScheduled();scheduleClipPlayback();}
+    window.removeEventListener('mousemove',onMove);window.removeEventListener('mouseup',onUp);
+    window.removeEventListener('touchmove',onMove);window.removeEventListener('touchend',onUp);
+  };
+  window.addEventListener('mousemove',onMove);window.addEventListener('mouseup',onUp);
+  window.addEventListener('touchmove',onMove,{passive:true});window.addEventListener('touchend',onUp);
+}
+
+function startSlipEdit(clipEl,ti,ci){
+  const clip=S.tracks[ti].clips[ci];
+  if(!clip.bufferId){toast('No audio to slip');return;}
+  const entry=S.buffers[clip.bufferId];if(!entry)return;
+  snapshot();toast('Slip: drag left/right to offset audio inside clip');
+  clipEl.style.cursor='ew-resize';clipEl.style.outline='2px solid var(--yel)';
+  const startTrimStart=clip.trimStart||0;let startX=null;
+  const onMove=ev=>{
+    const cx=ev.touches?ev.touches[0].clientX:ev.clientX;
+    if(startX===null){startX=cx;return;}
+    const delta=(cx-startX)/pxPerBeat()*(60/S.bpm);
+    const maxTrim=Math.max(0,entry.duration-beatToSec(clip.len));
+    clip.trimStart=Math.max(0,Math.min(maxTrim,startTrimStart-delta));
+    const sub=clipEl.querySelector('.clip-sub');
+    if(sub)sub.textContent=`${clip.start.toFixed(1)}b · ${clip.len.toFixed(1)}b · ⊢${clip.trimStart.toFixed(2)}s`;
+    drawAllLaneWaveforms();
+  };
+  const onUp=()=>{
+    clipEl.style.cursor='';clipEl.style.outline='';
+    renderTracks();if(S.playing){stopAllScheduled();scheduleClipPlayback();}
+    window.removeEventListener('mousemove',onMove);window.removeEventListener('mouseup',onUp);
+    window.removeEventListener('touchmove',onMove);window.removeEventListener('touchend',onUp);
+  };
+  window.addEventListener('mousemove',onMove);window.addEventListener('mouseup',onUp);
+  window.addEventListener('touchmove',onMove,{passive:true});window.addEventListener('touchend',onUp);
+}
+
+if(!document.getElementById('fade-style')){
+  const s=document.createElement('style');s.id='fade-style';
+  s.textContent=`
+.clip-fade-handle{position:absolute;top:0;bottom:0;width:10px;z-index:4;cursor:ew-resize;background:rgba(255,255,255,0.18);border-radius:2px;}
+.clip-fade-in-zone{position:absolute;top:0;bottom:0;left:0;width:20px;z-index:3;cursor:e-resize;opacity:0;}
+.clip-fade-out-zone{position:absolute;top:0;bottom:0;right:0;width:20px;z-index:3;cursor:w-resize;opacity:0;}
+.clip-fade-in-zone:hover,.clip-fade-out-zone:hover{background:rgba(255,255,255,0.07);opacity:1;}
+.clip-slip-btn{position:absolute;top:3px;right:22px;width:16px;height:16px;border-radius:3px;background:rgba(0,0,0,0.45);
+  display:flex;align-items:center;justify-content:center;font-size:9px;color:rgba(255,255,255,0.5);cursor:pointer;z-index:5;transition:background .1s,color .1s;}
+.clip-slip-btn:hover{background:var(--yel);color:#000;}
+.clip-el.dragging{opacity:.75;box-shadow:0 4px 20px rgba(0,0,0,.5);}
+#snap-toggle{font-size:10px;padding:3px 8px;border-radius:5px;border:1px solid var(--txt3);background:transparent;color:var(--txt2);cursor:pointer;transition:all .1s;}
+`;
+  document.head.appendChild(s);
+}
+
+requestAnimationFrame(()=>{
+  const topbar=document.getElementById('topbar');
+  if(topbar&&!document.getElementById('snap-toggle')){
+    const btn=document.createElement('button');
+    btn.id='snap-toggle';btn.textContent='⊞ Snap';btn.title='Toggle snap to grid (N)';
+    btn.style.borderColor=S.snapOn?'var(--acc)':'var(--txt3)';
+    btn.style.background=S.snapOn?'rgba(176,110,243,0.18)':'transparent';
+    btn.style.color=S.snapOn?'var(--acc)':'var(--txt2)';
+    btn.onclick=()=>{
+      S.snapOn=!S.snapOn;
+      btn.style.borderColor=S.snapOn?'var(--acc)':'var(--txt3)';
+      btn.style.background=S.snapOn?'rgba(176,110,243,0.18)':'transparent';
+      btn.style.color=S.snapOn?'var(--acc)':'var(--txt2)';
+      toast(S.snapOn?`Snap ON (${S.snapDiv}b)`:'Snap OFF');
+    };
+    topbar.appendChild(btn);
+  }
+});
+
+renderTracks();
 </script>
 </body>
 </html>
