@@ -1,0 +1,82 @@
+/* ═══════════════════════════════════════════════════════════════
+   DESIGN TOKENS — Dark Monochromatic + Neon Accent (DAW theme)
+   ───────────────────────────────────────────────────────────────
+   Philosophy:
+   · Near-black chrome (bg/bg1/bg2/bg3) keeps long sessions easy on
+     the eyes — the UI itself stays neutral so track/clip colors and
+     meters are what draw the eye.
+   · Two neon accents carry all "active" meaning: electric blue
+     (--acc) for selection/focus/primary actions, neon orange
+     (--acc3) for record/warning/secondary emphasis.
+   · Muted gray (--txt2) for passive labels, bright white (--txt)
+     reserved for live/active data (time code, values, VU peaks).
+   · --nsl / --nsd are the light/dark neumorphic shadow pair used
+     everywhere a control needs to look "pressed into" or "raised
+     off of" the black chrome (knobs, faders, pads, buttons).
+   All variable NAMES are contract with every other CSS/JS file in
+   this project — only change values here, never rename.
+═══════════════════════════════════════════════════════════════ */
+:root {
+  /* ── Chrome (near-black monochrome) ── */
+  --bg:   #121212;   /* page / outermost background            */
+  --bg1:  #1a1a1a;   /* raised panel surface (.nr)              */
+  --bg2:  #1e1e1e;   /* standard surface / container            */
+  --bg3:  #262626;   /* elevated / hover surface                */
+  --bgd:  #0a0a0a;   /* deep inset (fader tracks, canvases)     */
+
+  /* ── Skeuomorphic shadow pair (hardware-esque controls) ── */
+  --nsl:  rgba(255,255,255,0.045);
+  --nsd:  rgba(0,0,0,0.9);
+
+  /* ── Neon accents ── */
+  --acc:  #00d2ff;   /* electric blue — primary / selection      */
+  --acc2: #00a8cc;   /* deeper blue — pressed / active fill      */
+  --acc3: #ff7300;   /* neon orange — record / secondary emphasis*/
+  --accg: rgba(0,210,255,0.35);
+
+  --red:  #ff3b3b;   /* danger / mute / delete                   */
+  --redg: rgba(255,59,59,0.35);
+
+  --grn:  #00e676;   /* solo / positive / loudness-good           */
+  --grng: rgba(0,230,118,0.3);
+
+  --yel:  #ffd60a;   /* warning / near-clip                        */
+
+  /* ── Text ── */
+  --txt:  #ffffff;   /* bright white — active/live data             */
+  --txt2: #a0a0a0;   /* muted gray — passive labels                 */
+  --txt3: #4a4a4a;   /* faint / disabled                            */
+
+  /* ── Radii ── */
+  --r:    12px;
+  --rsm:  8px;
+  --rlg:  18px;
+
+  /* ── Fixed chrome dimensions ── */
+  --hdr:  54px;
+  --nav:  58px;
+  --toolbar-h: 54px;
+  --drawer-h: 310px;
+  --track-h: 72px;
+  --hdr-w: 152px;
+
+  /* ── Track / clip color palette (vivid, tuned for near-black bg) ── */
+  --c1:#00e5c9; --c2:#ff8a3d; --c3:#b57bff;
+  --c4:#3ea6ff; --c5:#ff5fa8; --c6:#3ddc84;
+  --c7:#ffcc33; --c8:#ff5c5c;
+
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+
+html,body{height:100%;overflow:hidden;touch-action:none;}
+
+body{
+  background:var(--bg);
+  color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',system-ui,sans-serif;
+  font-size:13px;
+  user-select:none;
+  -webkit-user-select:none;
+}
