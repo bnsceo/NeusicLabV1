@@ -1,0 +1,80 @@
+/* ═══════════════════════════════════════════════
+   Top transport bar: undo/redo, transport, BPM chip, zoom, save/load
+═══════════════════════════════════════════════ */
+/* ── TOP BAR ── */
+#topbar{
+  height:var(--hdr);flex-shrink:0;
+  display:flex;align-items:center;gap:8px;
+  padding:0 14px;
+  background:var(--bg1);
+  box-shadow:0 3px 12px var(--nsd),0 1px 0 var(--nsl);
+  z-index:100;
+}
+
+.brand{
+  font-size:20px;font-weight:900;letter-spacing:-1px;
+  background:linear-gradient(135deg,var(--acc),#60a5fa);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;flex-shrink:0;margin-right:2px;
+}
+
+.tb-sep{width:1px;height:26px;background:var(--txt3);flex-shrink:0;}
+.tb-spacer{flex:1;}
+
+/* Transport buttons */
+.tb-btn{
+  width:32px;height:32px;border-radius:var(--rsm);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-family:inherit;transition:all .12s;
+  background:var(--bg);color:var(--txt2);
+  box-shadow:3px 3px 7px var(--nsd),-2px -2px 5px var(--nsl);
+}
+.tb-btn:active{box-shadow:inset 2px 2px 5px var(--nsd),inset -1px -1px 3px var(--nsl);transform:scale(.94);}
+.tb-btn.play-active{background:var(--grn);color:#001;box-shadow:3px 3px 8px var(--nsd),0 0 12px var(--grng);}
+.tb-btn.rec-active{background:var(--red);color:#fff;box-shadow:3px 3px 8px var(--nsd),0 0 14px var(--redg);animation:recpulse 1s infinite;}
+.tb-btn.acc-btn{background:var(--acc2);color:#fff;box-shadow:3px 3px 8px var(--nsd),0 0 10px var(--accg);}
+
+@keyframes recpulse{0%,100%{box-shadow:3px 3px 8px var(--nsd),0 0 14px var(--redg);}50%{box-shadow:3px 3px 8px var(--nsd),0 0 28px var(--redg);}}
+
+/* Time / BPM chips */
+.chip{
+  display:flex;flex-direction:column;align-items:center;
+  padding:4px 9px;border-radius:var(--rsm);cursor:default;
+  background:var(--bgd);
+  box-shadow:inset 2px 2px 6px var(--nsd),inset -1px -1px 4px var(--nsl);
+  white-space:nowrap;
+}
+.chip-main{font-size:13px;font-weight:700;color:var(--txt);letter-spacing:.8px;font-variant-numeric:tabular-nums;line-height:1.2;}
+.chip-sub{font-size:8px;color:var(--txt3);letter-spacing:.3px;}
+.bpm-chip{cursor:pointer;}
+.bpm-chip .chip-main{color:var(--acc);font-size:15px;}
+
+/* Zoom / tool strip */
+.zoom-group{display:flex;align-items:center;gap:4px;}
+.zoom-btn{
+  width:26px;height:26px;border-radius:6px;border:none;cursor:pointer;
+  background:var(--bg);color:var(--txt2);font-size:14px;
+  box-shadow:2px 2px 5px var(--nsd),-1px -1px 3px var(--nsl);
+  display:flex;align-items:center;justify-content:center;transition:all .1s;
+}
+.zoom-btn:active{box-shadow:inset 1px 1px 4px var(--nsd);transform:scale(.9);}
+.zoom-read{
+  min-width:44px;height:26px;padding:0 7px;border-radius:6px;display:flex;align-items:center;justify-content:center;
+  background:var(--bgd);color:var(--txt2);font-size:10px;font-weight:800;font-variant-numeric:tabular-nums;
+  box-shadow:inset 1px 1px 4px var(--nsd);
+}
+
+/* undo/redo badges */
+.undo-count{
+  position:absolute;top:-5px;right:-5px;
+  width:16px;height:16px;border-radius:50%;
+  background:var(--acc2);color:#fff;font-size:9px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 6px var(--accg);
+}
+.tb-btn-wrap{position:relative;}
+
+/* ═══════════════════════════════════════════════
+   MAIN CONTENT — sidebar + center or full
+═══════════════════════════════════════════════ */
+#main{display:flex;flex:1;overflow:hidden;}

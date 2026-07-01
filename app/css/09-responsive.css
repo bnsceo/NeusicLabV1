@@ -1,0 +1,33 @@
+/* ═══════════════════════════════════════════════
+   Responsive breakpoints + touch scrollbar hiding
+═══════════════════════════════════════════════ */
+/* ─ Responsive grid for panels ─ */
+@media(min-width:768px){
+  #drawer{--drawer-h:340px;}
+  .mix-strips{gap:10px;}
+  .mix-ch{min-width:66px;padding:10px 9px;}
+  .mix-fader-t,.mix-meter{height:100px;}
+  .rec-opts{grid-template-columns:repeat(4,1fr);}
+}
+@media(min-width:1024px){
+  #drawer{--drawer-h:360px;}
+  .dpanel{padding:12px 18px;}
+}
+
+/* ─ Responsive track header width ─ */
+@media(max-width:480px){
+  :root{--hdr-w:112px;--track-h:64px;}
+  .pad-grid{grid-template-columns:repeat(4,minmax(0,1fr));width:100%;max-width:320px;}
+  .pad-btn{max-width:none;}
+  .track-icon{display:none;}
+  .track-hdr{grid-template-columns:minmax(0,1fr) auto;padding-left:9px;}
+  .track-kind{display:none;}
+}
+@media(min-width:1024px){
+  :root{--hdr-w:168px;}
+}
+
+/* ─ Scrollbar hide on touch ─ */
+@media(pointer:coarse){
+  #tracks-scroll::-webkit-scrollbar{display:none;}
+}
