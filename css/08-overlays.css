@@ -1,0 +1,30 @@
+/* ═══════════════════════════════════════════════
+   Context menu, toast, selection box
+═══════════════════════════════════════════════ */
+/* ─ Context menu ─ */
+#ctx-menu{
+  position:fixed;z-index:200;border-radius:var(--r);overflow:hidden;
+  background:var(--bg2);
+  box-shadow:6px 6px 20px var(--nsd),-2px -2px 8px var(--nsl);
+  display:none;min-width:140px;
+}
+.ctx-item{padding:10px 14px;font-size:12px;cursor:pointer;color:var(--txt);transition:background .1s;}
+.ctx-item:hover{background:var(--bg3);}
+.ctx-item.danger{color:var(--red);}
+.ctx-sep{height:1px;background:rgba(255,255,255,.06);margin:2px 0;}
+
+/* ─ Toast ─ */
+#toast{
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+  background:var(--bg2);border-radius:20px;padding:7px 16px;
+  font-size:12px;color:var(--txt);opacity:0;pointer-events:none;
+  transition:opacity .2s;z-index:300;white-space:nowrap;
+  box-shadow:4px 4px 12px var(--nsd),-2px -2px 8px var(--nsl);
+}
+#toast.show{opacity:1;}
+
+/* ─ Selection box ─ */
+#sel-box{
+  position:absolute;border:1.5px solid var(--acc);background:rgba(176,110,243,.1);
+  pointer-events:none;z-index:25;display:none;border-radius:3px;
+}
