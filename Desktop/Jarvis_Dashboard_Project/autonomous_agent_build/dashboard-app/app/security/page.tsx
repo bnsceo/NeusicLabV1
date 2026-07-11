@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import NavBar from '@/components/NavBar';
 
 interface Vulnerability {
   id: string;
@@ -44,136 +45,148 @@ export default function SecurityDashboard() {
       setVulnerabilities(data.vulnerabilities || []);
       setCompliance(data.compliance || []);
       setIncidents(data.incidents || []);
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
-  const getSeverityColor = (severity: string) => {
-    const map: Record<string, string> = {
-      critical: 'bg-red-600 text-white',
-      high: 'bg-orange-500 text-white',
-      medium: 'bg-yellow-500 text-black',
-      low: 'bg-blue-400 text-white',
-    };
-    return map[severity] || 'bg-gray-500';
-  };
-
-  const getStatusColor = (status: string) => {
-    const map: Record<string, string> = {
-      'open': 'text-red-400',
-      'in-progress': 'text-yellow-400',
-      'resolved': 'text-green-400',
-      'investigating': 'text-orange-400',
-    };
-    return map[status] || 'text-gray-400';
-  };
-
-  if (loading) return (
-    <div className="min-h-screen bg-slate-900 p-6 text-white flex items-center justify-center">
-      <div className="text-xl">Loading security dashboard...</div>
-    </div>
-  );
-
   return (
-    <div className="min-h-screen bg-slate-900 p-6 text-white">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">
-          🛡️ Security Dashboard
-        </h1>
+    <div className="min-h-screen bg-[#070b12] text-white">
+      <NavBar />
 
-        <div className="glass glass-dark p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">Compliance Status</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {compliance.length === 0 && <p className="text-slate-400 col-span-3">No compliance data available.</p>}
-            {compliance.map((item, idx) => (
-              <div key={idx} className="bg-slate-800/40 rounded-lg p-4">
-                <div className="flex justify-between items-start">
-                  <span className="font-medium">{item.standard}</span>
-                  <span className={`text-xs px-2 py-1 rounded-full ${
-                    item.status === 'compliant' ? 'bg-green-500/20 text-green-300' :
-                    item.status === 'non-compliant' ? 'bg-red-500/20 text-red-300' :
-                    'bg-yellow-500/20 text-yellow-300'
-                  }`}>
-                    {item.status.toUpperCase()}
-                  </span>
-                </div>
-                <p className="text-sm text-slate-400 mt-1">{item.details}</p>
-                <p className="text-xs text-slate-500 mt-2">Last audit: {item.lastAudit}</p>
-              </div>
-            ))}
+      <main className="mx-auto max-w-7xl px-4 py-6 md:px-6 lg:px-8">
+        <section className="rounded-2xl border border-white/10 bg-slate-950/75 p-5 shadow-2xl shadow-blue-950/20 md:p-7">
+          <p className="text-sm font-medium uppercase tracking-[0.22em] text-cyan-300">War Room</p>
+          <div className="mt-2 grid gap-5 lg:grid-cols-[1fr_360px] lg:items-end">
+            <div>
+              <h1 className="text-3xl font-semibold md:text-5xl">Reliability and security</h1>
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300 md:text-base">
+                The autonomous quality-control room for incidents, vulnerabilities, compliance,
+                and proposed repairs before founder approval.
+              </p>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <Stat label="Incidents" value={incidents.length} />
+              <Stat label="Open vulns" value={vulnerabilities.length} />
+              <Stat label="Audits" value={compliance.length} />
+            </div>
           </div>
-        </div>
+        </section>
 
-        <div className="glass glass-dark p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">Open Vulnerabilities</h2>
-          {vulnerabilities.length === 0 && <p className="text-slate-400">No vulnerabilities reported.</p>}
-          <div className="space-y-3">
-            {vulnerabilities.map((v) => (
-              <div key={v.id} className="bg-slate-800/40 rounded-lg p-4 flex flex-wrap justify-between items-start gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3">
-                    <span className={`text-xs px-2 py-1 rounded-full ${getSeverityColor(v.severity)}`}>
-                      {v.severity.toUpperCase()}
-                    </span>
-                    <span className={`text-sm ${getStatusColor(v.status)}`}>{v.status}</span>
-                  </div>
-                  <h4 className="font-medium mt-1">{v.title}</h4>
-                  <p className="text-sm text-slate-400">{v.description}</p>
-                  <p className="text-xs text-slate-500 mt-1">Reported: {v.date}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="glass glass-dark p-6">
-          <h2 className="text-xl font-semibold mb-4">Recent Security Incidents</h2>
-          {incidents.length === 0 && <p className="text-slate-400">No incidents recorded.</p>}
-          <div className="space-y-3">
-            {incidents.map((inc) => (
-              <div key={inc.id} className="bg-slate-800/40 rounded-lg p-4">
-                <div className="flex flex-wrap justify-between items-start gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3">
-                      <span className={`text-xs px-2 py-1 rounded-full ${getSeverityColor(inc.severity)}`}>
-                        {inc.severity.toUpperCase()}
-                      </span>
-                      <span className={`text-sm ${getStatusColor(inc.status)}`}>{inc.status}</span>
+        {loading ? (
+          <p className="mt-6 rounded-2xl border border-white/10 bg-slate-950/70 p-6 text-sm text-slate-400">
+            Loading War Room...
+          </p>
+        ) : (
+          <section className="mt-6 grid gap-6 xl:grid-cols-[1fr_1fr]">
+            <Panel title="Compliance status" subtitle="Control surfaces and audit posture">
+              {compliance.length === 0 ? (
+                <Empty>No compliance data available.</Empty>
+              ) : (
+                <div className="grid gap-3">
+                  {compliance.map((item) => (
+                    <div key={item.standard} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <p className="text-sm font-medium">{item.standard}</p>
+                        <StatusBadge status={item.status} />
+                      </div>
+                      <p className="mt-2 text-sm text-slate-400">{item.details}</p>
+                      <p className="mt-2 text-xs text-slate-500">Last audit: {item.lastAudit}</p>
                     </div>
-                    <h4 className="font-medium mt-1">{inc.title}</h4>
-                    <p className="text-sm text-slate-400">Remediation: {inc.remediation || 'Pending'}</p>
-                    <p className="text-xs text-slate-500 mt-1">{inc.timestamp}</p>
-                  </div>
+                  ))}
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
+              )}
+            </Panel>
 
-        <div className="mt-8 text-center text-slate-500 text-xs">
-          🔐 Security data is tenant‑specific.
-        </div>
-      </div>
+            <Panel title="Recent incidents" subtitle="Failures, anomalies, and repair candidates">
+              {incidents.length === 0 ? (
+                <Empty>No incidents recorded.</Empty>
+              ) : (
+                <div className="space-y-3">
+                  {incidents.map((incident) => (
+                    <div key={incident.id} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Severity severity={incident.severity} />
+                        <span className="text-xs text-slate-400">{incident.status}</span>
+                      </div>
+                      <p className="mt-2 text-sm font-medium">{incident.title}</p>
+                      <p className="mt-1 text-sm text-slate-400">Remediation: {incident.remediation || 'Pending'}</p>
+                      <p className="mt-2 text-xs text-slate-500">{incident.timestamp}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Panel>
 
-      <style jsx>{`
-        .glass {
-          background: rgba(255, 255, 255, 0.05);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 24px;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-        .glass-dark {
-          background: rgba(10, 10, 20, 0.7);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-          border: 1px solid rgba(255, 255, 255, 0.06);
-        }
-      `}</style>
+            <Panel title="Open vulnerabilities" subtitle="Security work waiting for remediation">
+              {vulnerabilities.length === 0 ? (
+                <Empty>No vulnerabilities reported.</Empty>
+              ) : (
+                <div className="space-y-3">
+                  {vulnerabilities.map((vulnerability) => (
+                    <div key={vulnerability.id} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Severity severity={vulnerability.severity} />
+                        <span className="text-xs text-slate-400">{vulnerability.status}</span>
+                      </div>
+                      <p className="mt-2 text-sm font-medium">{vulnerability.title}</p>
+                      <p className="mt-1 text-sm text-slate-400">{vulnerability.description}</p>
+                      <p className="mt-2 text-xs text-slate-500">Reported: {vulnerability.date}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Panel>
+          </section>
+        )}
+      </main>
     </div>
   );
+}
+
+function Panel({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-5 md:p-6">
+      <h2 className="text-lg font-semibold">{title}</h2>
+      <p className="mt-1 text-sm text-slate-400">{subtitle}</p>
+      <div className="mt-4">{children}</div>
+    </div>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+      <p className="text-2xl font-semibold">{value}</p>
+      <p className="mt-1 text-xs text-slate-400">{label}</p>
+    </div>
+  );
+}
+
+function Empty({ children }: { children: React.ReactNode }) {
+  return <p className="rounded-xl border border-dashed border-white/10 bg-black/20 p-5 text-sm text-slate-400">{children}</p>;
+}
+
+function StatusBadge({ status }: { status: string }) {
+  const style =
+    status === 'compliant'
+      ? 'border-emerald-300/20 bg-emerald-300/10 text-emerald-200'
+      : status === 'non-compliant'
+        ? 'border-rose-300/20 bg-rose-300/10 text-rose-200'
+        : 'border-amber-300/20 bg-amber-300/10 text-amber-200';
+  return <span className={`rounded-full border px-3 py-1 text-xs ${style}`}>{status}</span>;
+}
+
+function Severity({ severity }: { severity: string }) {
+  const style =
+    severity === 'critical'
+      ? 'border-rose-300/20 bg-rose-300/10 text-rose-200'
+      : severity === 'high'
+        ? 'border-orange-300/20 bg-orange-300/10 text-orange-200'
+        : severity === 'medium'
+          ? 'border-amber-300/20 bg-amber-300/10 text-amber-200'
+          : 'border-cyan-300/20 bg-cyan-300/10 text-cyan-200';
+  return <span className={`rounded-full border px-3 py-1 text-xs ${style}`}>{severity}</span>;
 }

@@ -1,5 +1,15 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Free Codex Mode
+
+To use Codex without OpenAI billing on this machine, run:
+
+```bash
+npm run codex:free -- "your prompt here"
+```
+
+The first run may download `gpt-oss:20b` into Ollama. After that it stays local and free to use.
+
 ## Getting Started
 
 First, run the development server:

@@ -1,0 +1,17 @@
+{
+  "name": "AI Command Center",
+  "short_name": "Command Center",
+  "description": "Autonomous business operating system",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#070b12",
+  "theme_color": "#070b12",
+  "icons": [
+    {
+      "src": "/pwa-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import { getTenantPath, ensureTenantDirectories } from '@/lib/tenant';
+import { ensureTenantDirectories } from '@/lib/tenant';
 
 export async function GET(req: NextRequest) {
   try {
@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json(incidents);
-  } catch (error) {
+  } catch {
     return NextResponse.json([]);
   }
 }

@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { exec } from 'child_process';
-import { promisify } from 'util';
 import fs from 'fs';
 import path from 'path';
-import { getTenantPath, ensureTenantDirectories } from '@/lib/tenant';
-
-const execAsync = promisify(exec);
+import { ensureTenantDirectories } from '@/lib/tenant';
+import { workspaceRoot } from '@/lib/paths';
+import { updateMissionStatus } from '@/lib/db';
+import { isDemoMode } from '@/lib/runtimeMode';
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,12 +12,19 @@ export async function POST(req: NextRequest) {
     if (!action || !['decree', 'abandon'].includes(action)) {
       return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
+    if (isDemoMode()) {
+      return NextResponse.json(
+        { error: 'Mission approval is read-only in free demo mode' },
+        { status: 403 }
+      );
+    }
 
     const cookieStore = await req.cookies;
     const tenant = cookieStore.get('tenant')?.value || 'default';
     const tenantPath = ensureTenantDirectories(tenant);
-    const briefingPath = path.join(tenantPath, 'briefings', 'mission_briefing.md');
-    const statusPath = path.join(tenantPath, 'briefings', 'status.json');
+    const briefingPath = path.join(/*turbopackIgnore: true*/ tenantPath, 'briefings', 'mission_briefing.md');
+    const statusPath = path.join(/*turbopackIgnore: true*/ tenantPath, 'briefings', 'status.json');
+    const idPath = path.join(/*turbopackIgnore: true*/ tenantPath, 'briefings', 'mission_id.json');
 
     let content = '';
     try {
@@ -29,20 +35,35 @@ export async function POST(req: NextRequest) {
 
     const newStatus = action === 'decree' ? 'approved' : 'abandoned';
 
-    if (action === 'decree') {
-      const projectRoot = path.join(process.cwd(), '..');
-      try {
-        await execAsync('git add .', { cwd: projectRoot });
-        await execAsync(`git commit -m "DECREED: ${objective.slice(0, 80)}"`, { cwd: projectRoot });
-        await execAsync('git push', { cwd: projectRoot });
-      } catch (gitError: any) {
-        console.error('Git error:', gitError);
-      }
-    }
-
+    // Update the status file
     const statusData = { status: newStatus, objective, timestamp: new Date().toISOString() };
     fs.writeFileSync(statusPath, JSON.stringify(statusData, null, 2));
 
+    // Update the database status
+    try {
+      const idData = JSON.parse(fs.readFileSync(idPath, 'utf-8'));
+      if (idData && idData.id) {
+        await updateMissionStatus(idData.id, newStatus);
+      }
+    } catch (dbError) {
+      console.warn('Failed to update database status:', dbError);
+      // We continue anyway – status file is the source of truth for the UI
+    }
+
+    // Try git but don't block
+    if (action === 'decree') {
+      try {
+        const { exec } = await import('child_process');
+        const projectRoot = workspaceRoot;
+        await exec('git add .', { cwd: projectRoot });
+        await exec(`git commit -m "DECREED: ${objective.slice(0, 80)}"`, { cwd: projectRoot });
+        await exec('git push', { cwd: projectRoot });
+      } catch (gitError) {
+        console.warn('Git failed, but status updated:', gitError);
+      }
+    }
+
+    // Parse and return the briefing with updated status
     const briefing = parseBriefing(content);
     briefing.status = newStatus;
     briefing.timestamp = statusData.timestamp;

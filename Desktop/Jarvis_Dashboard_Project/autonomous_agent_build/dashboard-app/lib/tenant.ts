@@ -1,13 +1,21 @@
 import path from 'path';
 import fs from 'fs';
+import { cookies } from 'next/headers';
+import { logsRoot, tenantsRoot } from './paths';
+import { isDemoMode } from './runtimeMode';
 
-const TENANTS_ROOT = path.join(process.cwd(), '..', 'tenants');
-
-export function getTenantPath(tenantId: string): string {
-  return path.join(TENANTS_ROOT, tenantId);
+export async function getTenantId(): Promise<string> {
+  const cookieStore = await cookies();
+  const cookieTenant = cookieStore.get('tenant')?.value || 'default';
+  return isDemoMode() ? 'demo' : cookieTenant;
 }
 
-export function ensureTenantDirectories(tenantId: string) {
+export function getTenantPath(tenantId?: string): string {
+  const id = isDemoMode() ? 'demo' : tenantId || 'default';
+  return path.join(tenantsRoot, id);
+}
+
+export function ensureTenantDirectories(tenantId?: string) {
   const tenantPath = getTenantPath(tenantId);
   const dirs = ['logs', 'briefings', 'security'];
   for (const d of dirs) {
@@ -20,23 +28,25 @@ export function ensureTenantDirectories(tenantId: string) {
 }
 
 export function listTenants(): string[] {
-  if (!fs.existsSync(TENANTS_ROOT)) return ['default'];
-  return fs.readdirSync(TENANTS_ROOT).filter((f) =>
-    fs.statSync(path.join(TENANTS_ROOT, f)).isDirectory()
+  if (isDemoMode()) return ['demo'];
+  if (!fs.existsSync(tenantsRoot)) return ['default'];
+  return fs.readdirSync(tenantsRoot).filter((f) =>
+    fs.statSync(path.join(tenantsRoot, f)).isDirectory()
   );
 }
 
 export function createTenant(name: string): void {
-  const tenantPath = path.join(TENANTS_ROOT, name);
+  if (isDemoMode()) return;
+  const tenantPath = path.join(tenantsRoot, name);
   if (!fs.existsSync(tenantPath)) {
     fs.mkdirSync(tenantPath, { recursive: true });
     const dirs = ['logs', 'briefings', 'security'];
     for (const d of dirs) {
-      fs.mkdirSync(path.join(tenantPath, d), { recursive: true });
+      fs.mkdirSync(path.join(/*turbopackIgnore: true*/ tenantPath, d), { recursive: true });
     }
-    const defaultLog = path.join(process.cwd(), '..', 'logs', 'error.log');
+    const defaultLog = path.join(logsRoot, 'error.log');
     if (fs.existsSync(defaultLog)) {
-      fs.copyFileSync(defaultLog, path.join(tenantPath, 'logs', 'error.log'));
+      fs.copyFileSync(defaultLog, path.join(/*turbopackIgnore: true*/ tenantPath, 'logs', 'error.log'));
     }
   }
 }

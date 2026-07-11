@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import { getTenantPath, ensureTenantDirectories } from '@/lib/tenant';
+import { ensureTenantDirectories } from '@/lib/tenant';
+import { ensureDemoShowcase } from '@/lib/demoShowcase';
+import { isDemoMode } from '@/lib/runtimeMode';
 
 export async function GET(req: NextRequest) {
   try {
     const cookieStore = await req.cookies;
     const tenant = cookieStore.get('tenant')?.value || 'default';
+    if (isDemoMode()) {
+      await ensureDemoShowcase();
+    }
     const tenantPath = ensureTenantDirectories(tenant);
     const briefingPath = path.join(tenantPath, 'briefings', 'mission_briefing.md');
     const statusPath = path.join(tenantPath, 'briefings', 'status.json');
@@ -36,7 +41,7 @@ export async function GET(req: NextRequest) {
     briefing.timestamp = statusData.timestamp;
 
     return NextResponse.json(briefing);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to load briefing' }, { status: 500 });
   }
 }

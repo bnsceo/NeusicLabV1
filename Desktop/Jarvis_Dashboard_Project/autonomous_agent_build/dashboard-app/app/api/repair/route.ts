@@ -3,32 +3,34 @@ import { spawn } from 'child_process';
 import path from 'path';
 import fs from 'fs';
 import { sendSSEEvent } from '../stream/route';
-import { getTenantPath, ensureTenantDirectories } from '@/lib/tenant';
+import { ensureTenantDirectories, getTenantId } from '@/lib/tenant';
+import { backendRoot, workspaceRoot } from '@/lib/paths';
+import { getRuntimeModeInfo, shouldUseMockMode } from '@/lib/runtimeMode';
 
 const SECURITY_KEYWORDS = ['breach', 'intrusion', 'malware', 'unauthorized', 'vulnerability', 'exploit', 'ransomware', 'phishing', 'compromise'];
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const { alert } = await req.json();
     if (!alert) {
       return NextResponse.json({ error: 'Alert description is required' }, { status: 400 });
     }
 
-    const cookieStore = await req.cookies;
-    const tenant = cookieStore.get('tenant')?.value || 'default';
+    const tenant = await getTenantId();
     const tenantPath = ensureTenantDirectories(tenant);
+    const runtimeMode = getRuntimeModeInfo();
 
-    const projectRoot = path.join(process.cwd(), '..');
+    const projectRoot = workspaceRoot;
 
     const isSecurity = SECURITY_KEYWORDS.some(keyword => alert.toLowerCase().includes(keyword));
     let scriptPath;
     let goal = alert;
     if (isSecurity) {
-      scriptPath = path.join(projectRoot, 'backend', 'app', 'agents', 'orchestrator', 'supervisor_router.py');
+      scriptPath = path.join(backendRoot, 'app', 'agents', 'orchestrator', 'supervisor_router.py');
       goal = `Investigate the following security incident and provide a detailed report with remediation steps: ${alert}`;
       sendSSEEvent({ type: 'start', message: '🛡️ Security Supervisor engaged', alert });
     } else {
-      scriptPath = path.join(projectRoot, 'backend', 'app', 'agents', 'orchestrator', 'war_room_monitor.py');
+      scriptPath = path.join(backendRoot, 'app', 'agents', 'orchestrator', 'war_room_monitor.py');
       sendSSEEvent({ type: 'start', message: '🛡️ War Room engaged', alert });
     }
 
@@ -36,9 +38,33 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Agent script not found' }, { status: 404 });
     }
 
+    // war_room_monitor.py does not provide a local mock implementation, so
+    // return a deterministic repair briefing without starting an API client.
+    const mockMode = shouldUseMockMode();
+
+    if (mockMode && !isSecurity) {
+      const content = [
+        '# Repair Briefing',
+        '',
+        `**Incident:** ${alert}`,
+        '',
+        '**Investigation:**',
+        'Free-mode simulation completed. Review application logs, reproduce the failure locally, and validate a proposed repair before deployment.',
+        '',
+        '---',
+        '**Please review and DECREE or ABANDON.**',
+      ].join('\n');
+      const destBriefing = path.join(/*turbopackIgnore: true*/ tenantPath, 'briefings', 'repair_briefing.md');
+      fs.writeFileSync(destBriefing, content);
+      const briefing = { objective: alert, content };
+      sendSSEEvent({ type: 'done', briefing });
+      return NextResponse.json({ success: true, briefing, security: false, freeMode: true });
+    }
+
+    const env = { ...process.env, MOCK_MODE: mockMode ? 'true' : 'false' };
     const pythonProcess = spawn('python3', [scriptPath, goal], {
       cwd: projectRoot,
-      env: { ...process.env, PYTHONUNBUFFERED: '1' },
+      env: { ...env, PYTHONUNBUFFERED: '1' },
     });
 
     pythonProcess.stdout.on('data', (data) => {
@@ -55,16 +81,16 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    return new Promise((resolve) => {
+    return new Promise<NextResponse>((resolve) => {
       pythonProcess.on('close', async (code) => {
         if (code === 0) {
           let sourceBriefing, destBriefing;
           if (isSecurity) {
             sourceBriefing = path.join(projectRoot, 'mission_briefing.md');
-            destBriefing = path.join(tenantPath, 'briefings', 'mission_briefing.md');
+            destBriefing = path.join(/*turbopackIgnore: true*/ tenantPath, 'briefings', 'mission_briefing.md');
           } else {
             sourceBriefing = path.join(projectRoot, 'repair_briefing.md');
-            destBriefing = path.join(tenantPath, 'briefings', 'repair_briefing.md');
+            destBriefing = path.join(/*turbopackIgnore: true*/ tenantPath, 'briefings', 'repair_briefing.md');
           }
           if (fs.existsSync(sourceBriefing)) {
             fs.copyFileSync(sourceBriefing, destBriefing);
@@ -77,7 +103,15 @@ export async function POST(req: NextRequest) {
           }
           const briefing = { objective: alert, content };
           sendSSEEvent({ type: 'done', briefing });
-          resolve(NextResponse.json({ success: true, briefing, security: isSecurity }));
+          resolve(
+            NextResponse.json({
+              success: true,
+              briefing,
+              security: isSecurity,
+              runtime_mode: runtimeMode.mode,
+              mock_mode: runtimeMode.mockMode,
+            })
+          );
         } else {
           sendSSEEvent({ type: 'error', message: `Process exited with code ${code}` });
           resolve(NextResponse.json({ error: 'Repair mission failed' }, { status: 500 }));

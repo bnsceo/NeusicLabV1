@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  turbopack: {
+    root: "/Users/paolaalvarez/Desktop/Jarvis_Dashboard_Project/autonomous_agent_build/dashboard-app",
+  },
 };
 
 export default nextConfig;
