@@ -23,10 +23,10 @@ export default function NavBar() {
       <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2 transition hover:bg-white/[0.06]">
-            <Image src="/dominion-logo.svg" alt="Dominion logo" width={36} height={36} className="h-9 w-9 rounded-xl" />
+            <Image src="/dominion-logo.svg" alt="Neusic Foundry logo" width={36} height={36} className="h-9 w-9 rounded-xl" />
             <div className="leading-tight">
-              <p className="text-sm font-semibold text-white">AI Command Center</p>
-              <p className="text-[11px] uppercase tracking-[0.22em] text-cyan-200/80">Dominion</p>
+              <p className="text-sm font-semibold text-white">Neusic Foundry</p>
+              <p className="text-[11px] uppercase tracking-[0.22em] text-cyan-200/80">Autonomous business OS</p>
             </div>
           </Link>
 

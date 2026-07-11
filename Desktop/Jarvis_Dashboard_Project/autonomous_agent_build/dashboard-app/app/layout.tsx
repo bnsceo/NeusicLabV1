@@ -4,7 +4,7 @@ import MobileDock from "@/components/MobileDock";
 import PwaBootstrap from "@/components/PwaBootstrap";
 
 export const metadata: Metadata = {
-  title: "AI Command Center · Dominion",
+  title: "Neusic Foundry",
   description: "Autonomous business operating system for the Anderson founder stack",
   manifest: "/manifest.webmanifest",
 };
@@ -25,7 +25,7 @@ export default function RootLayout({
         <PwaBootstrap />
         {children}
         <footer className="border-t border-white/10 bg-slate-950/80 px-4 py-4 text-center text-xs text-slate-500">
-          Created by Anderson · Founder · AI Command Center Dominion
+          Created by Anderson · Founder · Neusic Foundry
         </footer>
         <MobileDock />
       </body>

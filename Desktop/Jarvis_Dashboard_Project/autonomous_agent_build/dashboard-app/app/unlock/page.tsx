@@ -13,13 +13,13 @@ function UnlockShell({ nextPath }: { nextPath: string }) {
   return (
     <div className="min-h-screen bg-[#070b12] px-4 py-10 text-white">
       <div className="mx-auto max-w-md rounded-3xl border border-white/10 bg-slate-950/80 p-6 shadow-2xl shadow-blue-950/30">
-        <div className="flex items-center gap-3">
-          <div className="h-12 w-12 rounded-2xl bg-cyan-300/20" />
-          <div>
-            <p className="text-xs uppercase tracking-[0.24em] text-cyan-300">Private tunnel</p>
-            <h1 className="text-2xl font-semibold">Unlock AI Command Center</h1>
+          <div className="flex items-center gap-3">
+            <div className="h-12 w-12 rounded-2xl bg-cyan-300/20" />
+            <div>
+              <p className="text-xs uppercase tracking-[0.24em] text-cyan-300">Private tunnel</p>
+              <h1 className="text-2xl font-semibold">Unlock Neusic Foundry</h1>
+            </div>
           </div>
-        </div>
 
         <form action="/api/unlock" method="post" className="mt-4">
           <p className="mt-4 text-sm leading-6 text-slate-400">

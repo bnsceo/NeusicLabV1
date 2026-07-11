@@ -733,11 +733,11 @@ export default function Home() {
                 Mission Control
               </p>
               <h1 className="mt-2 text-3xl font-semibold md:text-5xl">
-                AI Command Center
+                Neusic Foundry
               </h1>
               <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300 md:text-base">
-                The operating room for an autonomous business organization. The Executive AI
-                turns founder intent into companies, departments, agents, approvals, and outputs.
+                Autonomous business command center. The Executive AI turns founder intent into
+                companies, departments, agents, approvals, and outputs.
               </p>
               <div className="mt-5 flex flex-wrap gap-2">
                 <Pill tone="cyan">Founder intent first</Pill>
