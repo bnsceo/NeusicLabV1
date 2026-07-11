@@ -15,6 +15,11 @@ interface Company {
   status: string;
 }
 
+const actionButtonBase =
+  'inline-flex min-h-11 items-center justify-center rounded-xl px-4 py-2.5 text-sm transition';
+const actionButtonFilled = `${actionButtonBase} bg-cyan-300 font-semibold text-slate-950 hover:bg-cyan-200`;
+const actionButtonOutline = `${actionButtonBase} border border-white/10 bg-white/[0.03] text-slate-200 hover:bg-white/[0.06]`;
+
 export default function CompaniesPage() {
   const runtimeInfo = getRuntimeModeInfo();
   const isDemoModeActive = runtimeInfo.mode === 'demo';
@@ -133,7 +138,7 @@ export default function CompaniesPage() {
             {isDemoModeActive ? (
               <button
                 onClick={handleResetDemo}
-                className="rounded-xl border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:bg-white/5"
+                className={actionButtonOutline}
               >
                 Reset demo
               </button>
@@ -293,7 +298,7 @@ export default function CompaniesPage() {
             <button
               onClick={handleCreateCompany}
               disabled={submitting || !vision.trim() || !blueprintApproved || isDemoModeActive}
-              className="mt-4 w-full rounded-xl bg-cyan-300 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-50"
+              className={`mt-4 w-full ${actionButtonFilled} disabled:cursor-not-allowed disabled:opacity-50`}
             >
               {isDemoModeActive
                 ? 'Demo is read-only'
@@ -305,7 +310,7 @@ export default function CompaniesPage() {
             </button>
             <Link
               href="/headquarters"
-              className="mt-3 block rounded-xl border border-white/10 px-5 py-2.5 text-center text-sm text-slate-200 transition hover:bg-white/5"
+              className={`mt-3 block ${actionButtonOutline} text-center`}
             >
               Open Headquarters
             </Link>
@@ -313,7 +318,7 @@ export default function CompaniesPage() {
               <button
                 type="button"
                 onClick={handleResetDemo}
-                className="mt-3 block w-full rounded-xl border border-white/10 px-5 py-2.5 text-center text-sm text-slate-200 transition hover:bg-white/5 md:hidden"
+                className={`mt-3 block w-full ${actionButtonOutline} text-center md:hidden`}
               >
                 Reset demo
               </button>

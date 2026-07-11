@@ -127,6 +127,15 @@ const missionPresets = [
   'I want to build a consulting group.',
 ];
 
+const actionButtonBase =
+  'inline-flex min-h-11 items-center justify-center rounded-xl px-4 py-2.5 text-sm transition';
+const actionButtonPrimary = `${actionButtonBase} cyvora-tactile font-semibold text-cyan-50 hover:translate-y-[-1px]`;
+const actionButtonFilled = `${actionButtonBase} bg-cyan-300 font-semibold text-slate-950 hover:bg-cyan-200`;
+const actionButtonSecondary = `${actionButtonBase} cyvora-chip text-slate-200 hover:translate-y-[-1px]`;
+const actionButtonOutline = `${actionButtonBase} border border-white/10 bg-white/[0.03] text-slate-200 hover:bg-white/[0.06]`;
+const tileActionButton =
+  'cyvora-tactile flex min-h-24 flex-col items-start justify-center rounded-2xl p-4 text-left';
+
 export default function Home() {
   const runtimeInfo = getRuntimeModeInfo();
   const isDemoModeActive = runtimeInfo.mode === 'demo';
@@ -804,14 +813,14 @@ export default function Home() {
                 <button
                   onClick={() => setModalOpen(true)}
                   disabled={isDemoModeActive}
-                  className="cyvora-tactile rounded-xl px-4 py-2 text-sm font-semibold text-cyan-50 transition hover:translate-y-[-1px] disabled:cursor-not-allowed disabled:opacity-50"
+                  className={`${actionButtonPrimary} disabled:cursor-not-allowed disabled:opacity-50`}
                 >
                   {isDemoModeActive ? 'Demo is read-only' : 'New idea'}
                 </button>
                 {isDemoModeActive ? (
                   <button
                     onClick={handleResetDemo}
-                    className="cyvora-chip rounded-xl px-4 py-2 text-sm text-slate-200 transition hover:translate-y-[-1px]"
+                    className={actionButtonSecondary}
                   >
                     Reset demo
                   </button>
@@ -845,7 +854,7 @@ export default function Home() {
                 </select>
                 <button
                   onClick={() => setShowCreateTenant(true)}
-                  className="cyvora-chip rounded-xl px-3 py-2 text-sm text-slate-200 transition hover:translate-y-[-1px]"
+                  className={`${actionButtonSecondary} px-3`}
                 >
                   New
                 </button>
@@ -890,10 +899,10 @@ export default function Home() {
               <MiniMetric label="Approvals" value={String(pendingApprovals)} />
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
-              <Link href="/headquarters" className="rounded-xl border border-white/10 px-4 py-2 text-sm text-slate-200">
+              <Link href="/headquarters" className={actionButtonOutline}>
                 HQ
               </Link>
-              <Link href="/harness-engineering" className="rounded-xl border border-white/10 px-4 py-2 text-sm text-slate-200">
+              <Link href="/harness-engineering" className={actionButtonOutline}>
                 Harness
               </Link>
               <button
@@ -902,12 +911,12 @@ export default function Home() {
                   setMobileDetailKind('company');
                   setMobileDetailOpen(true);
                 }}
-                className="rounded-xl border border-white/10 px-4 py-2 text-sm text-slate-200"
+                className={actionButtonOutline}
               >
                 Inspect
               </button>
               {isDemoModeActive ? (
-                <button onClick={handleResetDemo} className="rounded-xl border border-white/10 px-4 py-2 text-sm text-slate-200">
+                <button onClick={handleResetDemo} className={actionButtonOutline}>
                   Reset
                 </button>
               ) : null}
@@ -936,14 +945,14 @@ export default function Home() {
                   setMobileDetailKind('company');
                   setMobileDetailOpen(true);
                 }}
-                className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-slate-200"
+                className={`${actionButtonOutline} px-3`}
               >
                 Inspect
               </button>
               <button
                 type="button"
                 onClick={copyShareableView}
-                className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-slate-200"
+                className={`${actionButtonOutline} px-3`}
               >
                 Copy link
               </button>
@@ -976,7 +985,7 @@ export default function Home() {
                     setMobileDetailKind('company');
                     setMobileDetailOpen(true);
                   }}
-                  className="cyvora-tactile rounded-2xl p-4 text-left"
+                  className={tileActionButton}
                 >
                   <p className="text-sm font-semibold text-white">Company</p>
                   <p className="mt-1 text-xs text-slate-400">Open the active company</p>
@@ -987,7 +996,7 @@ export default function Home() {
                     setMobileDetailKind('connector');
                     setMobileDetailOpen(true);
                   }}
-                  className="cyvora-tactile rounded-2xl p-4 text-left"
+                  className={tileActionButton}
                 >
                   <p className="text-sm font-semibold text-white">Connector</p>
                   <p className="mt-1 text-xs text-slate-400">Inspect live system links</p>
@@ -1000,7 +1009,7 @@ export default function Home() {
                     setMobileDetailKind('task');
                     setMobileDetailOpen(true);
                   }}
-                  className="cyvora-tactile rounded-2xl p-4 text-left"
+                  className={tileActionButton}
                 >
                   <p className="text-sm font-semibold text-white">Task</p>
                   <p className="mt-1 text-xs text-slate-400">Open the current work item</p>
@@ -1011,7 +1020,7 @@ export default function Home() {
                     setMobileDetailKind('output');
                     setMobileDetailOpen(true);
                   }}
-                  className="cyvora-tactile rounded-2xl p-4 text-left"
+                  className={tileActionButton}
                 >
                   <p className="text-sm font-semibold text-white">Output</p>
                   <p className="mt-1 text-xs text-slate-400">See produced artifacts</p>
@@ -1021,19 +1030,19 @@ export default function Home() {
                 <button
                   onClick={() => setModalOpen(true)}
                   disabled={isDemoModeActive}
-                  className="cyvora-tactile rounded-2xl px-4 py-3 text-sm font-semibold text-cyan-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  className={`${actionButtonPrimary} min-h-12 w-full disabled:cursor-not-allowed disabled:opacity-50`}
                 >
                   {isDemoModeActive ? 'Demo locked' : 'New idea'}
                 </button>
                 {isDemoModeActive ? (
                   <button
                     onClick={handleResetDemo}
-                    className="cyvora-chip rounded-2xl px-4 py-3 text-sm text-slate-200"
+                    className={`${actionButtonSecondary} min-h-12 w-full`}
                   >
                     Reset demo
                   </button>
                 ) : (
-                  <Link href="/security" className="cyvora-chip rounded-2xl px-4 py-3 text-sm text-slate-200">
+                  <Link href="/security" className={`${actionButtonSecondary} min-h-12 w-full`}>
                     War room
                   </Link>
                 )}
@@ -1096,14 +1105,14 @@ export default function Home() {
                   setGoal(missionDraft);
                   setModalOpen(true);
                 }}
-                className="cyvora-chip rounded-xl px-4 py-2 text-sm text-slate-200 transition hover:translate-y-[-1px]"
+                className={actionButtonSecondary}
               >
                 Review mission
               </button>
               <button
                 onClick={() => submitMission(missionDraft)}
                 disabled={submitting || !missionDraft.trim() || isDemoModeActive}
-                className="cyvora-tactile rounded-xl px-4 py-2 text-sm font-semibold text-cyan-50 transition hover:translate-y-[-1px] disabled:cursor-not-allowed disabled:opacity-50"
+                className={`${actionButtonPrimary} disabled:cursor-not-allowed disabled:opacity-50`}
               >
                 {isDemoModeActive ? 'Demo is read-only' : submitting ? 'Starting...' : 'Launch mission'}
               </button>
@@ -1625,7 +1634,7 @@ export default function Home() {
                 <h2 className="text-lg font-semibold">Harness Engineering queue</h2>
                 <p className="mt-1 text-sm text-slate-400">Factory-building requests and approval state</p>
               </div>
-              <Link href="/harness-engineering" className="text-sm text-cyan-200 underline-offset-4 hover:underline">
+              <Link href="/harness-engineering" className={`${actionButtonOutline} px-3 py-2`}>
                 Manage
               </Link>
             </div>
@@ -1655,12 +1664,9 @@ export default function Home() {
           <div className="cyvora-glass rounded-2xl p-5 md:p-6">
             <h2 className="text-lg font-semibold">Analytics snapshot</h2>
             <p className="mt-1 text-sm text-slate-400">Agent and platform performance</p>
-            <button
-              onClick={handleAnalytics}
-              className="mt-5 w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left text-sm text-slate-200 transition hover:bg-white/[0.06]"
-            >
-              Open current analytics report
-            </button>
+              <button onClick={handleAnalytics} className={`mt-5 w-full ${actionButtonOutline} justify-start`}>
+                Open current analytics report
+              </button>
             <div className="mt-4 grid grid-cols-2 gap-3">
               <MiniMetric label="API cost" value="$0.00" />
               <MiniMetric label="Health" value="Nominal" />
@@ -1700,7 +1706,7 @@ export default function Home() {
                     <button
                       onClick={() => handleRollbackRun(selectedExecutionRun)}
                       disabled={selectedExecutionRun.status === 'rolled_back'}
-                      className="cyvora-chip rounded-xl px-3 py-1.5 text-xs font-semibold text-rose-100 transition hover:translate-y-[-1px] disabled:cursor-not-allowed disabled:opacity-50"
+                    className="inline-flex min-h-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-semibold text-rose-100 transition hover:translate-y-[-1px] disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       Rollback
                     </button>
@@ -1734,7 +1740,7 @@ export default function Home() {
                         <button
                           type="button"
                           onClick={copySelectedRunPlan}
-                          className="rounded-xl border border-white/10 px-3 py-1.5 text-xs text-slate-200 transition hover:bg-white/[0.06]"
+                        className="inline-flex min-h-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-slate-200 transition hover:bg-white/[0.06]"
                         >
                           Copy plan
                         </button>
@@ -1890,14 +1896,14 @@ export default function Home() {
                 setGoal('');
                 setMissionPlanApproved(false);
               }}
-              className="rounded-xl border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:bg-white/5"
+              className={actionButtonOutline}
             >
               Cancel
             </button>
             <button
               onClick={handleNewMission}
               disabled={submitting || !goal.trim() || !missionPlanApproved || isDemoModeActive}
-              className="rounded-xl bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-50"
+              className={`${actionButtonFilled} disabled:cursor-not-allowed disabled:opacity-50`}
             >
               {isDemoModeActive
                 ? 'Demo is read-only'
@@ -1923,14 +1929,14 @@ export default function Home() {
           <div className="mt-4 flex justify-end gap-3">
             <button
               onClick={() => { setShowCreateTenant(false); setNewTenantName(''); }}
-              className="rounded-xl border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:bg-white/5"
+              className={actionButtonOutline}
             >
               Cancel
             </button>
             <button
               onClick={createTenant}
               disabled={isDemoModeActive}
-              className="rounded-xl bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-50"
+              className={`${actionButtonFilled} disabled:cursor-not-allowed disabled:opacity-50`}
             >
               {isDemoModeActive ? 'Demo is read-only' : 'Create'}
             </button>
