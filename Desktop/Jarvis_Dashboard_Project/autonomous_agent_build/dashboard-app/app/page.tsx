@@ -192,6 +192,7 @@ export default function Home() {
       null,
     [executionRuns, selectedExecutionRunId]
   );
+  const selectedRuntimePlan = selectedExecutionRun?.runtime_plan || null;
   const selectedConnector = useMemo(
     () => activeConnectors.find((connector: any) => connector.id === selectedConnectorId) || activeConnectors[0] || null,
     [activeConnectors, selectedConnectorId]
@@ -581,6 +582,25 @@ export default function Home() {
       alert('Current view link copied');
     } catch {
       alert(nextLink);
+    }
+  };
+
+  const copySelectedRunPlan = async () => {
+    if (typeof window === 'undefined' || !selectedExecutionRun || !selectedRuntimePlan) return;
+    const planText = [
+      `Goal: ${selectedExecutionRun.goal}`,
+      `Sandbox scope: ${selectedRuntimePlan.sandbox_scope.join(' | ')}`,
+      `Permissions: ${selectedRuntimePlan.permissions.join(' | ')}`,
+      `Validation checks: ${selectedRuntimePlan.validation_checks.join(' | ')}`,
+      `Rollback path: ${selectedRuntimePlan.rollback_path.join(' | ')}`,
+      `Token ceiling: ${selectedRuntimePlan.token_cost_ceiling.tokens}`,
+      `Cost ceiling: ${selectedRuntimePlan.token_cost_ceiling.cost_usd}`,
+    ].join('\n');
+    try {
+      await navigator.clipboard.writeText(planText);
+      alert('Runtime plan copied');
+    } catch {
+      alert(planText);
     }
   };
 
@@ -1645,6 +1665,47 @@ export default function Home() {
                     label="Approval lock"
                     value={`${selectedExecutionRun.paid_ai ? 'Paid AI on' : 'Paid AI off'} · ${selectedExecutionRun.mock_mode ? 'mock-safe' : 'live'}`}
                   />
+                  {selectedRuntimePlan ? (
+                    <div className="rounded-xl border border-white/10 bg-slate-950/80 p-4">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <p className="text-sm font-semibold text-white">Approved runtime plan</p>
+                          <p className="mt-1 text-xs text-slate-400">
+                            Exact plan used by execution. This is the founder-visible harness contract.
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={copySelectedRunPlan}
+                          className="rounded-xl border border-white/10 px-3 py-1.5 text-xs text-slate-200 transition hover:bg-white/[0.06]"
+                        >
+                          Copy plan
+                        </button>
+                      </div>
+                      <div className="mt-4 grid gap-3">
+                        <RuntimePlanBlock label="Sandbox scope" values={selectedRuntimePlan.sandbox_scope} />
+                        <RuntimePlanBlock label="Permissions" values={selectedRuntimePlan.permissions} />
+                        <RuntimePlanBlock label="Validation checks" values={selectedRuntimePlan.validation_checks} />
+                        <RuntimePlanBlock label="Rollback path" values={selectedRuntimePlan.rollback_path} />
+                      </div>
+                      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                        <MiniMetric label="Token ceiling" value={`${selectedRuntimePlan.token_cost_ceiling.tokens}`} />
+                        <MiniMetric label="Cost ceiling" value={selectedRuntimePlan.token_cost_ceiling.cost_usd} />
+                      </div>
+                      {selectedRuntimePlan.runtime_notes.length ? (
+                        <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                          <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Runtime notes</p>
+                          <div className="mt-2 space-y-2">
+                            {selectedRuntimePlan.runtime_notes.map((note) => (
+                              <p key={note} className="text-sm leading-6 text-slate-200">
+                                {note}
+                              </p>
+                            ))}
+                          </div>
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : null}
                 </div>
               ) : (
                 <p className="mt-4 rounded-xl border border-dashed border-white/10 bg-slate-950/80 p-4 text-sm text-slate-500">
@@ -2086,6 +2147,21 @@ function ExecutionMetric({ label, value }: { label: string; value: string }) {
     <div className="rounded-xl border border-white/10 bg-slate-950/80 p-3">
       <p className="text-xs uppercase tracking-[0.16em] text-slate-500">{label}</p>
       <p className="mt-1 text-sm leading-6 text-white">{value}</p>
+    </div>
+  );
+}
+
+function RuntimePlanBlock({ label, values }: { label: string; values: string[] }) {
+  return (
+    <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+      <p className="text-xs uppercase tracking-[0.18em] text-slate-500">{label}</p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {values.map((value) => (
+          <span key={value} className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-slate-200">
+            {value}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }
