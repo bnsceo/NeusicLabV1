@@ -1,8 +1,10 @@
-import type { NextConfig } from "next";
+import path from 'path';
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  outputFileTracingRoot: path.join(__dirname, '..'),
   turbopack: {
-    root: "/Users/paolaalvarez/Desktop/Jarvis_Dashboard_Project/autonomous_agent_build/dashboard-app",
+    root: path.join(__dirname, '..'),
   },
 };
 

@@ -1,20 +1,17 @@
-import { Suspense } from 'react';
-import UnlockForm from './UnlockForm';
+'use client';
 
-export default function UnlockPage() {
-  return (
-    <Suspense fallback={<UnlockShell nextPath="/" />}>
-      <UnlockForm />
-    </Suspense>
-  );
-}
+import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 
-function UnlockShell({ nextPath }: { nextPath: string }) {
+export default function UnlockForm() {
+  const searchParams = useSearchParams();
+  const nextPath = searchParams.get('next') || '/';
+
   return (
     <div className="min-h-screen bg-[#070b12] px-4 py-10 text-white">
       <div className="mx-auto max-w-md rounded-3xl border border-white/10 bg-slate-950/80 p-6 shadow-2xl shadow-blue-950/30">
         <div className="flex items-center gap-3">
-          <div className="h-12 w-12 rounded-2xl bg-cyan-300/20" />
+          <Image src="/dominion-logo.svg" alt="Dominion" width={48} height={48} className="h-12 w-12 rounded-2xl" />
           <div>
             <p className="text-xs uppercase tracking-[0.24em] text-cyan-300">Private tunnel</p>
             <h1 className="text-2xl font-semibold">Unlock AI Command Center</h1>

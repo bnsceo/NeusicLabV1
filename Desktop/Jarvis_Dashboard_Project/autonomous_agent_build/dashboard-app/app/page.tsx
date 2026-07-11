@@ -6,6 +6,7 @@ import NavBar from '@/components/NavBar';
 import { inferMissionBlueprint } from '@/lib/missionBlueprint';
 import { buildHarnessPlan, type HarnessPlan } from '@/lib/harnessPlan';
 import { getRuntimeModeInfo } from '@/lib/runtimeMode';
+import { buildShareableUrl, readNumericQueryParam } from '@/lib/viewState';
 
 interface Briefing {
   objective: string;
@@ -156,6 +157,8 @@ export default function Home() {
   const [selectedOutputId, setSelectedOutputId] = useState<number | null>(null);
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
   const [mobileDetailKind, setMobileDetailKind] = useState<'company' | 'connector' | 'task' | 'output'>('company');
+  const [shareLink, setShareLink] = useState('');
+  const [urlHydrated, setUrlHydrated] = useState(false);
   const [expandedCompanies, setExpandedCompanies] = useState<number[]>([]);
   const [expandedDepartments, setExpandedDepartments] = useState<number[]>([]);
   const [expandedTeams, setExpandedTeams] = useState<number[]>([]);
@@ -200,6 +203,17 @@ export default function Home() {
   const selectedOutput = useMemo(
     () => activeOutputsList.find((output: any) => output.id === selectedOutputId) || activeOutputsList[0] || null,
     [activeOutputsList, selectedOutputId]
+  );
+  const selectedNodeTrail = useMemo(
+    () =>
+      buildSelectionBreadcrumbs(
+        headquarters?.companies || [],
+        selectedCompanyId,
+        selectedDepartmentId,
+        selectedTeamId,
+        selectedAgentId
+      ),
+    [headquarters?.companies, selectedCompanyId, selectedDepartmentId, selectedTeamId, selectedAgentId]
   );
   const mobileDetail = useMemo(() => {
     switch (mobileDetailKind) {
@@ -317,7 +331,12 @@ export default function Home() {
       const data = await res.json();
       if (Array.isArray(data)) {
         setExecutionRuns(data);
-        setSelectedExecutionRunId((current) => current ?? data[0]?.id ?? null);
+        setSelectedExecutionRunId((current) => {
+          if (current && data.some((run) => run.id === current)) {
+            return current;
+          }
+          return data[0]?.id ?? null;
+        });
       }
     } catch (error) {
       console.error(error);
@@ -382,21 +401,25 @@ export default function Home() {
   useEffect(() => {
     if (!activeCompanyDetail) return;
     const firstDepartment = activeCompanyDetail.departments?.[0];
-    const firstTeam = firstDepartment?.teams?.[0];
-    const firstAgent = firstTeam?.agents?.[0];
+    const department =
+      activeCompanyDetail.departments?.find((item) => item.id === selectedDepartmentId) || firstDepartment;
+    const firstTeam = department?.teams?.[0];
+    const team = department?.teams?.find((item) => item.id === selectedTeamId) || firstTeam;
+    const firstAgent = team?.agents?.[0];
+    const agent = team?.agents?.find((item) => item.id === selectedAgentId) || firstAgent;
     const firstConnector = activeCompanyDetail.connectors?.[0];
     const firstTask = activeCompanyDetail.tasks?.[0];
     const firstOutput = activeCompanyDetail.outputs?.[0];
-    setSelectedDepartmentId(firstDepartment?.id || null);
-    setSelectedTeamId(firstTeam?.id || null);
-    setSelectedAgentId(firstAgent?.id || null);
+    setSelectedDepartmentId(department?.id || null);
+    setSelectedTeamId(team?.id || null);
+    setSelectedAgentId(agent?.id || null);
     setSelectedConnectorId(firstConnector?.id || null);
     setSelectedTaskId(firstTask?.id || null);
     setSelectedOutputId(firstOutput?.id || null);
     setExpandedCompanies((current) =>
       current.includes(activeCompanyDetail.id) ? current : [...current, activeCompanyDetail.id]
     );
-  }, [activeCompanyDetail]);
+  }, [activeCompanyDetail, selectedDepartmentId, selectedTeamId, selectedAgentId]);
 
   useEffect(() => {
     localStorage.setItem('dashboardPrefs', JSON.stringify(prefs));
@@ -405,6 +428,47 @@ export default function Home() {
   useEffect(() => {
     localStorage.setItem('missionDraft', missionDraft);
   }, [missionDraft]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const companyId = readNumericQueryParam(window.location.search, 'company');
+    const runId = readNumericQueryParam(window.location.search, 'run');
+    const departmentId = readNumericQueryParam(window.location.search, 'department');
+    const teamId = readNumericQueryParam(window.location.search, 'team');
+    const agentId = readNumericQueryParam(window.location.search, 'agent');
+    if (companyId !== null) {
+      setSelectedCompanyId(companyId);
+    }
+    if (runId !== null) {
+      setSelectedExecutionRunId(runId);
+    }
+    if (departmentId !== null) {
+      setSelectedDepartmentId(departmentId);
+    }
+    if (teamId !== null) {
+      setSelectedTeamId(teamId);
+    }
+    if (agentId !== null) {
+      setSelectedAgentId(agentId);
+    }
+    setUrlHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!urlHydrated || typeof window === 'undefined') return;
+    const nextPath = buildShareableUrl(window.location.pathname, {
+      company: selectedCompanyId,
+      run: selectedExecutionRunId,
+      department: selectedDepartmentId,
+      team: selectedTeamId,
+      agent: selectedAgentId,
+    });
+    const nextUrl = `${window.location.origin}${nextPath}`;
+    setShareLink(nextUrl);
+    if (`${window.location.pathname}${window.location.search}` !== nextPath) {
+      window.history.replaceState(null, '', nextPath);
+    }
+  }, [selectedCompanyId, selectedExecutionRunId, selectedDepartmentId, selectedTeamId, selectedAgentId, urlHydrated]);
 
   useEffect(() => {
     const es = new EventSource('/api/stream');
@@ -501,6 +565,22 @@ export default function Home() {
       );
     } catch {
       alert('Failed to load analytics');
+    }
+  };
+
+  const copyShareableView = async () => {
+    if (typeof window === 'undefined') return;
+    const nextLink =
+      shareLink ||
+      `${window.location.origin}${buildShareableUrl(window.location.pathname, {
+        company: selectedCompanyId,
+        run: selectedExecutionRunId,
+      })}`;
+    try {
+      await navigator.clipboard.writeText(nextLink);
+      alert('Current view link copied');
+    } catch {
+      alert(nextLink);
     }
   };
 
@@ -755,6 +835,42 @@ export default function Home() {
                   Reset
                 </button>
               ) : null}
+            </div>
+          </div>
+        </section>
+
+        <section className="sticky bottom-4 z-30 mt-4 md:hidden">
+          <div className="rounded-2xl border border-cyan-300/20 bg-slate-950/95 p-4 shadow-2xl shadow-black/40 backdrop-blur">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-cyan-300">Current node</p>
+                <p className="mt-1 truncate text-sm font-medium text-white">
+                  {selectedNodeTrail.length ? selectedNodeTrail.join(' / ') : 'No node selected'}
+                </p>
+                <p className="mt-1 text-xs text-slate-400">
+                  {activeCompanyDetail?.name || 'Choose a company'} · {activeConnectors.length} connectors · {activeTasksList.length} tasks
+                </p>
+              </div>
+              <Pill tone="cyan">Live</Pill>
+            </div>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileDetailKind('company');
+                  setMobileDetailOpen(true);
+                }}
+                className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-slate-200"
+              >
+                Inspect
+              </button>
+              <button
+                type="button"
+                onClick={copyShareableView}
+                className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-slate-200"
+              >
+                Copy link
+              </button>
             </div>
           </div>
         </section>
@@ -1287,13 +1403,7 @@ export default function Home() {
               <DetailPanel
                 title="Selected node"
                 subtitle="Where you are in the org"
-                items={buildSelectionBreadcrumbs(
-                  headquarters?.companies || [],
-                  selectedCompanyId,
-                  selectedDepartmentId,
-                  selectedTeamId,
-                  selectedAgentId
-                )}
+                items={selectedNodeTrail}
                 emptyLabel="Select a company, department, team, or agent"
               />
               <div className="rounded-xl border border-white/10 bg-black/20 p-4">
@@ -1306,6 +1416,21 @@ export default function Home() {
                   <Pill tone="emerald">{activeConnectors.length} connectors</Pill>
                   <Pill tone="blue">{activeTasksList.length} tasks</Pill>
                   <Pill tone="amber">{activeOutputsList.length} outputs</Pill>
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Link
+                    href={`/headquarters${selectedCompanyId ? `?company=${selectedCompanyId}` : ''}`}
+                    className="rounded-xl border border-white/10 px-3 py-2 text-xs text-slate-200 transition hover:bg-white/5"
+                  >
+                    Open HQ view
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={copyShareableView}
+                    className="rounded-xl border border-white/10 px-3 py-2 text-xs text-slate-200 transition hover:bg-white/5"
+                  >
+                    Copy current link
+                  </button>
                 </div>
               </div>
               <ControlSurfaceSection

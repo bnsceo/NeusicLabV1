@@ -1,0 +1,23 @@
+project:
+  name: robinhood-agentic-trading
+  mode: dry-run
+
+account:
+  starting_balance: 50
+  currency: USD
+  use_margin: false
+  allow_options: false
+  allow_unattended_trades: false
+
+risk:
+  max_trade_size: 10
+  max_daily_loss: 5
+  max_trades_per_day: 1
+  allowed_assets:
+    - stocks
+    - etfs
+
+execution:
+  require_human_approval: true
+  log_every_step: true
+

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import NavBar from '@/components/NavBar';
 import { getRuntimeModeInfo } from '@/lib/runtimeMode';
+import { buildShareableUrl, readNumericQueryParam } from '@/lib/viewState';
 
 type Agent = {
   id: number;
@@ -58,6 +59,29 @@ export default function HeadquartersPage() {
   const [data, setData] = useState<HeadquartersData | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(null);
+  const [shareLink, setShareLink] = useState('');
+  const [urlHydrated, setUrlHydrated] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const companyId = readNumericQueryParam(window.location.search, 'company');
+    if (companyId !== null) {
+      setSelectedCompanyId(companyId);
+    }
+    setUrlHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!urlHydrated || typeof window === 'undefined') return;
+    const nextPath = buildShareableUrl(window.location.pathname, {
+      company: selectedCompanyId,
+    });
+    const nextUrl = `${window.location.origin}${nextPath}`;
+    setShareLink(nextUrl);
+    if (`${window.location.pathname}${window.location.search}` !== nextPath) {
+      window.history.replaceState(null, '', nextPath);
+    }
+  }, [selectedCompanyId, urlHydrated]);
 
   useEffect(() => {
     fetch('/api/headquarters')
@@ -65,7 +89,12 @@ export default function HeadquartersPage() {
       .then((payload) => {
         setData(payload);
         if (payload.companies?.length) {
-          setSelectedCompanyId(payload.companies[0].id);
+          setSelectedCompanyId((current) => {
+            if (current && payload.companies.some((company: Company) => company.id === current)) {
+              return current;
+            }
+            return payload.companies[0].id;
+          });
         }
       })
       .catch((error) => console.error(error))
@@ -95,6 +124,21 @@ export default function HeadquartersPage() {
     if (!data?.companies.length) return null;
     return data.companies.find((company) => company.id === selectedCompanyId) || data.companies[0];
   }, [data, selectedCompanyId]);
+
+  const copyShareableLink = async () => {
+    if (typeof window === 'undefined') return;
+    const nextLink =
+      shareLink ||
+      `${window.location.origin}${buildShareableUrl(window.location.pathname, {
+        company: selectedCompanyId,
+      })}`;
+    try {
+      await navigator.clipboard.writeText(nextLink);
+      alert('Company view link copied');
+    } catch {
+      alert(nextLink);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#070b12] text-white">
@@ -194,6 +238,23 @@ export default function HeadquartersPage() {
                     </div>
                   </button>
                 ))}
+              </div>
+
+              <button
+                type="button"
+                onClick={copyShareableLink}
+                className="mt-4 rounded-xl border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:bg-white/5"
+              >
+                Copy selected company link
+              </button>
+
+              <div className="mt-4 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-4 text-sm text-slate-100 md:hidden">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-cyan-200">Phone view</p>
+                <p className="mt-1 font-medium">{selectedCompany?.name || 'No company selected'}</p>
+                <p className="mt-1 text-xs text-slate-300">
+                  {selectedCompany?.departments.length || 0} departments · {countTeams(selectedCompany?.departments)} teams ·{' '}
+                  {countAgents(selectedCompany?.departments)} agents
+                </p>
               </div>
             </aside>
 
@@ -317,5 +378,19 @@ function MiniStat({ label, value }: { label: string; value: string | number }) {
       <p className="text-sm font-semibold text-white">{String(value)}</p>
       <p className="mt-1 text-xs text-slate-500">{label}</p>
     </div>
+  );
+}
+
+function countTeams(departments?: Department[]) {
+  return departments?.reduce((total, department) => total + (department.teams?.length || 0), 0) || 0;
+}
+
+function countAgents(departments?: Department[]) {
+  return (
+    departments?.reduce(
+      (total, department) =>
+        total + (department.teams?.reduce((teamTotal, team) => teamTotal + (team.agents?.length || 0), 0) || 0),
+      0
+    ) || 0
   );
 }
