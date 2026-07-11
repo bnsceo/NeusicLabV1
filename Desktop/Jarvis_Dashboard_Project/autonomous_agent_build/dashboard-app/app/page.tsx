@@ -695,6 +695,80 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="mt-6 grid gap-4 md:hidden">
+          <div className="rounded-2xl border border-cyan-300/20 bg-slate-950/80 p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs uppercase tracking-[0.18em] text-cyan-300">Mobile command surface</p>
+                <h2 className="mt-1 text-lg font-semibold">Phone-first control</h2>
+                <p className="mt-1 text-sm leading-6 text-slate-400">
+                  Quick actions, live status, and the current org snapshot stay within thumb reach.
+                </p>
+              </div>
+              <Pill tone="cyan">PWA ready</Pill>
+            </div>
+
+            <div className="mt-4 grid gap-3">
+              <div className="grid grid-cols-2 gap-3">
+                <MiniMetric label="Departments" value={String(activeDepartments)} />
+                <MiniMetric label="Tasks" value={String(activeTasks)} />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Link href="/headquarters" className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left">
+                  <p className="text-sm font-semibold text-white">Headquarters</p>
+                  <p className="mt-1 text-xs text-slate-400">Hierarchy and live org map</p>
+                </Link>
+                <Link href="/harness-engineering" className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left">
+                  <p className="text-sm font-semibold text-white">Harness</p>
+                  <p className="mt-1 text-xs text-slate-400">Plan, approve, and execute safely</p>
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Link href="/companies" className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left">
+                  <p className="text-sm font-semibold text-white">Companies</p>
+                  <p className="mt-1 text-xs text-slate-400">Create or inspect an org</p>
+                </Link>
+                <Link href="/history" className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left">
+                  <p className="text-sm font-semibold text-white">History</p>
+                  <p className="mt-1 text-xs text-slate-400">Reload prior missions</p>
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => setModalOpen(true)}
+                  disabled={isDemoModeActive}
+                  className="rounded-2xl bg-cyan-300 px-4 py-3 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isDemoModeActive ? 'Demo locked' : 'New idea'}
+                </button>
+                {isDemoModeActive ? (
+                  <button
+                    onClick={handleResetDemo}
+                    className="rounded-2xl border border-white/10 px-4 py-3 text-sm text-slate-200"
+                  >
+                    Reset demo
+                  </button>
+                ) : (
+                  <Link href="/security" className="rounded-2xl border border-white/10 px-4 py-3 text-sm text-slate-200">
+                    War room
+                  </Link>
+                )}
+              </div>
+              {selectedExecutionRun ? (
+                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                  <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Latest run</p>
+                  <p className="mt-2 text-sm font-medium text-white">{selectedExecutionRun.goal}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Pill tone="emerald">{selectedExecutionRun.status}</Pill>
+                    <Pill tone="amber">{selectedExecutionRun.runtime_mode}</Pill>
+                    <Pill tone="blue">{selectedExecutionRun.mock_mode ? 'mock-safe' : 'live'}</Pill>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </section>
+
         <section className="mt-6 grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
           <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-5 md:p-6">
             <div className="flex flex-wrap items-start justify-between gap-4">

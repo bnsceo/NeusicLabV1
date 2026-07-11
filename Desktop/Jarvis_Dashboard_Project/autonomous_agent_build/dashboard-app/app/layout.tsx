@@ -19,6 +19,7 @@ export default function RootLayout({
       <head>
         <meta name="theme-color" content="#070b12" />
         <link rel="manifest" href="/manifest.webmanifest" />
+        <link rel="icon" href="/dominion-logo.svg" type="image/svg+xml" />
       </head>
       <body className="min-h-full flex flex-col overflow-x-hidden pb-20 md:pb-0">
         <PwaBootstrap />
