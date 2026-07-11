@@ -111,6 +111,17 @@ The safe rule is:
 - Start execution only from an approved request.
 - If you are testing, stay in local mode or free demo mode.
 
+## Local HTTPS for iPhone testing
+
+If your phone is set to HTTPS-only, use the secure dev server:
+
+```bash
+npm run dev:https
+```
+
+Then open the Mac’s LAN address from the phone using `https://<mac-ip>:3000`.
+You may need to trust the local certificate once on the phone before the page loads cleanly.
+
 ## Practical rule of thumb
 
 If a change is irreversible, expensive, or touches production state, it should be blocked until:
