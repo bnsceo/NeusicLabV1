@@ -1,46 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cyvora
 
-## Free Codex Mode
+Cyvora is an AI Command Center for founder-led operations: a dashboard for turning objectives into companies, departments, teams, agents, tasks, connectors, and outputs.
 
-To use Codex without OpenAI billing on this machine, run:
+## What this project does
+
+- captures a business objective from the founder
+- previews the generated operating structure before execution
+- requires approval before the build or mission can start
+- supports a local-only free mode for development and testing
+- keeps the UI focused on hierarchy, execution, and control
+
+## Run locally
+
+```bash
+npm install
+npm run dev
+```
+
+Open `http://localhost:3000` in your browser.
+
+## Free local Codex mode
+
+If you want to use Codex without OpenAI billing on your own machine, run:
 
 ```bash
 npm run codex:free -- "your prompt here"
 ```
 
-The first run may download `gpt-oss:20b` into Ollama. After that it stays local and free to use.
+The first run may download a local model into Ollama. After that, it stays local to your machine.
 
-## Getting Started
+## Project notes
 
-First, run the development server:
+- The app is designed to run in local, demo, and later production modes.
+- The public demo mode is read-only.
+- Approval gates are intentionally required before execution.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Learn more
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- [Next.js documentation](https://nextjs.org/docs)
+- [Next.js deployment docs](https://nextjs.org/docs/app/building-your-application/deploying)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
