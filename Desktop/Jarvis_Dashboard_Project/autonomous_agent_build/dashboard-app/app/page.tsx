@@ -154,6 +154,8 @@ export default function Home() {
   const [selectedConnectorId, setSelectedConnectorId] = useState<number | null>(null);
   const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
   const [selectedOutputId, setSelectedOutputId] = useState<number | null>(null);
+  const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
+  const [mobileDetailKind, setMobileDetailKind] = useState<'company' | 'connector' | 'task' | 'output'>('company');
   const [expandedCompanies, setExpandedCompanies] = useState<number[]>([]);
   const [expandedDepartments, setExpandedDepartments] = useState<number[]>([]);
   const [expandedTeams, setExpandedTeams] = useState<number[]>([]);
@@ -199,6 +201,58 @@ export default function Home() {
     () => activeOutputsList.find((output: any) => output.id === selectedOutputId) || activeOutputsList[0] || null,
     [activeOutputsList, selectedOutputId]
   );
+  const mobileDetail = useMemo(() => {
+    switch (mobileDetailKind) {
+      case 'connector':
+        return selectedConnector
+          ? {
+              title: selectedConnector.name,
+              subtitle: selectedConnector.connector_type,
+              description: selectedConnector.summary || 'No connector summary.',
+              badges: [selectedConnector.status, selectedConnector.connector_type],
+            }
+          : null;
+      case 'task':
+        return selectedTask
+          ? {
+              title: selectedTask.title,
+              subtitle: selectedTask.workflow_stage,
+              description: selectedTask.description || 'No task description.',
+              badges: [selectedTask.priority, selectedTask.status],
+            }
+          : null;
+      case 'output':
+        return selectedOutput
+          ? {
+              title: selectedOutput.title,
+              subtitle: selectedOutput.output_type,
+              description: selectedOutput.summary || 'No output summary.',
+              badges: [selectedOutput.status, selectedOutput.output_type],
+            }
+          : null;
+      default:
+        return activeCompanyDetail
+          ? {
+              title: activeCompanyDetail.name,
+              subtitle: activeCompanyDetail.status || 'active',
+              description: activeCompanyDetail.description || 'No company description.',
+              badges: [
+                `${activeCompanyDetail.departments?.length || 0} departments`,
+                `${activeConnectors.length} connectors`,
+                `${activeTasksList.length} tasks`,
+              ],
+            }
+          : null;
+    }
+  }, [
+    activeCompanyDetail,
+    activeConnectors.length,
+    activeTasksList.length,
+    mobileDetailKind,
+    selectedConnector,
+    selectedOutput,
+    selectedTask,
+  ]);
 
   const missionStatus = useMemo(() => {
     if (!briefing || briefing.objective === 'No active mission') return 'No active mission';
@@ -686,6 +740,16 @@ export default function Home() {
               <Link href="/harness-engineering" className="rounded-xl border border-white/10 px-4 py-2 text-sm text-slate-200">
                 Harness
               </Link>
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileDetailKind('company');
+                  setMobileDetailOpen(true);
+                }}
+                className="rounded-xl border border-white/10 px-4 py-2 text-sm text-slate-200"
+              >
+                Inspect
+              </button>
               {isDemoModeActive ? (
                 <button onClick={handleResetDemo} className="rounded-xl border border-white/10 px-4 py-2 text-sm text-slate-200">
                   Reset
@@ -714,24 +778,52 @@ export default function Home() {
                 <MiniMetric label="Tasks" value={String(activeTasks)} />
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <Link href="/headquarters" className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left">
-                  <p className="text-sm font-semibold text-white">Headquarters</p>
-                  <p className="mt-1 text-xs text-slate-400">Hierarchy and live org map</p>
-                </Link>
-                <Link href="/harness-engineering" className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left">
-                  <p className="text-sm font-semibold text-white">Harness</p>
-                  <p className="mt-1 text-xs text-slate-400">Plan, approve, and execute safely</p>
-                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileDetailKind('company');
+                    setMobileDetailOpen(true);
+                  }}
+                  className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left"
+                >
+                  <p className="text-sm font-semibold text-white">Company</p>
+                  <p className="mt-1 text-xs text-slate-400">Open the active company</p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileDetailKind('connector');
+                    setMobileDetailOpen(true);
+                  }}
+                  className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left"
+                >
+                  <p className="text-sm font-semibold text-white">Connector</p>
+                  <p className="mt-1 text-xs text-slate-400">Inspect live system links</p>
+                </button>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <Link href="/companies" className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left">
-                  <p className="text-sm font-semibold text-white">Companies</p>
-                  <p className="mt-1 text-xs text-slate-400">Create or inspect an org</p>
-                </Link>
-                <Link href="/history" className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left">
-                  <p className="text-sm font-semibold text-white">History</p>
-                  <p className="mt-1 text-xs text-slate-400">Reload prior missions</p>
-                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileDetailKind('task');
+                    setMobileDetailOpen(true);
+                  }}
+                  className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left"
+                >
+                  <p className="text-sm font-semibold text-white">Task</p>
+                  <p className="mt-1 text-xs text-slate-400">Open the current work item</p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileDetailKind('output');
+                    setMobileDetailOpen(true);
+                  }}
+                  className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left"
+                >
+                  <p className="text-sm font-semibold text-white">Output</p>
+                  <p className="mt-1 text-xs text-slate-400">See produced artifacts</p>
+                </button>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <button
@@ -1541,6 +1633,78 @@ export default function Home() {
           </div>
         </Modal>
       )}
+
+      {mobileDetailOpen && mobileDetail ? (
+        <div className="fixed inset-x-0 bottom-0 z-50 md:hidden">
+          <div className="mx-auto max-w-2xl rounded-t-3xl border border-white/10 bg-slate-950/95 p-4 shadow-2xl shadow-black/60 backdrop-blur">
+            <div className="mx-auto mb-3 h-1.5 w-14 rounded-full bg-white/15" />
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs uppercase tracking-[0.22em] text-cyan-300">Quick detail</p>
+                <h2 className="mt-1 text-lg font-semibold text-white">{mobileDetail.title}</h2>
+                <p className="mt-1 text-sm text-slate-400">{mobileDetail.subtitle}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setMobileDetailOpen(false)}
+                className="rounded-lg border border-white/10 px-3 py-1 text-sm text-slate-200"
+              >
+                Close
+              </button>
+            </div>
+            <p className="mt-4 text-sm leading-6 text-slate-300">{mobileDetail.description}</p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {mobileDetail.badges.map((badge) => (
+                <Pill key={badge} tone="cyan">
+                  {badge}
+                </Pill>
+              ))}
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileDetailKind('company');
+                  setMobileDetailOpen(true);
+                }}
+                className={`rounded-xl border px-3 py-2 text-sm ${mobileDetailKind === 'company' ? 'border-cyan-300/40 bg-cyan-300/10 text-cyan-100' : 'border-white/10 text-slate-200'}`}
+              >
+                Company
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileDetailKind('connector');
+                  setMobileDetailOpen(true);
+                }}
+                className={`rounded-xl border px-3 py-2 text-sm ${mobileDetailKind === 'connector' ? 'border-cyan-300/40 bg-cyan-300/10 text-cyan-100' : 'border-white/10 text-slate-200'}`}
+              >
+                Connector
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileDetailKind('task');
+                  setMobileDetailOpen(true);
+                }}
+                className={`rounded-xl border px-3 py-2 text-sm ${mobileDetailKind === 'task' ? 'border-cyan-300/40 bg-cyan-300/10 text-cyan-100' : 'border-white/10 text-slate-200'}`}
+              >
+                Task
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileDetailKind('output');
+                  setMobileDetailOpen(true);
+                }}
+                className={`rounded-xl border px-3 py-2 text-sm ${mobileDetailKind === 'output' ? 'border-cyan-300/40 bg-cyan-300/10 text-cyan-100' : 'border-white/10 text-slate-200'}`}
+              >
+                Output
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
