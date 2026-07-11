@@ -19,11 +19,11 @@ export default function NavBar() {
   ];
 
   return (
-    <nav className="cyvora-glass sticky top-0 z-50 border-x-0 border-t-0 px-4 py-3">
+    <nav className="cyvora-tactile sticky top-0 z-50 border-x-0 border-t-0 px-4 py-3">
       <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <Link href="/" className="cyvora-tactile flex items-center gap-3 rounded-2xl px-3 py-2 transition hover:translate-y-[-1px] hover:shadow-[0_18px_30px_rgba(0,0,0,0.32)]">
-            <Image src="/cyvora-mark.svg" alt="Cyvora logo" width={36} height={36} className="h-9 w-9 rounded-xl" />
+          <Link href="/" className="cyvora-tactile flex items-center gap-3 rounded-2xl px-3 py-2 transition hover:translate-y-[-1px]">
+            <Image src="/cyvora-mark.svg" alt="Cyvora logo" width={36} height={36} className="h-9 w-9 rounded-2xl" />
             <div className="leading-tight">
               <p className="text-sm font-semibold text-white">Cyvora</p>
               <p className="text-[11px] uppercase tracking-[0.22em] text-cyan-200/80">AI Command Center</p>
@@ -35,10 +35,10 @@ export default function NavBar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium transition ${
+                className={`cyvora-chip whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium transition ${
                   pathname === link.href
-                    ? 'bg-white/10 text-white shadow-sm shadow-cyan-500/10'
-                    : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                    ? 'cyvora-neumo-pressed text-white'
+                    : 'text-slate-400 hover:text-white'
                 }`}
               >
                 {link.label}

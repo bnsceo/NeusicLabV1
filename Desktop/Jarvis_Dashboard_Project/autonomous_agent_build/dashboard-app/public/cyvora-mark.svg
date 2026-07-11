@@ -1,25 +1,29 @@
 <svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cyvora mark">
   <defs>
-    <linearGradient id="bg" x1="24" y1="18" x2="232" y2="238" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#060b15"/>
-      <stop offset="1" stop-color="#0c1322"/>
+    <linearGradient id="base" x1="34" y1="28" x2="222" y2="228" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#122033"/>
+      <stop offset="1" stop-color="#0a1220"/>
     </linearGradient>
-    <linearGradient id="ring" x1="44" y1="42" x2="212" y2="214" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#6de3ff"/>
-      <stop offset="0.46" stop-color="#8b8cff"/>
-      <stop offset="1" stop-color="#f0c76b"/>
+    <linearGradient id="edge" x1="48" y1="44" x2="208" y2="212" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#d9e6ff" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#6ea6ff" stop-opacity="0.14"/>
     </linearGradient>
-    <linearGradient id="stroke" x1="70" y1="72" x2="186" y2="186" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#f5fbff"/>
-      <stop offset="1" stop-color="#9fe5ff"/>
+    <linearGradient id="glyph" x1="82" y1="76" x2="176" y2="180" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f4f8ff"/>
+      <stop offset="1" stop-color="#8ddfff"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="102" y1="100" x2="154" y2="156" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#a39dff"/>
+      <stop offset="1" stop-color="#f4d487"/>
     </linearGradient>
   </defs>
-  <rect x="16" y="16" width="224" height="224" rx="56" fill="url(#bg)"/>
-  <rect x="39" y="39" width="178" height="178" rx="44" stroke="url(#ring)" stroke-width="8" opacity="0.42"/>
-  <circle cx="128" cy="128" r="60" fill="url(#ring)" fill-opacity="0.11"/>
-  <path d="M172 88C162 76 147 68 128 68C96.5198 68 71 93.5198 71 125C71 156.48 96.5198 182 128 182C147 182 162 174 172 162" stroke="url(#stroke)" stroke-width="14" stroke-linecap="round"/>
-  <path d="M99 96L128 162L157 96" stroke="url(#stroke)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M112 128H144" stroke="#f0c76b" stroke-width="10" stroke-linecap="round"/>
-  <circle cx="184" cy="76" r="7" fill="#f0c76b"/>
-  <circle cx="72" cy="180" r="6" fill="#6de3ff"/>
+  <rect x="16" y="16" width="224" height="224" rx="58" fill="url(#base)"/>
+  <rect x="18" y="18" width="220" height="220" rx="56" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+  <path d="M52 110C52 77.9675 77.9675 52 110 52H146C178.033 52 204 77.9675 204 110V146C204 178.033 178.033 204 146 204H110C77.9675 204 52 178.033 52 146V110Z" fill="url(#edge)"/>
+  <circle cx="128" cy="128" r="62" fill="#0f1828" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+  <path d="M168 96C157.5 84.5 143.6 78 128 78C98.653 78 75 101.653 75 131C75 160.347 98.653 184 128 184C143.6 184 157.5 177.5 168 166" stroke="url(#glyph)" stroke-width="16" stroke-linecap="round"/>
+  <path d="M102 100L128 156L154 100" stroke="url(#glyph)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="176" cy="78" r="8" fill="url(#accent)"/>
+  <circle cx="80" cy="178" r="6.5" fill="#8ddfff"/>
+  <path d="M112 130H144" stroke="url(#accent)" stroke-width="10" stroke-linecap="round"/>
 </svg>

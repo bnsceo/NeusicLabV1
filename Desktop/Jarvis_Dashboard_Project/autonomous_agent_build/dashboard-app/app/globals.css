@@ -1,21 +1,26 @@
 @import "tailwindcss";
 
 :root {
-  --background: #050913;
+  --background: #08101c;
   --foreground: #edf6ff;
-  --surface: rgba(8, 13, 24, 0.72);
-  --surface-strong: rgba(10, 16, 30, 0.9);
-  --surface-soft: rgba(255, 255, 255, 0.04);
-  --border-soft: rgba(205, 226, 255, 0.12);
-  --border-strong: rgba(113, 176, 255, 0.22);
-  --accent-cyan: #6de3ff;
-  --accent-violet: #8b8cff;
-  --accent-gold: #f0c76b;
-  --shadow-heavy: 0 28px 70px rgba(0, 0, 0, 0.45);
+  --surface: #0e1727;
+  --surface-strong: #0b1423;
+  --surface-soft: rgba(255, 255, 255, 0.035);
+  --border-soft: rgba(210, 226, 255, 0.09);
+  --border-strong: rgba(150, 194, 255, 0.18);
+  --accent-cyan: #8ddfff;
+  --accent-violet: #a39dff;
+  --accent-gold: #f4d487;
+  --shadow-heavy:
+    16px 16px 30px rgba(0, 0, 0, 0.48),
+    -12px -12px 24px rgba(255, 255, 255, 0.03);
   --shadow-tactile:
-    16px 16px 30px rgba(0, 0, 0, 0.34),
-    -8px -8px 20px rgba(255, 255, 255, 0.03),
-    inset 1px 1px 0 rgba(255, 255, 255, 0.04);
+    10px 10px 20px rgba(0, 0, 0, 0.42),
+    -8px -8px 16px rgba(255, 255, 255, 0.035),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.035);
+  --shadow-pressed:
+    inset 8px 8px 16px rgba(0, 0, 0, 0.42),
+    inset -6px -6px 14px rgba(255, 255, 255, 0.02);
 }
 
 @theme inline {
@@ -27,17 +32,17 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #08101c;
+    --foreground: #edf6ff;
   }
 }
 
 body {
   background:
-    radial-gradient(circle at top, rgba(109, 227, 255, 0.12), transparent 24%),
-    radial-gradient(circle at 20% 18%, rgba(139, 140, 255, 0.12), transparent 22%),
-    radial-gradient(circle at 84% 20%, rgba(240, 199, 107, 0.08), transparent 20%),
-    linear-gradient(180deg, #040712 0%, #060c16 45%, #050913 100%);
+    radial-gradient(circle at top, rgba(141, 223, 255, 0.08), transparent 24%),
+    radial-gradient(circle at 20% 18%, rgba(163, 157, 255, 0.07), transparent 22%),
+    radial-gradient(circle at 84% 20%, rgba(244, 212, 135, 0.06), transparent 20%),
+    linear-gradient(180deg, #07101b 0%, #08131f 50%, #07101a 100%);
   color: var(--foreground);
   font-family: var(--font-sans);
   color-scheme: dark;
@@ -50,35 +55,35 @@ body {
 
 .cyvora-glass {
   background:
-    linear-gradient(180deg, rgba(17, 23, 39, 0.88), rgba(9, 14, 27, 0.78)),
-    var(--surface);
-  border: 1px solid var(--border-soft);
+    linear-gradient(145deg, #101a2b, #0b1524);
+  border: 1px solid rgba(212, 229, 255, 0.06);
   box-shadow: var(--shadow-heavy);
-  backdrop-filter: blur(22px) saturate(1.35);
 }
 
 .cyvora-glass-strong {
   background:
-    linear-gradient(180deg, rgba(15, 21, 36, 0.96), rgba(8, 12, 21, 0.92)),
-    var(--surface-strong);
-  border: 1px solid var(--border-strong);
+    linear-gradient(145deg, #0f1727, #09111d);
+  border: 1px solid rgba(188, 208, 238, 0.08);
   box-shadow: var(--shadow-heavy);
-  backdrop-filter: blur(24px) saturate(1.35);
 }
 
 .cyvora-tactile {
   background:
-    linear-gradient(145deg, rgba(18, 24, 42, 0.96), rgba(7, 11, 19, 0.98));
-  border: 1px solid rgba(193, 216, 255, 0.08);
+    linear-gradient(145deg, #101a2b, #09111d);
+  border: 1px solid rgba(195, 216, 255, 0.075);
   box-shadow: var(--shadow-tactile);
 }
 
 .cyvora-chip {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
-  border: 1px solid rgba(194, 216, 255, 0.12);
+    linear-gradient(145deg, #0f1727, #09111d);
+  border: 1px solid rgba(194, 216, 255, 0.08);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 12px 24px rgba(0, 0, 0, 0.16);
-  backdrop-filter: blur(14px);
+    8px 8px 16px rgba(0, 0, 0, 0.28),
+    -8px -8px 16px rgba(255, 255, 255, 0.025),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+.cyvora-neumo-pressed {
+  box-shadow: var(--shadow-pressed);
 }
