@@ -148,6 +148,7 @@ export default function Home() {
   const [newTenantName, setNewTenantName] = useState('');
   const [showCreateTenant, setShowCreateTenant] = useState(false);
   const [missionDraft, setMissionDraft] = useState('I want to build a YouTube business.');
+  const [missionPlanApproved, setMissionPlanApproved] = useState(false);
   const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(null);
   const [selectedDepartmentId, setSelectedDepartmentId] = useState<number | null>(null);
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
@@ -175,13 +176,15 @@ export default function Home() {
   const activeTasks = headquarters?.totals.tasks || 0;
   const pendingApprovals = pendingSelfCoding + (headquarters?.totals.approvals || 0) + (briefing?.status === 'pending' ? 1 : 0);
   const modeSummary = `${runtimeInfo.label} · ${runtimeInfo.description}`;
+  const missionBlueprint = useMemo(() => inferMissionBlueprint(missionDraft), [missionDraft]);
+  const missionDraftBlueprint = useMemo(() => inferMissionBlueprint(goal), [goal]);
+  const missionDraftRuntimePlan = useMemo(() => buildHarnessPlan(goal), [goal]);
   const selectedCompany = useMemo(() => {
     if (!headquarters?.companies?.length) return null;
     if (!selectedCompanyId) return headquarters.companies[0];
     return headquarters.companies.find((company) => company.id === selectedCompanyId) || headquarters.companies[0];
   }, [headquarters, selectedCompanyId]);
   const activeCompanyDetail = companyDetail || selectedCompany;
-  const missionBlueprint = useMemo(() => inferMissionBlueprint(missionDraft), [missionDraft]);
   const activeConnectors = useMemo(() => activeCompanyDetail?.connectors || [], [activeCompanyDetail?.connectors]);
   const activeTasksList = useMemo(() => activeCompanyDetail?.tasks || [], [activeCompanyDetail?.tasks]);
   const activeOutputsList = useMemo(() => activeCompanyDetail?.outputs || [], [activeCompanyDetail?.outputs]);
@@ -502,25 +505,17 @@ export default function Home() {
       return;
     }
     if (!objective.trim()) return;
-    const approvedRequest = selfCodingRequests.find(
-      (request) =>
-        request.approval_state === 'approved' &&
-        request.request.trim().toLowerCase() === objective.trim().toLowerCase()
-    );
-    if (!approvedRequest) {
-      alert('Approve a matching Harness Engineering request before starting execution.');
-      return;
-    }
     setSubmitting(true);
     setLogs([]);
     try {
+      const approvedRequest = await ensureApprovedMissionRequest(objective);
       const res = await fetch('/api/start-mission', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           goal: approvedRequest.request,
           harness_request_id: approvedRequest.id,
-          runtime_plan: buildHarnessPlan(approvedRequest.request),
+          runtime_plan: approvedRequest.runtime_plan,
         }),
       });
       const data = await res.json();
@@ -543,6 +538,67 @@ export default function Home() {
 
   const handleNewMission = async () => {
     await submitMission(goal);
+  };
+
+  const ensureApprovedMissionRequest = async (objective: string) => {
+    const normalizedObjective = objective.trim().toLowerCase();
+    const requestedPlan = buildHarnessPlan(objective);
+    const matchingApproved = selfCodingRequests.find(
+      (request) =>
+        request.approval_state === 'approved' &&
+        request.request.trim().toLowerCase() === normalizedObjective
+    );
+    if (matchingApproved) {
+      return { id: matchingApproved.id, request: matchingApproved.request, runtime_plan: buildHarnessPlan(matchingApproved.request) };
+    }
+
+    const matchingExisting = selfCodingRequests.find(
+      (request) => request.request.trim().toLowerCase() === normalizedObjective
+    );
+
+    let requestRecord = matchingExisting;
+    if (!requestRecord) {
+      const createRes = await fetch('/api/self-coding/requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ request: objective.trim() }),
+      });
+      const created = await createRes.json();
+      if (!createRes.ok) {
+        throw new Error(created.error || 'Failed to create Harness Engineering request');
+      }
+      await fetchSelfCodingRequests();
+      requestRecord = created;
+    }
+
+    if (!requestRecord) {
+      throw new Error('Failed to resolve Harness Engineering request');
+    }
+
+    const resolvedRequest = requestRecord;
+    if (!resolvedRequest) {
+      throw new Error('Failed to resolve Harness Engineering request');
+    }
+
+    if (resolvedRequest.approval_state !== 'approved') {
+      const approveRes = await fetch(`/api/harness-engineering/requests/${resolvedRequest.id}/approve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'approve', runtime_plan: requestedPlan }),
+      });
+      const approved = await approveRes.json();
+      if (!approveRes.ok) {
+        throw new Error(approved.error || 'Failed to approve Harness Engineering request');
+      }
+      await fetchSelfCodingRequests();
+      requestRecord = approved;
+    }
+
+    return {
+      id: resolvedRequest.id,
+      request: resolvedRequest.request,
+      runtime_plan: requestedPlan,
+    };
   };
 
   const handleWarRoom = async () => {
@@ -1538,6 +1594,7 @@ export default function Home() {
             action="Open"
             onClick={() => {
               setGoal(missionDraft);
+              setMissionPlanApproved(false);
               setModalOpen(true);
             }}
           />
@@ -1763,7 +1820,14 @@ export default function Home() {
       </main>
 
       {modalOpen && (
-        <Modal title="New Mission" onClose={() => { setModalOpen(false); setGoal(''); }}>
+        <Modal
+          title="New Mission"
+          onClose={() => {
+            setModalOpen(false);
+            setGoal('');
+            setMissionPlanApproved(false);
+          }}
+        >
           <p className="text-sm text-slate-400">
             Describe the business outcome. The Executive AI will decompose it into company,
             department, agent, and approval work.
@@ -1775,19 +1839,73 @@ export default function Home() {
             value={goal}
             onChange={(event) => setGoal(event.target.value)}
           />
+          <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-[0.18em] text-cyan-300">Blueprint preview</p>
+                <h3 className="mt-1 text-sm font-semibold text-white">{missionDraftBlueprint.companyName}</h3>
+                <p className="mt-1 text-sm leading-6 text-slate-400">{missionDraftBlueprint.description}</p>
+              </div>
+              <label className={`flex items-center gap-2 text-sm ${goal.trim() ? 'text-slate-200' : 'cursor-not-allowed text-slate-500'}`}>
+                <input
+                  type="checkbox"
+                  checked={missionPlanApproved}
+                  disabled={!goal.trim() || isDemoModeActive}
+                  onChange={(event) => setMissionPlanApproved(event.target.checked)}
+                  className="h-4 w-4 rounded border-white/20 bg-slate-900 text-cyan-300 focus:ring-cyan-300/30 disabled:cursor-not-allowed"
+                />
+                I have reviewed the plan
+              </label>
+            </div>
+
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              <div className="rounded-xl border border-white/10 bg-slate-950/70 p-3">
+                <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Connectors</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {missionDraftBlueprint.connectors.map((connector) => (
+                    <span
+                      key={connector}
+                      className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs text-cyan-100"
+                    >
+                      {connector}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-slate-950/70 p-3">
+                <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Runtime plan</p>
+                <div className="mt-2 space-y-2 text-xs leading-5 text-slate-300">
+                  <p>Sandbox: {missionDraftRuntimePlan.sandbox_scope.join(' · ')}</p>
+                  <p>Permissions: {missionDraftRuntimePlan.permissions.join(' · ')}</p>
+                  <p>Validation: {missionDraftRuntimePlan.validation_checks.join(' · ')}</p>
+                  <p>Rollback: {missionDraftRuntimePlan.rollback_path.join(' · ')}</p>
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="mt-4 flex justify-end gap-3">
             <button
-              onClick={() => { setModalOpen(false); setGoal(''); }}
+              onClick={() => {
+                setModalOpen(false);
+                setGoal('');
+                setMissionPlanApproved(false);
+              }}
               className="rounded-xl border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:bg-white/5"
             >
               Cancel
             </button>
             <button
               onClick={handleNewMission}
-              disabled={submitting || !goal.trim() || isDemoModeActive}
+              disabled={submitting || !goal.trim() || !missionPlanApproved || isDemoModeActive}
               className="rounded-xl bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isDemoModeActive ? 'Demo is read-only' : submitting ? 'Deploying...' : 'Decree mission'}
+              {isDemoModeActive
+                ? 'Demo is read-only'
+                : submitting
+                  ? 'Deploying...'
+                  : missionPlanApproved
+                    ? 'Decree mission'
+                    : 'Approve plan to continue'}
             </button>
           </div>
         </Modal>

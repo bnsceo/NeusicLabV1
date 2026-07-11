@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import NavBar from '@/components/NavBar';
+import { inferMissionBlueprint } from '@/lib/missionBlueprint';
 import { getRuntimeModeInfo } from '@/lib/runtimeMode';
 
 interface Company {
@@ -21,6 +22,13 @@ export default function CompaniesPage() {
   const [loading, setLoading] = useState(true);
   const [vision, setVision] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [blueprintApproved, setBlueprintApproved] = useState(false);
+
+  const preview = useMemo(() => {
+    const trimmed = vision.trim();
+    if (!trimmed) return null;
+    return inferMissionBlueprint(trimmed);
+  }, [vision]);
 
   const fetchCompanies = async () => {
     try {
@@ -37,6 +45,10 @@ export default function CompaniesPage() {
   useEffect(() => {
     fetchCompanies();
   }, []);
+
+  useEffect(() => {
+    setBlueprintApproved(false);
+  }, [vision]);
 
   const handleResetDemo = async () => {
     try {
@@ -59,6 +71,10 @@ export default function CompaniesPage() {
       return;
     }
     if (!vision.trim()) return;
+    if (!blueprintApproved) {
+      alert('Approve the generated blueprint before building the company.');
+      return;
+    }
     setSubmitting(true);
     try {
       const res = await fetch('/api/execute-vision', {
@@ -69,6 +85,7 @@ export default function CompaniesPage() {
       const data = await res.json();
       if (res.ok) {
         setVision('');
+        setBlueprintApproved(false);
         await fetchCompanies();
       } else {
         alert(`Error: ${data.error}`);
@@ -186,12 +203,105 @@ export default function CompaniesPage() {
               value={vision}
               onChange={(event) => setVision(event.target.value)}
             />
+            <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-[0.18em] text-cyan-300">Approval gate</p>
+                  <p className="mt-1 text-sm text-slate-300">
+                    {preview
+                      ? 'Review the exact org blueprint that will be created.'
+                      : 'Enter an objective to generate a blueprint preview.'}
+                  </p>
+                </div>
+                <label className={`flex items-center gap-2 text-sm ${preview ? 'text-slate-200' : 'cursor-not-allowed text-slate-500'}`}>
+                  <input
+                    type="checkbox"
+                    checked={blueprintApproved}
+                    disabled={!preview || isDemoModeActive}
+                    onChange={(event) => setBlueprintApproved(event.target.checked)}
+                    className="h-4 w-4 rounded border-white/20 bg-slate-900 text-cyan-300 focus:ring-cyan-300/30 disabled:cursor-not-allowed"
+                  />
+                  Approve blueprint
+                </label>
+              </div>
+
+              {preview ? (
+                <div className="mt-4 grid gap-3">
+                  <div className="rounded-xl border border-white/10 bg-slate-950/70 p-4">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Generated company</p>
+                        <h3 className="mt-1 text-lg font-semibold text-white">{preview.companyName}</h3>
+                        <p className="mt-1 text-sm leading-6 text-slate-400">{preview.description}</p>
+                      </div>
+                      <span
+                        className="h-10 w-10 rounded-xl ring-1 ring-white/10"
+                        style={{ backgroundColor: preview.brandColor }}
+                        aria-hidden="true"
+                      />
+                    </div>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {preview.connectors.map((connector) => (
+                        <span
+                          key={connector}
+                          className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs text-cyan-100"
+                        >
+                          {connector}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                      <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500">Departments</p>
+                      <div className="mt-3 space-y-3">
+                        {preview.departments.map((department) => (
+                          <div key={department.name} className="rounded-lg border border-white/10 bg-black/20 p-3">
+                            <p className="text-sm font-semibold text-white">{department.name}</p>
+                            <p className="mt-1 text-xs leading-5 text-slate-400">{department.description}</p>
+                            <p className="mt-2 text-xs text-cyan-100/80">
+                              {department.teams.length} team{department.teams.length === 1 ? '' : 's'}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                      <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500">Execution shape</p>
+                      <div className="mt-3 space-y-3">
+                        {preview.departments.map((department) => (
+                          <div key={department.name} className="rounded-lg border border-white/10 bg-black/20 p-3">
+                            <p className="text-sm font-semibold text-white">{department.name}</p>
+                            <p className="mt-2 text-xs leading-5 text-slate-400">
+                              {department.teams
+                                .map((team) => `${team.name}: ${team.agents.map((agent) => agent.name).join(', ')}`)
+                                .join(' · ')}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <p className="mt-4 rounded-xl border border-dashed border-white/10 bg-black/20 p-4 text-sm text-slate-400">
+                  The preview will appear here as soon as you type a business objective.
+                </p>
+              )}
+            </div>
             <button
               onClick={handleCreateCompany}
-              disabled={submitting || !vision.trim() || isDemoModeActive}
+              disabled={submitting || !vision.trim() || !blueprintApproved || isDemoModeActive}
               className="mt-4 w-full rounded-xl bg-cyan-300 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isDemoModeActive ? 'Demo is read-only' : submitting ? 'Building company...' : 'Build company'}
+              {isDemoModeActive
+                ? 'Demo is read-only'
+                : submitting
+                  ? 'Building company...'
+                  : blueprintApproved
+                    ? 'Build approved company'
+                    : 'Approve blueprint to continue'}
             </button>
             <Link
               href="/headquarters"
