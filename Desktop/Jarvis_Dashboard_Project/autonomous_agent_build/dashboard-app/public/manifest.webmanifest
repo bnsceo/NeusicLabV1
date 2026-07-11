@@ -1,7 +1,7 @@
 {
-  "name": "Neusic Foundry",
-  "short_name": "Foundry",
-  "description": "Autonomous business operating system",
+  "name": "Cyvora",
+  "short_name": "Cyvora",
+  "description": "AI Command Center",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -9,7 +9,7 @@
   "theme_color": "#070b12",
   "icons": [
     {
-      "src": "/pwa-icon.svg",
+      "src": "/cyvora-icon.svg",
       "sizes": "any",
       "type": "image/svg+xml"
     }

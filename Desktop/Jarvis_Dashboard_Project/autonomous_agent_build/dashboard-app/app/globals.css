@@ -1,8 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #050913;
+  --foreground: #edf6ff;
+  --surface: rgba(8, 13, 24, 0.72);
+  --surface-strong: rgba(10, 16, 30, 0.9);
+  --surface-soft: rgba(255, 255, 255, 0.04);
+  --border-soft: rgba(205, 226, 255, 0.12);
+  --border-strong: rgba(113, 176, 255, 0.22);
+  --accent-cyan: #6de3ff;
+  --accent-violet: #8b8cff;
+  --accent-gold: #f0c76b;
+  --shadow-heavy: 0 28px 70px rgba(0, 0, 0, 0.45);
+  --shadow-tactile:
+    16px 16px 30px rgba(0, 0, 0, 0.34),
+    -8px -8px 20px rgba(255, 255, 255, 0.03),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 @theme inline {
@@ -21,14 +34,51 @@
 
 body {
   background:
-    radial-gradient(circle at top, rgba(34, 211, 238, 0.10), transparent 28%),
-    radial-gradient(circle at 80% 20%, rgba(52, 211, 153, 0.08), transparent 24%),
-    linear-gradient(180deg, #05070c 0%, #070b12 100%);
+    radial-gradient(circle at top, rgba(109, 227, 255, 0.12), transparent 24%),
+    radial-gradient(circle at 20% 18%, rgba(139, 140, 255, 0.12), transparent 22%),
+    radial-gradient(circle at 84% 20%, rgba(240, 199, 107, 0.08), transparent 20%),
+    linear-gradient(180deg, #040712 0%, #060c16 45%, #050913 100%);
   color: var(--foreground);
   font-family: var(--font-sans);
+  color-scheme: dark;
 }
 
 ::selection {
-  background: rgba(34, 211, 238, 0.35);
+  background: rgba(109, 227, 255, 0.34);
   color: #fff;
+}
+
+.cyvora-glass {
+  background:
+    linear-gradient(180deg, rgba(17, 23, 39, 0.88), rgba(9, 14, 27, 0.78)),
+    var(--surface);
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-heavy);
+  backdrop-filter: blur(22px) saturate(1.35);
+}
+
+.cyvora-glass-strong {
+  background:
+    linear-gradient(180deg, rgba(15, 21, 36, 0.96), rgba(8, 12, 21, 0.92)),
+    var(--surface-strong);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-heavy);
+  backdrop-filter: blur(24px) saturate(1.35);
+}
+
+.cyvora-tactile {
+  background:
+    linear-gradient(145deg, rgba(18, 24, 42, 0.96), rgba(7, 11, 19, 0.98));
+  border: 1px solid rgba(193, 216, 255, 0.08);
+  box-shadow: var(--shadow-tactile);
+}
+
+.cyvora-chip {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(194, 216, 255, 0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 12px 24px rgba(0, 0, 0, 0.16);
+  backdrop-filter: blur(14px);
 }

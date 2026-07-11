@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ai-command-center-v1';
+const CACHE_NAME = 'cyvora-v1';
 const ASSETS = [
   '/',
   '/companies',
@@ -7,7 +7,7 @@ const ASSETS = [
   '/harness-engineering',
   '/security',
   '/manifest.webmanifest',
-  '/pwa-icon.svg',
+  '/cyvora-icon.svg',
 ];
 
 self.addEventListener('install', (event) => {

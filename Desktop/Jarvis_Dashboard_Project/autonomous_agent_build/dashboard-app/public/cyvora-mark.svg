@@ -1,0 +1,25 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cyvora mark">
+  <defs>
+    <linearGradient id="bg" x1="24" y1="18" x2="232" y2="238" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#060b15"/>
+      <stop offset="1" stop-color="#0c1322"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="44" y1="42" x2="212" y2="214" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6de3ff"/>
+      <stop offset="0.46" stop-color="#8b8cff"/>
+      <stop offset="1" stop-color="#f0c76b"/>
+    </linearGradient>
+    <linearGradient id="stroke" x1="70" y1="72" x2="186" y2="186" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f5fbff"/>
+      <stop offset="1" stop-color="#9fe5ff"/>
+    </linearGradient>
+  </defs>
+  <rect x="16" y="16" width="224" height="224" rx="56" fill="url(#bg)"/>
+  <rect x="39" y="39" width="178" height="178" rx="44" stroke="url(#ring)" stroke-width="8" opacity="0.42"/>
+  <circle cx="128" cy="128" r="60" fill="url(#ring)" fill-opacity="0.11"/>
+  <path d="M172 88C162 76 147 68 128 68C96.5198 68 71 93.5198 71 125C71 156.48 96.5198 182 128 182C147 182 162 174 172 162" stroke="url(#stroke)" stroke-width="14" stroke-linecap="round"/>
+  <path d="M99 96L128 162L157 96" stroke="url(#stroke)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M112 128H144" stroke="#f0c76b" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="184" cy="76" r="7" fill="#f0c76b"/>
+  <circle cx="72" cy="180" r="6" fill="#6de3ff"/>
+</svg>

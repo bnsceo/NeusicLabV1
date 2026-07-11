@@ -9,12 +9,12 @@ export default function UnlockForm() {
 
   return (
     <div className="min-h-screen bg-[#070b12] px-4 py-10 text-white">
-      <div className="mx-auto max-w-md rounded-3xl border border-white/10 bg-slate-950/80 p-6 shadow-2xl shadow-blue-950/30">
+      <div className="cyvora-glass mx-auto max-w-md rounded-3xl p-6">
         <div className="flex items-center gap-3">
-          <Image src="/dominion-logo.svg" alt="Neusic Foundry" width={48} height={48} className="h-12 w-12 rounded-2xl" />
+          <Image src="/cyvora-mark.svg" alt="Cyvora" width={48} height={48} className="h-12 w-12 rounded-2xl" />
           <div>
             <p className="text-xs uppercase tracking-[0.24em] text-cyan-300">Private tunnel</p>
-            <h1 className="text-2xl font-semibold">Unlock Neusic Foundry</h1>
+            <h1 className="text-2xl font-semibold">Unlock Cyvora</h1>
           </div>
         </div>
 
@@ -32,7 +32,7 @@ export default function UnlockForm() {
             autoCapitalize="none"
             autoCorrect="off"
             enterKeyHint="done"
-            className="mt-5 w-full rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-3 text-sm text-white outline-none focus:border-cyan-300/60"
+            className="mt-5 w-full rounded-2xl border border-white/10 bg-slate-900/70 px-4 py-3 text-sm text-white outline-none focus:border-cyan-300/60"
           />
 
           <input type="hidden" name="next" value={nextPath} />

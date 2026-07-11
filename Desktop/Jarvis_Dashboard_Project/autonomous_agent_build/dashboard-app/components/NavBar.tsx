@@ -19,14 +19,14 @@ export default function NavBar() {
   ];
 
   return (
-    <nav className="bg-slate-950/75 backdrop-blur border-b border-white/10 px-4 py-3">
+    <nav className="cyvora-glass sticky top-0 z-50 border-x-0 border-t-0 px-4 py-3">
       <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2 transition hover:bg-white/[0.06]">
-            <Image src="/dominion-logo.svg" alt="Neusic Foundry logo" width={36} height={36} className="h-9 w-9 rounded-xl" />
+          <Link href="/" className="cyvora-tactile flex items-center gap-3 rounded-2xl px-3 py-2 transition hover:translate-y-[-1px] hover:shadow-[0_18px_30px_rgba(0,0,0,0.32)]">
+            <Image src="/cyvora-mark.svg" alt="Cyvora logo" width={36} height={36} className="h-9 w-9 rounded-xl" />
             <div className="leading-tight">
-              <p className="text-sm font-semibold text-white">Neusic Foundry</p>
-              <p className="text-[11px] uppercase tracking-[0.22em] text-cyan-200/80">Autonomous business OS</p>
+              <p className="text-sm font-semibold text-white">Cyvora</p>
+              <p className="text-[11px] uppercase tracking-[0.22em] text-cyan-200/80">AI Command Center</p>
             </div>
           </Link>
 
@@ -47,7 +47,7 @@ export default function NavBar() {
           </div>
         </div>
 
-        <div className="flex max-w-full items-center gap-2 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1.5 text-xs text-emerald-200">
+        <div className="cyvora-chip flex max-w-full items-center gap-2 rounded-full px-3 py-1.5 text-xs text-cyan-100">
           <span className="h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_16px_rgba(110,231,183,0.9)]" />
           {runtime.label}
           <span className="hidden text-emerald-100/70 sm:inline">·</span>

@@ -733,7 +733,7 @@ export default function Home() {
                 Mission Control
               </p>
               <h1 className="mt-2 text-3xl font-semibold md:text-5xl">
-                Neusic Foundry
+                Cyvora
               </h1>
               <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300 md:text-base">
                 Autonomous business command center. The Executive AI turns founder intent into
@@ -1915,14 +1915,14 @@ function Metric({
 
   return (
     <div
-      className={`rounded-2xl border p-5 ${
+      className={`cyvora-glass rounded-2xl p-5 ${
         tone === 'cyan'
           ? 'border-cyan-300/15 bg-gradient-to-br from-cyan-300/10 via-slate-950 to-slate-950'
           : tone === 'emerald'
             ? 'border-emerald-300/15 bg-gradient-to-br from-emerald-300/10 via-slate-950 to-slate-950'
-            : tone === 'blue'
-              ? 'border-blue-300/15 bg-gradient-to-br from-blue-300/10 via-slate-950 to-slate-950'
-              : 'border-amber-300/15 bg-gradient-to-br from-amber-300/10 via-slate-950 to-slate-950'
+              : tone === 'blue'
+                ? 'border-blue-300/15 bg-gradient-to-br from-blue-300/10 via-slate-950 to-slate-950'
+                : 'border-amber-300/15 bg-gradient-to-br from-amber-300/10 via-slate-950 to-slate-950'
       }`}
     >
       <p className={`text-3xl font-semibold ${tones[tone]}`}>{value}</p>
@@ -1936,10 +1936,10 @@ function StatusPill({ status }: { status: string }) {
   const isReady = status === 'Approved' || status === 'No active mission';
   return (
     <span
-      className={`rounded-full border px-3 py-1 text-xs ${
+      className={`cyvora-chip rounded-full px-3 py-1 text-xs ${
         isReady
-          ? 'border-emerald-300/20 bg-emerald-300/10 text-emerald-200'
-          : 'border-amber-300/20 bg-amber-300/10 text-amber-200'
+          ? 'border-emerald-300/20 text-emerald-200'
+          : 'border-amber-300/20 text-amber-200'
       }`}
     >
       {status}
@@ -1958,7 +1958,7 @@ function ActivityRow({
 }) {
   const dot = tone === 'amber' ? 'bg-amber-300' : tone === 'emerald' ? 'bg-emerald-300' : 'bg-cyan-300';
   return (
-    <div className="rounded-xl border border-white/10 bg-gradient-to-br from-white/[0.05] to-white/[0.02] p-4">
+    <div className="cyvora-glass rounded-xl p-4">
       <div className="flex gap-3">
         <span className={`mt-1 h-2.5 w-2.5 rounded-full ${dot}`} />
         <div>
@@ -1997,7 +1997,7 @@ function ActionCard({
 
   if (href) {
     return (
-      <Link href={href} className="rounded-2xl border border-white/10 bg-slate-950/70 p-5 transition hover:border-cyan-300/40 hover:bg-slate-900/80">
+      <Link href={href} className="cyvora-tactile rounded-2xl p-5 transition hover:translate-y-[-1px] hover:shadow-[0_22px_40px_rgba(0,0,0,0.32)]">
         {content}
       </Link>
     );
@@ -2006,7 +2006,7 @@ function ActionCard({
   return (
     <button
       onClick={onClick}
-      className="rounded-2xl border border-white/10 bg-gradient-to-br from-slate-950 via-slate-950 to-slate-900 p-5 text-left transition hover:border-cyan-300/40 hover:shadow-lg hover:shadow-cyan-950/20"
+      className="cyvora-tactile rounded-2xl p-5 text-left transition hover:translate-y-[-1px] hover:shadow-[0_22px_40px_rgba(0,0,0,0.32)]"
     >
       {content}
     </button>
@@ -2015,7 +2015,7 @@ function ActionCard({
 
 function MiniMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+    <div className="cyvora-tactile rounded-xl p-3">
       <p className="text-sm font-semibold text-white">{value}</p>
       <p className="mt-1 text-xs text-slate-500">{label}</p>
     </div>
@@ -2033,10 +2033,10 @@ function Modal({
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-gradient-to-b from-slate-950 to-slate-900 p-6 shadow-2xl shadow-blue-950/40">
+      <div className="cyvora-glass-strong w-full max-w-lg rounded-2xl p-6">
         <div className="mb-4 flex items-center justify-between gap-4">
           <h2 className="text-xl font-semibold">{title}</h2>
-          <button onClick={onClose} className="rounded-lg border border-white/10 px-3 py-1 text-sm text-slate-300 hover:bg-white/5">
+          <button onClick={onClose} className="cyvora-chip rounded-lg px-3 py-1 text-sm text-slate-200">
             Close
           </button>
         </div>
@@ -2054,7 +2054,7 @@ function Pill({ tone, children }: { tone: 'cyan' | 'emerald' | 'amber' | 'blue';
     blue: 'border-blue-300/20 bg-blue-300/10 text-blue-100',
   };
 
-  return <span className={`rounded-full border px-3 py-1 text-xs ${styles[tone]}`}>{children}</span>;
+  return <span className={`cyvora-chip rounded-full px-3 py-1 text-xs ${styles[tone]}`}>{children}</span>;
 }
 
 function ToggleRow({
@@ -2072,7 +2072,7 @@ function ToggleRow({
     <button
       type="button"
       onClick={onChange}
-      className="flex w-full items-center justify-between gap-4 rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-left transition hover:border-cyan-300/30 hover:bg-white/[0.04]"
+      className="cyvora-tactile flex w-full items-center justify-between gap-4 rounded-xl px-3 py-2 text-left transition hover:translate-y-[-1px]"
     >
       <div>
         <p className="text-sm font-medium text-white">{label}</p>
@@ -2095,7 +2095,7 @@ function ToggleRow({
 
 function BridgeCard({ step, title, text }: { step: string; title: string; text: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.05] to-white/[0.02] p-4">
+    <div className="cyvora-glass rounded-2xl p-4">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">{step}</p>
       <h3 className="mt-3 text-sm font-semibold text-white">{title}</h3>
       <p className="mt-2 text-sm leading-6 text-slate-400">{text}</p>
@@ -2115,7 +2115,7 @@ function DetailPanel({
   emptyLabel: string;
 }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+    <div className="cyvora-glass rounded-xl p-4">
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="text-sm font-semibold text-white">{title}</p>
@@ -2144,7 +2144,7 @@ function DetailPanel({
 
 function ExecutionMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-slate-950/80 p-3">
+    <div className="cyvora-tactile rounded-xl p-3">
       <p className="text-xs uppercase tracking-[0.16em] text-slate-500">{label}</p>
       <p className="mt-1 text-sm leading-6 text-white">{value}</p>
     </div>
@@ -2153,7 +2153,7 @@ function ExecutionMetric({ label, value }: { label: string; value: string }) {
 
 function RuntimePlanBlock({ label, values }: { label: string; values: string[] }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+    <div className="cyvora-glass rounded-xl p-3">
       <p className="text-xs uppercase tracking-[0.18em] text-slate-500">{label}</p>
       <div className="mt-2 flex flex-wrap gap-2">
         {values.map((value) => (
@@ -2200,7 +2200,7 @@ function ControlSurfaceSection({
   detail: { label: string; description: string; badges: string[] } | null;
 }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+    <div className="cyvora-glass rounded-xl p-4">
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="text-sm font-semibold text-white">{title}</p>
@@ -2245,12 +2245,12 @@ function ControlSurfaceSection({
       </div>
 
       {detail && (
-        <div className="mt-3 rounded-xl border border-white/10 bg-slate-950/80 p-4">
+        <div className="cyvora-glass mt-3 rounded-xl p-4">
           <p className="text-sm font-semibold text-white">{detail.label}</p>
           <p className="mt-2 text-xs leading-5 text-slate-400">{detail.description}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {detail.badges.map((badge) => (
-              <span key={badge} className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-1 text-[11px] text-slate-300">
+              <span key={badge} className="cyvora-chip rounded-full px-2 py-1 text-[11px] text-slate-300">
                 {badge}
               </span>
             ))}
@@ -2262,7 +2262,7 @@ function ControlSurfaceSection({
 }
 
 function CountPill({ value }: { value: string }) {
-  return <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-slate-300">{value}</span>;
+  return <span className="cyvora-chip rounded-full px-3 py-1 text-xs text-slate-300">{value}</span>;
 }
 
 function countTeams(departments?: HeadquartersDepartment[]) {
