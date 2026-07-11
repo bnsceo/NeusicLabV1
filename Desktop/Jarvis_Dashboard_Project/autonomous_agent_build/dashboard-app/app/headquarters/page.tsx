@@ -145,7 +145,7 @@ export default function HeadquartersPage() {
       <NavBar />
 
       <main className="mx-auto max-w-7xl px-4 py-6 md:px-6 lg:px-8">
-        <section className="rounded-2xl border border-white/10 bg-slate-950/75 p-5 shadow-2xl shadow-blue-950/20 md:p-7">
+        <section className="cyvora-glass-strong rounded-2xl p-5 md:p-7">
           <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-start">
             <div>
               <p className="text-sm font-medium uppercase tracking-[0.22em] text-cyan-300">
@@ -159,10 +159,10 @@ export default function HeadquartersPage() {
                 departments contain teams, and teams hold the agents doing the work.
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
-                <span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs text-cyan-100">
+                <span className="cyvora-chip rounded-full px-3 py-1 text-xs text-cyan-100">
                   {runtimeInfo.label}
                 </span>
-                <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-slate-300">
+                <span className="cyvora-chip rounded-full px-3 py-1 text-xs text-slate-300">
                   {isDemoModeActive ? 'Read-only demo' : 'Live organization'}
                 </span>
               </div>
@@ -171,7 +171,7 @@ export default function HeadquartersPage() {
               {isDemoModeActive ? (
                 <button
                   onClick={handleResetDemo}
-                  className="self-start rounded-xl border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:bg-white/5"
+                  className="cyvora-chip self-start rounded-xl px-4 py-2 text-sm text-slate-200 transition hover:translate-y-[-1px]"
                 >
                   Reset demo
                 </button>
@@ -189,14 +189,14 @@ export default function HeadquartersPage() {
         </section>
 
         {loading ? (
-          <div className="mt-6 rounded-2xl border border-white/10 bg-slate-950/70 p-6 text-slate-400">
+          <div className="mt-6 cyvora-glass rounded-2xl p-6 text-slate-400">
             Loading Headquarters...
           </div>
         ) : !data || data.companies.length === 0 ? (
           <EmptyState />
         ) : (
           <section className="mt-6 grid gap-6 xl:grid-cols-[360px_1fr]">
-            <aside className="rounded-2xl border border-white/10 bg-slate-950/70 p-5">
+            <aside className="cyvora-glass rounded-2xl p-5">
               <div className="rounded-xl border border-cyan-300/25 bg-cyan-300/10 p-4">
                 <div className="flex items-center gap-3">
                   <div className="grid h-11 w-11 place-items-center rounded-xl bg-cyan-300 text-sm font-bold text-slate-950">
@@ -243,7 +243,7 @@ export default function HeadquartersPage() {
               <button
                 type="button"
                 onClick={copyShareableLink}
-                className="mt-4 rounded-xl border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:bg-white/5"
+                className="cyvora-chip mt-4 rounded-xl px-4 py-2 text-sm text-slate-200 transition hover:translate-y-[-1px]"
               >
                 Copy selected company link
               </button>
@@ -268,7 +268,7 @@ export default function HeadquartersPage() {
 
 function EmptyState() {
   return (
-    <div className="mt-6 rounded-2xl border border-white/10 bg-slate-950/70 p-8 text-center">
+    <div className="mt-6 cyvora-glass rounded-2xl p-8 text-center">
       <h2 className="text-xl font-semibold">No companies in Headquarters yet</h2>
       <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-400">
         Create a business vision first. The Executive AI will turn it into companies,
@@ -286,7 +286,7 @@ function EmptyState() {
 
 function OrganizationMap({ company, isDemoModeActive }: { company: Company; isDemoModeActive: boolean }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-5 md:p-6">
+    <div className="cyvora-glass rounded-2xl p-5 md:p-6">
       <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-sm text-slate-400">Selected company</p>
@@ -295,7 +295,7 @@ function OrganizationMap({ company, isDemoModeActive }: { company: Company; isDe
         </div>
         <Link
           href={`/companies/${company.id}`}
-          className="rounded-xl border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:bg-white/5"
+          className="cyvora-chip rounded-xl px-4 py-2 text-sm text-slate-200 transition hover:translate-y-[-1px]"
         >
           Open dashboard
         </Link>
@@ -309,7 +309,7 @@ function OrganizationMap({ company, isDemoModeActive }: { company: Company; isDe
 
       <div className="space-y-5">
         {company.departments.length === 0 ? (
-          <p className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm text-slate-400">
+          <p className="cyvora-tactile rounded-xl p-4 text-sm text-slate-400">
             This company has no departments yet.
           </p>
         ) : (
@@ -327,13 +327,13 @@ function OrganizationMap({ company, isDemoModeActive }: { company: Company; isDe
 
               <div className="mt-4 grid gap-4 lg:grid-cols-2">
                 {department.teams.map((team) => (
-                  <div key={team.id} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                  <div key={team.id} className="cyvora-tactile rounded-xl p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <h4 className="text-sm font-medium">{team.name}</h4>
                         <p className="mt-1 text-xs leading-5 text-slate-400">{team.description}</p>
                       </div>
-                      <span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-2 py-1 text-xs text-cyan-100">
+                      <span className="cyvora-chip rounded-full px-2 py-1 text-xs text-cyan-100">
                         {team.agents.length}
                       </span>
                     </div>
@@ -365,7 +365,7 @@ function OrganizationMap({ company, isDemoModeActive }: { company: Company; isDe
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+    <div className="cyvora-tactile rounded-xl p-4">
       <p className="text-2xl font-semibold text-white">{value}</p>
       <p className="mt-1 text-xs text-slate-400">{label}</p>
     </div>

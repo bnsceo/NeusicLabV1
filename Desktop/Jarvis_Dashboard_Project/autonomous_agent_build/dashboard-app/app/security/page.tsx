@@ -57,7 +57,7 @@ export default function SecurityDashboard() {
       <NavBar />
 
       <main className="mx-auto max-w-7xl px-4 py-6 md:px-6 lg:px-8">
-        <section className="rounded-2xl border border-white/10 bg-slate-950/75 p-5 shadow-2xl shadow-blue-950/20 md:p-7">
+        <section className="cyvora-glass-strong rounded-2xl p-5 md:p-7">
           <p className="text-sm font-medium uppercase tracking-[0.22em] text-cyan-300">War Room</p>
           <div className="mt-2 grid gap-5 lg:grid-cols-[1fr_360px] lg:items-end">
             <div>
@@ -76,7 +76,7 @@ export default function SecurityDashboard() {
         </section>
 
         {loading ? (
-          <p className="mt-6 rounded-2xl border border-white/10 bg-slate-950/70 p-6 text-sm text-slate-400">
+          <p className="mt-6 cyvora-glass rounded-2xl p-6 text-sm text-slate-400">
             Loading War Room...
           </p>
         ) : (
@@ -87,7 +87,7 @@ export default function SecurityDashboard() {
               ) : (
                 <div className="grid gap-3">
                   {compliance.map((item) => (
-                    <div key={item.standard} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                    <div key={item.standard} className="cyvora-tactile rounded-xl p-4">
                       <div className="flex items-start justify-between gap-3">
                         <p className="text-sm font-medium">{item.standard}</p>
                         <StatusBadge status={item.status} />
@@ -106,7 +106,7 @@ export default function SecurityDashboard() {
               ) : (
                 <div className="space-y-3">
                   {incidents.map((incident) => (
-                    <div key={incident.id} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                    <div key={incident.id} className="cyvora-tactile rounded-xl p-4">
                       <div className="flex flex-wrap items-center gap-2">
                         <Severity severity={incident.severity} />
                         <span className="text-xs text-slate-400">{incident.status}</span>
@@ -126,7 +126,7 @@ export default function SecurityDashboard() {
               ) : (
                 <div className="space-y-3">
                   {vulnerabilities.map((vulnerability) => (
-                    <div key={vulnerability.id} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                    <div key={vulnerability.id} className="cyvora-tactile rounded-xl p-4">
                       <div className="flex flex-wrap items-center gap-2">
                         <Severity severity={vulnerability.severity} />
                         <span className="text-xs text-slate-400">{vulnerability.status}</span>
@@ -148,7 +148,7 @@ export default function SecurityDashboard() {
 
 function Panel({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-5 md:p-6">
+    <div className="cyvora-glass rounded-2xl p-5 md:p-6">
       <h2 className="text-lg font-semibold">{title}</h2>
       <p className="mt-1 text-sm text-slate-400">{subtitle}</p>
       <div className="mt-4">{children}</div>
@@ -158,7 +158,7 @@ function Panel({ title, subtitle, children }: { title: string; subtitle: string;
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+    <div className="cyvora-tactile rounded-xl p-4">
       <p className="text-2xl font-semibold">{value}</p>
       <p className="mt-1 text-xs text-slate-400">{label}</p>
     </div>

@@ -13,7 +13,7 @@ export default function UnlockPage() {
 function UnlockShell({ nextPath }: { nextPath: string }) {
   return (
     <div className="min-h-screen bg-[#070b12] px-4 py-10 text-white">
-      <div className="cyvora-glass mx-auto max-w-md rounded-3xl p-6">
+      <div className="cyvora-glass-strong mx-auto max-w-md rounded-3xl p-6">
         <div className="flex items-center gap-3">
           <Image src="/cyvora-mark.svg" alt="Cyvora" width={48} height={48} className="h-12 w-12 rounded-2xl" />
           <div>
@@ -43,7 +43,7 @@ function UnlockShell({ nextPath }: { nextPath: string }) {
 
           <button
             type="submit"
-            className="mt-5 w-full rounded-2xl bg-cyan-300 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200"
+            className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-2xl bg-cyan-300 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200"
           >
             Unlock
           </button>

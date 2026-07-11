@@ -75,7 +75,7 @@ export default function HistoryPage() {
       <NavBar />
 
       <main className="mx-auto max-w-7xl px-4 py-6 md:px-6 lg:px-8">
-        <section className="rounded-2xl border border-white/10 bg-slate-950/75 p-5 shadow-2xl shadow-blue-950/20 md:p-7">
+        <section className="cyvora-glass-strong rounded-2xl p-5 md:p-7">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="text-sm font-medium uppercase tracking-[0.22em] text-cyan-300">Mission Archive</p>
@@ -86,7 +86,7 @@ export default function HistoryPage() {
             {isDemoModeActive ? (
               <button
                 onClick={handleResetDemo}
-                className="rounded-xl border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:bg-white/5"
+                className="cyvora-chip rounded-xl px-4 py-2 text-sm text-slate-200 transition hover:translate-y-[-1px]"
               >
                 Reset demo
               </button>
@@ -100,19 +100,19 @@ export default function HistoryPage() {
                 the AI organization over time.
               </p>
             </div>
-            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+            <div className="cyvora-tactile rounded-xl p-4">
               <p className="text-2xl font-semibold">{missions.length}</p>
               <p className="mt-1 text-xs text-slate-400">Visible missions</p>
             </div>
           </div>
           {isDemoModeActive ? (
-            <div className="mt-5 rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm text-slate-300 md:hidden">
+            <div className="cyvora-tactile mt-5 rounded-xl p-4 text-sm text-slate-300 md:hidden">
               The public demo archive is seeded, read-only, and resettable from this screen.
             </div>
           ) : null}
         </section>
 
-        <section className="mt-6 rounded-2xl border border-white/10 bg-slate-950/70 p-5 md:p-6">
+        <section className="mt-6 cyvora-glass rounded-2xl p-5 md:p-6">
           <div className="grid gap-3 md:grid-cols-[1fr_220px]">
             <input
               type="text"
@@ -145,7 +145,7 @@ export default function HistoryPage() {
                 <div
                   key={mission.id}
                   onClick={() => setSelectedMission(mission)}
-                  className="cursor-pointer rounded-xl border border-white/10 bg-white/[0.03] p-4 transition hover:border-cyan-300/40 hover:bg-white/[0.06]"
+                  className="cyvora-tactile cursor-pointer rounded-xl p-4 transition hover:translate-y-[-1px]"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
@@ -158,7 +158,7 @@ export default function HistoryPage() {
                     </div>
                     <button
                       onClick={(event) => { event.stopPropagation(); reloadMission(mission); }}
-                      className="rounded-xl border border-white/10 px-3 py-2 text-xs text-slate-200 transition hover:bg-white/5"
+                      className="cyvora-chip rounded-xl px-3 py-2 text-xs text-slate-200 transition hover:translate-y-[-1px]"
                     >
                       Load
                     </button>
@@ -178,7 +178,7 @@ export default function HistoryPage() {
                 <h2 className="text-xl font-semibold">Mission details</h2>
                 <p className="mt-1 text-sm text-slate-400">{selectedMission.objective}</p>
               </div>
-              <button onClick={() => setSelectedMission(null)} className="rounded-lg border border-white/10 px-3 py-1 text-sm text-slate-300 hover:bg-white/5">
+              <button onClick={() => setSelectedMission(null)} className="cyvora-chip rounded-lg px-3 py-1 text-sm text-slate-300 hover:translate-y-[-1px]">
                 Close
               </button>
             </div>
@@ -189,7 +189,7 @@ export default function HistoryPage() {
             </div>
             <div className="mt-5 space-y-2">
               {selectedMission.agents?.map((agent: any, index: number) => (
-                <div key={index} className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                <div key={index} className="cyvora-tactile rounded-xl p-3">
                   <p className="text-sm font-medium">{agent.name}</p>
                   <p className="mt-1 text-xs text-slate-400">{agent.task}</p>
                 </div>
@@ -197,7 +197,7 @@ export default function HistoryPage() {
             </div>
             <button
               onClick={() => reloadMission(selectedMission)}
-              className="mt-5 rounded-xl bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200"
+              className="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200"
             >
               Load into Mission Control
             </button>

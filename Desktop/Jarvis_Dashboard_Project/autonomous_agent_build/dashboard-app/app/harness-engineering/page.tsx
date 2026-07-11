@@ -298,7 +298,7 @@ export default function SelfCodingPage() {
             </div>
           </div>
 
-          <aside className="rounded-2xl border border-white/10 bg-slate-950/70 p-5 md:p-6">
+          <aside className="cyvora-glass rounded-2xl p-5 md:p-6">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <h2 className="text-lg font-semibold">Harness Board</h2>
@@ -317,7 +317,7 @@ export default function SelfCodingPage() {
             </div>
 
             {isDemoModeActive ? (
-              <div className="mt-5 rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm text-slate-300 md:hidden">
+              <div className="cyvora-tactile mt-5 rounded-xl p-4 text-sm text-slate-300 md:hidden">
                 Read-only demo mode is active. The seeded request and approval flow are visible, and
                 reset restores the showcase.
               </div>
@@ -334,11 +334,11 @@ export default function SelfCodingPage() {
         </section>
 
         <section className="mt-6 grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
-          <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-5 md:p-6">
+          <div className="cyvora-glass rounded-2xl p-5 md:p-6">
             <h2 className="text-lg font-semibold">Assigned workforce</h2>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {activeWorkers.map(([name, role]) => (
-                <div key={name} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                <div key={name} className="cyvora-tactile rounded-xl p-4">
                   <div className="flex items-center gap-3">
                     <div className="grid h-9 w-9 place-items-center rounded-lg bg-cyan-300/10 text-sm font-semibold text-cyan-200">
                       {name.charAt(0)}
@@ -353,13 +353,13 @@ export default function SelfCodingPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-5 md:p-6">
+          <div className="cyvora-glass rounded-2xl p-5 md:p-6">
             <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h2 className="text-lg font-semibold">Build lifecycle</h2>
                 <p className="mt-1 text-sm text-slate-400">Harness-first controlled delivery</p>
               </div>
-              <div className="rounded-full border border-white/10 px-3 py-1 text-xs text-slate-300">
+              <div className="cyvora-chip rounded-full px-3 py-1 text-xs text-slate-300">
                 {approvalState === 'pending' ? 'Waiting for founder' : approvalState}
               </div>
             </div>
@@ -381,14 +381,14 @@ export default function SelfCodingPage() {
               <button
                 onClick={() => updateApproval('hold')}
                 disabled={!selectedRequest || isDemoModeActive}
-                className="rounded-xl border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50"
+                className="cyvora-chip rounded-xl px-4 py-2 text-sm font-semibold text-slate-200 transition hover:translate-y-[-1px] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Hold for changes
               </button>
               <button
                 onClick={startExecution}
                 disabled={selectedRequest?.approval_state !== 'approved' || isDemoModeActive}
-                className="rounded-xl bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex min-h-11 items-center justify-center rounded-xl bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isDemoModeActive ? 'Demo is read-only' : 'Start approved execution'}
               </button>
@@ -396,7 +396,7 @@ export default function SelfCodingPage() {
           </div>
         </section>
 
-        <section className="mt-6 rounded-2xl border border-white/10 bg-slate-950/70 p-5 md:p-6">
+        <section className="mt-6 cyvora-glass-strong rounded-2xl p-5 md:p-6">
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-lg font-semibold">Runtime plan</h2>
@@ -404,7 +404,7 @@ export default function SelfCodingPage() {
                 Structured harness spec generated from the current request
               </p>
             </div>
-              <div className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs text-cyan-100">
+              <div className="cyvora-chip rounded-full px-3 py-1 text-xs text-cyan-100">
               {runtimePlan.token_cost_ceiling.tokens} tokens · {runtimePlan.token_cost_ceiling.cost_usd}
             </div>
           </div>
@@ -416,7 +416,7 @@ export default function SelfCodingPage() {
             <RuntimePanel title="Rollback path" items={runtimePlan.rollback_path} />
           </div>
 
-            <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+            <div className="cyvora-tactile mt-4 rounded-xl p-4">
               <h3 className="text-sm font-semibold text-white">Runtime notes</h3>
               <div className="mt-3 grid gap-2 md:grid-cols-2">
                 {runtimePlan.runtime_notes.map((note) => (
@@ -427,7 +427,7 @@ export default function SelfCodingPage() {
               </div>
             </div>
 
-            <div className="mt-4 rounded-xl border border-cyan-300/20 bg-cyan-300/10 p-4">
+            <div className="cyvora-tactile mt-4 rounded-xl p-4">
               <label className="flex cursor-pointer items-start gap-3">
                 <input
                   type="checkbox"
@@ -445,7 +445,7 @@ export default function SelfCodingPage() {
             </div>
           </section>
 
-        <section className="mt-6 rounded-2xl border border-white/10 bg-slate-950/70 p-5 md:p-6">
+        <section className="mt-6 cyvora-glass-strong rounded-2xl p-5 md:p-6">
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-lg font-semibold">Harness architecture</h2>
@@ -453,7 +453,7 @@ export default function SelfCodingPage() {
                 The runtime guardrails that keep autonomous execution safe and measurable
               </p>
             </div>
-            <div className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs text-cyan-100">
+              <div className="cyvora-chip rounded-full px-3 py-1 text-xs text-cyan-100">
               Loop Engineering inside Harness Engineering
             </div>
           </div>
@@ -466,7 +466,7 @@ export default function SelfCodingPage() {
           </div>
 
           <div className="mt-4 grid gap-4 lg:grid-cols-2">
-            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+            <div className="cyvora-tactile rounded-xl p-4">
               <h3 className="text-sm font-semibold text-white">How to run the loop safely</h3>
               <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-400">
                 <li>1. Define the goal and the acceptance checks before execution starts.</li>
@@ -477,7 +477,7 @@ export default function SelfCodingPage() {
               </ul>
             </div>
 
-            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+            <div className="cyvora-tactile rounded-xl p-4">
               <h3 className="text-sm font-semibold text-white">What this changes next</h3>
               <p className="mt-3 text-sm leading-6 text-slate-400">
                 The next useful product move is to make every self-coding request produce an
@@ -488,13 +488,13 @@ export default function SelfCodingPage() {
           </div>
         </section>
 
-        <section className="mt-6 rounded-2xl border border-white/10 bg-slate-950/70 p-5 md:p-6">
+        <section className="mt-6 cyvora-glass-strong rounded-2xl p-5 md:p-6">
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-lg font-semibold">Build history</h2>
               <p className="mt-1 text-sm text-slate-400">Persistent Harness Engineering requests for this tenant</p>
             </div>
-            <div className="rounded-full border border-white/10 px-3 py-1 text-xs text-slate-300">
+            <div className="cyvora-chip rounded-full px-3 py-1 text-xs text-slate-300">
               {requests.length} request{requests.length === 1 ? '' : 's'}
             </div>
           </div>
@@ -527,7 +527,7 @@ export default function SelfCodingPage() {
                         {new Date(item.updated_at).toLocaleString()}
                       </p>
                     </div>
-                    <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-slate-300">
+                    <span className="cyvora-chip rounded-full px-3 py-1 text-xs text-slate-300">
                       {item.qa_confidence}% QA
                     </span>
                   </div>
@@ -543,7 +543,7 @@ export default function SelfCodingPage() {
 
 function RuntimePanel({ title, items }: { title: string; items: string[] }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+    <div className="cyvora-tactile rounded-xl p-4">
       <h3 className="text-sm font-semibold text-white">{title}</h3>
       <div className="mt-3 space-y-2">
         {items.map((item) => (
@@ -590,7 +590,7 @@ function LifecycleRow({ index, stage }: { index: number; stage: BuildStage }) {
   };
 
   return (
-    <div className="grid gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-4 md:grid-cols-[72px_1fr_auto] md:items-center">
+    <div className="cyvora-tactile grid gap-3 rounded-xl p-4 md:grid-cols-[72px_1fr_auto] md:items-center">
       <div className="text-sm font-semibold text-slate-500">0{index}</div>
       <div>
         <div className="flex flex-wrap items-center gap-2">
