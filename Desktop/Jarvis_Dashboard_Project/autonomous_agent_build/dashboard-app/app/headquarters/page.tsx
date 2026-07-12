@@ -208,10 +208,10 @@ export default function HeadquartersPage() {
                   <button
                     key={company.id}
                     onClick={() => setSelectedCompanyId(company.id)}
-                    className={`min-w-[220px] rounded-xl border p-4 text-left transition xl:w-full ${
+                    className={`cyvora-tactile min-w-[220px] rounded-xl p-4 text-left transition xl:w-full ${
                       selectedCompany?.id === company.id
                         ? 'border-cyan-300/50 bg-cyan-300/10'
-                        : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.06]'
+                        : 'hover:bg-white/[0.06]'
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -238,8 +238,8 @@ export default function HeadquartersPage() {
                 Copy selected company link
               </button>
 
-              <div className="mt-4 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-4 text-sm text-slate-100 md:hidden">
-                <p className="text-[11px] uppercase tracking-[0.18em] text-cyan-200">Phone view</p>
+              <div className="mt-4 cyvora-tactile rounded-2xl p-4 text-sm text-slate-100 md:hidden">
+                <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-cyan-200">Phone view</p>
                 <p className="mt-1 font-medium">{selectedCompany?.name || 'No company selected'}</p>
                 <p className="mt-1 text-xs text-slate-300">
                   {selectedCompany?.departments.length || 0} departments · {countTeams(selectedCompany?.departments)} teams ·{' '}
@@ -259,7 +259,7 @@ export default function HeadquartersPage() {
 function EmptyState() {
   return (
     <div className="mt-6 cyvora-glass rounded-2xl p-8 text-center">
-      <h2 className="text-xl font-semibold">No companies in Headquarters yet</h2>
+      <h2 className="text-[20px] font-semibold">No companies in Headquarters yet</h2>
       <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-400">
         Create a business vision first. The Executive AI will turn it into companies,
         departments, teams, and agents.
@@ -279,8 +279,8 @@ function OrganizationMap({ company, isDemoModeActive }: { company: Company; isDe
     <div className="cyvora-glass rounded-2xl p-5 md:p-6">
       <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-sm text-slate-400">Selected company</p>
-          <h2 className="mt-1 text-2xl font-semibold">{company.name}</h2>
+          <p className="font-mono text-xs text-slate-400">Selected company</p>
+          <h2 className="mt-1 text-[20px] font-semibold">{company.name}</h2>
           <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-400">{company.description}</p>
         </div>
         <Link
@@ -304,13 +304,13 @@ function OrganizationMap({ company, isDemoModeActive }: { company: Company; isDe
           </p>
         ) : (
           company.departments.map((department) => (
-            <div key={department.id} className="rounded-2xl border border-white/10 bg-black/20 p-4">
+            <div key={department.id} className="cyvora-tactile rounded-2xl p-4">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-3">
                 <div>
                   <h3 className="font-semibold text-cyan-100">{department.name}</h3>
                   <p className="mt-1 text-xs text-slate-400">{department.description}</p>
                 </div>
-                <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-slate-300">
+                <span className="cyvora-chip rounded-full px-3 py-1 text-xs text-slate-300">
                   {department.teams.length} teams
                 </span>
               </div>
@@ -335,7 +335,7 @@ function OrganizationMap({ company, isDemoModeActive }: { company: Company; isDe
                         team.agents.map((agent) => (
                           <span
                             key={agent.id}
-                            className="rounded-full border border-white/10 bg-slate-900 px-3 py-1 text-xs text-slate-200"
+                            className="cyvora-chip rounded-full px-3 py-1 text-xs text-slate-200"
                           >
                             {agent.agent_name}
                           </span>
@@ -356,7 +356,7 @@ function OrganizationMap({ company, isDemoModeActive }: { company: Company; isDe
 function Stat({ label, value }: { label: string; value: number }) {
   return (
     <div className="cyvora-tactile rounded-xl p-4">
-      <p className="text-2xl font-semibold text-white">{value}</p>
+      <p className="text-[20px] font-semibold text-white">{value}</p>
       <p className="mt-1 text-xs text-slate-400">{label}</p>
     </div>
   );
@@ -364,8 +364,8 @@ function Stat({ label, value }: { label: string; value: number }) {
 
 function MiniStat({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-      <p className="text-sm font-semibold text-white">{String(value)}</p>
+    <div className="cyvora-tactile rounded-xl p-3">
+      <p className="text-[20px] font-semibold text-white">{String(value)}</p>
       <p className="mt-1 text-xs text-slate-500">{label}</p>
     </div>
   );

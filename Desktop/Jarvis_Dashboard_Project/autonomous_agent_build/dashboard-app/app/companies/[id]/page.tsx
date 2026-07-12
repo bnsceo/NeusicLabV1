@@ -77,7 +77,7 @@ export default function CompanyDetailPage() {
           description={company.description}
         >
           <div
-            className="h-14 w-14 rounded-2xl border border-white/10 shadow-[inset_1px_1px_0_rgba(255,255,255,0.05),8px_8px_16px_rgba(0,0,0,0.28)]"
+            className="h-14 w-14 rounded-2xl border border-white/10 shadow-[inset_1px_1px_0_rgba(255,255,255,0.06),6px_6px_14px_rgba(0,0,0,0.25)]"
             style={{ backgroundColor: company.brand_color || '#38bdf8' }}
             aria-hidden="true"
           />
@@ -95,16 +95,16 @@ export default function CompanyDetailPage() {
         <section className="mt-6 grid gap-6 xl:grid-cols-[1fr_420px]">
           <div className="cyvora-glass rounded-2xl p-5 md:p-6">
             <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <h2 className="text-lg font-semibold">Live command nodes</h2>
-                <p className="mt-1 text-sm text-slate-400">Connectors, tasks, and outputs are first-class nodes now</p>
+                <div>
+                  <h2 className="text-[20px] font-semibold">Live command nodes</h2>
+                  <p className="mt-1 text-sm text-slate-400">Connectors, tasks, and outputs are first-class nodes now</p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <button onClick={() => setActivePanel('connectors')} className={`cyvora-chip rounded-full px-3 py-1 text-xs ${activePanel === 'connectors' ? 'text-cyan-100' : 'text-slate-300'}`}>Connectors {connectorCount}</button>
+                  <button onClick={() => setActivePanel('tasks')} className={`cyvora-chip rounded-full px-3 py-1 text-xs ${activePanel === 'tasks' ? 'text-cyan-100' : 'text-slate-300'}`}>Tasks {taskCount}</button>
+                  <button onClick={() => setActivePanel('outputs')} className={`cyvora-chip rounded-full px-3 py-1 text-xs ${activePanel === 'outputs' ? 'text-cyan-100' : 'text-slate-300'}`}>Outputs {outputCount}</button>
+                </div>
               </div>
-              <div className="flex flex-wrap gap-2">
-                <button onClick={() => setActivePanel('connectors')} className={`cyvora-chip rounded-full px-3 py-1 text-xs ${activePanel === 'connectors' ? 'text-cyan-100' : 'text-slate-300'}`}>Connectors {connectorCount}</button>
-                <button onClick={() => setActivePanel('tasks')} className={`cyvora-chip rounded-full px-3 py-1 text-xs ${activePanel === 'tasks' ? 'text-cyan-100' : 'text-slate-300'}`}>Tasks {taskCount}</button>
-                <button onClick={() => setActivePanel('outputs')} className={`cyvora-chip rounded-full px-3 py-1 text-xs ${activePanel === 'outputs' ? 'text-cyan-100' : 'text-slate-300'}`}>Outputs {outputCount}</button>
-              </div>
-            </div>
             <div className="space-y-3">
               {activePanel === 'connectors' ? (
                 company.connectors?.length ? (
@@ -157,7 +157,7 @@ export default function CompanyDetailPage() {
 
           <div className="space-y-6">
             <div className="cyvora-glass rounded-2xl p-5 md:p-6">
-              <h2 className="text-lg font-semibold">Approval queue</h2>
+              <h2 className="text-[20px] font-semibold">Approval queue</h2>
               <div className="mt-4 space-y-3">
                 {company.approvals?.length ? (
                   company.approvals.map((approval: any) => (
@@ -174,7 +174,7 @@ export default function CompanyDetailPage() {
             </div>
 
             <div className="cyvora-glass rounded-2xl p-5 md:p-6">
-              <h2 className="text-lg font-semibold">Structure detail</h2>
+              <h2 className="text-[20px] font-semibold">Structure detail</h2>
               <p className="mt-1 text-sm text-slate-400">Departments and teams on mobile stay readable.</p>
               <div className="mt-4 space-y-3">
                 {company.departments?.length ? (
@@ -186,7 +186,7 @@ export default function CompanyDetailPage() {
                     </div>
                   ))
                 ) : (
-                  <p className="text-sm text-slate-400">No departments yet.</p>
+                  <p className="cyvora-tactile rounded-xl p-4 text-sm text-slate-400">No departments yet.</p>
                 )}
               </div>
             </div>
@@ -206,7 +206,7 @@ export default function CompanyDetailPage() {
 
           <div className="space-y-5">
             {company.departments?.length === 0 && (
-              <p className="rounded-xl border border-dashed border-white/10 bg-black/20 p-5 text-sm text-slate-400">No departments yet.</p>
+              <p className="cyvora-tactile rounded-xl p-5 text-sm text-slate-400">No departments yet.</p>
             )}
             {company.departments?.map((department: any) => (
               <div key={department.id} className="cyvora-tactile rounded-2xl p-4">
@@ -251,7 +251,7 @@ export default function CompanyDetailPage() {
 function Stat({ label, value }: { label: string; value: number }) {
   return (
     <div className="cyvora-glass rounded-2xl p-5">
-      <p className="text-3xl font-semibold text-white">{value}</p>
+      <p className="text-[20px] font-semibold text-white">{value}</p>
       <p className="mt-1 text-sm text-slate-400">{label}</p>
     </div>
   );
@@ -283,5 +283,5 @@ function LiveNodeCard({
 }
 
 function EmptyState({ children }: { children: React.ReactNode }) {
-  return <p className="rounded-xl border border-dashed border-white/10 bg-black/20 p-5 text-sm text-slate-400">{children}</p>;
+  return <p className="cyvora-tactile rounded-xl p-5 text-sm text-slate-400">{children}</p>;
 }

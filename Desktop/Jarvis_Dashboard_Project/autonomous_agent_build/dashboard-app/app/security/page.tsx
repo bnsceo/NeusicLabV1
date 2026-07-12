@@ -154,14 +154,14 @@ function Panel({ title, subtitle, children }: { title: string; subtitle: string;
 function Stat({ label, value }: { label: string; value: number }) {
   return (
     <div className="cyvora-tactile rounded-xl p-4">
-      <p className="text-2xl font-semibold">{value}</p>
-      <p className="mt-1 text-xs text-slate-400">{label}</p>
-    </div>
+            <p className="text-[20px] font-semibold">{value}</p>
+            <p className="mt-1 text-xs text-slate-400">{label}</p>
+          </div>
   );
 }
 
 function Empty({ children }: { children: React.ReactNode }) {
-  return <p className="rounded-xl border border-dashed border-white/10 bg-black/20 p-5 text-sm text-slate-400">{children}</p>;
+  return <p className="cyvora-tactile rounded-xl p-5 text-sm text-slate-400">{children}</p>;
 }
 
 function StatusBadge({ status }: { status: string }) {

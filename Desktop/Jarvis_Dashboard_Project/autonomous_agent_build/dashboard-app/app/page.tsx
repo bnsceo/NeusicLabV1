@@ -135,7 +135,7 @@ const actionButtonBase =
 const actionButtonPrimary = `${actionButtonBase} cyvora-tactile font-semibold text-cyan-50 hover:translate-y-[-1px]`;
 const actionButtonFilled = `${actionButtonBase} bg-cyan-300 font-semibold text-slate-950 hover:bg-cyan-200`;
 const actionButtonSecondary = `${actionButtonBase} cyvora-chip text-slate-200 hover:translate-y-[-1px]`;
-const actionButtonOutline = `${actionButtonBase} border border-white/10 bg-white/[0.03] text-slate-200 hover:bg-white/[0.06]`;
+const actionButtonOutline = `${actionButtonBase} cyvora-chip text-slate-200`;
 const tileActionButton =
   'cyvora-tactile flex min-h-24 flex-col items-start justify-center rounded-2xl p-4 text-left';
 
@@ -857,7 +857,7 @@ export default function Home() {
                 <select
                   value={currentTenant}
                   onChange={(event) => switchTenant(event.target.value)}
-                  className="min-w-0 flex-1 rounded-xl border border-white/10 bg-slate-950/80 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300/60"
+                  className="cyvora-tactile min-w-0 flex-1 rounded-xl px-3 py-2 text-sm text-white outline-none focus:border-cyan-300/60"
                 >
                   {tenants.map((tenant) => (
                     <option key={tenant} value={tenant}>
@@ -937,7 +937,7 @@ export default function Home() {
         </section>
 
         <section className="sticky bottom-4 z-30 mt-4 md:hidden">
-          <div className="rounded-2xl border border-cyan-300/20 bg-slate-950/95 p-4 shadow-2xl shadow-black/40 backdrop-blur">
+          <div className="cyvora-glass-strong rounded-2xl p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-[11px] uppercase tracking-[0.18em] text-cyan-300">Current node</p>
@@ -973,7 +973,7 @@ export default function Home() {
         </section>
 
         <section className="mt-6 grid gap-4 md:hidden">
-          <div className="rounded-2xl border border-cyan-300/20 bg-slate-950/80 p-4">
+          <div className="cyvora-glass rounded-2xl p-4">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-xs uppercase tracking-[0.18em] text-cyan-300">Mobile command surface</p>
@@ -1081,7 +1081,7 @@ export default function Home() {
                 <p className="text-sm font-medium uppercase tracking-[0.18em] text-slate-500">
                   Mission Composer
                 </p>
-                <h2 className="mt-2 text-2xl font-semibold">State a business objective once</h2>
+                <h2 className="mt-2 text-[20px] font-semibold">State a business objective once</h2>
                 <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-400">
                   The founder should describe the business outcome, not individual agents. The
                   Executive AI expands that objective into companies, departments, teams, agents,
@@ -1092,7 +1092,7 @@ export default function Home() {
             </div>
 
             <textarea
-              className="mt-5 min-h-40 w-full rounded-2xl border border-white/10 bg-slate-900/80 p-4 text-sm leading-6 text-white outline-none placeholder:text-slate-500 focus:border-cyan-300/60"
+            className="cyvora-tactile mt-5 min-h-40 w-full rounded-2xl p-4 text-sm leading-6 text-white outline-none placeholder:text-slate-500 focus:border-cyan-300/60"
               placeholder="Example: I want to build a YouTube business."
               value={missionDraft}
               onChange={(event) => setMissionDraft(event.target.value)}
@@ -1104,7 +1104,7 @@ export default function Home() {
                   key={preset}
                   type="button"
                   onClick={() => setMissionDraft(preset)}
-                  className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-slate-200 transition hover:border-cyan-300/40 hover:bg-white/[0.06]"
+                  className="cyvora-chip rounded-full px-3 py-1.5 text-xs text-slate-200 transition"
                 >
                   {preset}
                 </button>
@@ -1137,7 +1137,7 @@ export default function Home() {
                 <p className="text-sm font-medium uppercase tracking-[0.18em] text-slate-500">
                   Mission growth preview
                 </p>
-                <h2 className="mt-2 text-2xl font-semibold">The next objective grows the org</h2>
+                <h2 className="mt-2 text-[20px] font-semibold">The next objective grows the org</h2>
                 <p className="mt-1 text-sm leading-6 text-slate-400">
                   This preview is derived from the founder’s draft so the hierarchy shows the
                   shape of the business before the mission is launched.
@@ -1166,7 +1166,7 @@ export default function Home() {
                           <p className="text-sm font-semibold text-cyan-100">{department.name}</p>
                           <p className="mt-1 text-xs leading-5 text-slate-400">{department.description}</p>
                         </div>
-                        <span className="rounded-full border border-white/10 px-2 py-1 text-xs text-slate-300">
+                        <span className="cyvora-chip rounded-full px-2 py-1 text-xs text-slate-300">
                           {department.teams.length} teams
                         </span>
                       </div>
@@ -1230,13 +1230,13 @@ export default function Home() {
         </section>
 
         {prefs.showVisionBridge && (
-          <section className="mt-6 rounded-2xl border border-white/10 bg-slate-950/70 p-5 md:p-6">
+          <section className="mt-6 cyvora-glass rounded-2xl p-5 md:p-6">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <p className="text-sm font-medium uppercase tracking-[0.18em] text-slate-500">
                   Vision bridge
                 </p>
-                <h2 className="mt-2 text-2xl font-semibold">Turn founder intent into an operating system</h2>
+                <h2 className="mt-2 text-[20px] font-semibold">Turn founder intent into an operating system</h2>
                 <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-400">
                   This is the missing layer between a vision and a working business structure:
                   capture the idea, map the organization, then route execution through approvals.
@@ -1272,7 +1272,7 @@ export default function Home() {
                 <p className="text-sm font-medium uppercase tracking-[0.18em] text-slate-500">
                   Live hierarchy
                 </p>
-                <h2 className="mt-2 text-2xl font-semibold">Headquarters rendered from actual data</h2>
+                <h2 className="mt-2 text-[20px] font-semibold">Headquarters rendered from actual data</h2>
                 <p className="mt-1 text-sm leading-6 text-slate-400">
                   Companies expand into departments, departments contain teams, and teams hold the
                   agents. Click any layer to drill down.
@@ -1326,7 +1326,7 @@ export default function Home() {
                       className={`rounded-2xl border p-4 transition ${
                         selectedCompanyId === company.id
                           ? 'border-cyan-300/40 bg-cyan-300/10'
-                          : 'border-white/10 bg-black/20'
+                          : 'cyvora-tactile'
                       }`}
                     >
                       <button
@@ -1363,7 +1363,7 @@ export default function Home() {
                             company.departments.map((department) => {
                               const departmentOpen = expandedDepartments.includes(department.id);
                               return (
-                                <div key={department.id} className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                                <div key={department.id} className="cyvora-glass rounded-xl p-3">
                                   <button
                                     type="button"
                                     onClick={() => {
@@ -1376,7 +1376,7 @@ export default function Home() {
                                       <p className="text-sm font-medium text-cyan-100">{department.name}</p>
                                       <p className="mt-1 text-xs leading-5 text-slate-400">{department.description}</p>
                                     </div>
-                                    <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-slate-300">
+                                    <span className="cyvora-chip rounded-full px-3 py-1 text-xs text-slate-300">
                                       {departmentOpen ? 'Collapse' : 'Expand'} · {department.teams?.length || 0} teams
                                     </span>
                                   </button>
@@ -1386,7 +1386,7 @@ export default function Home() {
                                       {department.teams?.map((team) => {
                                         const teamOpen = expandedTeams.includes(team.id);
                                         return (
-                                          <div key={team.id} className="rounded-xl border border-white/10 bg-slate-950/70 p-3">
+                                          <div key={team.id} className="cyvora-tactile rounded-xl p-3">
                                             <button
                                               type="button"
                                               onClick={() => {
@@ -1420,7 +1420,7 @@ export default function Home() {
                                                         className={`rounded-full border px-3 py-1 text-xs transition ${
                                                           selectedAgentId === agent.id
                                                             ? 'border-emerald-300/30 bg-emerald-300/20 text-emerald-100'
-                                                            : 'border-white/10 bg-white/[0.03] text-slate-200 hover:border-cyan-300/30'
+                                                            : 'cyvora-chip text-slate-200'
                                                         }`}
                                                       >
                                                         {agent.agent_name}
@@ -1444,7 +1444,7 @@ export default function Home() {
                               );
                             })
                           ) : (
-                            <p className="rounded-xl border border-dashed border-white/10 bg-black/20 p-4 text-sm text-slate-400">
+                            <p className="cyvora-tactile rounded-xl p-4 text-sm text-slate-400">
                               No departments yet.
                             </p>
                           )}
@@ -1455,13 +1455,13 @@ export default function Home() {
                 })}
               </div>
             ) : (
-              <p className="mt-5 rounded-xl border border-dashed border-white/10 bg-black/20 p-5 text-sm text-slate-400">
+              <p className="cyvora-tactile mt-5 rounded-xl p-5 text-sm text-slate-400">
                 No headquarters data yet.
               </p>
             )}
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-5 md:p-6">
+          <div className="cyvora-glass rounded-2xl p-5 md:p-6">
             <div className="mb-4 flex items-center justify-between gap-4">
               <div>
                 <h2 className="text-lg font-semibold">Operations console</h2>
@@ -1475,7 +1475,7 @@ export default function Home() {
             </div>
 
             <div className="space-y-3">
-              <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+              <div className="cyvora-tactile rounded-xl p-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <p className="text-sm font-medium uppercase tracking-[0.18em] text-slate-500">
@@ -1493,7 +1493,7 @@ export default function Home() {
                     {briefing.agents.map((agent, index) => (
                       <div
                         key={`${agent.name}-${index}`}
-                        className="rounded-xl border border-white/10 bg-gradient-to-br from-white/[0.05] to-white/[0.01] p-4"
+                        className="cyvora-tactile rounded-xl p-4"
                       >
                         <div className="flex items-center justify-between gap-3">
                           <p className="text-sm font-medium text-white">{agent.name}</p>
@@ -1506,7 +1506,7 @@ export default function Home() {
                     ))}
                   </div>
                 ) : (
-                  <p className="mt-4 rounded-xl border border-dashed border-white/10 bg-slate-950/80 p-4 text-sm leading-6 text-slate-400">
+                  <p className="cyvora-tactile mt-4 rounded-xl p-4 text-sm leading-6 text-slate-400">
                     No active agent team is deployed. Start with a business objective and the Executive AI will create the plan.
                   </p>
                 )}
@@ -1538,7 +1538,7 @@ export default function Home() {
                 items={selectedNodeTrail}
                 emptyLabel="Select a company, department, team, or agent"
               />
-              <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+              <div className="cyvora-tactile rounded-xl p-4">
                 <p className="text-sm font-semibold text-white">{activeCompanyDetail?.name || 'No company selected'}</p>
                 <p className="mt-1 text-xs leading-5 text-slate-400">
                   {activeCompanyDetail?.description || 'Choose a live company in Headquarters to inspect its tasks and outputs.'}
@@ -1552,14 +1552,14 @@ export default function Home() {
                 <div className="mt-4 flex flex-wrap gap-2">
                   <Link
                     href={`/headquarters${selectedCompanyId ? `?company=${selectedCompanyId}` : ''}`}
-                    className="rounded-xl border border-white/10 px-3 py-2 text-xs text-slate-200 transition hover:bg-white/5"
+                    className="cyvora-chip rounded-xl px-3 py-2 text-xs text-slate-200 transition"
                   >
                     Open HQ view
                   </Link>
                   <button
                     type="button"
                     onClick={copyShareableView}
-                    className="rounded-xl border border-white/10 px-3 py-2 text-xs text-slate-200 transition hover:bg-white/5"
+                    className="cyvora-chip rounded-xl px-3 py-2 text-xs text-slate-200 transition"
                   >
                     Copy current link
                   </button>
@@ -1687,7 +1687,7 @@ export default function Home() {
             </div>
             <div className="mt-4 space-y-3">
               {selfCodingRequests.length === 0 ? (
-                <p className="rounded-xl border border-dashed border-white/10 bg-black/20 p-4 text-sm text-slate-400">
+                <p className="cyvora-tactile rounded-xl p-4 text-sm text-slate-400">
                   No Harness Engineering requests yet.
                 </p>
               ) : (
@@ -1695,7 +1695,7 @@ export default function Home() {
                   <div key={request.id} className="cyvora-tactile rounded-xl p-4">
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <p className="max-w-xl text-sm font-medium text-white">{request.request}</p>
-                      <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-slate-300">
+                      <span className="cyvora-chip rounded-full px-3 py-1 text-xs text-slate-300">
                         {request.stage}
                       </span>
                     </div>
@@ -1729,7 +1729,7 @@ export default function Home() {
               <p className="text-sm font-medium uppercase tracking-[0.18em] text-slate-500">
                 Execution control
               </p>
-              <h2 className="mt-2 text-2xl font-semibold">Approved run history</h2>
+              <h2 className="mt-2 text-[20px] font-semibold">Approved run history</h2>
               <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-400">
                 This is the execution record tied to approved harness plans. It shows the exact plan
                 snapshot, runtime mode, and rollback posture used for each run.
@@ -1753,7 +1753,7 @@ export default function Home() {
                     <button
                       onClick={() => handleRollbackRun(selectedExecutionRun)}
                       disabled={selectedExecutionRun.status === 'rolled_back'}
-                    className="inline-flex min-h-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-semibold text-rose-100 transition hover:translate-y-[-1px] disabled:cursor-not-allowed disabled:opacity-50"
+                    className="inline-flex min-h-9 items-center justify-center rounded-xl cyvora-chip px-3 py-1.5 text-xs font-semibold text-rose-100 transition hover:translate-y-[-1px] disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       Rollback
                     </button>
@@ -1776,7 +1776,7 @@ export default function Home() {
                     value={`${selectedExecutionRun.paid_ai ? 'Paid AI on' : 'Paid AI off'} · ${selectedExecutionRun.mock_mode ? 'mock-safe' : 'live'}`}
                   />
                   {selectedRuntimePlan ? (
-                    <div className="rounded-xl border border-white/10 bg-slate-950/80 p-4">
+                    <div className="cyvora-tactile rounded-xl p-4">
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div>
                           <p className="text-sm font-semibold text-white">Approved runtime plan</p>
@@ -1787,7 +1787,7 @@ export default function Home() {
                         <button
                           type="button"
                           onClick={copySelectedRunPlan}
-                        className="inline-flex min-h-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-slate-200 transition hover:bg-white/[0.06]"
+                        className="inline-flex min-h-9 items-center justify-center rounded-xl cyvora-chip px-3 py-1.5 text-xs text-slate-200 transition"
                         >
                           Copy plan
                         </button>
@@ -1803,7 +1803,7 @@ export default function Home() {
                         <MiniMetric label="Cost ceiling" value={selectedRuntimePlan.token_cost_ceiling.cost_usd} />
                       </div>
                       {selectedRuntimePlan.runtime_notes.length ? (
-                        <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                        <div className="cyvora-glass mt-4 rounded-xl p-3">
                           <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Runtime notes</p>
                           <div className="mt-2 space-y-2">
                             {selectedRuntimePlan.runtime_notes.map((note) => (
@@ -1818,19 +1818,19 @@ export default function Home() {
                   ) : null}
                 </div>
               ) : (
-                <p className="mt-4 rounded-xl border border-dashed border-white/10 bg-slate-950/80 p-4 text-sm text-slate-500">
+                <p className="cyvora-tactile mt-4 rounded-xl p-4 text-sm text-slate-500">
                   No approved execution has started yet.
                 </p>
               )}
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+            <div className="cyvora-tactile rounded-2xl p-4">
               <p className="text-sm font-semibold text-white">Recent runs</p>
               <p className="mt-1 text-xs text-slate-400">Execution timeline and rollback state</p>
 
               <div className="mt-4 space-y-3">
                 {executionRuns.length === 0 ? (
-                  <p className="rounded-xl border border-dashed border-white/10 bg-slate-950/80 p-4 text-sm text-slate-500">
+                  <p className="cyvora-tactile rounded-xl p-4 text-sm text-slate-500">
                     No execution records yet.
                   </p>
                 ) : (
@@ -1841,7 +1841,7 @@ export default function Home() {
                       className={`cyvora-tactile w-full rounded-xl p-4 text-left transition ${
                         selectedExecutionRun?.id === run.id
                           ? 'border-cyan-300/50 bg-cyan-300/10'
-                          : 'border-white/10 hover:border-cyan-300/30'
+                          : 'cyvora-chip hover:border-cyan-300/30'
                       }`}
                     >
                       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -1853,7 +1853,7 @@ export default function Home() {
                         </div>
                         <div className="flex flex-wrap gap-2">
                           <ExecutionBadge status={run.status} />
-                          <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-slate-300">
+                          <span className="cyvora-chip rounded-full px-3 py-1 text-xs text-slate-300">
                             {run.rollback_state}
                           </span>
                         </div>
@@ -1886,13 +1886,13 @@ export default function Home() {
             department, agent, and approval work.
           </p>
           <textarea
-            className="mt-4 w-full resize-none rounded-xl border border-white/10 bg-slate-900/80 p-4 text-sm leading-6 text-white outline-none focus:border-cyan-300/60"
+            className="cyvora-tactile mt-4 w-full resize-none rounded-xl p-4 text-sm leading-6 text-white outline-none focus:border-cyan-300/60"
             rows={4}
             placeholder="Example: I want to build a YouTube business around AI education."
             value={goal}
             onChange={(event) => setGoal(event.target.value)}
           />
-          <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+          <div className="cyvora-glass mt-4 rounded-xl p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-medium uppercase tracking-[0.18em] text-cyan-300">Blueprint preview</p>
@@ -1912,7 +1912,7 @@ export default function Home() {
             </div>
 
             <div className="mt-4 grid gap-3 md:grid-cols-2">
-              <div className="rounded-xl border border-white/10 bg-slate-950/70 p-3">
+              <div className="cyvora-tactile rounded-xl p-3">
                 <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Connectors</p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {missionDraftBlueprint.connectors.map((connector) => (
@@ -1925,7 +1925,7 @@ export default function Home() {
                   ))}
                 </div>
               </div>
-              <div className="rounded-xl border border-white/10 bg-slate-950/70 p-3">
+              <div className="cyvora-tactile rounded-xl p-3">
                 <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Runtime plan</p>
                 <div className="mt-2 space-y-2 text-xs leading-5 text-slate-300">
                   <p>Sandbox: {missionDraftRuntimePlan.sandbox_scope.join(' · ')}</p>
@@ -1971,7 +1971,7 @@ export default function Home() {
             placeholder="Tenant name"
             value={newTenantName}
             onChange={(event) => setNewTenantName(event.target.value)}
-            className="w-full rounded-xl border border-white/10 bg-slate-900/80 p-4 text-sm text-white outline-none focus:border-cyan-300/60"
+            className="cyvora-tactile w-full rounded-xl p-4 text-sm text-white outline-none focus:border-cyan-300/60"
           />
           <div className="mt-4 flex justify-end gap-3">
             <button
@@ -1993,7 +1993,7 @@ export default function Home() {
 
       {mobileDetailOpen && mobileDetail ? (
         <div className="fixed inset-x-0 bottom-0 z-50 md:hidden">
-          <div className="mx-auto max-w-2xl rounded-t-3xl border border-white/10 bg-slate-950/95 p-4 shadow-2xl shadow-black/60 backdrop-blur">
+          <div className="mx-auto max-w-2xl rounded-t-3xl cyvora-glass-strong p-4">
             <div className="mx-auto mb-3 h-1.5 w-14 rounded-full bg-white/15" />
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-start gap-3">
@@ -2007,7 +2007,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => setMobileDetailOpen(false)}
-                className="rounded-lg border border-white/10 px-3 py-1 text-sm text-slate-200"
+                className="cyvora-chip rounded-lg px-3 py-1 text-sm text-slate-200"
               >
                 Close
               </button>
@@ -2099,7 +2099,7 @@ function Metric({
                 : 'border-amber-300/15 bg-gradient-to-br from-amber-300/10 via-slate-950 to-slate-950'
       }`}
     >
-      <p className={`text-3xl font-semibold ${tones[tone]}`}>{value}</p>
+      <p className={`text-[20px] font-semibold ${tones[tone]}`}>{value}</p>
       <p className="mt-2 text-sm font-medium text-white">{label}</p>
       <p className="mt-1 text-xs text-slate-400">{helper}</p>
     </div>
@@ -2209,7 +2209,7 @@ function Modal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
       <div className="cyvora-glass-strong w-full max-w-lg rounded-2xl p-6">
         <div className="mb-4 flex items-center justify-between gap-4">
-          <h2 className="text-xl font-semibold">{title}</h2>
+          <h2 className="text-[20px] font-semibold">{title}</h2>
           <button onClick={onClose} className="cyvora-chip rounded-lg px-3 py-1 text-sm text-slate-200">
             Close
           </button>
@@ -2303,12 +2303,12 @@ function DetailPanel({
       <div className="mt-3 space-y-2">
         {items.length ? (
           items.map((item) => (
-            <div key={item} className="rounded-lg border border-white/10 bg-slate-950/80 px-3 py-2 text-sm text-slate-200">
+            <div key={item} className="cyvora-tactile rounded-lg px-3 py-2 text-sm text-slate-200">
               {item}
             </div>
           ))
         ) : (
-          <p className="rounded-lg border border-dashed border-white/10 bg-slate-950/80 px-3 py-3 text-sm text-slate-500">
+          <p className="cyvora-tactile rounded-lg px-3 py-3 text-sm text-slate-500">
             {emptyLabel}
           </p>
         )}
@@ -2332,7 +2332,7 @@ function RuntimePlanBlock({ label, values }: { label: string; values: string[] }
       <p className="text-xs uppercase tracking-[0.18em] text-slate-500">{label}</p>
       <div className="mt-2 flex flex-wrap gap-2">
         {values.map((value) => (
-          <span key={value} className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-slate-200">
+          <span key={value} className="cyvora-chip rounded-full px-3 py-1 text-xs text-slate-200">
             {value}
           </span>
         ))}
@@ -2397,7 +2397,7 @@ function ControlSurfaceSection({
                 type="button"
                 onClick={() => onSelect(item)}
                 className={`w-full rounded-lg border px-3 py-3 text-left transition ${
-                  active ? 'border-cyan-300/40 bg-cyan-300/10' : 'border-white/10 bg-slate-950/80 hover:border-cyan-300/25'
+                  active ? 'border-cyan-300/40 bg-cyan-300/10' : 'cyvora-chip hover:border-cyan-300/25'
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -2413,7 +2413,7 @@ function ControlSurfaceSection({
             );
           })
         ) : (
-          <p className="rounded-lg border border-dashed border-white/10 bg-slate-950/80 px-3 py-3 text-sm text-slate-500">
+          <p className="cyvora-tactile rounded-lg px-3 py-3 text-sm text-slate-500">
             {emptyLabel}
           </p>
         )}

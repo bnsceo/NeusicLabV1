@@ -96,7 +96,7 @@ export default function HistoryPage() {
             </button>
           ) : null}
           <div className="cyvora-tactile rounded-xl p-4">
-            <p className="text-2xl font-semibold">{missions.length}</p>
+            <p className="text-[20px] font-semibold">{missions.length}</p>
             <p className="mt-1 text-xs text-slate-400">Visible missions</p>
           </div>
           {isDemoModeActive ? (
@@ -113,12 +113,12 @@ export default function HistoryPage() {
               placeholder="Search objectives"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              className="rounded-xl border border-white/10 bg-slate-900/80 p-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-cyan-300/60"
+              className="cyvora-tactile rounded-xl p-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-cyan-300/60"
             />
             <select
               value={statusFilter}
               onChange={(event) => setStatusFilter(event.target.value)}
-              className="rounded-xl border border-white/10 bg-slate-900/80 p-3 text-sm text-white outline-none focus:border-cyan-300/60"
+              className="cyvora-tactile rounded-xl p-3 text-sm text-white outline-none focus:border-cyan-300/60"
             >
               <option value="all">All statuses</option>
               <option value="pending">Pending</option>
@@ -131,7 +131,7 @@ export default function HistoryPage() {
             {loading ? (
               <p className="text-sm text-slate-400">Loading history...</p>
             ) : missions.length === 0 ? (
-              <p className="rounded-xl border border-dashed border-white/10 bg-black/20 p-5 text-sm text-slate-400">
+              <p className="cyvora-tactile rounded-xl p-5 text-sm text-slate-400">
                 No missions found.
               </p>
             ) : (
@@ -166,10 +166,10 @@ export default function HistoryPage() {
 
       {selectedMission && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-          <div className="max-h-[80vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-white/10 bg-slate-950 p-6 shadow-2xl shadow-blue-950/40">
+          <div className="cyvora-glass-strong max-h-[80vh] w-full max-w-3xl overflow-y-auto rounded-2xl p-6">
             <div className="mb-5 flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-xl font-semibold">Mission details</h2>
+                <h2 className="text-[20px] font-semibold">Mission details</h2>
                 <p className="mt-1 text-sm text-slate-400">{selectedMission.objective}</p>
               </div>
               <button onClick={() => setSelectedMission(null)} className="cyvora-chip rounded-lg px-3 py-1 text-sm text-slate-300 hover:translate-y-[-1px]">
@@ -214,8 +214,8 @@ function StatusBadge({ status }: { status: string }) {
 
 function Detail({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-      <p className="text-sm font-semibold">{value}</p>
+    <div className="cyvora-tactile rounded-xl p-3">
+      <p className="text-[20px] font-semibold">{value}</p>
       <p className="mt-1 text-xs text-slate-500">{label}</p>
     </div>
   );
