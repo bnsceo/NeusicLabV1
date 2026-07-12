@@ -2,6 +2,7 @@
 """
 Supervisor Router – The brain of the Digital Empire.
 Listens for high-level goals, delegates to workers, and compiles Mission Briefings.
+Mock mode available via MOCK_MODE=true environment variable.
 """
 
 import os
@@ -14,18 +15,22 @@ import openai
 AGENTS_LIBRARY = "backend/app/agents/library"
 CUSTOM_AGENTS = "backend/app/agents/custom"
 
-# Set your API key via environment variable
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "your-key-here")
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
 DEFAULT_MODEL = "openai/gpt-3.5-turbo"   # or "anthropic/claude-3-haiku"
 
+MOCK_MODE = os.environ.get("MOCK_MODE", "false").lower() == "true"
+
 class Supervisor:
     def __init__(self):
-        self.client = openai.OpenAI(
-            base_url=OPENROUTER_BASE_URL,
-            api_key=OPENROUTER_API_KEY,
-        )
+        if not MOCK_MODE:
+            self.client = openai.OpenAI(
+                base_url=OPENROUTER_BASE_URL,
+                api_key=OPENROUTER_API_KEY,
+            )
+        else:
+            self.client = None
         self.agents = self._load_agents()
         self.agent_names = list(self.agents.keys())
 
@@ -37,7 +42,6 @@ class Supervisor:
             for filepath in glob.glob(pattern, recursive=True):
                 with open(filepath, 'r') as f:
                     content = f.read()
-                    # Extract name from frontmatter
                     if content.startswith("---"):
                         try:
                             import yaml
@@ -52,27 +56,20 @@ class Supervisor:
         return agents
 
     def _find_agent(self, query: str) -> str:
-        """
-        Find the best matching agent name given a query.
-        Handles partial matches, paths, and case insensitivity.
-        """
-        # If exact match, return it
         if query in self.agents:
             return query
-        # Strip path and extension
         base = os.path.splitext(os.path.basename(query))[0]
-        # Try to match based on substring (case-insensitive)
         base_lower = base.lower()
         for name in self.agent_names:
             name_lower = name.lower()
-            # Check if the base is contained in the name, or vice versa
             if base_lower in name_lower or name_lower in base_lower:
                 return name
-        # If still not found, return None
         return None
 
     def delegate(self, task: str, agent_query: str) -> str:
         """Send a task to a specific agent and get its output."""
+        if MOCK_MODE:
+            return f"Mock output for agent '{agent_query}' doing '{task}'"
         agent_name = self._find_agent(agent_query)
         if agent_name is None:
             return f"Error: Agent '{agent_query}' not found. Available: {self.agent_names[:10]}..."
@@ -90,14 +87,19 @@ Provide your output in a structured format (Markdown with code blocks if needed)
             model=DEFAULT_MODEL,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3,
+            max_tokens=800,
         )
         return response.choices[0].message.content
 
     def break_down_goal(self, goal: str) -> List[Dict[str, str]]:
-        """
-        Use the Supervisor to decompose a goal into sub-tasks.
-        The LLM is given the list of available agent names so it can pick from them.
-        """
+        if MOCK_MODE:
+            # Return a synthetic decomposition
+            return [
+                {"description": "Design wireframes", "agent": "UX Architect"},
+                {"description": "Implement frontend code", "agent": "Frontend Developer"},
+                {"description": "Write copy", "agent": "Copywriter"},
+                {"description": "Optimize performance", "agent": "Performance Benchmarker"},
+            ]
         supervisor_def = self.agents.get("Supervisor (Smart-Strategist)")
         if not supervisor_def:
             for name in self.agent_names:
@@ -107,7 +109,6 @@ Provide your output in a structured format (Markdown with code blocks if needed)
         if not supervisor_def:
             supervisor_def = "You are a strategic planner."
 
-        # Provide the list of agent names for the LLM to choose from
         agent_list = "\n".join(f"- {name}" for name in self.agent_names)
 
         prompt = f"""
@@ -129,17 +130,56 @@ Return the list as JSON: [{{"description": "...", "agent": "..."}}, ...]
             model=DEFAULT_MODEL,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.2,
+            max_tokens=600,
         )
         try:
             tasks = json.loads(response.choices[0].message.content)
             return tasks
         except json.JSONDecodeError:
-            # fallback: simple split
             return [{"description": goal, "agent": "Senior Developer"}]
 
-    def run(self, goal: str) -> str:
-        """Main orchestration: decompose, delegate, compile briefing."""
+    def run(self, goal: str) -> Dict[str, Any]:
         print(f"🧠 Supervisor received goal: {goal}")
+        if MOCK_MODE:
+            print("🧪 MOCK MODE: Generating synthetic briefing")
+            tasks = [
+                {"description": "Design wireframes", "agent": "UX Architect"},
+                {"description": "Implement frontend code", "agent": "Frontend Developer"},
+                {"description": "Write copy", "agent": "Copywriter"},
+                {"description": "Optimize performance", "agent": "Performance Benchmarker"},
+            ]
+            results = []
+            for task in tasks:
+                agent_name = task.get("agent", "Senior Developer")
+                desc = task.get("description", task)
+                print(f"   → Assigning '{desc}' to {agent_name}")
+                output = self.delegate(desc, agent_name)
+                results.append({
+                    "agent": agent_name,
+                    "task": desc,
+                    "output": output
+                })
+            briefing_content = f"# Mission Briefing\n\n**Objective:** {goal}\n\n"
+            for r in results:
+                briefing_content += f"## Agent: {r['agent']}\n**Task:** {r['task']}\n\n**Output:**\n{r['output']}\n\n---\n"
+            briefing_content += "\n**Please review and DECREE or ABANDON.**"
+
+            # Write to file so dashboard can read
+            with open("mission_briefing.md", "w") as f:
+                f.write(briefing_content)
+
+            # Also write status.json
+            with open("mission_status.json", "w") as f:
+                json.dump({"status": "pending", "objective": goal, "timestamp": "2026-07-10T00:00:00Z"}, f)
+
+            return {
+                "objective": goal,
+                "agents": results,
+                "status": "pending",
+                "timestamp": "2026-07-10T00:00:00Z"
+            }
+
+        # Normal mode (not mock)
         tasks = self.break_down_goal(goal)
         print(f"📋 Decomposed into {len(tasks)} tasks.")
         results = []
@@ -158,7 +198,18 @@ Return the list as JSON: [{{"description": "...", "agent": "..."}}, ...]
         for r in results:
             briefing += f"## Agent: {r['agent']}\n**Task:** {r['task']}\n\n**Output:**\n{r['output']}\n\n---\n"
         briefing += "\n**Please review and DECREE or ABANDON.**"
-        return briefing
+        # Save to file
+        with open("mission_briefing.md", "w") as f:
+            f.write(briefing)
+        with open("mission_status.json", "w") as f:
+            json.dump({"status": "pending", "objective": goal, "timestamp": "2026-07-10T00:00:00Z"}, f)
+        return {
+            "objective": goal,
+            "agents": results,
+            "status": "pending",
+            "timestamp": "2026-07-10T00:00:00Z"
+        }
+
 
 if __name__ == "__main__":
     import sys
@@ -169,8 +220,6 @@ if __name__ == "__main__":
     sup = Supervisor()
     briefing = sup.run(goal)
     print("\n" + "="*80)
-    print(briefing)
+    print(json.dumps(briefing, indent=2))
     print("="*80)
-    with open("mission_briefing.md", "w") as f:
-        f.write(briefing)
     print("📄 Briefing saved to mission_briefing.md")
