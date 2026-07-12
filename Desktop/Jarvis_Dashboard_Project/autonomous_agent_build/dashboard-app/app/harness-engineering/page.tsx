@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import NavBar from '@/components/NavBar';
-import CyvoraPageHeader from '@/components/CyvoraPageHeader';
 import { buildHarnessPlan, type HarnessPlan } from '@/lib/harnessPlan';
 import { clearDemoClientState, reloadFreshDemoPage } from '@/lib/demoClient';
 import { getRuntimeModeInfo } from '@/lib/runtimeMode';

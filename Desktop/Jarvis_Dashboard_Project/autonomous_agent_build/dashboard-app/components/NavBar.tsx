@@ -15,6 +15,7 @@ export default function NavBar() {
     { href: '/companies', label: 'Companies' },
     { href: '/harness-engineering', label: 'Harness Engineering' },
     { href: '/security', label: 'War Room' },
+    { href: '/marketing', label: 'Public Demo' },
     { href: '/history', label: 'History' },
   ];
 
@@ -22,8 +23,22 @@ export default function NavBar() {
     <nav className="cyvora-tactile sticky top-0 z-50 border-x-0 border-t-0 px-4 py-3">
       <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <Link href="/" className="cyvora-tactile flex items-center gap-3 rounded-2xl px-3 py-2 transition hover:translate-y-[-1px]">
-            <Image src="/cyvora-header-logo.png" alt="Cyvora logo" width={926} height={854} className="h-12 w-auto shrink-0" priority />
+          <Link
+            href="/"
+            className="relative flex items-center overflow-hidden rounded-[1.75rem] px-2 py-1 transition hover:translate-y-[-1px]"
+          >
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 rounded-[1.75rem] bg-[radial-gradient(circle_at_30%_30%,rgba(141,223,255,0.12),transparent_72%),linear-gradient(135deg,rgba(10,17,28,0.35),rgba(10,17,28,0.08))] opacity-90 blur-[1px]"
+            />
+            <Image
+              src="/cyvora-header-logo.png"
+              alt="Cyvora logo"
+              width={926}
+              height={854}
+              className="relative h-12 w-auto shrink-0 opacity-95 mix-blend-screen drop-shadow-[0_12px_26px_rgba(0,0,0,0.38)]"
+              priority
+            />
           </Link>
 
           <div className="flex items-center gap-2 overflow-x-auto">
