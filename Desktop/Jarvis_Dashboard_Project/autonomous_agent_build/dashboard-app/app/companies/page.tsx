@@ -3,7 +3,9 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import NavBar from '@/components/NavBar';
+import CyvoraPageHeader from '@/components/CyvoraPageHeader';
 import { inferMissionBlueprint } from '@/lib/missionBlueprint';
+import { clearDemoClientState, reloadFreshDemoPage } from '@/lib/demoClient';
 import { getRuntimeModeInfo } from '@/lib/runtimeMode';
 
 interface Company {
@@ -64,6 +66,8 @@ export default function CompaniesPage() {
         return;
       }
       await fetchCompanies();
+      clearDemoClientState();
+      reloadFreshDemoPage();
       alert('Demo showcase reset');
     } catch {
       alert('Failed to reset demo showcase');
@@ -107,23 +111,15 @@ export default function CompaniesPage() {
       <NavBar />
 
       <main className="mx-auto max-w-7xl px-4 py-6 md:px-6 lg:px-8">
-        <section className="rounded-2xl border border-emerald-300/20 bg-gradient-to-r from-emerald-300/10 via-cyan-300/10 to-blue-300/10 p-4 shadow-2xl shadow-emerald-950/10">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-200">
-                Vision intake
-              </p>
-              <p className="mt-1 text-sm text-slate-200">
-                {runtimeInfo.description}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Pill tone="emerald">Local-first</Pill>
-              <Pill tone="cyan">Approval aware</Pill>
-              <Pill tone="amber">Vision to org</Pill>
-            </div>
-          </div>
-        </section>
+        <CyvoraPageHeader
+          eyebrow="Vision intake"
+          title="Companies"
+          description={runtimeInfo.description}
+        >
+          <Pill tone="emerald">Local-first</Pill>
+          <Pill tone="cyan">Approval aware</Pill>
+          <Pill tone="amber">Vision to org</Pill>
+        </CyvoraPageHeader>
 
         <section className="rounded-2xl border border-white/10 bg-slate-950/75 p-5 shadow-2xl shadow-blue-950/20 md:p-7">
           <div className="flex flex-wrap items-start justify-between gap-3">

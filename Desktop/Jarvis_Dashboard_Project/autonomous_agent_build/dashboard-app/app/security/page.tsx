@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import NavBar from '@/components/NavBar';
+import CyvoraPageHeader from '@/components/CyvoraPageHeader';
 
 interface Vulnerability {
   id: string;
@@ -57,23 +58,17 @@ export default function SecurityDashboard() {
       <NavBar />
 
       <main className="mx-auto max-w-7xl px-4 py-6 md:px-6 lg:px-8">
-        <section className="cyvora-glass-strong rounded-2xl p-5 md:p-7">
-          <p className="text-sm font-medium uppercase tracking-[0.22em] text-cyan-300">War Room</p>
-          <div className="mt-2 grid gap-5 lg:grid-cols-[1fr_360px] lg:items-end">
-            <div>
-              <h1 className="text-3xl font-semibold md:text-5xl">Reliability and security</h1>
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300 md:text-base">
-                The autonomous quality-control room for incidents, vulnerabilities, compliance,
-                and proposed repairs before founder approval.
-              </p>
-            </div>
-            <div className="grid grid-cols-3 gap-3">
-              <Stat label="Incidents" value={incidents.length} />
-              <Stat label="Open vulns" value={vulnerabilities.length} />
-              <Stat label="Audits" value={compliance.length} />
-            </div>
+        <CyvoraPageHeader
+          eyebrow="War Room"
+          title="Reliability and security"
+          description="The autonomous quality-control room for incidents, vulnerabilities, compliance, and proposed repairs before founder approval."
+        >
+          <div className="grid grid-cols-3 gap-3">
+            <Stat label="Incidents" value={incidents.length} />
+            <Stat label="Open vulns" value={vulnerabilities.length} />
+            <Stat label="Audits" value={compliance.length} />
           </div>
-        </section>
+        </CyvoraPageHeader>
 
         {loading ? (
           <p className="mt-6 cyvora-glass rounded-2xl p-6 text-sm text-slate-400">

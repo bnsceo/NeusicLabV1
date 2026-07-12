@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import NavBar from '@/components/NavBar';
+import CyvoraPageHeader from '@/components/CyvoraPageHeader';
+import { clearDemoClientState, reloadFreshDemoPage } from '@/lib/demoClient';
 import { getRuntimeModeInfo } from '@/lib/runtimeMode';
 
 interface Mission {
@@ -51,6 +53,8 @@ export default function HistoryPage() {
         return;
       }
       await fetchHistory();
+      clearDemoClientState();
+      reloadFreshDemoPage();
       alert('Demo showcase reset');
     } catch {
       alert('Failed to reset demo showcase');
@@ -75,42 +79,32 @@ export default function HistoryPage() {
       <NavBar />
 
       <main className="mx-auto max-w-7xl px-4 py-6 md:px-6 lg:px-8">
-        <section className="cyvora-glass-strong rounded-2xl p-5 md:p-7">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p className="text-sm font-medium uppercase tracking-[0.22em] text-cyan-300">Mission Archive</p>
-              <p className="mt-1 text-sm text-slate-400">
-                {isDemoModeActive ? 'Read-only demo archive' : runtimeInfo.description}
-              </p>
-            </div>
-            {isDemoModeActive ? (
-              <button
-                onClick={handleResetDemo}
-                className="cyvora-chip rounded-xl px-4 py-2 text-sm text-slate-200 transition hover:translate-y-[-1px]"
-              >
-                Reset demo
-              </button>
-            ) : null}
-          </div>
-          <div className="mt-2 grid gap-5 lg:grid-cols-[1fr_280px] lg:items-end">
-            <div>
-              <h1 className="text-3xl font-semibold md:text-5xl">History</h1>
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300 md:text-base">
-                Search previous mission briefings, reload decisions into Mission Control, and audit
-                the AI organization over time.
-              </p>
-            </div>
-            <div className="cyvora-tactile rounded-xl p-4">
-              <p className="text-2xl font-semibold">{missions.length}</p>
-              <p className="mt-1 text-xs text-slate-400">Visible missions</p>
-            </div>
+        <CyvoraPageHeader
+          eyebrow="Mission Archive"
+          title="History"
+          description="Search previous mission briefings, reload decisions into Mission Control, and audit the AI organization over time."
+        >
+          <span className="cyvora-chip rounded-xl px-4 py-2 text-sm text-slate-200">
+            {isDemoModeActive ? 'Read-only demo archive' : runtimeInfo.description}
+          </span>
+          {isDemoModeActive ? (
+            <button
+              onClick={handleResetDemo}
+              className="cyvora-chip rounded-xl px-4 py-2 text-sm text-slate-200 transition hover:translate-y-[-1px]"
+            >
+              Reset demo
+            </button>
+          ) : null}
+          <div className="cyvora-tactile rounded-xl p-4">
+            <p className="text-2xl font-semibold">{missions.length}</p>
+            <p className="mt-1 text-xs text-slate-400">Visible missions</p>
           </div>
           {isDemoModeActive ? (
-            <div className="cyvora-tactile mt-5 rounded-xl p-4 text-sm text-slate-300 md:hidden">
+            <div className="cyvora-tactile rounded-xl p-4 text-sm text-slate-300 md:hidden">
               The public demo archive is seeded, read-only, and resettable from this screen.
             </div>
           ) : null}
-        </section>
+        </CyvoraPageHeader>
 
         <section className="mt-6 cyvora-glass rounded-2xl p-5 md:p-6">
           <div className="grid gap-3 md:grid-cols-[1fr_220px]">

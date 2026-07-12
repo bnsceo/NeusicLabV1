@@ -1,8 +1,11 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
 import NavBar from '@/components/NavBar';
+import CyvoraPageHeader from '@/components/CyvoraPageHeader';
 import { buildHarnessPlan, type HarnessPlan } from '@/lib/harnessPlan';
+import { clearDemoClientState, reloadFreshDemoPage } from '@/lib/demoClient';
 import { getRuntimeModeInfo } from '@/lib/runtimeMode';
 
 type BuildStage = {
@@ -141,6 +144,8 @@ export default function SelfCodingPage() {
         return;
       }
       await fetchRequests();
+      clearDemoClientState();
+      reloadFreshDemoPage();
       alert('Demo showcase reset');
     } catch {
       alert('Failed to reset demo showcase');
@@ -243,9 +248,13 @@ export default function SelfCodingPage() {
 
       <main className="mx-auto max-w-7xl px-4 py-6 md:px-6 lg:px-8">
         <section className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-          <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-5 shadow-2xl shadow-cyan-950/20 md:p-7">
+          <div className="cyvora-glass-strong rounded-2xl p-5 md:p-7">
             <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
               <div>
+                <div className="mb-3 flex items-center gap-3">
+                  <Image src="/cyvora-logo.png" alt="Cyvora" width={360} height={202} className="h-14 w-auto shrink-0" priority />
+                  <span className="cyvora-chip rounded-full px-3 py-1 text-xs text-cyan-100">Cyvora · Harness</span>
+                </div>
                 <p className="text-sm font-medium uppercase tracking-[0.22em] text-cyan-300">
                   Harness Engineering
                 </p>

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cyvora-v1';
+const CACHE_NAME = 'cyvora-v3';
 const ASSETS = [
   '/',
   '/companies',
@@ -7,7 +7,7 @@ const ASSETS = [
   '/harness-engineering',
   '/security',
   '/manifest.webmanifest',
-  '/cyvora-icon.svg',
+  '/cyvora-logo.png',
 ];
 
 self.addEventListener('install', (event) => {

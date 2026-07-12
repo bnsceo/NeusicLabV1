@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import NavBar from '@/components/NavBar';
+import CyvoraPageHeader from '@/components/CyvoraPageHeader';
+import { clearDemoClientState, reloadFreshDemoPage } from '@/lib/demoClient';
 import { getRuntimeModeInfo } from '@/lib/runtimeMode';
 import { buildShareableUrl, readNumericQueryParam } from '@/lib/viewState';
 
@@ -114,6 +116,8 @@ export default function HeadquartersPage() {
       if (refreshed.companies?.length) {
         setSelectedCompanyId(refreshed.companies[0].id);
       }
+      clearDemoClientState();
+      reloadFreshDemoPage();
       alert('Demo showcase reset');
     } catch {
       alert('Failed to reset demo showcase');
@@ -145,48 +149,34 @@ export default function HeadquartersPage() {
       <NavBar />
 
       <main className="mx-auto max-w-7xl px-4 py-6 md:px-6 lg:px-8">
-        <section className="cyvora-glass-strong rounded-2xl p-5 md:p-7">
-          <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-start">
-            <div>
-              <p className="text-sm font-medium uppercase tracking-[0.22em] text-cyan-300">
-                Headquarters View
-              </p>
-              <h1 className="mt-2 text-3xl font-semibold md:text-5xl">
-                Executive AI operating map
-              </h1>
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300 md:text-base">
-                A living map of the autonomous organization: companies expand into departments,
-                departments contain teams, and teams hold the agents doing the work.
-              </p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <span className="cyvora-chip rounded-full px-3 py-1 text-xs text-cyan-100">
-                  {runtimeInfo.label}
-                </span>
-                <span className="cyvora-chip rounded-full px-3 py-1 text-xs text-slate-300">
-                  {isDemoModeActive ? 'Read-only demo' : 'Live organization'}
-                </span>
-              </div>
-            </div>
-            <div className="flex flex-col gap-3">
-              {isDemoModeActive ? (
-                <button
-                  onClick={handleResetDemo}
-                  className="cyvora-chip self-start rounded-xl px-4 py-2 text-sm text-slate-200 transition hover:translate-y-[-1px]"
-                >
-                  Reset demo
-                </button>
-              ) : null}
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:w-[520px]">
-                <Stat label="Companies" value={data?.totals.companies ?? 0} />
-                <Stat label="Departments" value={data?.totals.departments ?? 0} />
-                <Stat label="Teams" value={data?.totals.teams ?? 0} />
-                <Stat label="Agents" value={data?.totals.agents ?? 0} />
-                <Stat label="Tasks" value={data?.totals.tasks ?? 0} />
-                <Stat label="Approvals" value={data?.totals.approvals ?? 0} />
-              </div>
-            </div>
+        <CyvoraPageHeader
+          eyebrow="Headquarters View"
+          title="Executive AI operating map"
+          description="A living map of the autonomous organization: companies expand into departments, departments contain teams, and teams hold the agents doing the work."
+        >
+          <span className="cyvora-chip rounded-full px-3 py-1 text-xs text-cyan-100">
+            {runtimeInfo.label}
+          </span>
+          <span className="cyvora-chip rounded-full px-3 py-1 text-xs text-slate-300">
+            {isDemoModeActive ? 'Read-only demo' : 'Live organization'}
+          </span>
+          {isDemoModeActive ? (
+            <button
+              onClick={handleResetDemo}
+              className="cyvora-chip rounded-xl px-4 py-2 text-sm text-slate-200 transition hover:translate-y-[-1px]"
+            >
+              Reset demo
+            </button>
+          ) : null}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:w-[520px]">
+            <Stat label="Companies" value={data?.totals.companies ?? 0} />
+            <Stat label="Departments" value={data?.totals.departments ?? 0} />
+            <Stat label="Teams" value={data?.totals.teams ?? 0} />
+            <Stat label="Agents" value={data?.totals.agents ?? 0} />
+            <Stat label="Tasks" value={data?.totals.tasks ?? 0} />
+            <Stat label="Approvals" value={data?.totals.approvals ?? 0} />
           </div>
-        </section>
+        </CyvoraPageHeader>
 
         {loading ? (
           <div className="mt-6 cyvora-glass rounded-2xl p-6 text-slate-400">

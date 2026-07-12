@@ -9,9 +9,9 @@
   "theme_color": "#070b12",
   "icons": [
     {
-      "src": "/cyvora-icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml"
+      "src": "/cyvora-logo.png",
+      "sizes": "1664x928",
+      "type": "image/png"
     }
   ]
 }

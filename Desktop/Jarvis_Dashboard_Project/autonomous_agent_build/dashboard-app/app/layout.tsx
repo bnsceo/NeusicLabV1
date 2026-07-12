@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import "./globals.css";
 import MobileDock from "@/components/MobileDock";
 import PwaBootstrap from "@/components/PwaBootstrap";
@@ -19,13 +20,16 @@ export default function RootLayout({
       <head>
         <meta name="theme-color" content="#070b12" />
         <link rel="manifest" href="/manifest.webmanifest" />
-        <link rel="icon" href="/cyvora-mark.svg" type="image/svg+xml" />
+        <link rel="icon" href="/cyvora-logo.png" type="image/png" />
       </head>
       <body className="min-h-full flex flex-col overflow-x-hidden pb-20 md:pb-0">
-        <PwaBootstrap />
+        {process.env.NODE_ENV === 'production' ? <PwaBootstrap /> : null}
         {children}
         <footer className="border-t border-white/10 bg-slate-950/80 px-4 py-4 text-center text-xs text-slate-500">
-          Created by Anderson · Founder · Cyvora
+          <div className="mx-auto flex items-center justify-center gap-2">
+            <Image src="/cyvora-logo.png" alt="Cyvora" width={96} height={54} className="h-5 w-auto" />
+            <span>Created by Anderson · Founder · Cyvora</span>
+          </div>
         </footer>
         <MobileDock />
       </body>

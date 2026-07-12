@@ -11,10 +11,16 @@ export default function UnlockForm() {
     <div className="min-h-screen bg-[#070b12] px-4 py-10 text-white">
       <div className="cyvora-glass mx-auto max-w-md rounded-3xl p-6">
         <div className="flex items-center gap-3">
-          <Image src="/cyvora-mark.svg" alt="Cyvora" width={48} height={48} className="h-12 w-12 rounded-2xl" />
+          <Image src="/cyvora-logo.png" alt="Cyvora" width={360} height={202} className="h-14 w-auto shrink-0" priority />
           <div>
             <p className="text-xs uppercase tracking-[0.24em] text-cyan-300">Private tunnel</p>
             <h1 className="text-2xl font-semibold">Unlock Cyvora</h1>
+          </div>
+        </div>
+        <div className="mt-4 cyvora-tactile rounded-2xl p-4">
+          <div className="flex items-center gap-3">
+            <Image src="/cyvora-logo.png" alt="Cyvora icon" width={180} height={100} className="h-10 w-auto" />
+            <p className="text-sm text-slate-300">Brand gate active for the local tunnel.</p>
           </div>
         </div>
 

@@ -1,10 +1,13 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import NavBar from '@/components/NavBar';
+import CyvoraPageHeader from '@/components/CyvoraPageHeader';
 import { inferMissionBlueprint } from '@/lib/missionBlueprint';
 import { buildHarnessPlan, type HarnessPlan } from '@/lib/harnessPlan';
+import { clearDemoClientState, reloadFreshDemoPage } from '@/lib/demoClient';
 import { getRuntimeModeInfo } from '@/lib/runtimeMode';
 import { buildShareableUrl, readNumericQueryParam } from '@/lib/viewState';
 
@@ -700,7 +703,9 @@ export default function Home() {
         alert(data.error || 'Failed to reset demo showcase');
         return;
       }
+      clearDemoClientState();
       await Promise.all([fetchBriefing(), fetchHeadquarters(), fetchSelfCodingRequests(), fetchExecutionRuns()]);
+      reloadFreshDemoPage();
       alert('Demo showcase reset');
     } catch {
       alert('Failed to reset demo showcase');
@@ -775,6 +780,24 @@ export default function Home() {
       <NavBar />
 
       <main className="mx-auto max-w-7xl px-4 py-6 md:px-6 lg:px-8">
+        <section className="cyvora-tactile mb-6 rounded-2xl px-4 py-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <Image src="/cyvora-logo.png" alt="Cyvora logo" width={360} height={202} className="h-14 w-auto shrink-0" priority />
+              <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-cyan-200">
+                Neumorphic shell active
+              </p>
+              <p className="mt-1 text-sm text-slate-300">
+                This is the local Cyvora project on your PC. If you do not see this banner,
+                the browser is still serving old cached assets.
+              </p>
+              </div>
+            </div>
+            <Pill tone="cyan">Local build</Pill>
+          </div>
+        </section>
+
         <section className="cyvora-glass rounded-2xl p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
@@ -791,44 +814,34 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="cyvora-glass-strong rounded-2xl p-5 md:p-7">
-          <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-start">
-            <div>
-              <p className="text-sm font-medium uppercase tracking-[0.22em] text-cyan-300">
-                Mission Control
-              </p>
-              <h1 className="mt-2 text-3xl font-semibold md:text-5xl">
-                Cyvora
-              </h1>
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300 md:text-base">
-                Autonomous business command center. The Executive AI turns founder intent into
-                companies, departments, agents, approvals, and outputs.
-              </p>
-              <div className="mt-5 flex flex-wrap gap-2">
-                <Pill tone="cyan">Founder intent first</Pill>
-                <Pill tone="emerald">Headquarters view</Pill>
-                <Pill tone="blue">Dry-run safe</Pill>
-              </div>
-              <div className="mt-4 flex flex-wrap gap-3">
-                <button
-                  onClick={() => setModalOpen(true)}
-                  disabled={isDemoModeActive}
-                  className={`${actionButtonPrimary} disabled:cursor-not-allowed disabled:opacity-50`}
-                >
-                  {isDemoModeActive ? 'Demo is read-only' : 'New idea'}
-                </button>
-                {isDemoModeActive ? (
-                  <button
-                    onClick={handleResetDemo}
-                    className={actionButtonSecondary}
-                  >
-                    Reset demo
-                  </button>
-                ) : null}
-              </div>
-            </div>
-
-            <div className="cyvora-glass rounded-2xl p-4 lg:w-[332px]">
+        <CyvoraPageHeader
+          eyebrow="Mission Control"
+          title="Cyvora"
+          description="Autonomous business command center. The Executive AI turns founder intent into companies, departments, agents, approvals, and outputs."
+        >
+          <div className="flex flex-wrap gap-2">
+            <Pill tone="cyan">Founder intent first</Pill>
+            <Pill tone="emerald">Headquarters view</Pill>
+            <Pill tone="blue">Dry-run safe</Pill>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <button
+              onClick={() => setModalOpen(true)}
+              disabled={isDemoModeActive}
+              className={`${actionButtonPrimary} disabled:cursor-not-allowed disabled:opacity-50`}
+            >
+              {isDemoModeActive ? 'Demo is read-only' : 'New idea'}
+            </button>
+            {isDemoModeActive ? (
+              <button
+                onClick={handleResetDemo}
+                className={actionButtonSecondary}
+              >
+                Reset demo
+              </button>
+            ) : null}
+          </div>
+          <div className="cyvora-glass rounded-2xl p-4 lg:w-[332px]">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-semibold text-cyan-100">Executive AI</p>
@@ -888,8 +901,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          </div>
-        </section>
+        </CyvoraPageHeader>
 
         <section className="mt-6 grid gap-3 md:hidden">
           <div className="cyvora-glass rounded-2xl p-4">
@@ -1267,6 +1279,41 @@ export default function Home() {
                 </p>
               </div>
               <Pill tone="cyan">{headquarters?.executive_ai?.status || 'online'}</Pill>
+            </div>
+
+            <div className="mt-5 cyvora-tactile rounded-2xl p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.18em] text-cyan-200">Mission-to-hierarchy bridge</p>
+                  <h3 className="mt-2 text-lg font-semibold text-white">{missionBlueprint.companyName}</h3>
+                  <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-300">
+                    Current objective: <span className="text-white">{missionDraft}</span>
+                    {' '}→ this draft expands into {missionBlueprint.departments.length} departments,
+                    {missionBlueprint.departments.reduce((total, department) => total + department.teams.length, 0)} teams,
+                    and {missionBlueprint.departments.reduce(
+                      (total, department) =>
+                        total + department.teams.reduce((teamTotal, team) => teamTotal + team.agents.length, 0),
+                      0
+                    )} agents before launch.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Pill tone="emerald">Draft linked</Pill>
+                  <Pill tone="amber">{missionBlueprint.connectors.length} connectors</Pill>
+                </div>
+              </div>
+              <div className="mt-4 grid gap-3 md:grid-cols-3">
+                {missionBlueprint.departments.slice(0, 3).map((department) => (
+                  <div key={department.name} className="cyvora-glass rounded-xl p-3">
+                    <p className="text-sm font-medium text-cyan-100">{department.name}</p>
+                    <p className="mt-1 text-xs text-slate-400">{department.description}</p>
+                    <p className="mt-2 text-xs text-slate-500">
+                      {department.teams.length} teams ·{' '}
+                      {department.teams.reduce((count, team) => count + team.agents.length, 0)} agents
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {headquarters?.companies?.length ? (
@@ -1949,10 +1996,13 @@ export default function Home() {
           <div className="mx-auto max-w-2xl rounded-t-3xl border border-white/10 bg-slate-950/95 p-4 shadow-2xl shadow-black/60 backdrop-blur">
             <div className="mx-auto mb-3 h-1.5 w-14 rounded-full bg-white/15" />
             <div className="flex items-start justify-between gap-3">
-              <div>
+              <div className="flex items-start gap-3">
+                <Image src="/cyvora-logo.png" alt="Cyvora" width={180} height={100} className="h-10 w-auto shrink-0" />
+                <div>
                 <p className="text-xs uppercase tracking-[0.22em] text-cyan-300">Quick detail</p>
                 <h2 className="mt-1 text-lg font-semibold text-white">{mobileDetail.title}</h2>
                 <p className="mt-1 text-sm text-slate-400">{mobileDetail.subtitle}</p>
+                </div>
               </div>
               <button
                 type="button"
@@ -1977,7 +2027,7 @@ export default function Home() {
                   setMobileDetailKind('company');
                   setMobileDetailOpen(true);
                 }}
-                className={`rounded-xl border px-3 py-2 text-sm ${mobileDetailKind === 'company' ? 'border-cyan-300/40 bg-cyan-300/10 text-cyan-100' : 'border-white/10 text-slate-200'}`}
+                className={`cyvora-chip rounded-xl px-3 py-2 text-sm ${mobileDetailKind === 'company' ? 'cyvora-neumo-pressed text-cyan-100' : 'text-slate-200'}`}
               >
                 Company
               </button>
@@ -1987,7 +2037,7 @@ export default function Home() {
                   setMobileDetailKind('connector');
                   setMobileDetailOpen(true);
                 }}
-                className={`rounded-xl border px-3 py-2 text-sm ${mobileDetailKind === 'connector' ? 'border-cyan-300/40 bg-cyan-300/10 text-cyan-100' : 'border-white/10 text-slate-200'}`}
+                className={`cyvora-chip rounded-xl px-3 py-2 text-sm ${mobileDetailKind === 'connector' ? 'cyvora-neumo-pressed text-cyan-100' : 'text-slate-200'}`}
               >
                 Connector
               </button>
@@ -1997,7 +2047,7 @@ export default function Home() {
                   setMobileDetailKind('task');
                   setMobileDetailOpen(true);
                 }}
-                className={`rounded-xl border px-3 py-2 text-sm ${mobileDetailKind === 'task' ? 'border-cyan-300/40 bg-cyan-300/10 text-cyan-100' : 'border-white/10 text-slate-200'}`}
+                className={`cyvora-chip rounded-xl px-3 py-2 text-sm ${mobileDetailKind === 'task' ? 'cyvora-neumo-pressed text-cyan-100' : 'text-slate-200'}`}
               >
                 Task
               </button>
@@ -2007,7 +2057,7 @@ export default function Home() {
                   setMobileDetailKind('output');
                   setMobileDetailOpen(true);
                 }}
-                className={`rounded-xl border px-3 py-2 text-sm ${mobileDetailKind === 'output' ? 'border-cyan-300/40 bg-cyan-300/10 text-cyan-100' : 'border-white/10 text-slate-200'}`}
+                className={`cyvora-chip rounded-xl px-3 py-2 text-sm ${mobileDetailKind === 'output' ? 'cyvora-neumo-pressed text-cyan-100' : 'text-slate-200'}`}
               >
                 Output
               </button>
