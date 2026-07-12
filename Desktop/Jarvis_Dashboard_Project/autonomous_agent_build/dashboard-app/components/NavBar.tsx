@@ -23,7 +23,7 @@ export default function NavBar() {
       <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Link href="/" className="cyvora-tactile flex items-center gap-3 rounded-2xl px-3 py-2 transition hover:translate-y-[-1px]">
-            <Image src="/cyvora-logo.png" alt="Cyvora logo" width={360} height={202} className="h-12 w-auto shrink-0" priority />
+            <Image src="/cyvora-header-logo.png" alt="Cyvora logo" width={926} height={854} className="h-12 w-auto shrink-0" priority />
           </Link>
 
           <div className="flex items-center gap-2 overflow-x-auto">

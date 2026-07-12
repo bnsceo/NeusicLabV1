@@ -14,7 +14,7 @@ export default function CyvoraPageHeader({ eyebrow, title, description, children
       <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-start">
         <div>
           <div className="flex items-center gap-3">
-            <Image src="/cyvora-logo.png" alt="Cyvora" width={360} height={202} className="h-14 w-auto shrink-0" priority />
+            <Image src="/cyvora-header-logo.png" alt="Cyvora" width={926} height={854} className="h-14 w-auto shrink-0" priority />
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-cyan-200">{eyebrow}</p>
               <h1 className="mt-1 text-3xl font-semibold md:text-5xl">{title}</h1>

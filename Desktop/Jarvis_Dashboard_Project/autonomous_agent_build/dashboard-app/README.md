@@ -1,5 +1,7 @@
 # Cyvora
 
+![Cyvora AI Command Center](./public/cyvora-logo.png)
+
 Cyvora is an AI Command Center for founder-led operations: a dashboard for turning objectives into companies, departments, teams, agents, tasks, connectors, and outputs.
 
 ## What this project does
@@ -39,4 +41,3 @@ The first run may download a local model into Ollama. After that, it stays local
 
 - [Next.js documentation](https://nextjs.org/docs)
 - [Next.js deployment docs](https://nextjs.org/docs/app/building-your-application/deploying)
-

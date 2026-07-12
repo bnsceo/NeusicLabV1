@@ -783,7 +783,7 @@ export default function Home() {
         <section className="cyvora-tactile mb-6 rounded-2xl px-4 py-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <Image src="/cyvora-logo.png" alt="Cyvora logo" width={360} height={202} className="h-14 w-auto shrink-0" priority />
+              <Image src="/cyvora-header-logo.png" alt="Cyvora logo" width={926} height={854} className="h-14 w-auto shrink-0" priority />
               <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-cyan-200">
                 Neumorphic shell active
@@ -1997,7 +1997,7 @@ export default function Home() {
             <div className="mx-auto mb-3 h-1.5 w-14 rounded-full bg-white/15" />
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-start gap-3">
-                <Image src="/cyvora-logo.png" alt="Cyvora" width={180} height={100} className="h-10 w-auto shrink-0" />
+                <Image src="/cyvora-header-logo.png" alt="Cyvora" width={926} height={854} className="h-10 w-auto shrink-0" />
                 <div>
                 <p className="text-xs uppercase tracking-[0.22em] text-cyan-300">Quick detail</p>
                 <h2 className="mt-1 text-lg font-semibold text-white">{mobileDetail.title}</h2>

@@ -7,7 +7,7 @@ const ASSETS = [
   '/harness-engineering',
   '/security',
   '/manifest.webmanifest',
-  '/cyvora-logo.png',
+  '/cyvora-header-logo.png',
 ];
 
 self.addEventListener('install', (event) => {
