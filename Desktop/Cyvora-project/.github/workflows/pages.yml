@@ -1,9 +1,6 @@
-name: Cyvora GitHub Pages
+name: Deploy Cyvora OS Showcase
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:
