@@ -419,32 +419,6 @@ html[data-density='compact'] .cyvora-glass,
 html[data-density='compact'] .cyvora-glass-strong { --cyvora-density-pad: .85rem; }
 html[data-density='compact'] .cyvora-shell-nav-item { min-height: 39px; }
 
-/* Phase 6/7 information architecture and collapsible desktop shell */
-.cyvora-shell-main {
-  min-width: 0;
-  transition: padding-left 180ms ease;
-}
-.cyvora-app-sidebar {
-  transition: width 180ms ease, padding 180ms ease;
-}
-.cyvora-sidebar-copy {
-  transition: opacity 120ms ease, width 180ms ease;
-}
-.cyvora-collapse-button {
-  flex: 0 0 auto;
-}
-@media (min-width: 1024px) {
-  .cyvora-shell-main { padding-left: 260px; }
-  .cyvora-shell-is-collapsed .cyvora-shell-main { padding-left: 86px; }
-  .cyvora-shell-is-collapsed .cyvora-app-sidebar { width: 86px; padding-inline: 12px; }
-  .cyvora-shell-is-collapsed .cyvora-sidebar-copy { width: 0; max-width: 0; overflow: hidden; opacity: 0; pointer-events: none; }
-  .cyvora-shell-is-collapsed .cyvora-shell-brand { justify-content: center; min-height: 52px; padding: .3rem; border-color: transparent; background: transparent; box-shadow: none; }
-  .cyvora-shell-is-collapsed .cyvora-shell-nav-item { justify-content: center; gap: 0; padding-inline: .25rem; }
-  .cyvora-shell-is-collapsed .cyvora-shell-nav-item:hover { transform: translateY(-1px); }
-  .cyvora-shell-is-collapsed .cyvora-shell-runtime { display: grid; min-height: 48px; place-items: center; padding: .5rem; }
-  .cyvora-shell-is-collapsed .cyvora-collapse-button { position: absolute; right: -18px; top: 20px; z-index: 2; width: 34px; height: 34px; border-radius: 999px; }
-}
-
 .cyvora-select {
   display: block;
   width: 100%;
