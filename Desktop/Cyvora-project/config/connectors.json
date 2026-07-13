@@ -1,0 +1,131 @@
+{
+  "version": "1.0.0",
+  "connectors": [
+    {
+      "id": "github",
+      "name": "GitHub",
+      "category": "development",
+      "summary": "Repository, issue, pull request, and release workflows.",
+      "authType": "oauth_or_token",
+      "actions": [
+        {"id":"search_repositories","label":"Search repositories","description":"Search accessible repositories and code metadata.","risk":"low","sideEffect":"read","reversible":true},
+        {"id":"read_file","label":"Read file","description":"Read a file from an accessible repository.","risk":"low","sideEffect":"read","reversible":true},
+        {"id":"create_issue","label":"Create issue","description":"Create a new repository issue.","risk":"medium","sideEffect":"write","reversible":true},
+        {"id":"create_pull_request","label":"Create pull request","description":"Open a pull request from an existing branch.","risk":"high","sideEffect":"publish","reversible":true},
+        {"id":"merge_pull_request","label":"Merge pull request","description":"Merge approved code into a protected branch.","risk":"critical","sideEffect":"destructive","reversible":false}
+      ]
+    },
+    {
+      "id": "gmail",
+      "name": "Gmail",
+      "category": "communication",
+      "summary": "Email discovery, drafting, sending, labeling, and archival.",
+      "authType": "oauth",
+      "actions": [
+        {"id":"search_email","label":"Search email","description":"Search mailbox metadata and message summaries.","risk":"low","sideEffect":"read","reversible":true},
+        {"id":"read_email","label":"Read email","description":"Read a selected message or thread.","risk":"medium","sideEffect":"read_sensitive","reversible":true},
+        {"id":"create_draft","label":"Create draft","description":"Create a reviewable draft without sending it.","risk":"medium","sideEffect":"write","reversible":true},
+        {"id":"send_email","label":"Send email","description":"Send an external email as the user.","risk":"high","sideEffect":"publish","reversible":false},
+        {"id":"delete_email","label":"Move email to trash","description":"Move one or more messages to trash.","risk":"critical","sideEffect":"destructive","reversible":true}
+      ]
+    },
+    {
+      "id": "google-drive",
+      "name": "Google Drive",
+      "category": "productivity",
+      "summary": "File discovery, document creation, organization, and sharing.",
+      "authType": "oauth",
+      "actions": [
+        {"id":"list_files","label":"List files","description":"List accessible file metadata.","risk":"low","sideEffect":"read","reversible":true},
+        {"id":"read_file","label":"Read file","description":"Read a selected file.","risk":"medium","sideEffect":"read_sensitive","reversible":true},
+        {"id":"create_document","label":"Create document","description":"Create a new document in the workspace.","risk":"medium","sideEffect":"write","reversible":true},
+        {"id":"share_document","label":"Share document","description":"Grant another person access to a document.","risk":"high","sideEffect":"publish","reversible":true},
+        {"id":"delete_file","label":"Delete file","description":"Move a file to trash.","risk":"critical","sideEffect":"destructive","reversible":true}
+      ]
+    },
+    {
+      "id": "youtube",
+      "name": "YouTube",
+      "category": "publishing",
+      "summary": "Research, metadata preparation, uploads, and channel publishing.",
+      "authType": "oauth",
+      "actions": [
+        {"id":"search_videos","label":"Search videos","description":"Search public video and channel metadata.","risk":"low","sideEffect":"read","reversible":true},
+        {"id":"read_analytics","label":"Read analytics","description":"Read private channel analytics.","risk":"medium","sideEffect":"read_sensitive","reversible":true},
+        {"id":"draft_metadata","label":"Draft metadata","description":"Prepare title, description, chapters, and tags.","risk":"medium","sideEffect":"write","reversible":true},
+        {"id":"upload_video","label":"Upload video","description":"Upload a private or unlisted video asset.","risk":"high","sideEffect":"publish","reversible":true},
+        {"id":"publish_video","label":"Publish video","description":"Make a video publicly visible.","risk":"critical","sideEffect":"publish","reversible":true}
+      ]
+    },
+    {
+      "id": "etsy",
+      "name": "Etsy",
+      "category": "commerce",
+      "summary": "Market research, listing preparation, publishing, and order operations.",
+      "authType": "oauth",
+      "actions": [
+        {"id":"research_market","label":"Research market","description":"Read public listing and category signals.","risk":"low","sideEffect":"read","reversible":true},
+        {"id":"read_orders","label":"Read orders","description":"Read private order and customer data.","risk":"medium","sideEffect":"read_sensitive","reversible":true},
+        {"id":"draft_listing","label":"Draft listing","description":"Prepare a product listing without publishing it.","risk":"medium","sideEffect":"write","reversible":true},
+        {"id":"publish_listing","label":"Publish listing","description":"Publish a listing to the storefront.","risk":"high","sideEffect":"publish","reversible":true},
+        {"id":"cancel_order","label":"Cancel order","description":"Cancel a customer order.","risk":"critical","sideEffect":"financial","reversible":false}
+      ]
+    },
+    {
+      "id": "gumroad",
+      "name": "Gumroad",
+      "category": "commerce",
+      "summary": "Digital product preparation, publishing, sales, and customer operations.",
+      "authType": "token",
+      "actions": [
+        {"id":"list_products","label":"List products","description":"Read product catalog metadata.","risk":"low","sideEffect":"read","reversible":true},
+        {"id":"read_sales","label":"Read sales","description":"Read private sales and customer data.","risk":"medium","sideEffect":"read_sensitive","reversible":true},
+        {"id":"draft_product","label":"Draft product","description":"Prepare a product record without publishing.","risk":"medium","sideEffect":"write","reversible":true},
+        {"id":"publish_product","label":"Publish product","description":"Publish a digital product for sale.","risk":"high","sideEffect":"publish","reversible":true},
+        {"id":"refund_sale","label":"Refund sale","description":"Issue a customer refund.","risk":"critical","sideEffect":"financial","reversible":false}
+      ]
+    },
+    {
+      "id": "stripe",
+      "name": "Stripe",
+      "category": "finance",
+      "summary": "Customer, checkout, invoice, subscription, and refund operations.",
+      "authType": "secret_key",
+      "actions": [
+        {"id":"list_customers","label":"List customers","description":"Read customer account metadata.","risk":"medium","sideEffect":"read_sensitive","reversible":true},
+        {"id":"read_balance","label":"Read balance","description":"Read account balance and payout metadata.","risk":"medium","sideEffect":"read_sensitive","reversible":true},
+        {"id":"create_checkout","label":"Create checkout","description":"Create a new customer checkout session.","risk":"high","sideEffect":"financial","reversible":true},
+        {"id":"update_subscription","label":"Update subscription","description":"Change a customer subscription.","risk":"high","sideEffect":"financial","reversible":true},
+        {"id":"refund_payment","label":"Refund payment","description":"Issue a payment refund.","risk":"critical","sideEffect":"financial","reversible":false}
+      ]
+    },
+    {
+      "id": "slack",
+      "name": "Slack",
+      "category": "communication",
+      "summary": "Channel discovery, drafting, posting, and workspace operations.",
+      "authType": "oauth",
+      "actions": [
+        {"id":"search_messages","label":"Search messages","description":"Search accessible workspace messages.","risk":"medium","sideEffect":"read_sensitive","reversible":true},
+        {"id":"draft_message","label":"Draft message","description":"Prepare a message without posting it.","risk":"medium","sideEffect":"write","reversible":true},
+        {"id":"send_message","label":"Send message","description":"Post a message into a channel or DM.","risk":"high","sideEffect":"publish","reversible":false},
+        {"id":"create_channel","label":"Create channel","description":"Create a new workspace channel.","risk":"high","sideEffect":"write","reversible":true},
+        {"id":"archive_channel","label":"Archive channel","description":"Archive an existing channel.","risk":"critical","sideEffect":"destructive","reversible":true}
+      ]
+    },
+    {
+      "id": "discord",
+      "name": "Discord",
+      "category": "communication",
+      "summary": "Server discovery, drafting, posting, and moderation workflows.",
+      "authType": "oauth_or_bot_token",
+      "actions": [
+        {"id":"read_channels","label":"Read channels","description":"Read accessible server and channel metadata.","risk":"low","sideEffect":"read","reversible":true},
+        {"id":"draft_message","label":"Draft message","description":"Prepare a message without posting it.","risk":"medium","sideEffect":"write","reversible":true},
+        {"id":"send_message","label":"Send message","description":"Post a message to a server channel.","risk":"high","sideEffect":"publish","reversible":false},
+        {"id":"create_channel","label":"Create channel","description":"Create a new server channel.","risk":"high","sideEffect":"write","reversible":true},
+        {"id":"ban_member","label":"Ban member","description":"Ban a member from a server.","risk":"critical","sideEffect":"destructive","reversible":true}
+      ]
+    }
+  ]
+}

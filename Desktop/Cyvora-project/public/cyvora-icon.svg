@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Cyvora">
+  <defs>
+    <linearGradient id="base" x1="78" y1="64" x2="432" y2="444" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#122033"/>
+      <stop offset="1" stop-color="#0a1220"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="92" y1="90" x2="420" y2="424" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#d9e6ff" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#6ea6ff" stop-opacity="0.13"/>
+    </linearGradient>
+    <linearGradient id="glyph" x1="150" y1="136" x2="362" y2="376" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f4f8ff"/>
+      <stop offset="1" stop-color="#8ddfff"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="206" y1="196" x2="304" y2="316" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#a39dff"/>
+      <stop offset="1" stop-color="#f4d487"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="120" fill="url(#base)"/>
+  <rect x="22" y="22" width="468" height="468" rx="108" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="3"/>
+  <path d="M124 168C124 119.817 162.817 81 211 81H301C349.183 81 388 119.817 388 168V344C388 392.183 349.183 431 301 431H211C162.817 431 124 392.183 124 344V168Z" fill="url(#edge)"/>
+  <circle cx="256" cy="256" r="134" fill="#0f1828" stroke="rgba(255,255,255,0.08)" stroke-width="3"/>
+  <path d="M340 180C318 156 288.8 144 256 144C194.095 144 144 194.095 144 256C144 317.905 194.095 368 256 368C288.8 368 318 356 340 332" stroke="url(#glyph)" stroke-width="32" stroke-linecap="round"/>
+  <path d="M208 186L256 308L304 186" stroke="url(#glyph)" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M226 258H286" stroke="url(#accent)" stroke-width="20" stroke-linecap="round"/>
+  <circle cx="354" cy="158" r="14" fill="url(#accent)"/>
+  <circle cx="158" cy="352" r="12" fill="#8ddfff"/>
+</svg>

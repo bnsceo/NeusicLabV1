@@ -1,0 +1,461 @@
+@import "tailwindcss";
+
+:root {
+  --color-bg-primary: #0f172a;
+  --color-text-muted: #94a3b8;
+  --color-border-subtle: rgba(255, 255, 255, 0.08);
+  --background: #08101c;
+  --foreground: #edf6ff;
+  --surface: #0e1727;
+  --surface-strong: #0b1423;
+  --surface-soft: rgba(255, 255, 255, 0.035);
+  --border-soft: rgba(210, 226, 255, 0.09);
+  --border-strong: rgba(150, 194, 255, 0.18);
+  --accent-cyan: #8ddfff;
+  --accent-violet: #a39dff;
+  --accent-gold: #f4d487;
+  --shadow-heavy:
+    22px 22px 42px rgba(0, 0, 0, 0.56),
+    -12px -12px 24px rgba(255, 255, 255, 0.04),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.05);
+  --shadow-tactile:
+    14px 14px 28px rgba(0, 0, 0, 0.52),
+    -10px -10px 20px rgba(255, 255, 255, 0.04),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.05),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.18);
+  --shadow-pressed:
+    inset 12px 12px 22px rgba(0, 0, 0, 0.6),
+    inset -8px -8px 16px rgba(255, 255, 255, 0.025);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #08101c;
+    --foreground: #edf6ff;
+  }
+}
+
+body {
+  background:
+    radial-gradient(circle at top, rgba(141, 223, 255, 0.08), transparent 24%),
+    radial-gradient(circle at 20% 18%, rgba(163, 157, 255, 0.07), transparent 22%),
+    radial-gradient(circle at 84% 20%, rgba(244, 212, 135, 0.06), transparent 20%),
+    linear-gradient(180deg, #07101b 0%, #08131f 50%, #07101a 100%);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  color-scheme: dark;
+}
+
+::selection {
+  background: rgba(109, 227, 255, 0.34);
+  color: #fff;
+}
+
+.cyvora-glass {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.09), transparent 28%),
+    linear-gradient(325deg, rgba(0, 0, 0, 0.16), transparent 42%),
+    linear-gradient(145deg, rgba(17, 28, 45, 0.84), rgba(11, 21, 36, 0.9));
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: var(--shadow-heavy);
+  backdrop-filter: blur(16px);
+  position: relative;
+  isolation: isolate;
+}
+
+.cyvora-glass-strong {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.085), transparent 24%),
+    linear-gradient(325deg, rgba(0, 0, 0, 0.18), transparent 40%),
+    linear-gradient(145deg, rgba(15, 23, 39, 0.9), rgba(9, 17, 29, 0.96));
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: var(--shadow-heavy);
+  backdrop-filter: blur(18px);
+  position: relative;
+  isolation: isolate;
+}
+
+.cyvora-tactile {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.075), transparent 26%),
+    linear-gradient(325deg, rgba(0, 0, 0, 0.2), transparent 36%),
+    linear-gradient(145deg, rgba(16, 26, 43, 0.94), rgba(9, 17, 29, 0.98));
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: var(--shadow-tactile);
+  position: relative;
+  isolation: isolate;
+}
+
+.cyvora-chip {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.07), transparent 24%),
+    linear-gradient(325deg, rgba(0, 0, 0, 0.16), transparent 34%),
+    linear-gradient(145deg, rgba(15, 23, 39, 0.95), rgba(9, 17, 29, 0.98));
+  border: 1px solid var(--color-border-subtle);
+  box-shadow:
+    10px 10px 20px rgba(0, 0, 0, 0.34),
+    -8px -8px 16px rgba(255, 255, 255, 0.03),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.035),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.12);
+}
+
+.cyvora-neumo-pressed {
+  box-shadow: var(--shadow-pressed);
+}
+
+:where(input:not([type='hidden']), textarea, select) {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.065), transparent 28%),
+    linear-gradient(325deg, rgba(0, 0, 0, 0.18), transparent 36%),
+    linear-gradient(145deg, rgba(15, 23, 39, 0.92), rgba(9, 17, 29, 0.98));
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 1rem;
+  color: var(--foreground);
+  box-shadow: var(--shadow-tactile);
+  outline: none;
+  appearance: none;
+}
+
+:where(input:not([type='hidden']), textarea, select)::placeholder {
+  color: rgba(148, 163, 184, 0.7);
+}
+
+:where(input:not([type='hidden']), textarea, select):focus {
+  border-color: rgba(141, 223, 255, 0.42);
+  box-shadow: var(--shadow-pressed);
+}
+
+/* Shared Cyvora application shell */
+.cyvora-app-shell {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(141, 223, 255, 0.045), transparent 24%),
+    linear-gradient(180deg, rgba(7, 16, 27, 0.92), rgba(7, 16, 26, 0.98));
+}
+
+.cyvora-app-sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 70;
+  width: 260px;
+  flex-direction: column;
+  padding: 18px;
+  overflow-y: auto;
+  border-right: 1px solid rgba(210, 226, 255, 0.08);
+  background:
+    radial-gradient(circle at 10% 0%, rgba(141, 223, 255, 0.06), transparent 24%),
+    linear-gradient(180deg, rgba(8, 17, 30, 0.985), rgba(6, 13, 23, 0.995));
+  box-shadow: 18px 0 46px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(22px);
+}
+
+.cyvora-shell-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 60px;
+  padding: 0.65rem;
+  border: 1px solid rgba(210, 226, 255, 0.08);
+  border-radius: 1rem;
+  background: linear-gradient(145deg, rgba(16, 26, 43, 0.94), rgba(8, 16, 28, 0.98));
+  box-shadow:
+    10px 10px 20px rgba(0, 0, 0, 0.38),
+    -7px -7px 15px rgba(255, 255, 255, 0.02),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.cyvora-shell-mark {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(141, 223, 255, 0.2);
+  border-radius: 0.85rem;
+  background: rgba(141, 223, 255, 0.055);
+  box-shadow: inset 1px 1px 0 rgba(255,255,255,.04), 0 0 24px rgba(141,223,255,.06);
+}
+
+.cyvora-shell-nav-label {
+  margin: 0 0 0.6rem 0.7rem;
+  color: rgba(100, 116, 139, 0.9);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.cyvora-shell-nav-item {
+  display: flex;
+  min-height: 46px;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 0.8rem;
+  border: 1px solid transparent;
+  border-radius: 0.9rem;
+  color: #94a3b8;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: color 160ms ease, background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.cyvora-shell-nav-item:hover {
+  color: #fff;
+  border-color: rgba(210, 226, 255, 0.07);
+  background: rgba(255, 255, 255, 0.025);
+  transform: translateX(2px);
+}
+
+.cyvora-shell-nav-item.is-active {
+  color: #fff;
+  border-color: rgba(141, 223, 255, 0.13);
+  background: linear-gradient(145deg, rgba(15, 25, 42, 0.96), rgba(7, 15, 27, 0.99));
+  box-shadow:
+    inset 7px 7px 14px rgba(0, 0, 0, 0.38),
+    inset -5px -5px 12px rgba(255, 255, 255, 0.018);
+}
+
+.cyvora-shell-nav-icon {
+  display: grid;
+  width: 29px;
+  height: 29px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgba(141, 223, 255, 0.09);
+  border-radius: 0.65rem;
+  color: var(--accent-cyan);
+  background: rgba(141, 223, 255, 0.04);
+}
+
+.cyvora-shell-badge {
+  display: inline-grid;
+  min-width: 21px;
+  height: 21px;
+  margin-left: auto;
+  place-items: center;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  color: #211805;
+  background: var(--accent-gold);
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+.cyvora-shell-runtime {
+  padding: 0.9rem;
+  border: 1px solid rgba(210, 226, 255, 0.08);
+  border-radius: 1rem;
+  background: linear-gradient(145deg, rgba(15, 24, 40, 0.94), rgba(7, 15, 26, 0.98));
+  box-shadow:
+    10px 10px 22px rgba(0, 0, 0, 0.34),
+    -7px -7px 15px rgba(255, 255, 255, 0.018),
+    inset 1px 1px 0 rgba(255,255,255,.03);
+}
+
+.cyvora-app-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  min-height: 68px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid rgba(210, 226, 255, 0.075);
+  background: rgba(7, 16, 27, 0.86);
+  box-shadow: 0 12px 32px rgba(0,0,0,.18);
+  backdrop-filter: blur(20px);
+}
+
+.cyvora-shell-icon-button {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 1px solid rgba(210, 226, 255, 0.08);
+  border-radius: 0.8rem;
+  color: #a8b6c9;
+  background: linear-gradient(145deg, rgba(16, 26, 43, 0.9), rgba(8, 16, 28, 0.96));
+  box-shadow: 7px 7px 15px rgba(0,0,0,.28), -5px -5px 12px rgba(255,255,255,.018);
+  transition: transform 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.cyvora-shell-icon-button:hover {
+  color: #fff;
+  border-color: rgba(141, 223, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+.cyvora-app-content {
+  min-height: calc(100vh - 68px);
+}
+
+.cyvora-app-content > .min-h-screen {
+  min-height: auto;
+  background: transparent !important;
+}
+
+.cyvora-mobile-dock {
+  position: fixed;
+  inset: auto 0.75rem 0.75rem;
+  z-index: 60;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.35rem;
+  padding: 0.45rem;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 0.45rem);
+  border: 1px solid rgba(210, 226, 255, 0.09);
+  border-radius: 1.2rem;
+  background: rgba(7, 16, 27, 0.94);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.48);
+  backdrop-filter: blur(22px);
+}
+
+.cyvora-mobile-dock-item {
+  min-width: 0;
+  min-height: 48px;
+  padding: 0.4rem 0.25rem;
+  border-radius: 0.8rem;
+  color: #64748b;
+  text-align: center;
+  transition: color 160ms ease, background 160ms ease;
+}
+
+.cyvora-mobile-dock-item.is-active {
+  color: #d9f7ff;
+  background: rgba(141, 223, 255, 0.065);
+  box-shadow: var(--shadow-pressed);
+}
+
+.cyvora-mobile-dock-item.is-primary {
+  color: #06121a;
+  background: linear-gradient(135deg, var(--accent-cyan), #6ee7b7);
+  box-shadow: 0 8px 22px rgba(141, 223, 255, 0.18);
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@media (max-width: 1023px) {
+  body { padding-bottom: 5.5rem; }
+}
+
+/* Phase 4 — Cyvora operating-system controls */
+.cyvora-shell-search {
+  min-height: 40px;
+  align-items: center;
+  gap: .55rem;
+  padding: 0 .75rem;
+  border: 1px solid rgba(210,226,255,.08);
+  border-radius: .8rem;
+  color: #94a3b8;
+  background: linear-gradient(145deg, rgba(16,26,43,.9), rgba(8,16,28,.96));
+  box-shadow: 7px 7px 15px rgba(0,0,0,.28), -5px -5px 12px rgba(255,255,255,.018);
+  font-size: .72rem;
+}
+.cyvora-shell-search:hover { color: #fff; border-color: rgba(141,223,255,.18); }
+.cyvora-shell-search kbd { margin-left: .4rem; padding: .18rem .38rem; border: 1px solid rgba(255,255,255,.08); border-radius: .4rem; color: #64748b; background: rgba(255,255,255,.025); font-size: .58rem; }
+.cyvora-os-modal,
+.cyvora-os-drawer {
+  border: 1px solid rgba(210,226,255,.1);
+  background: linear-gradient(145deg, rgba(13,23,39,.98), rgba(6,13,24,.99));
+  box-shadow: 24px 24px 70px rgba(0,0,0,.58), -12px -12px 28px rgba(255,255,255,.018);
+}
+.cyvora-os-modal { border-radius: 1.4rem; }
+.cyvora-os-drawer { border-left-color: rgba(141,223,255,.12); }
+.cyvora-os-command {
+  display: flex;
+  min-height: 58px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .65rem .8rem;
+  border: 1px solid transparent;
+  border-radius: .9rem;
+  color: #cbd5e1;
+  transition: 150ms ease;
+}
+.cyvora-os-command:hover { border-color: rgba(141,223,255,.11); background: rgba(141,223,255,.035); color: #fff; }
+.cyvora-os-command strong { display: block; font-size: .78rem; }
+.cyvora-os-command small { display: block; margin-top: .2rem; color: #64748b; font-size: .64rem; }
+.cyvora-os-kbd { display: inline-flex; align-items: center; min-height: 24px; padding: 0 .45rem; border: 1px solid rgba(255,255,255,.09); border-radius: .45rem; color: #94a3b8; background: rgba(255,255,255,.025); font-size: .62rem; white-space: nowrap; }
+.cyvora-os-card { display: flex; align-items: flex-start; gap: .75rem; padding: .9rem; border: 1px solid rgba(210,226,255,.07); border-radius: 1rem; background: rgba(255,255,255,.022); }
+.cyvora-os-card strong { display: block; color: #f8fafc; font-size: .77rem; }
+.cyvora-os-card p { margin-top: .28rem; color: #64748b; font-size: .67rem; line-height: 1.55; }
+.cyvora-os-status { width: .55rem; height: .55rem; margin-top: .25rem; flex: 0 0 auto; border-radius: 999px; }
+.cyvora-os-status.is-cyan { background: #8ddfff; box-shadow: 0 0 12px rgba(141,223,255,.65); }
+.cyvora-os-status.is-violet { background: #a39dff; box-shadow: 0 0 12px rgba(163,157,255,.65); }
+.cyvora-os-status.is-amber { background: #f4d487; box-shadow: 0 0 12px rgba(244,212,135,.6); }
+.cyvora-os-status.is-emerald { background: #6ee7b7; box-shadow: 0 0 12px rgba(110,231,183,.65); }
+.cyvora-os-section-label { margin-bottom: .7rem; color: #64748b; font-size: .62rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+.cyvora-os-choice { min-height: 82px; padding: .75rem; border: 1px solid rgba(210,226,255,.07); border-radius: 1rem; color: #94a3b8; background: rgba(255,255,255,.02); text-align: left; }
+.cyvora-os-choice.is-selected { border-color: rgba(141,223,255,.25); color: #fff; box-shadow: inset 6px 6px 12px rgba(0,0,0,.28), inset -4px -4px 10px rgba(255,255,255,.015); }
+.cyvora-os-choice strong, .cyvora-os-choice small { display: block; }
+.cyvora-os-choice strong { font-size: .72rem; }.cyvora-os-choice small { margin-top: .3rem; color: #64748b; font-size: .6rem; line-height: 1.45; }
+.cyvora-theme-swatch { display: block; width: 100%; height: 24px; margin-bottom: .55rem; border-radius: .5rem; }
+.cyvora-theme-swatch.is-midnight { background: linear-gradient(90deg,#07101b,#0e1727,#8ddfff); }
+.cyvora-theme-swatch.is-deep { background: linear-gradient(90deg,#020617,#111827,#a39dff); }
+.cyvora-theme-swatch.is-contrast { background: linear-gradient(90deg,#000,#172033,#f4d487); }
+
+html[data-theme='deep'] body { background-color: #020617; background-image: radial-gradient(circle at top, rgba(163,157,255,.08), transparent 30%), linear-gradient(180deg,#020617,#080d18); }
+html[data-theme='deep'] .cyvora-app-sidebar,
+html[data-theme='deep'] .cyvora-app-topbar { background-color: rgba(2,6,23,.94); }
+html[data-theme='contrast'] body { background-color: #000; background-image: radial-gradient(circle at top, rgba(244,212,135,.065), transparent 28%), linear-gradient(180deg,#000,#070b12); }
+html[data-theme='contrast'] .cyvora-app-sidebar,
+html[data-theme='contrast'] .cyvora-app-topbar { background-color: rgba(0,0,0,.96); }
+html[data-density='compact'] .cyvora-app-content main { padding-top: 1rem !important; padding-bottom: 1rem !important; }
+html[data-density='compact'] .cyvora-glass,
+html[data-density='compact'] .cyvora-glass-strong { --cyvora-density-pad: .85rem; }
+html[data-density='compact'] .cyvora-shell-nav-item { min-height: 39px; }
+
+/* Phase 6/7 information architecture and collapsible desktop shell */
+.cyvora-shell-main {
+  min-width: 0;
+  transition: padding-left 180ms ease;
+}
+.cyvora-app-sidebar {
+  transition: width 180ms ease, padding 180ms ease;
+}
+.cyvora-sidebar-copy {
+  transition: opacity 120ms ease, width 180ms ease;
+}
+.cyvora-collapse-button {
+  flex: 0 0 auto;
+}
+@media (min-width: 1024px) {
+  .cyvora-shell-main { padding-left: 260px; }
+  .cyvora-shell-is-collapsed .cyvora-shell-main { padding-left: 86px; }
+  .cyvora-shell-is-collapsed .cyvora-app-sidebar { width: 86px; padding-inline: 12px; }
+  .cyvora-shell-is-collapsed .cyvora-sidebar-copy { width: 0; max-width: 0; overflow: hidden; opacity: 0; pointer-events: none; }
+  .cyvora-shell-is-collapsed .cyvora-shell-brand { justify-content: center; min-height: 52px; padding: .3rem; border-color: transparent; background: transparent; box-shadow: none; }
+  .cyvora-shell-is-collapsed .cyvora-shell-nav-item { justify-content: center; gap: 0; padding-inline: .25rem; }
+  .cyvora-shell-is-collapsed .cyvora-shell-nav-item:hover { transform: translateY(-1px); }
+  .cyvora-shell-is-collapsed .cyvora-shell-runtime { display: grid; min-height: 48px; place-items: center; padding: .5rem; }
+  .cyvora-shell-is-collapsed .cyvora-collapse-button { position: absolute; right: -18px; top: 20px; z-index: 2; width: 34px; height: 34px; border-radius: 999px; }
+}
+
+.cyvora-select {
+  display: block;
+  width: 100%;
+  min-height: 2.75rem;
+  margin-top: .5rem;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: .75rem;
+  background: rgba(2,6,23,.92);
+  padding: 0 .75rem;
+  color: rgb(226 232 240);
+  font-size: .75rem;
+  outline: none;
+}
+.cyvora-select:focus { border-color: rgba(103,232,249,.35); box-shadow: 0 0 0 3px rgba(103,232,249,.06); }

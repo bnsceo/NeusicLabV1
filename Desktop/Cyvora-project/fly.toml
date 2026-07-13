@@ -1,0 +1,46 @@
+app = "cyvoraai"
+primary_region = "ewr"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+  JARVIS_WORKSPACE_ROOT = "/app"
+  MISSIONS_DB_PATH = "/app/data/missions.db"
+  TENANTS_ROOT = "/app/data/tenants"
+  AGENCY_AGENTS_DIR = "/app/personas"
+  WORKER_POLL_INTERVAL_SECONDS = "15"
+  WORKER_LEASE_SECONDS = "180"
+  WORKER_STALE_SECONDS = "90"
+  WORKER_MAX_ATTEMPTS = "3"
+  MOCK_MODE = "true"
+  CYVORA_MODEL_PROVIDER = "mock"
+  CYVORA_CONNECTOR_MODE = "mock"
+  ALLOW_PAID_AI = "false"
+  CYVORA_BILLING_MODE = "enforce"
+  CYVORA_MAX_RUN_COST_USD = "0.25"
+  CYVORA_MAX_DAILY_COST_USD = "1.00"
+  CYVORA_AUTH_REQUIRED = "true"
+
+[[mounts]]
+  source = "cyvora_data"
+  destination = "/app/data"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    grace_period = "30s"
+    interval = "30s"
+    method = "GET"
+    timeout = "5s"
+    path = "/api/health"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

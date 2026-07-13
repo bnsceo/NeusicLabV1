@@ -1,0 +1,17 @@
+{
+  "name": "Cyvora",
+  "short_name": "Cyvora",
+  "description": "AI Command Center",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#070b12",
+  "theme_color": "#070b12",
+  "icons": [
+    {
+      "src": "/cyvora-header-logo.png",
+      "sizes": "1664x928",
+      "type": "image/png"
+    }
+  ]
+}

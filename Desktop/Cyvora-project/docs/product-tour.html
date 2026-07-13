@@ -1,0 +1,2231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#08101c" />
+  <title>Cyvora AI · Full App Showcase</title>
+  <meta
+    name="description"
+    content="A static, fully mocked showcase of the Cyvora AI Command Center."
+  />
+  <meta name="robots" content="noindex,nofollow" />
+
+  <style>
+    :root {
+      color-scheme: dark;
+
+      --bg: #07101b;
+      --bg-2: #08131f;
+      --surface: #0e1727;
+      --surface-strong: #0a1322;
+      --surface-soft: rgba(255,255,255,.035);
+      --surface-soft-2: rgba(255,255,255,.055);
+
+      --text: #edf6ff;
+      --muted: #94a3b8;
+      --muted-2: #64748b;
+
+      --cyan: #8ddfff;
+      --violet: #a39dff;
+      --gold: #f4d487;
+      --emerald: #6ee7b7;
+      --red: #fb7185;
+
+      --border: rgba(210,226,255,.09);
+      --border-strong: rgba(150,194,255,.18);
+
+      --shadow-heavy:
+        16px 16px 30px rgba(0,0,0,.48),
+        -12px -12px 24px rgba(255,255,255,.025);
+
+      --shadow-tactile:
+        10px 10px 20px rgba(0,0,0,.42),
+        -8px -8px 16px rgba(255,255,255,.03),
+        inset 1px 1px 0 rgba(255,255,255,.03);
+
+      --shadow-pressed:
+        inset 8px 8px 16px rgba(0,0,0,.42),
+        inset -6px -6px 14px rgba(255,255,255,.02);
+
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(141,223,255,.08), transparent 24%),
+        radial-gradient(circle at 18% 16%, rgba(163,157,255,.07), transparent 22%),
+        radial-gradient(circle at 86% 20%, rgba(244,212,135,.055), transparent 18%),
+        linear-gradient(180deg, #07101b 0%, #08131f 50%, #07101a 100%);
+      overflow-x: hidden;
+    }
+
+    button, input, textarea, select {
+      font: inherit;
+    }
+
+    button, a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      color: inherit;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 260px minmax(0,1fr);
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 18px;
+      border-right: 1px solid var(--border);
+      background: rgba(7,16,27,.92);
+      backdrop-filter: blur(24px);
+      z-index: 30;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 18px;
+      background: linear-gradient(145deg, #101a2b, #09111d);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-tactile);
+    }
+
+    .brand-mark {
+      width: 42px;
+      aspect-ratio: 1;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      font-size: 20px;
+      letter-spacing: -.06em;
+      color: var(--cyan);
+      background:
+        radial-gradient(circle at 35% 30%, rgba(141,223,255,.26), transparent 35%),
+        linear-gradient(145deg, #13243a, #08111f);
+      border: 1px solid rgba(141,223,255,.28);
+      box-shadow:
+        inset 1px 1px 0 rgba(255,255,255,.06),
+        0 0 28px rgba(141,223,255,.12);
+    }
+
+    .brand-copy strong {
+      display: block;
+      font-size: 15px;
+      letter-spacing: .02em;
+    }
+
+    .brand-copy span {
+      display: block;
+      margin-top: 2px;
+      color: var(--cyan);
+      font-size: 9px;
+      letter-spacing: .23em;
+      text-transform: uppercase;
+    }
+
+    .nav-section {
+      margin-top: 20px;
+    }
+
+    .nav-label {
+      margin: 0 0 10px 12px;
+      color: var(--muted-2);
+      font-size: 10px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+    }
+
+    .nav-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .nav-button {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 46px;
+      padding: 0 14px;
+      border-radius: 16px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #aebbd0;
+      cursor: pointer;
+      transition: .2s ease;
+      text-align: left;
+    }
+
+    .nav-button:hover {
+      color: #fff;
+      background: rgba(255,255,255,.035);
+      border-color: var(--border);
+    }
+
+    .nav-button.active {
+      color: #fff;
+      background: linear-gradient(145deg, #0f1727, #09111d);
+      border-color: rgba(141,223,255,.17);
+      box-shadow: var(--shadow-pressed);
+    }
+
+    .nav-icon {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      color: var(--cyan);
+      background: rgba(141,223,255,.06);
+      border: 1px solid rgba(141,223,255,.12);
+      font-size: 13px;
+      flex: 0 0 auto;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 7px;
+      border-radius: 999px;
+      display: inline-grid;
+      place-items: center;
+      font-size: 10px;
+      color: #120f04;
+      background: var(--gold);
+      font-weight: 800;
+    }
+
+    .sidebar-footer {
+      position: absolute;
+      inset: auto 18px 18px 18px;
+    }
+
+    .runtime-card {
+      padding: 14px;
+      border-radius: 18px;
+      background: linear-gradient(145deg, #0f1727, #09111d);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-tactile);
+    }
+
+    .runtime-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .runtime-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 16px rgba(110,231,183,.85);
+    }
+
+    .runtime-card strong {
+      font-size: 12px;
+    }
+
+    .runtime-card p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .main {
+      min-width: 0;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      min-height: 72px;
+      padding: 12px 24px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(7,16,27,.86);
+      backdrop-filter: blur(20px);
+    }
+
+    .topbar-left,
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .menu-button {
+      display: none;
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--surface-soft);
+      cursor: pointer;
+    }
+
+    .workspace-title {
+      min-width: 0;
+    }
+
+    .workspace-title strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .workspace-title span {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mode-pill,
+    .status-pill,
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: linear-gradient(145deg, #0f1727, #09111d);
+      box-shadow:
+        7px 7px 14px rgba(0,0,0,.25),
+        -6px -6px 12px rgba(255,255,255,.02);
+      white-space: nowrap;
+    }
+
+    .mode-pill {
+      padding: 9px 12px;
+      font-size: 11px;
+      color: var(--cyan);
+    }
+
+    .status-pill,
+    .chip {
+      padding: 7px 10px;
+      font-size: 10px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .status-pill.emerald { color: var(--emerald); }
+    .status-pill.amber { color: var(--gold); }
+    .status-pill.red { color: var(--red); }
+    .status-pill.violet { color: var(--violet); }
+    .status-pill.cyan { color: var(--cyan); }
+
+    .icon-button,
+    .avatar-button {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: linear-gradient(145deg, #101a2b, #09111d);
+      box-shadow: var(--shadow-tactile);
+      cursor: pointer;
+      position: relative;
+    }
+
+    .icon-button:hover,
+    .avatar-button:hover,
+    .button:hover,
+    .quick-action:hover {
+      transform: translateY(-1px);
+      border-color: var(--border-strong);
+    }
+
+    .alert-dot {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--red);
+      box-shadow: 0 0 12px rgba(251,113,133,.8);
+    }
+
+    .avatar-button {
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      color: var(--cyan);
+    }
+
+    .content {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+      animation: fadeIn .22s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .environment-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 16px;
+      padding: 11px 14px;
+      border: 1px solid rgba(141,223,255,.12);
+      border-radius: 16px;
+      color: #bfeeff;
+      background: rgba(141,223,255,.045);
+    }
+
+    .environment-strip p {
+      margin: 0;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .environment-strip strong {
+      color: var(--cyan);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto;
+      gap: 20px;
+      align-items: start;
+      padding: 26px;
+      border-radius: var(--radius-xl);
+      background: linear-gradient(145deg, #0f1727, #09111d);
+      border: 1px solid rgba(188,208,238,.08);
+      box-shadow: var(--shadow-heavy);
+    }
+
+    .eyebrow {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .26em;
+      text-transform: uppercase;
+    }
+
+    .hero h1,
+    .page-heading h1 {
+      margin: 7px 0 0;
+      font-size: clamp(30px,5vw,48px);
+      line-height: 1;
+      letter-spacing: -.045em;
+    }
+
+    .hero-copy,
+    .page-heading p {
+      margin: 14px 0 0;
+      max-width: 68ch;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .hero-actions,
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .button {
+      min-height: 44px;
+      padding: 0 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: linear-gradient(145deg, #101a2b, #09111d);
+      box-shadow: var(--shadow-tactile);
+      cursor: pointer;
+      transition: .2s ease;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .button.primary {
+      color: #031018;
+      background: linear-gradient(135deg, var(--cyan), #6ee7b7);
+      border-color: transparent;
+      box-shadow: 0 12px 28px rgba(141,223,255,.18);
+    }
+
+    .button.violet {
+      color: #100d24;
+      background: linear-gradient(135deg, var(--violet), #cabfff);
+      border-color: transparent;
+    }
+
+    .button.danger {
+      color: #22070d;
+      background: linear-gradient(135deg, #fb7185, #fda4af);
+      border-color: transparent;
+    }
+
+    .executive-card {
+      width: min(100%, 350px);
+      padding: 18px;
+      border-radius: 20px;
+      border: 1px solid rgba(163,157,255,.18);
+      background:
+        radial-gradient(circle at top right, rgba(163,157,255,.12), transparent 35%),
+        linear-gradient(145deg, #11182a, #09111d);
+      box-shadow: var(--shadow-tactile);
+    }
+
+    .executive-card h3 {
+      margin: 10px 0 0;
+      font-size: 15px;
+    }
+
+    .executive-card p {
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(6,minmax(0,1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .metric {
+      min-width: 0;
+      padding: 15px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: linear-gradient(145deg, #101a2b, #09111d);
+      box-shadow: var(--shadow-tactile);
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted-2);
+      font-size: 9px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 22px;
+    }
+
+    .metric small {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .grid-2,
+    .grid-3,
+    .grid-main {
+      display: grid;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .grid-2 { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .grid-3 { grid-template-columns: repeat(3,minmax(0,1fr)); }
+    .grid-main { grid-template-columns: minmax(0,1.15fr) minmax(320px,.85fr); }
+
+    .card {
+      min-width: 0;
+      padding: 20px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: linear-gradient(145deg, #101a2b, #0b1524);
+      box-shadow: var(--shadow-heavy);
+    }
+
+    .card.strong {
+      background: linear-gradient(145deg, #0f1727, #09111d);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .card-header h2,
+    .card-header h3 {
+      margin: 4px 0 0;
+      font-size: 18px;
+    }
+
+    .card-header p {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .list-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 13px 14px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.025);
+    }
+
+    .list-row:hover {
+      background: rgba(255,255,255,.04);
+    }
+
+    .list-main {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .list-icon {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.035);
+      flex: 0 0 auto;
+      font-size: 13px;
+    }
+
+    .list-copy {
+      min-width: 0;
+    }
+
+    .list-copy strong {
+      display: block;
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .list-copy span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .row-action {
+      flex: 0 0 auto;
+      padding: 7px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.035);
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .company-grid {
+      display: grid;
+      grid-template-columns: repeat(2,minmax(0,1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .company-card {
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background:
+        radial-gradient(circle at top right, rgba(141,223,255,.06), transparent 35%),
+        rgba(255,255,255,.025);
+    }
+
+    .company-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .company-card h3 {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .company-card p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .progress {
+      height: 7px;
+      margin-top: 14px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.04);
+    }
+
+    .progress > span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--cyan), var(--violet));
+    }
+
+    .company-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .timeline {
+      position: relative;
+      display: grid;
+      gap: 13px;
+      margin-top: 16px;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 18px;
+      top: 8px;
+      bottom: 8px;
+      width: 1px;
+      background: linear-gradient(var(--cyan), rgba(141,223,255,.02));
+    }
+
+    .timeline-item {
+      position: relative;
+      display: grid;
+      grid-template-columns: 38px minmax(0,1fr);
+      gap: 12px;
+    }
+
+    .timeline-dot {
+      position: relative;
+      z-index: 1;
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      border: 1px solid rgba(141,223,255,.18);
+      background: #0d1a2b;
+      color: var(--cyan);
+      font-size: 11px;
+    }
+
+    .timeline-copy {
+      padding-top: 2px;
+    }
+
+    .timeline-copy strong {
+      display: block;
+      font-size: 12px;
+    }
+
+    .timeline-copy p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .timeline-copy time {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted-2);
+      font-size: 9px;
+    }
+
+    .composer {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(141,223,255,.14);
+      background: rgba(141,223,255,.035);
+    }
+
+    .composer textarea {
+      width: 100%;
+      min-height: 100px;
+      resize: vertical;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: #07101b;
+      color: var(--text);
+      outline: none;
+    }
+
+    .composer textarea:focus {
+      border-color: rgba(141,223,255,.45);
+      box-shadow: 0 0 0 3px rgba(141,223,255,.06);
+    }
+
+    .quick-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .quick-chip {
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
+      font-size: 10px;
+      cursor: pointer;
+    }
+
+    .quick-chip:hover {
+      color: #fff;
+      border-color: rgba(141,223,255,.28);
+    }
+
+    .page-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 18px;
+      margin-bottom: 16px;
+      padding: 24px;
+      border-radius: var(--radius-xl);
+      background: linear-gradient(145deg, #0f1727, #09111d);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-heavy);
+    }
+
+    .org-chart {
+      display: grid;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .org-level {
+      display: grid;
+      gap: 12px;
+      position: relative;
+    }
+
+    .org-level.level-2 { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .org-level.level-3 { grid-template-columns: repeat(3,minmax(0,1fr)); }
+
+    .org-node {
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      text-align: center;
+    }
+
+    .org-node.primary {
+      max-width: 420px;
+      margin: 0 auto;
+      border-color: rgba(163,157,255,.25);
+      background: rgba(163,157,255,.06);
+    }
+
+    .org-node h3 {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .org-node p {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    .org-connector {
+      width: 1px;
+      height: 18px;
+      margin: -2px auto;
+      background: linear-gradient(var(--violet), rgba(163,157,255,.08));
+    }
+
+    .table-wrap {
+      margin-top: 16px;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: collapse;
+      background: rgba(255,255,255,.02);
+    }
+
+    th, td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+    }
+
+    th {
+      color: var(--muted-2);
+      font-size: 9px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      background: rgba(255,255,255,.02);
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .health-grid {
+      display: grid;
+      grid-template-columns: repeat(4,minmax(0,1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .health-card {
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.025);
+    }
+
+    .health-card strong {
+      display: block;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    .health-card span {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(4,minmax(0,1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .quick-action {
+      padding: 15px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.025);
+      cursor: pointer;
+      transition: .2s ease;
+      text-align: left;
+    }
+
+    .quick-action strong {
+      display: block;
+      font-size: 12px;
+    }
+
+    .quick-action span {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.4;
+    }
+
+    .mock-banner {
+      margin-top: 16px;
+      padding: 13px 15px;
+      border: 1px solid rgba(244,212,135,.18);
+      border-radius: 16px;
+      color: #f8e7b7;
+      background: rgba(244,212,135,.045);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .footer {
+      margin-top: 24px;
+      padding: 18px 4px 90px;
+      color: var(--muted-2);
+      text-align: center;
+      font-size: 10px;
+    }
+
+    .mobile-dock {
+      display: none;
+      position: fixed;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      z-index: 40;
+      grid-template-columns: repeat(5,1fr);
+      gap: 6px;
+      padding: 8px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: rgba(7,16,27,.94);
+      backdrop-filter: blur(22px);
+      box-shadow: 0 20px 50px rgba(0,0,0,.5);
+    }
+
+    .dock-button {
+      min-width: 0;
+      min-height: 48px;
+      border: 0;
+      border-radius: 14px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 9px;
+      cursor: pointer;
+    }
+
+    .dock-button.active {
+      color: #fff;
+      background: rgba(141,223,255,.08);
+      box-shadow: var(--shadow-pressed);
+    }
+
+    .dock-button span {
+      display: block;
+      margin-top: 4px;
+    }
+
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: none;
+      background: rgba(2,6,23,.64);
+      backdrop-filter: blur(6px);
+    }
+
+    .drawer-backdrop.open {
+      display: block;
+    }
+
+    .drawer {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: min(420px,92vw);
+      height: 100%;
+      padding: 22px;
+      background: #08111e;
+      border-left: 1px solid var(--border);
+      box-shadow: -20px 0 60px rgba(0,0,0,.45);
+      overflow-y: auto;
+    }
+
+    .drawer h2 {
+      margin: 7px 0 0;
+      font-size: 24px;
+    }
+
+    .drawer p {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 80;
+      max-width: 340px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(110,231,183,.2);
+      background: rgba(7,16,27,.96);
+      box-shadow: 0 20px 50px rgba(0,0,0,.45);
+      transform: translateY(120px);
+      opacity: 0;
+      transition: .24s ease;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    @media (max-width: 1180px) {
+      .metrics { grid-template-columns: repeat(3,minmax(0,1fr)); }
+      .grid-main { grid-template-columns: 1fr; }
+      .health-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    }
+
+    @media (max-width: 960px) {
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar {
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: 280px;
+        transform: translateX(-105%);
+        transition: .24s ease;
+        box-shadow: 20px 0 60px rgba(0,0,0,.5);
+      }
+      .sidebar.open { transform: translateX(0); }
+      .menu-button { display: inline-grid; place-items: center; }
+      .topbar { padding: 10px 14px; }
+      .content { padding: 16px; }
+      .hero { grid-template-columns: 1fr; }
+      .executive-card { width: 100%; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .quick-actions { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .org-level.level-3 { grid-template-columns: 1fr; }
+      .mobile-dock { display: grid; }
+      .footer { padding-bottom: 110px; }
+    }
+
+    @media (max-width: 680px) {
+      .mode-pill .mode-copy { display: none; }
+      .topbar-right .icon-button:first-child { display: none; }
+      .content { padding: 12px; }
+      .environment-strip { align-items: flex-start; }
+      .environment-strip .button { display: none; }
+      .hero, .page-heading, .card { padding: 17px; border-radius: 20px; }
+      .hero h1, .page-heading h1 { font-size: 32px; }
+      .metrics { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .company-grid { grid-template-columns: 1fr; }
+      .health-grid { grid-template-columns: 1fr 1fr; }
+      .quick-actions { grid-template-columns: 1fr; }
+      .org-level.level-2 { grid-template-columns: 1fr; }
+      .page-heading { align-items: flex-start; flex-direction: column; }
+      .list-row { align-items: flex-start; }
+      .row-action { align-self: center; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .001ms !important;
+        transition-duration: .001ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#" data-page="command">
+        <div class="brand-mark">C</div>
+        <div class="brand-copy">
+          <strong>Cyvora</strong>
+          <span>AI Command Center</span>
+        </div>
+      </a>
+
+      <nav class="nav-section" aria-label="Primary navigation">
+        <p class="nav-label">Command</p>
+        <div class="nav-list">
+          <button class="nav-button active" data-page="command">
+            <span class="nav-icon">⌂</span>
+            <span>Command Center</span>
+          </button>
+          <button class="nav-button" data-page="companies">
+            <span class="nav-icon">◫</span>
+            <span>Companies</span>
+          </button>
+          <button class="nav-button" data-page="headquarters">
+            <span class="nav-icon">⌘</span>
+            <span>Headquarters</span>
+          </button>
+          <button class="nav-button" data-page="approvals">
+            <span class="nav-icon">✓</span>
+            <span>Approvals</span>
+            <span class="nav-badge">3</span>
+          </button>
+        </div>
+      </nav>
+
+      <nav class="nav-section" aria-label="Operations navigation">
+        <p class="nav-label">Operations</p>
+        <div class="nav-list">
+          <button class="nav-button" data-page="harness">
+            <span class="nav-icon">⚙</span>
+            <span>Harness</span>
+          </button>
+          <button class="nav-button" data-page="warroom">
+            <span class="nav-icon">⚠</span>
+            <span>War Room</span>
+          </button>
+          <button class="nav-button" data-page="history">
+            <span class="nav-icon">↻</span>
+            <span>History</span>
+          </button>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="runtime-card">
+          <div class="runtime-row">
+            <strong>Static Showcase</strong>
+            <span class="runtime-dot"></span>
+          </div>
+          <p>All data is mocked. No private runtime, worker, credentials, or database is connected.</p>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-button" id="menuButton" aria-label="Open navigation">☰</button>
+          <div class="workspace-title">
+            <strong id="topbarTitle">Command Center</strong>
+            <span>Founder workspace · Cyvora preview</span>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="mode-pill">
+            <span class="runtime-dot"></span>
+            <span class="mode-copy">Demo Mode · Mocked</span>
+          </div>
+          <button class="icon-button" data-action="search" aria-label="Search">⌕</button>
+          <button class="icon-button" data-action="notifications" aria-label="Notifications">
+            ◉
+            <span class="alert-dot"></span>
+          </button>
+          <button class="avatar-button" data-action="profile" aria-label="Open founder profile">AP</button>
+        </div>
+      </header>
+
+      <main class="content">
+        <!-- COMMAND CENTER -->
+        <section class="page active" id="page-command">
+          <div class="environment-strip">
+            <p>
+              <strong>Static Showcase</strong> · Mock worker online · Demo companies · Approval-gated presentation
+            </p>
+            <button class="button" data-action="runtime">Runtime details</button>
+          </div>
+
+          <section class="hero">
+            <div>
+              <p class="eyebrow">Founder command surface</p>
+              <h1>Command Center</h1>
+              <p class="hero-copy">
+                See what your AI organization is doing, what needs your approval, which companies are active,
+                and what the Executive AI recommends next.
+              </p>
+              <div class="hero-actions">
+                <button class="button primary" data-action="new-mission">New Mission</button>
+                <button class="button" data-action="ask-ai">Ask Executive AI</button>
+              </div>
+            </div>
+
+            <aside class="executive-card">
+              <span class="status-pill violet">Executive AI</span>
+              <h3>Three actions need your attention</h3>
+              <p>
+                Content Studio is ready to begin production. Marketplace Research needs one revision, and
+                the YouTube connector is still waiting to be configured.
+              </p>
+              <div class="button-row">
+                <button class="button violet" data-page="approvals">Review priorities</button>
+              </div>
+            </aside>
+          </section>
+
+          <section class="metrics">
+            <div class="metric"><span>Companies</span><strong>4</strong><small>3 active · 1 building</small></div>
+            <div class="metric"><span>Active agents</span><strong>18</strong><small>Across 9 teams</small></div>
+            <div class="metric"><span>Tasks</span><strong>12</strong><small>5 in progress</small></div>
+            <div class="metric"><span>Approvals</span><strong>3</strong><small>1 high priority</small></div>
+            <div class="metric"><span>Incidents</span><strong>1</strong><small>Connector warning</small></div>
+            <div class="metric"><span>Today’s cost</span><strong>$4.20</strong><small>Mocked estimate</small></div>
+          </section>
+
+          <section class="grid-main">
+            <div class="card strong">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">Priority queue</p>
+                  <h2>Founder decisions</h2>
+                  <p>Only items requiring a decision or intervention appear here.</p>
+                </div>
+                <span class="status-pill amber">3 pending</span>
+              </div>
+
+              <div class="list">
+                <div class="list-row">
+                  <div class="list-main">
+                    <div class="list-icon" style="color:var(--gold)">!</div>
+                    <div class="list-copy">
+                      <strong>Approve Content Studio production phase</strong>
+                      <span>Medium risk · Estimated cost $0.42 · 7 tasks</span>
+                    </div>
+                  </div>
+                  <button class="row-action" data-page="approvals">Review</button>
+                </div>
+
+                <div class="list-row">
+                  <div class="list-main">
+                    <div class="list-icon" style="color:var(--violet)">AI</div>
+                    <div class="list-copy">
+                      <strong>Marketplace research needs revision</strong>
+                      <span>Consensus confidence 71% · Revenue assumptions unsupported</span>
+                    </div>
+                  </div>
+                  <button class="row-action" data-action="inspect-review">Inspect</button>
+                </div>
+
+                <div class="list-row">
+                  <div class="list-main">
+                    <div class="list-icon" style="color:var(--red)">×</div>
+                    <div class="list-copy">
+                      <strong>Connect YouTube Studio</strong>
+                      <span>Publishing remains blocked until credentials are added</span>
+                    </div>
+                  </div>
+                  <button class="row-action" data-action="connector">Connect</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">Live operations</p>
+                  <h2>What changed recently</h2>
+                </div>
+                <span class="status-pill cyan">Live</span>
+              </div>
+
+              <div class="timeline">
+                <div class="timeline-item">
+                  <div class="timeline-dot">✓</div>
+                  <div class="timeline-copy">
+                    <strong>Research Agent completed competitor scan</strong>
+                    <p>12 competitors analyzed and grouped by pricing strategy.</p>
+                    <time>2 minutes ago</time>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-dot">!</div>
+                  <div class="timeline-copy">
+                    <strong>Founder approval requested</strong>
+                    <p>Content Studio production plan is ready for review.</p>
+                    <time>8 minutes ago</time>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-dot">↻</div>
+                  <div class="timeline-copy">
+                    <strong>Worker claimed task #18</strong>
+                    <p>Software Lab started architecture validation.</p>
+                    <time>14 minutes ago</time>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-dot">×</div>
+                  <div class="timeline-copy">
+                    <strong>YouTube connector health check failed</strong>
+                    <p>Authentication has not been configured in this mock.</p>
+                    <time>22 minutes ago</time>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">Active companies</p>
+                  <h2>AI-operated businesses</h2>
+                </div>
+                <button class="row-action" data-page="companies">View all</button>
+              </div>
+
+              <div class="company-grid">
+                <article class="company-card">
+                  <div class="company-top">
+                    <h3>Content Studio</h3>
+                    <span class="status-pill emerald">Healthy</span>
+                  </div>
+                  <p>Audience research, content production, packaging, and publishing.</p>
+                  <div class="progress"><span style="width:78%"></span></div>
+                  <div class="company-meta"><span>5 agents</span><span>3 tasks</span><span>1 approval</span></div>
+                </article>
+
+                <article class="company-card">
+                  <div class="company-top">
+                    <h3>Software Lab</h3>
+                    <span class="status-pill cyan">Building</span>
+                  </div>
+                  <p>Product strategy, architecture, development, QA, and deployment.</p>
+                  <div class="progress"><span style="width:52%"></span></div>
+                  <div class="company-meta"><span>6 agents</span><span>4 tasks</span><span>0 incidents</span></div>
+                </article>
+
+                <article class="company-card">
+                  <div class="company-top">
+                    <h3>Marketplace Division</h3>
+                    <span class="status-pill amber">Attention</span>
+                  </div>
+                  <p>Trend research, digital products, listings, and marketplace operations.</p>
+                  <div class="progress"><span style="width:64%"></span></div>
+                  <div class="company-meta"><span>4 agents</span><span>2 tasks</span><span>1 review</span></div>
+                </article>
+
+                <article class="company-card">
+                  <div class="company-top">
+                    <h3>Research Group</h3>
+                    <span class="status-pill violet">Reviewing</span>
+                  </div>
+                  <p>Market intelligence, opportunity scoring, and decision support.</p>
+                  <div class="progress"><span style="width:88%"></span></div>
+                  <div class="company-meta"><span>3 agents</span><span>3 tasks</span><span>2 outputs</span></div>
+                </article>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">Mission composer</p>
+                  <h2>State the outcome once</h2>
+                  <p>The Executive AI expands it into a company, departments, agents, tasks, connectors, and approvals.</p>
+                </div>
+              </div>
+
+              <div class="composer">
+                <textarea id="missionInput">I want to build a YouTube business focused on practical AI tools for small business owners.</textarea>
+                <div class="quick-chips">
+                  <button class="quick-chip" data-prompt="I want to build a software lab.">Software lab</button>
+                  <button class="quick-chip" data-prompt="I want to build a marketplace division.">Marketplace</button>
+                  <button class="quick-chip" data-prompt="I want to build a consulting group.">Consulting</button>
+                  <button class="quick-chip" data-prompt="I want to build an AI music label.">Music label</button>
+                </div>
+                <div class="button-row">
+                  <button class="button primary" data-action="preview-mission">Preview organization</button>
+                  <button class="button" data-action="clear-mission">Clear</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">Approvals & risks</p>
+                  <h2>Control remains visible</h2>
+                </div>
+                <button class="row-action" data-page="approvals">Open queue</button>
+              </div>
+              <div class="list">
+                <div class="list-row">
+                  <div class="list-copy">
+                    <strong>Production phase approval</strong>
+                    <span>Content Studio · Medium risk · $0.42 estimate</span>
+                  </div>
+                  <span class="status-pill amber">Pending</span>
+                </div>
+                <div class="list-row">
+                  <div class="list-copy">
+                    <strong>Missing connector</strong>
+                    <span>YouTube Studio · Publishing blocked</span>
+                  </div>
+                  <span class="status-pill red">Blocked</span>
+                </div>
+                <div class="list-row">
+                  <div class="list-copy">
+                    <strong>War Room status</strong>
+                    <span>No critical incidents detected</span>
+                  </div>
+                  <span class="status-pill emerald">Nominal</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">Recent outputs</p>
+                  <h2>Latest artifacts</h2>
+                </div>
+                <button class="row-action" data-page="history">View history</button>
+              </div>
+              <div class="list">
+                <div class="list-row">
+                  <div class="list-main">
+                    <div class="list-icon">R</div>
+                    <div class="list-copy">
+                      <strong>Market Opportunity Report</strong>
+                      <span>Research · Candidate · 8 minutes ago</span>
+                    </div>
+                  </div>
+                  <button class="row-action" data-action="open-output">Open</button>
+                </div>
+                <div class="list-row">
+                  <div class="list-main">
+                    <div class="list-icon">P</div>
+                    <div class="list-copy">
+                      <strong>YouTube Launch Plan</strong>
+                      <span>Strategy · Awaiting approval</span>
+                    </div>
+                  </div>
+                  <button class="row-action" data-page="approvals">Review</button>
+                </div>
+                <div class="list-row">
+                  <div class="list-main">
+                    <div class="list-icon">D</div>
+                    <div class="list-copy">
+                      <strong>Landing Page Draft</strong>
+                      <span>Content · Final · Yesterday</span>
+                    </div>
+                  </div>
+                  <button class="row-action" data-action="open-output">Open</button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <!-- COMPANIES -->
+        <section class="page" id="page-companies">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">Portfolio operations</p>
+              <h1>Companies</h1>
+              <p>Inspect each AI-operated business, its current focus, health, tasks, connectors, and outputs.</p>
+            </div>
+            <button class="button primary" data-action="new-mission">Create company</button>
+          </div>
+
+          <div class="grid-2">
+            <div class="card strong">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">Content Studio</p>
+                  <h2>Audience and media operations</h2>
+                </div>
+                <span class="status-pill emerald">Healthy</span>
+              </div>
+              <div class="health-grid">
+                <div class="health-card"><span>Departments</span><strong>2</strong><span>Research · Production</span></div>
+                <div class="health-card"><span>Agents</span><strong>5</strong><span>4 active</span></div>
+                <div class="health-card"><span>Tasks</span><strong>3</strong><span>2 in progress</span></div>
+                <div class="health-card"><span>Outputs</span><strong>8</strong><span>2 awaiting approval</span></div>
+              </div>
+              <div class="list">
+                <div class="list-row"><div class="list-copy"><strong>Current focus</strong><span>YouTube topic research and launch planning</span></div><span class="status-pill cyan">Active</span></div>
+                <div class="list-row"><div class="list-copy"><strong>Connector readiness</strong><span>Drive ready · Analytics ready · YouTube missing</span></div><span class="status-pill amber">Partial</span></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">Software Lab</p>
+                  <h2>Product and engineering</h2>
+                </div>
+                <span class="status-pill cyan">Building</span>
+              </div>
+              <div class="health-grid">
+                <div class="health-card"><span>Departments</span><strong>4</strong><span>Strategy · Eng · QA · Deploy</span></div>
+                <div class="health-card"><span>Agents</span><strong>6</strong><span>5 active</span></div>
+                <div class="health-card"><span>Tasks</span><strong>4</strong><span>1 validating</span></div>
+                <div class="health-card"><span>Outputs</span><strong>12</strong><span>3 final</span></div>
+              </div>
+              <div class="list">
+                <div class="list-row"><div class="list-copy"><strong>Current focus</strong><span>Worker reliability and deployment architecture</span></div><span class="status-pill violet">Reviewing</span></div>
+                <div class="list-row"><div class="list-copy"><strong>Connector readiness</strong><span>GitHub ready · Fly ready · Sandbox planned</span></div><span class="status-pill amber">Partial</span></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">Marketplace Division</p>
+                  <h2>Digital product operations</h2>
+                </div>
+                <span class="status-pill amber">Attention</span>
+              </div>
+              <div class="list">
+                <div class="list-row"><div class="list-copy"><strong>Research report</strong><span>Needs revised demand evidence</span></div><span class="status-pill red">Blocked</span></div>
+                <div class="list-row"><div class="list-copy"><strong>Product pipeline</strong><span>3 concepts currently scored</span></div><span class="status-pill cyan">Active</span></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">Research Group</p>
+                  <h2>Intelligence and decision support</h2>
+                </div>
+                <span class="status-pill violet">Reviewing</span>
+              </div>
+              <div class="list">
+                <div class="list-row"><div class="list-copy"><strong>Latest decision</strong><span>Gumroad chosen as fastest route to revenue</span></div><span class="status-pill emerald">Passed</span></div>
+                <div class="list-row"><div class="list-copy"><strong>Consensus review</strong><span>Minority position preserved</span></div><span class="status-pill violet">Dissent</span></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- HEADQUARTERS -->
+        <section class="page" id="page-headquarters">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">Organization map</p>
+              <h1>Headquarters</h1>
+              <p>Navigate from Executive AI to companies, departments, teams, agents, tasks, and outputs.</p>
+            </div>
+            <button class="button" data-action="expand-org">Expand all</button>
+          </div>
+
+          <div class="card strong">
+            <div class="org-chart">
+              <div class="org-level">
+                <div class="org-node primary">
+                  <span class="status-pill violet">Central intelligence</span>
+                  <h3 style="margin-top:12px">Executive AI</h3>
+                  <p>Coordinates portfolio strategy, approvals, budgets, and operating priorities.</p>
+                </div>
+              </div>
+
+              <div class="org-connector"></div>
+
+              <div class="org-level level-2">
+                <div class="org-node">
+                  <h3>Content Studio</h3>
+                  <p>2 departments · 2 teams · 5 agents</p>
+                </div>
+                <div class="org-node">
+                  <h3>Software Lab</h3>
+                  <p>4 departments · 4 teams · 6 agents</p>
+                </div>
+              </div>
+
+              <div class="org-connector"></div>
+
+              <div class="org-level level-3">
+                <div class="org-node"><h3>Audience Research</h3><p>Trend Researcher · UX Researcher</p></div>
+                <div class="org-node"><h3>Creative Production</h3><p>Copywriter · Visual Storyteller · Brand Guardian</p></div>
+                <div class="org-node"><h3>Engineering</h3><p>Architect · Frontend · Backend · QA</p></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <div><p class="eyebrow">Selected node</p><h2>Content Studio</h2></div>
+                <span class="status-pill emerald">Healthy</span>
+              </div>
+              <div class="list">
+                <div class="list-row"><div class="list-copy"><strong>Current mission</strong><span>Launch a YouTube business</span></div></div>
+                <div class="list-row"><div class="list-copy"><strong>Active work</strong><span>3 tasks · 2 outputs · 1 approval</span></div></div>
+                <div class="list-row"><div class="list-copy"><strong>Required connectors</strong><span>YouTube · Drive · Analytics · Publishing Queue</span></div></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div><p class="eyebrow">Agent roster</p><h2>Active workers</h2></div>
+              </div>
+              <div class="list">
+                <div class="list-row"><div class="list-main"><div class="list-icon">TR</div><div class="list-copy"><strong>Product Trend Researcher</strong><span>Scanning market opportunities</span></div></div><span class="status-pill cyan">Working</span></div>
+                <div class="list-row"><div class="list-main"><div class="list-icon">CW</div><div class="list-copy"><strong>Copywriter</strong><span>Waiting for approved topic</span></div></div><span class="status-pill amber">Queued</span></div>
+                <div class="list-row"><div class="list-main"><div class="list-icon">BG</div><div class="list-copy"><strong>Brand Guardian</strong><span>Reviewing creative direction</span></div></div><span class="status-pill violet">Reviewing</span></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- APPROVALS -->
+        <section class="page" id="page-approvals">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">Founder control</p>
+              <h1>Approvals</h1>
+              <p>Review runtime plans, generated outputs, publishing actions, deployments, and other high-risk decisions.</p>
+            </div>
+            <span class="status-pill amber">3 pending</span>
+          </div>
+
+          <div class="card strong">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Request</th>
+                    <th>Company</th>
+                    <th>Type</th>
+                    <th>Risk</th>
+                    <th>Cost</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Content Studio production phase</td>
+                    <td>Content Studio</td>
+                    <td>Task execution</td>
+                    <td><span class="status-pill amber">Medium</span></td>
+                    <td>$0.42</td>
+                    <td><span class="status-pill amber">Pending</span></td>
+                    <td><button class="row-action" data-action="approve">Review</button></td>
+                  </tr>
+                  <tr>
+                    <td>Marketplace opportunity report</td>
+                    <td>Marketplace</td>
+                    <td>Result acceptance</td>
+                    <td><span class="status-pill violet">Review</span></td>
+                    <td>$0.27</td>
+                    <td><span class="status-pill red">Revision</span></td>
+                    <td><button class="row-action" data-action="inspect-review">Inspect</button></td>
+                  </tr>
+                  <tr>
+                    <td>Deploy worker reliability patch</td>
+                    <td>Software Lab</td>
+                    <td>Production deploy</td>
+                    <td><span class="status-pill red">High</span></td>
+                    <td>$0.18</td>
+                    <td><span class="status-pill amber">Pending</span></td>
+                    <td><button class="row-action" data-action="approve">Review</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- HARNESS -->
+        <section class="page" id="page-harness">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">Safe autonomous execution</p>
+              <h1>Harness</h1>
+              <p>Inspect the exact runtime plan, permissions, cost limits, validation rules, and rollback posture before work runs.</p>
+            </div>
+            <button class="button primary" data-action="new-request">New request</button>
+          </div>
+
+          <div class="grid-2">
+            <div class="card strong">
+              <div class="card-header">
+                <div><p class="eyebrow">Active request</p><h2>Worker reliability upgrade</h2></div>
+                <span class="status-pill violet">QA</span>
+              </div>
+              <div class="list">
+                <div class="list-row"><div class="list-copy"><strong>Plan</strong><span>Add task leases, heartbeat, stale recovery, and bounded retries</span></div><span class="status-pill emerald">Passed</span></div>
+                <div class="list-row"><div class="list-copy"><strong>Build</strong><span>Patch generated in isolated branch</span></div><span class="status-pill emerald">Passed</span></div>
+                <div class="list-row"><div class="list-copy"><strong>Diff</strong><span>7 files changed · 214 additions · 38 deletions</span></div><span class="status-pill emerald">Ready</span></div>
+                <div class="list-row"><div class="list-copy"><strong>QA</strong><span>Lint passed · Build passed · 2 tests pending</span></div><span class="status-pill amber">Running</span></div>
+                <div class="list-row"><div class="list-copy"><strong>Approval</strong><span>Founder review required before apply</span></div><span class="status-pill amber">Waiting</span></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div><p class="eyebrow">Runtime policy</p><h2>Execution boundaries</h2></div>
+              </div>
+              <div class="list">
+                <div class="list-row"><div class="list-copy"><strong>Model budget</strong><span>Maximum $0.25 per run</span></div><span class="status-pill cyan">Enforced</span></div>
+                <div class="list-row"><div class="list-copy"><strong>Tool scope</strong><span>Repository read/write · No external publishing</span></div><span class="status-pill amber">Limited</span></div>
+                <div class="list-row"><div class="list-copy"><strong>Rollback</strong><span>Git branch and reversible patch</span></div><span class="status-pill emerald">Ready</span></div>
+                <div class="list-row"><div class="list-copy"><strong>Sandbox</strong><span>Target architecture only in this mock</span></div><span class="status-pill red">Planned</span></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- WAR ROOM -->
+        <section class="page" id="page-warroom">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">Reliability and security</p>
+              <h1>War Room</h1>
+              <p>Monitor worker health, incidents, connector failures, blocked tasks, and operational recovery.</p>
+            </div>
+            <span class="status-pill amber">1 warning</span>
+          </div>
+
+          <div class="health-grid">
+            <div class="health-card"><span>Web service</span><strong style="color:var(--emerald)">Online</strong><span>Latency 83 ms</span></div>
+            <div class="health-card"><span>Worker</span><strong style="color:var(--emerald)">Online</strong><span>Last heartbeat 7 sec</span></div>
+            <div class="health-card"><span>Database</span><strong style="color:var(--emerald)">Connected</strong><span>SQLite mock</span></div>
+            <div class="health-card"><span>Connectors</span><strong style="color:var(--gold)">3 / 4</strong><span>YouTube unavailable</span></div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <div><p class="eyebrow">Active incident</p><h2>YouTube authentication missing</h2></div>
+                <span class="status-pill amber">Warning</span>
+              </div>
+              <p class="hero-copy">Publishing tasks remain blocked. Research and draft creation can continue safely.</p>
+              <div class="button-row">
+                <button class="button primary" data-action="connector">Resolve connector</button>
+                <button class="button" data-action="acknowledge">Acknowledge</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div><p class="eyebrow">Recovery posture</p><h2>System safeguards</h2></div>
+              </div>
+              <div class="list">
+                <div class="list-row"><div class="list-copy"><strong>Approval gates</strong><span>All risky actions require founder review</span></div><span class="status-pill emerald">Active</span></div>
+                <div class="list-row"><div class="list-copy"><strong>Budget ceiling</strong><span>Per-run and daily limits</span></div><span class="status-pill emerald">Active</span></div>
+                <div class="list-row"><div class="list-copy"><strong>Task recovery</strong><span>Shown as target capability in this mock</span></div><span class="status-pill violet">Planned</span></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- HISTORY -->
+        <section class="page" id="page-history">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">Audit and execution archive</p>
+              <h1>History</h1>
+              <p>Review missions, approvals, task transitions, outputs, failures, cost estimates, and rollback posture.</p>
+            </div>
+            <button class="button" data-action="export">Export report</button>
+          </div>
+
+          <div class="card strong">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Run</th>
+                    <th>Objective</th>
+                    <th>Mode</th>
+                    <th>Status</th>
+                    <th>Cost</th>
+                    <th>Rollback</th>
+                    <th>Started</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>#1042</td>
+                    <td>Launch Content Studio research phase</td>
+                    <td>Demo</td>
+                    <td><span class="status-pill emerald">Completed</span></td>
+                    <td>$0.42</td>
+                    <td><span class="status-pill emerald">Ready</span></td>
+                    <td>Today 10:31</td>
+                  </tr>
+                  <tr>
+                    <td>#1041</td>
+                    <td>Review marketplace product opportunity</td>
+                    <td>Demo</td>
+                    <td><span class="status-pill red">Revision</span></td>
+                    <td>$0.27</td>
+                    <td><span class="status-pill cyan">N/A</span></td>
+                    <td>Today 09:48</td>
+                  </tr>
+                  <tr>
+                    <td>#1040</td>
+                    <td>Generate worker reliability plan</td>
+                    <td>Local</td>
+                    <td><span class="status-pill violet">QA</span></td>
+                    <td>$0.18</td>
+                    <td><span class="status-pill emerald">Git branch</span></td>
+                    <td>Yesterday 18:12</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <footer class="footer">
+          Cyvora AI · Full App Static Showcase · All data and interactions are mocked for presentation
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <nav class="mobile-dock" aria-label="Mobile navigation">
+    <button class="dock-button active" data-page="command">⌂<span>Command</span></button>
+    <button class="dock-button" data-page="companies">◫<span>Companies</span></button>
+    <button class="dock-button" data-action="new-mission">＋<span>New</span></button>
+    <button class="dock-button" data-page="approvals">✓<span>Approvals</span></button>
+    <button class="dock-button" data-page="warroom">⚠<span>More</span></button>
+  </nav>
+
+  <div class="drawer-backdrop" id="drawerBackdrop" aria-hidden="true">
+    <aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+      <button class="button" id="closeDrawer">Close</button>
+      <p class="eyebrow" style="margin-top:22px">Static preview</p>
+      <h2 id="drawerTitle">Cyvora detail</h2>
+      <div id="drawerContent"></div>
+    </aside>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const pages = {
+      command: "Command Center",
+      companies: "Companies",
+      headquarters: "Headquarters",
+      approvals: "Approvals",
+      harness: "Harness",
+      warroom: "War Room",
+      history: "History"
+    };
+
+    const sidebar = document.getElementById("sidebar");
+    const menuButton = document.getElementById("menuButton");
+    const topbarTitle = document.getElementById("topbarTitle");
+    const drawerBackdrop = document.getElementById("drawerBackdrop");
+    const drawerTitle = document.getElementById("drawerTitle");
+    const drawerContent = document.getElementById("drawerContent");
+    const closeDrawer = document.getElementById("closeDrawer");
+    const toast = document.getElementById("toast");
+    const missionInput = document.getElementById("missionInput");
+
+    function showPage(pageName) {
+      if (!pages[pageName]) return;
+
+      document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
+      document.querySelectorAll("[data-page]").forEach(button => button.classList.remove("active"));
+
+      const page = document.getElementById(`page-${pageName}`);
+      if (page) page.classList.add("active");
+
+      document.querySelectorAll(`[data-page="${pageName}"]`).forEach(button => button.classList.add("active"));
+      topbarTitle.textContent = pages[pageName];
+      sidebar.classList.remove("open");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => toast.classList.remove("show"), 2600);
+    }
+
+    function openDrawer(title, html) {
+      drawerTitle.textContent = title;
+      drawerContent.innerHTML = html;
+      drawerBackdrop.classList.add("open");
+      drawerBackdrop.setAttribute("aria-hidden", "false");
+    }
+
+    function closeDetailDrawer() {
+      drawerBackdrop.classList.remove("open");
+      drawerBackdrop.setAttribute("aria-hidden", "true");
+    }
+
+    document.querySelectorAll("[data-page]").forEach(button => {
+      button.addEventListener("click", event => {
+        event.preventDefault();
+        showPage(button.dataset.page);
+      });
+    });
+
+    document.querySelectorAll("[data-prompt]").forEach(button => {
+      button.addEventListener("click", () => {
+        missionInput.value = button.dataset.prompt;
+        missionInput.focus();
+      });
+    });
+
+    document.querySelectorAll("[data-action]").forEach(button => {
+      button.addEventListener("click", () => {
+        const action = button.dataset.action;
+
+        if (action === "new-mission") {
+          showPage("command");
+          missionInput.focus();
+          missionInput.scrollIntoView({ behavior: "smooth", block: "center" });
+          return;
+        }
+
+        if (action === "ask-ai") {
+          openDrawer(
+            "Ask Executive AI",
+            `
+              <p>This is a safe mocked interaction. In the live product, this panel would query the Executive AI using your current company, task, approval, and cost context.</p>
+              <div class="composer">
+                <textarea placeholder="Ask about priorities, risks, costs, or next actions...">What should I approve next?</textarea>
+                <div class="button-row">
+                  <button class="button primary" onclick="showToast('Mock Executive AI response generated')">Ask</button>
+                </div>
+              </div>
+            `
+          );
+          return;
+        }
+
+        if (action === "runtime") {
+          openDrawer(
+            "Runtime Details",
+            `
+              <div class="list">
+                <div class="list-row"><div class="list-copy"><strong>Mode</strong><span>Static showcase</span></div><span class="status-pill cyan">Mocked</span></div>
+                <div class="list-row"><div class="list-copy"><strong>Worker</strong><span>Presentation-only status</span></div><span class="status-pill emerald">Online</span></div>
+                <div class="list-row"><div class="list-copy"><strong>Database</strong><span>No live database connected</span></div><span class="status-pill violet">Demo</span></div>
+                <div class="list-row"><div class="list-copy"><strong>Credentials</strong><span>No secrets loaded</span></div><span class="status-pill emerald">Safe</span></div>
+              </div>
+            `
+          );
+          return;
+        }
+
+        if (action === "notifications") {
+          openDrawer(
+            "Notifications",
+            `
+              <div class="list">
+                <div class="list-row"><div class="list-copy"><strong>Approval requested</strong><span>Content Studio production phase</span></div></div>
+                <div class="list-row"><div class="list-copy"><strong>Review needs revision</strong><span>Marketplace opportunity report</span></div></div>
+                <div class="list-row"><div class="list-copy"><strong>Connector warning</strong><span>YouTube authentication missing</span></div></div>
+              </div>
+            `
+          );
+          return;
+        }
+
+        if (action === "profile") {
+          openDrawer(
+            "Founder Workspace",
+            `
+              <p>Anderson Paulino · Founder · Cyvora</p>
+              <div class="list">
+                <div class="list-row"><div class="list-copy"><strong>Workspace</strong><span>Default founder organization</span></div></div>
+                <div class="list-row"><div class="list-copy"><strong>Permissions</strong><span>Owner · Approver · Operator</span></div></div>
+                <div class="list-row"><div class="list-copy"><strong>Session</strong><span>Static showcase only</span></div></div>
+              </div>
+            `
+          );
+          return;
+        }
+
+        if (action === "preview-mission") {
+          const objective = missionInput.value.trim() || "Untitled business objective";
+          openDrawer(
+            "Mission Preview",
+            `
+              <p><strong>Objective:</strong> ${objective.replace(/[<>&]/g, "")}</p>
+              <div class="list">
+                <div class="list-row"><div class="list-copy"><strong>Proposed company</strong><span>Content Studio</span></div></div>
+                <div class="list-row"><div class="list-copy"><strong>Organization</strong><span>2 departments · 2 teams · 5 agents</span></div></div>
+                <div class="list-row"><div class="list-copy"><strong>Connectors</strong><span>YouTube · Drive · Analytics · Publishing Queue</span></div></div>
+                <div class="list-row"><div class="list-copy"><strong>Estimated next-stage cost</strong><span>$0.42 mocked estimate</span></div></div>
+              </div>
+              <div class="button-row">
+                <button class="button primary" onclick="showToast('Mock mission created safely')">Create mock mission</button>
+              </div>
+            `
+          );
+          return;
+        }
+
+        if (action === "clear-mission") {
+          missionInput.value = "";
+          showToast("Mission composer cleared");
+          return;
+        }
+
+        if (action === "approve") {
+          openDrawer(
+            "Approval Review",
+            `
+              <p>This mock review shows how Cyvora presents risk, scope, cost, and rollback posture before an action is approved.</p>
+              <div class="list">
+                <div class="list-row"><div class="list-copy"><strong>Risk</strong><span>Medium</span></div></div>
+                <div class="list-row"><div class="list-copy"><strong>Estimated cost</strong><span>$0.42</span></div></div>
+                <div class="list-row"><div class="list-copy"><strong>External actions</strong><span>None until separate publish approval</span></div></div>
+                <div class="list-row"><div class="list-copy"><strong>Rollback</strong><span>Draft outputs can be discarded</span></div></div>
+              </div>
+              <div class="button-row">
+                <button class="button primary" onclick="showToast('Mock approval recorded')">Approve</button>
+                <button class="button danger" onclick="showToast('Mock request rejected')">Reject</button>
+              </div>
+            `
+          );
+          return;
+        }
+
+        if (action === "inspect-review") {
+          openDrawer(
+            "Consensus Review",
+            `
+              <p>The candidate result is promising but needs revision before acceptance.</p>
+              <div class="list">
+                <div class="list-row"><div class="list-copy"><strong>Confidence</strong><span>71%</span></div><span class="status-pill amber">Review</span></div>
+                <div class="list-row"><div class="list-copy"><strong>Blocking finding</strong><span>Revenue assumptions are not supported by recent evidence.</span></div></div>
+                <div class="list-row"><div class="list-copy"><strong>Preserved dissent</strong><span>One reviewer supports a limited low-cost market test.</span></div></div>
+              </div>
+              <div class="button-row">
+                <button class="button primary" onclick="showToast('Revision requested')">Request revision</button>
+              </div>
+            `
+          );
+          return;
+        }
+
+        if (action === "connector") {
+          openDrawer(
+            "Connector Setup",
+            `
+              <p>This static showcase never requests or stores credentials.</p>
+              <div class="mock-banner">In the live app, connector credentials would be handled through a secure server-side secret store and explicit permission scopes.</div>
+              <div class="button-row">
+                <button class="button" onclick="showToast('Connector setup is disabled in static mode')">Continue</button>
+              </div>
+            `
+          );
+          return;
+        }
+
+        if (action === "open-output") {
+          openDrawer(
+            "Output Preview",
+            `
+              <p><strong>Market Opportunity Report</strong></p>
+              <p>This mocked report summarizes market demand, competitor positioning, pricing, risks, and the recommended first experiment.</p>
+              <div class="mock-banner">Candidate output · Requires review before becoming final.</div>
+            `
+          );
+          return;
+        }
+
+        if (action === "acknowledge") {
+          showToast("Mock incident acknowledged");
+          return;
+        }
+
+        if (action === "export") {
+          showToast("Mock audit report prepared");
+          return;
+        }
+
+        if (action === "expand-org") {
+          showToast("Organization expanded in preview");
+          return;
+        }
+
+        if (action === "new-request") {
+          openDrawer(
+            "New Harness Request",
+            `
+              <p>Describe a software or operational change. The live system would produce a plan, diff, QA result, approval package, and reversible apply step.</p>
+              <div class="composer">
+                <textarea>Add worker leases, heartbeat, and stale-task recovery.</textarea>
+                <div class="button-row">
+                  <button class="button primary" onclick="showToast('Mock Harness request created')">Create request</button>
+                </div>
+              </div>
+            `
+          );
+          return;
+        }
+
+        showToast("Static showcase action");
+      });
+    });
+
+    menuButton.addEventListener("click", () => sidebar.classList.toggle("open"));
+    closeDrawer.addEventListener("click", closeDetailDrawer);
+    drawerBackdrop.addEventListener("click", event => {
+      if (event.target === drawerBackdrop) closeDetailDrawer();
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") {
+        closeDetailDrawer();
+        sidebar.classList.remove("open");
+      }
+    });
+  </script>
+</body>
+</html>

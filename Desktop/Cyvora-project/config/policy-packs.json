@@ -1,0 +1,48 @@
+{
+  "version": "1.0.0",
+  "defaultPack": "founder-safe",
+  "packs": [
+    {
+      "id": "founder-safe",
+      "name": "Founder Safe",
+      "summary": "Zero-cost default. Reads may run, drafts are simulated, and consequential actions require founder approval.",
+      "autoApproveRisks": ["low"],
+      "approvalRisks": ["medium", "high", "critical"],
+      "blockedSideEffects": [],
+      "approvalSideEffects": ["publish", "financial", "destructive", "read_sensitive"],
+      "maxAutoCostUsd": 0,
+      "allowPaidAi": false,
+      "allowRealConnectors": false,
+      "sensitiveExternalRule": "require_approval",
+      "criticalRule": "require_approval"
+    },
+    {
+      "id": "balanced",
+      "name": "Balanced",
+      "summary": "Allows low-risk reads and reversible drafts while retaining approval for publishing, finance, destructive actions, and sensitive data.",
+      "autoApproveRisks": ["low", "medium"],
+      "approvalRisks": ["high", "critical"],
+      "blockedSideEffects": [],
+      "approvalSideEffects": ["publish", "financial", "destructive", "read_sensitive"],
+      "maxAutoCostUsd": 0,
+      "allowPaidAi": false,
+      "allowRealConnectors": false,
+      "sensitiveExternalRule": "require_approval",
+      "criticalRule": "require_approval"
+    },
+    {
+      "id": "locked-down",
+      "name": "Locked Down",
+      "summary": "Everything beyond public read-only discovery requires approval; financial and destructive operations are blocked.",
+      "autoApproveRisks": ["low"],
+      "approvalRisks": ["medium", "high"],
+      "blockedSideEffects": ["financial", "destructive"],
+      "approvalSideEffects": ["write", "publish", "read_sensitive"],
+      "maxAutoCostUsd": 0,
+      "allowPaidAi": false,
+      "allowRealConnectors": false,
+      "sensitiveExternalRule": "require_approval",
+      "criticalRule": "block"
+    }
+  ]
+}
