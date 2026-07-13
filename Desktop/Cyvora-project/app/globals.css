@@ -306,15 +306,15 @@ body {
 
 .cyvora-mobile-dock {
   position: fixed;
-  inset: auto 0.75rem 0.75rem;
+  inset: auto 0 0 0;
   z-index: 60;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 0.35rem;
-  padding: 0.45rem;
-  padding-bottom: calc(env(safe-area-inset-bottom) + 0.45rem);
+  gap: 0.28rem;
+  padding: 0.35rem 0.35rem calc(env(safe-area-inset-bottom) + 0.35rem);
   border: 1px solid rgba(210, 226, 255, 0.09);
-  border-radius: 1.2rem;
+  border-bottom: 0;
+  border-radius: 1.1rem 1.1rem 0 0;
   background: rgba(7, 16, 27, 0.94);
   box-shadow: 0 20px 48px rgba(0, 0, 0, 0.48);
   backdrop-filter: blur(22px);
@@ -347,8 +347,8 @@ body {
   to { transform: translateX(0); }
 }
 
-@media (max-width: 1023px) {
-  body { padding-bottom: 5.5rem; }
+@media (max-width: 639px) {
+  body { padding-bottom: 5.15rem; }
 }
 
 /* Phase 4 — Cyvora operating-system controls */

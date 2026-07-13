@@ -1,0 +1,10 @@
+# Phase 0 dependencies
+crewai==0.34.1
+anthropic==0.28.0
+pydantic==2.5.3
+python-dotenv==1.0.0
+requests==2.31.0
+
+# Optional: for TikTok/YouTube API wrappers (Phase 1)
+# youtube-api==1.4.11
+# tiktok-api==0.1.0

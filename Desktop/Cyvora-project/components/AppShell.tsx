@@ -71,19 +71,15 @@ type SidebarContentProps = {
   runtime: ReturnType<typeof getRuntimeModeInfo>;
   health: 'online' | 'degraded';
   avgLatency: string;
-  mobile?: boolean;
-  collapsed: boolean;
-  onToggleCollapsed: () => void;
 };
 
-function SidebarContent({ pathname, runtime, health, avgLatency, mobile = false, collapsed, onToggleCollapsed }: SidebarContentProps) {
+function SidebarContent({ pathname, runtime, health, avgLatency }: SidebarContentProps) {
   return <>
     <div className="flex items-center gap-2">
       <Link href="/" className="cyvora-shell-brand min-w-0 flex-1" aria-label="Cyvora Home">
         <span className="cyvora-shell-mark"><Image src="/cyvora-mark.svg" alt="" width={34} height={34} className="h-8 w-8" /></span>
         <span className="cyvora-sidebar-copy min-w-0 leading-tight"><span className="block text-[15px] font-semibold tracking-[0.02em] text-white">Cyvora</span><span className="mt-1 block truncate text-[9px] uppercase tracking-[0.22em] text-cyan-200/75">AI Business OS</span></span>
       </Link>
-      {!mobile ? <button onClick={onToggleCollapsed} className="cyvora-shell-icon-button cyvora-collapse-button" aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'} title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}><Icon name="collapse" className={`h-4 w-4 transition ${collapsed ? 'rotate-180' : ''}`} /></button> : null}
     </div>
     <nav className="mt-6" aria-label="Primary navigation"><p className="cyvora-shell-nav-label cyvora-sidebar-copy">Workspace</p><div className="space-y-1.5">{primaryLinks.map((link) => <Link key={link.href} href={link.href} title={link.label} className={`cyvora-shell-nav-item ${isActive(pathname, link.href) ? 'is-active' : ''}`}><span className="cyvora-shell-nav-icon"><Icon name={link.icon} /></span><span className="cyvora-sidebar-copy truncate">{link.label}</span></Link>)}</div></nav>
     <nav className="mt-7" aria-label="Governance navigation"><p className="cyvora-shell-nav-label cyvora-sidebar-copy">Governance</p><div className="space-y-1.5">{governanceLinks.map((link) => <Link key={link.href} href={link.href} title={link.label} className={`cyvora-shell-nav-item ${isActive(pathname, link.href) ? 'is-active' : ''}`}><span className="cyvora-shell-nav-icon"><Icon name={link.icon} /></span><span className="cyvora-sidebar-copy truncate">{link.label}</span></Link>)}</div></nav>
@@ -96,16 +92,10 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const runtime = getRuntimeModeInfo();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [collapsed, setCollapsed] = useState(true);
   const [avgLatency, setAvgLatency] = useState('—');
   const [health, setHealth] = useState<'online' | 'degraded'>('online');
   const title = useMemo(() => pageTitle(pathname), [pathname]);
   const publicRoute = pathname.startsWith('/unlock');
-
-  useEffect(() => {
-    const saved = window.localStorage.getItem('cyvora.sidebarCollapsed');
-    setCollapsed(saved === null ? true : saved === 'true');
-  }, []);
 
   useEffect(() => { setDrawerOpen(false); }, [pathname]);
   useEffect(() => {
@@ -122,22 +112,14 @@ export default function AppShell({ children }: { children: ReactNode }) {
     return () => { alive = false; };
   }, [publicRoute]);
 
-  function toggleCollapsed() {
-    setCollapsed((current) => {
-      const next = !current;
-      window.localStorage.setItem('cyvora.sidebarCollapsed', String(next));
-      return next;
-    });
-  }
-
   if (publicRoute) return <>{children}</>;
 
-  return <div className={`cyvora-app-shell ${collapsed ? 'cyvora-shell-is-collapsed' : ''}`}>
-    <aside className="cyvora-app-sidebar hidden lg:flex"><SidebarContent pathname={pathname} runtime={runtime} health={health} avgLatency={avgLatency} collapsed={collapsed} onToggleCollapsed={toggleCollapsed} /></aside>
-    {drawerOpen ? <div className="fixed inset-0 z-[80] lg:hidden" role="dialog" aria-modal="true" aria-label="Navigation"><button className="absolute inset-0 bg-slate-950/75 backdrop-blur-sm" onClick={() => setDrawerOpen(false)} aria-label="Close navigation" /><aside className="cyvora-app-sidebar relative flex h-full w-[min(19rem,88vw)]"><button onClick={() => setDrawerOpen(false)} className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/[0.035] text-slate-300" aria-label="Close navigation"><Icon name="close" /></button><SidebarContent pathname={pathname} runtime={runtime} health={health} avgLatency={avgLatency} mobile collapsed={false} onToggleCollapsed={toggleCollapsed} /></aside></div> : null}
+  return <div className="cyvora-app-shell">
+    <aside className="cyvora-app-sidebar hidden lg:flex"><SidebarContent pathname={pathname} runtime={runtime} health={health} avgLatency={avgLatency} /></aside>
+    {drawerOpen ? <div className="fixed inset-0 z-[80] lg:hidden" role="dialog" aria-modal="true" aria-label="Navigation"><button className="absolute inset-0 bg-slate-950/75 backdrop-blur-sm" onClick={() => setDrawerOpen(false)} aria-label="Close navigation" /><aside className="cyvora-app-sidebar relative flex h-full w-[min(19rem,88vw)]"><button onClick={() => setDrawerOpen(false)} className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/[0.035] text-slate-300" aria-label="Close navigation"><Icon name="close" /></button><SidebarContent pathname={pathname} runtime={runtime} health={health} avgLatency={avgLatency} /></aside></div> : null}
 
     <div className="cyvora-shell-main min-w-0">
-      <header className="cyvora-app-topbar"><div className="flex min-w-0 items-center gap-3"><button onClick={() => setDrawerOpen(true)} className="cyvora-shell-icon-button lg:hidden" aria-label="Open navigation"><Icon name="menu" /></button><button onClick={toggleCollapsed} className="cyvora-shell-icon-button hidden lg:grid" aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}><Icon name="menu" /></button><div className="min-w-0"><div className="flex items-center gap-2 text-[10px] text-slate-600"><Link href="/">Cyvora</Link><span>/</span><span className="text-cyan-100/70">{title}</span></div><p className="mt-1 truncate text-sm font-semibold text-white">{title}</p></div></div>
+      <header className="cyvora-app-topbar"><div className="flex min-w-0 items-center gap-3"><button onClick={() => setDrawerOpen(true)} className="cyvora-shell-icon-button lg:hidden" aria-label="Open navigation"><Icon name="menu" /></button><div className="min-w-0"><div className="flex items-center gap-2 text-[10px] text-slate-600"><Link href="/">Cyvora</Link><span>/</span><span className="text-cyan-100/70">{title}</span></div><p className="mt-1 truncate text-sm font-semibold text-white">{title}</p></div></div>
         <div className="flex items-center gap-2"><button onClick={() => window.dispatchEvent(new Event('cyvora:commands'))} className="cyvora-shell-search hidden sm:flex" aria-label="Open command palette"><Icon name="search" /><span>Search</span><kbd>⌘K</kbd></button><button onClick={() => window.dispatchEvent(new Event('cyvora:notifications'))} className="cyvora-shell-icon-button relative" aria-label="Notifications"><Icon name="bell" /><span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-rose-400" /></button><button onClick={() => window.dispatchEvent(new Event('cyvora:workspace'))} className="grid h-10 w-10 place-items-center rounded-xl border border-cyan-300/15 bg-cyan-300/[0.06] text-xs font-bold text-cyan-100">AP</button></div>
       </header>
       <div className="cyvora-app-content">{children}</div>
