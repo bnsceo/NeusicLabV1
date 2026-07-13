@@ -27,6 +27,8 @@ logs/
 tenants/
 mission_briefing.md
 mission_status.json
+!app/api/tenants/
+!app/api/tenants/route.ts
 
 # debug
 npm-debug.log*
