@@ -8,7 +8,7 @@ import MobileDock from '@/components/MobileDock';
 import OperatingSystemControls from '@/components/OperatingSystemControls';
 import { getRuntimeModeInfo } from '@/lib/runtimeMode';
 
-type IconName = 'home' | 'command' | 'executive' | 'briefing' | 'companies' | 'agents' | 'headquarters' | 'connectors' | 'policies' | 'harness' | 'warroom' | 'history' | 'menu' | 'bell' | 'search' | 'close' | 'collapse';
+type IconName = 'home' | 'command' | 'executive' | 'briefing' | 'companies' | 'agents' | 'headquarters' | 'connectors' | 'policies' | 'harness' | 'warroom' | 'history' | 'menu' | 'bell' | 'search' | 'collapse';
 
 function Icon({ name, className = 'h-4 w-4' }: { name: IconName; className?: string }) {
   const paths: Record<IconName, ReactNode> = {
@@ -27,7 +27,6 @@ function Icon({ name, className = 'h-4 w-4' }: { name: IconName; className?: str
     menu: <><path d="M4 7h16M4 12h16M4 17h16"/></>,
     bell: <><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></>,
     search: <><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></>,
-    close: <><path d="m6 6 12 12M18 6 6 18"/></>,
     collapse: <><path d="m14 6-6 6 6 6"/><path d="M20 4v16"/></>,
   };
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden>{paths[name]}</svg>;
@@ -115,10 +114,10 @@ export default function AppShell({ children }: { children: ReactNode }) {
   if (publicRoute) return <>{children}</>;
 
   return <div className="cyvora-app-shell">
-    {drawerOpen ? <div className="fixed inset-0 z-[80]" role="dialog" aria-modal="true" aria-label="Navigation"><button className="absolute inset-0 bg-slate-950/75 backdrop-blur-sm" onClick={() => setDrawerOpen(false)} aria-label="Close navigation" /><aside className="cyvora-app-sidebar relative flex h-full w-[min(19rem,88vw)]"><button onClick={() => setDrawerOpen(false)} className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/[0.035] text-slate-300" aria-label="Close navigation"><Icon name="close" /></button><SidebarContent pathname={pathname} runtime={runtime} health={health} avgLatency={avgLatency} /></aside></div> : null}
+    {drawerOpen ? <div className="fixed inset-0 z-[80] flex justify-start pointer-events-none" role="dialog" aria-label="Navigation"><aside className="cyvora-app-sidebar pointer-events-auto relative flex h-full w-[min(19rem,88vw)]"><SidebarContent pathname={pathname} runtime={runtime} health={health} avgLatency={avgLatency} /></aside></div> : null}
 
     <div className="cyvora-shell-main min-w-0">
-      <header className="cyvora-app-topbar"><div className="flex min-w-0 items-center gap-3"><button onClick={() => setDrawerOpen((current) => !current)} className="cyvora-shell-icon-button" aria-label={drawerOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={drawerOpen}><Icon name={drawerOpen ? 'close' : 'menu'} /></button><div className="min-w-0"><div className="flex items-center gap-2 text-[10px] text-slate-600"><Link href="/">Cyvora</Link><span>/</span><span className="text-cyan-100/70">{title}</span></div><p className="mt-1 truncate text-sm font-semibold text-white">{title}</p></div></div>
+      <header className="cyvora-app-topbar"><div className="flex min-w-0 items-center gap-3"><button onClick={() => setDrawerOpen((current) => !current)} className="cyvora-shell-icon-button" aria-label="Toggle navigation" aria-expanded={drawerOpen}><Icon name="menu" /></button><div className="min-w-0"><div className="flex items-center gap-2 text-[10px] text-slate-600"><Link href="/">Cyvora</Link><span>/</span><span className="text-cyan-100/70">{title}</span></div><p className="mt-1 truncate text-sm font-semibold text-white">{title}</p></div></div>
         <div className="flex items-center gap-2"><button onClick={() => window.dispatchEvent(new Event('cyvora:commands'))} className="cyvora-shell-search hidden sm:flex" aria-label="Open command palette"><Icon name="search" /><span>Search</span><kbd>⌘K</kbd></button><button onClick={() => window.dispatchEvent(new Event('cyvora:notifications'))} className="cyvora-shell-icon-button relative" aria-label="Notifications"><Icon name="bell" /><span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-rose-400" /></button><button onClick={() => window.dispatchEvent(new Event('cyvora:workspace'))} className="grid h-10 w-10 place-items-center rounded-xl border border-cyan-300/15 bg-cyan-300/[0.06] text-xs font-bold text-cyan-100">AP</button></div>
       </header>
       <div className="cyvora-app-content">{children}</div>
