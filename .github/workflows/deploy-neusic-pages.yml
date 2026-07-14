@@ -28,31 +28,52 @@ jobs:
       - name: Prepare production site
         run: |
           rm -rf _site
-          mkdir -p _site/studio _site/wave-loom
+          mkdir -p _site/studio _site/wave-loom _site/studio-v2
           cp index.html _site/index.html
           cp -R app/. _site/studio/
           cp -R wave-loom/. _site/wave-loom/
+          cp -R studio-v2/. _site/studio-v2/
           mv _site/studio/index.html _site/studio/core.html
           mv _site/studio/phase-a.html _site/studio/index.html
           python - <<'PY'
           from pathlib import Path
-          page = Path('_site/index.html')
-          html = page.read_text()
+
+          creator_style = '''<style id="neusic-creator-credit-style">
+          .neusic-creator-credit{position:fixed;z-index:100000;pointer-events:none;color:rgba(196,225,232,.52);font:700 7px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;text-shadow:0 1px 6px #000}.neusic-creator-top{top:5px;left:10px}.neusic-creator-bottom{right:10px;bottom:7px}
+          </style>'''
+          creator_markup = '<div class="neusic-creator-credit neusic-creator-top" data-neusic-creator>Made by Anderson Paulino</div><div class="neusic-creator-credit neusic-creator-bottom" data-neusic-creator>Made by Anderson Paulino</div>'
+
+          landing = Path('_site/index.html')
+          html = landing.read_text()
           html = html.replace(
               '<div class="actions">',
-              '<div class="actions"><a class="btn" href="./wave-loom/">Wave Loom Lab</a>',
+              '<div class="actions"><a class="btn" href="./studio-v2/">Studio v2 Lab</a><a class="btn" href="./wave-loom/">Wave Loom Lab</a>',
               1,
           )
           html = html.replace(
               '<div class="hero-actions">',
-              '<div class="hero-actions"><a class="btn" href="./wave-loom/">Enter Wave Loom Lab <span aria-hidden="true">✦</span></a>',
+              '<div class="hero-actions"><a class="btn" href="./studio-v2/">Enter Studio v2 <span aria-hidden="true">✦</span></a><a class="btn" href="./wave-loom/">Open Wave Loom <span aria-hidden="true">⌁</span></a>',
               1,
           )
-          page.write_text(html)
+          landing.write_text(html)
+
+          for page in Path('_site').rglob('*.html'):
+              html = page.read_text()
+              if 'data-neusic-creator' in html:
+                  continue
+              if '</head>' in html:
+                  html = html.replace('</head>', creator_style + '</head>', 1)
+              body_at = html.find('<body')
+              if body_at >= 0:
+                  body_end = html.find('>', body_at)
+                  if body_end >= 0:
+                      html = html[:body_end + 1] + creator_markup + html[body_end + 1:]
+              page.write_text(html)
           PY
           touch _site/.nojekyll
           touch _site/studio/.nojekyll
           touch _site/wave-loom/.nojekyll
+          touch _site/studio-v2/.nojekyll
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
