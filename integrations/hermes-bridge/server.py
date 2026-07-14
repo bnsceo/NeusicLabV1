@@ -25,7 +25,7 @@ PROFILE = os.getenv("NEUSIC_HERMES_PROFILE", "").strip()
 MODEL = os.getenv("NEUSIC_HERMES_MODEL", "").strip()
 PROVIDER = os.getenv("NEUSIC_HERMES_PROVIDER", "").strip()
 TOKEN = os.getenv("NEUSIC_HERMES_TOKEN", "").strip()
-TIMEOUT = int(os.getenv("NEUSIC_HERMES_TIMEOUT", "90"))
+TIMEOUT = int(os.getenv("NEUSIC_HERMES_TIMEOUT", "120"))
 MAX_BODY = int(os.getenv("NEUSIC_HERMES_MAX_BODY", "65536"))
 SERVE_APP = os.getenv("NEUSIC_SERVE_APP", "0").lower() in {"1", "true", "yes"}
 ALLOWED = {
@@ -71,9 +71,24 @@ def hermes_command(prompt: str) -> list[str]:
     return command
 
 
-def verify_hermes() -> tuple[bool, str]:
-    if not shutil.which("hermes"):
+def verify_hermes(deep: bool = False) -> tuple[bool, str]:
+    executable = shutil.which("hermes")
+    if not executable:
         return False, "Hermes CLI is not installed or is not on PATH."
+    if not deep:
+        try:
+            run = subprocess.run(
+                [executable, "--version"],
+                capture_output=True,
+                text=True,
+                timeout=8,
+                check=False,
+                env=os.environ.copy(),
+            )
+        except subprocess.TimeoutExpired:
+            return True, "Hermes is installed; the version check was slow."
+        detail = (run.stdout.strip() or run.stderr.strip() or "Hermes CLI found.")[:300]
+        return run.returncode == 0, detail
     try:
         run = subprocess.run(
             hermes_command("Reply exactly READY."),
@@ -84,11 +99,11 @@ def verify_hermes() -> tuple[bool, str]:
             env=os.environ.copy(),
         )
     except subprocess.TimeoutExpired:
-        return False, "Hermes startup check timed out."
+        return False, "Hermes inference check timed out. Neusic can still run with Local Copilot."
     if run.returncode != 0:
-        return False, (run.stderr.strip() or "Hermes startup check failed.")[:800]
+        return False, (run.stderr.strip() or "Hermes inference check failed.")[:800]
     if not run.stdout.strip():
-        return False, "Hermes returned an empty startup response."
+        return False, "Hermes returned an empty inference response."
     return True, run.stdout.strip()
 
 
@@ -120,7 +135,7 @@ def static_target(path: str) -> Path | None:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "NeusicHermesRuntime/2.0"
+    server_version = "NeusicHermesRuntime/2.1"
 
     def security_headers(self) -> None:
         self.send_header("X-Content-Type-Options", "nosniff")
@@ -167,6 +182,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         path = urlparse(self.path).path.rstrip("/") or "/"
         if path == "/health":
+            installed = bool(shutil.which("hermes"))
             self.json_reply(
                 200,
                 {
@@ -175,6 +191,7 @@ class Handler(BaseHTTPRequestHandler):
                     "toolset": "context_engine",
                     "auth": "required" if TOKEN else "local-only",
                     "servingApp": bool(getattr(self.server, "serve_app", False)),
+                    "hermesInstalled": installed,
                 },
             )
             return
@@ -230,10 +247,10 @@ class Handler(BaseHTTPRequestHandler):
                 env=os.environ.copy(),
             )
         except FileNotFoundError:
-            self.json_reply(503, {"error": "Hermes CLI was not found on this machine"})
+            self.json_reply(503, {"error": "Hermes CLI was not found. Local Copilot remains available."})
             return
         except subprocess.TimeoutExpired:
-            self.json_reply(504, {"error": "Hermes request timed out"})
+            self.json_reply(504, {"error": "Hermes request timed out. Try Local Copilot or repair the configured provider."})
             return
         if run.returncode != 0:
             self.json_reply(502, {"error": (run.stderr.strip() or "Hermes exited with an error")[:800]})
@@ -254,29 +271,34 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--port", type=int, default=PORT)
     parser.add_argument("--serve-app", action="store_true", default=SERVE_APP)
     parser.add_argument("--open", action="store_true", dest="open_browser")
-    parser.add_argument("--check", action="store_true", help="Verify Hermes before starting.")
+    parser.add_argument("--check", action="store_true", help="Run a lightweight Hermes CLI check without inference.")
+    parser.add_argument("--deep-check", action="store_true", help="Run an actual Hermes inference diagnostic.")
     parser.add_argument("--check-only", action="store_true")
     return parser.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
-    if args.check or args.check_only:
-        ok, detail = verify_hermes()
-        print(f"Hermes check: {'OK' if ok else 'FAILED'} — {detail}")
-        if not ok:
-            return 2
+    if args.check or args.deep_check or args.check_only:
+        ok, detail = verify_hermes(deep=args.deep_check)
+        print(f"Hermes check: {'OK' if ok else 'WARNING'} — {detail}")
         if args.check_only:
-            return 0
+            return 0 if ok else 2
+        if not ok:
+            print("Starting Neusic anyway. Local Copilot remains available.")
     if args.host not in {"127.0.0.1", "localhost", "::1"} and not TOKEN:
         print("Refusing non-local bind without NEUSIC_HERMES_TOKEN.", file=sys.stderr)
         return 2
-    server = ThreadingHTTPServer((args.host, args.port), Handler)
+    try:
+        server = ThreadingHTTPServer((args.host, args.port), Handler)
+    except OSError as exc:
+        print(f"Could not start Neusic on {args.host}:{args.port}: {exc}", file=sys.stderr)
+        return 2
     server.serve_app = args.serve_app
     base = f"http://{args.host}:{args.port}"
-    print(f"Neusic Hermes runtime: {base}")
+    print(f"Neusic local runtime: {base}")
     print(f"Hermes endpoint: {base}/api/hermes")
-    print(f"Tool access: disabled (context_engine only)")
+    print("Tool access: disabled (context_engine only)")
     if TOKEN:
         print("Bridge authentication: bearer token required")
     if args.serve_app:
@@ -286,7 +308,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        print("\nNeusic Hermes runtime stopped.")
+        print("\nNeusic local runtime stopped.")
     finally:
         server.server_close()
     return 0
