@@ -19,6 +19,8 @@ from urllib.parse import unquote, urlparse
 
 ROOT = Path(__file__).resolve().parents[2]
 APP_ROOT = ROOT / "app"
+WAVE_ROOT = ROOT / "wave-loom"
+STUDIO_V2_ROOT = ROOT / "studio-v2"
 HOST = os.getenv("NEUSIC_HERMES_HOST", "127.0.0.1")
 PORT = int(os.getenv("NEUSIC_HERMES_PORT", "8787"))
 PROFILE = os.getenv("NEUSIC_HERMES_PROFILE", "").strip()
@@ -36,6 +38,11 @@ ALLOWED = {
     ).split(",")
     if item.strip()
 }
+
+CREATOR_STYLE = """<style id="neusic-creator-credit-style">
+.neusic-creator-credit{position:fixed;z-index:100000;pointer-events:none;color:rgba(196,225,232,.52);font:700 7px/1 \"JetBrains Mono\",ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;text-shadow:0 1px 6px #000}.neusic-creator-top{top:5px;left:10px}.neusic-creator-bottom{right:10px;bottom:7px}
+</style>"""
+CREATOR_MARKUP = """<div class="neusic-creator-credit neusic-creator-top" data-neusic-creator>Made by Anderson Paulino</div><div class="neusic-creator-credit neusic-creator-bottom" data-neusic-creator>Made by Anderson Paulino</div>"""
 
 
 def compact(value: Any, limit: int = 24000) -> str:
@@ -115,6 +122,15 @@ def authorized(headers: Any) -> bool:
     return bool(supplied) and hmac.compare_digest(supplied, TOKEN)
 
 
+def safe_child(root: Path, relative: str) -> Path | None:
+    candidate = (root / relative).resolve()
+    try:
+        candidate.relative_to(root.resolve())
+    except ValueError:
+        return None
+    return candidate
+
+
 def static_target(path: str) -> Path | None:
     clean = unquote(urlparse(path).path)
     if clean == "/":
@@ -124,18 +140,32 @@ def static_target(path: str) -> Path | None:
     if clean == "/studio/core.html":
         return APP_ROOT / "index.html"
     if clean.startswith("/studio/"):
-        relative = clean.removeprefix("/studio/")
-        candidate = (APP_ROOT / relative).resolve()
-        try:
-            candidate.relative_to(APP_ROOT.resolve())
-        except ValueError:
-            return None
-        return candidate
+        return safe_child(APP_ROOT, clean.removeprefix("/studio/"))
+    if clean in {"/wave-loom", "/wave-loom/"}:
+        return WAVE_ROOT / "index.html"
+    if clean.startswith("/wave-loom/"):
+        return safe_child(WAVE_ROOT, clean.removeprefix("/wave-loom/"))
+    if clean in {"/studio-v2", "/studio-v2/"}:
+        return STUDIO_V2_ROOT / "index.html"
+    if clean.startswith("/studio-v2/"):
+        return safe_child(STUDIO_V2_ROOT, clean.removeprefix("/studio-v2/"))
     return None
 
 
+def inject_creator_credit(html: str) -> str:
+    if "data-neusic-creator" in html:
+        return html
+    if "</head>" in html:
+        html = html.replace("</head>", f"{CREATOR_STYLE}</head>", 1)
+    if "<body" in html:
+        close = html.find(">", html.find("<body"))
+        if close >= 0:
+            html = html[: close + 1] + CREATOR_MARKUP + html[close + 1 :]
+    return html
+
+
 class Handler(BaseHTTPRequestHandler):
-    server_version = "NeusicHermesRuntime/2.1"
+    server_version = "NeusicHermesRuntime/2.2"
 
     def security_headers(self) -> None:
         self.send_header("X-Content-Type-Options", "nosniff")
@@ -164,14 +194,24 @@ class Handler(BaseHTTPRequestHandler):
         if not path.is_file():
             self.json_reply(404, {"error": "Not found"})
             return
-        data = path.read_bytes()
         content_type = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
+        if path.suffix.lower() == ".html":
+            data = inject_creator_credit(path.read_text(encoding="utf-8")).encode("utf-8")
+            content_type = "text/html; charset=utf-8"
+        else:
+            data = path.read_bytes()
         self.send_response(200)
         self.security_headers()
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(data)))
         self.end_headers()
         self.wfile.write(data)
+
+    def redirect(self, location: str) -> None:
+        self.send_response(302)
+        self.send_header("Location", location)
+        self.security_headers()
+        self.end_headers()
 
     def do_OPTIONS(self) -> None:
         self.send_response(204)
@@ -180,7 +220,8 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self) -> None:
-        path = urlparse(self.path).path.rstrip("/") or "/"
+        request_path = urlparse(self.path).path
+        path = request_path.rstrip("/") or "/"
         if path == "/health":
             installed = bool(shutil.which("hermes"))
             self.json_reply(
@@ -192,14 +233,14 @@ class Handler(BaseHTTPRequestHandler):
                     "auth": "required" if TOKEN else "local-only",
                     "servingApp": bool(getattr(self.server, "serve_app", False)),
                     "hermesInstalled": installed,
+                    "pages": ["/studio/", "/wave-loom/", "/studio-v2/"],
                 },
             )
             return
         if getattr(self.server, "serve_app", False):
-            if urlparse(self.path).path == "/studio":
-                self.send_response(302)
-                self.send_header("Location", "/studio/")
-                self.end_headers()
+            redirects = {"/studio": "/studio/", "/wave-loom": "/wave-loom/", "/studio-v2": "/studio-v2/"}
+            if request_path in redirects:
+                self.redirect(redirects[request_path])
                 return
             target = static_target(self.path)
             if target:
@@ -302,7 +343,9 @@ def main(argv: list[str] | None = None) -> int:
     if TOKEN:
         print("Bridge authentication: bearer token required")
     if args.serve_app:
-        print(f"Neusic Studio: {base}/studio/")
+        print(f"Classic Studio: {base}/studio/")
+        print(f"Wave Loom Lab: {base}/wave-loom/")
+        print(f"Studio v2 Hybrid: {base}/studio-v2/")
         if args.open_browser:
             threading.Timer(0.5, lambda: webbrowser.open(f"{base}/studio/")).start()
     try:
