@@ -195,7 +195,9 @@ class Handler(BaseHTTPRequestHandler):
             self.json_reply(404, {"error": "Not found"})
             return
         origin = self.headers.get("Origin", "")
-        if origin and origin not in ALLOWED and origin != f"http://{HOST}:{PORT}":
+        server_port = self.server.server_address[1]
+        local_origins = {f"http://127.0.0.1:{server_port}", f"http://localhost:{server_port}"}
+        if origin and origin not in ALLOWED and origin not in local_origins:
             self.json_reply(403, {"error": "Origin not allowed"})
             return
         if not authorized(self.headers):
