@@ -14,17 +14,17 @@
   </style>
 </head>
 <body>
-  <div id="boot"><div class="boot-card"><div class="logo">Neu<span>sic</span></div><div class="sub">The Premium Studio · Initializing</div><div class="bar"></div></div></div>
+  <div id="boot"><div class="boot-card"><div class="logo">Neu<span>sic</span></div><div class="sub">Recording & Mix Workflow · Initializing</div><div class="bar"></div></div></div>
   <iframe id="studio" src="core.html" title="Neusic digital audio workstation" allow="microphone; autoplay; clipboard-read; clipboard-write; midi"></iframe>
   <script>
     const frame=document.getElementById('studio');
     frame.addEventListener('load',async()=>{
       const d=frame.contentDocument;
-      const css=['css/13-workspace-ux.css','css/14-production-integrity.css','css/15-mobile-first.css','css/16-project-safety.css','css/17a-studio-foundation.css','css/17b-studio-navigation.css','css/17c-studio-controls.css','css/17d-studio-mixer-mobile.css','css/18-producer-flow.css','css/19-professional-arranger.css','css/20a-hyperreal-shell.css','css/20b-hyperreal-tracks.css','css/20c-hyperreal-creator.css','css/21-production-copilot.css','css/22-premium-studio.css'];
+      const css=['css/13-workspace-ux.css','css/14-production-integrity.css','css/15-mobile-first.css','css/16-project-safety.css','css/17a-studio-foundation.css','css/17b-studio-navigation.css','css/17c-studio-controls.css','css/17d-studio-mixer-mobile.css','css/18-producer-flow.css','css/19-professional-arranger.css','css/20a-hyperreal-shell.css','css/20b-hyperreal-tracks.css','css/20c-hyperreal-creator.css','css/21-production-copilot.css','css/22-premium-studio.css','css/23-recording-mix-workflow.css'];
       css.forEach(href=>{if(!d.querySelector(`link[href="${href}"]`)){const link=d.createElement('link');link.rel='stylesheet';link.href=href;d.head.appendChild(link);}});
       const load=src=>new Promise((resolve,reject)=>{if(d.querySelector(`script[src="${src}"]`))return resolve();const script=d.createElement('script');script.src=src;script.onload=resolve;script.onerror=reject;d.body.appendChild(script);});
       try{
-        for(const src of ['js/22-workspace-ux.js','js/23-production-integrity.js','js/24-mobile-first.js','js/25-project-safety.js','js/26-producer-flow.js','js/27-producer-flow-hardening.js','js/28-professional-arranger.js','js/29-arranger-recovery-sync.js','js/30-track-engine.js','js/31-midi-clips.js','js/32-track-workspace.js','js/33-production-copilot.js','js/34-theme-personalization.js'])await load(src);
+        for(const src of ['js/22-workspace-ux.js','js/23-production-integrity.js','js/24-mobile-first.js','js/25-project-safety.js','js/26-producer-flow.js','js/27-producer-flow-hardening.js','js/28-professional-arranger.js','js/29-arranger-recovery-sync.js','js/30-track-engine.js','js/31-midi-clips.js','js/32-track-workspace.js','js/33-production-copilot.js','js/34-theme-personalization.js','js/35-recording-mix-workflow.js'])await load(src);
       }finally{
         document.getElementById('boot').style.display='none';
       }
