@@ -1,0 +1,571 @@
+/* ═══════════════════════════════════════════════════════════════
+   Neusic Workspace UX
+   Tactile controls remain skeuomorphic. Precision editing areas stay
+   flat, sharp, high-contrast, and free from decorative soft shadows.
+═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --workspace-footer-h: 58px;
+  --precision-bg: #10101c;
+  --precision-panel: #151525;
+  --precision-line: rgba(255,255,255,.12);
+  --precision-line-strong: rgba(255,255,255,.24);
+}
+
+/* One workspace selector, not two competing navigation rows. */
+#toolbar {
+  display: none !important;
+}
+
+#drawer-handle {
+  height: 14px;
+  background: #171728;
+  border-top: 1px solid rgba(255,255,255,.055);
+  border-bottom: 1px solid rgba(255,255,255,.035);
+}
+
+#drawer-handle .drawer-pill {
+  width: 48px;
+  height: 3px;
+  background: rgba(255,255,255,.22);
+}
+
+#drawer.open {
+  height: clamp(270px, 42vh, 440px);
+  border-top: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 -14px 34px rgba(0,0,0,.34);
+}
+
+.dtabs {
+  min-height: 52px;
+  padding: 7px 10px;
+  gap: 6px;
+  align-items: center;
+  background: #19192b;
+  border-bottom: 1px solid rgba(255,255,255,.075);
+  scrollbar-width: none;
+}
+
+.dtab.smart-workspace-tab {
+  min-height: 38px;
+  padding: 7px 12px;
+  border-radius: 10px;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(255,255,255,.06);
+  background: #202034;
+  color: #a6a6c4;
+  box-shadow: 3px 3px 7px rgba(5,5,14,.68), -1px -1px 3px rgba(69,69,104,.46);
+}
+
+.dtab.smart-workspace-tab:hover {
+  color: #fff;
+  border-color: rgba(176,110,243,.35);
+}
+
+.dtab.smart-workspace-tab.active {
+  color: #fff;
+  background: linear-gradient(145deg, #8350d6, #a465ed);
+  border-color: rgba(255,255,255,.15);
+  box-shadow: inset 2px 2px 5px rgba(42,16,74,.5), inset -1px -1px 2px rgba(255,255,255,.14), 0 0 15px rgba(176,110,243,.26);
+}
+
+.dpanels {
+  height: calc(100% - 52px);
+}
+
+.dpanel {
+  padding: 0 12px 12px;
+  background: #171728;
+}
+
+.workspace-context-bar {
+  min-height: 48px;
+  margin: 0 -12px 10px;
+  padding: 7px 12px;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: rgba(23,23,40,.96);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,.065);
+}
+
+.workspace-context-main,
+.workspace-context-actions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.workspace-context-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  background: #202035;
+  box-shadow: 2px 2px 5px rgba(5,5,14,.65), -1px -1px 3px rgba(67,67,104,.42);
+}
+
+.workspace-context-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--txt);
+}
+
+.workspace-context-hint {
+  margin-top: 1px;
+  font-size: 9px;
+  color: var(--txt2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.workspace-track-chip {
+  --track-color: var(--acc);
+  max-width: 150px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--track-color) 46%, transparent);
+  color: var(--track-color);
+  background: color-mix(in srgb, var(--track-color) 10%, transparent);
+  font-size: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.workspace-hide-btn {
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 8px;
+  background: #202034;
+  color: var(--txt2);
+  font-size: 9px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.workspace-hide-btn:hover {
+  color: #fff;
+  border-color: rgba(176,110,243,.4);
+}
+
+/* Persistent system footer: global utilities only. */
+#mobile-nav {
+  display: flex !important;
+  height: var(--workspace-footer-h);
+  min-height: var(--workspace-footer-h);
+  padding: 0 max(10px, env(safe-area-inset-right)) env(safe-area-inset-bottom, 0) max(10px, env(safe-area-inset-left));
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #171728;
+  border-top: 1px solid rgba(255,255,255,.075);
+  box-shadow: 0 -8px 24px rgba(0,0,0,.28);
+}
+
+.system-footer-btn {
+  min-width: 105px;
+  min-height: 40px;
+  padding: 6px 14px;
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: #202034;
+  color: #8f8fac;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 2px 2px 6px rgba(5,5,14,.66), -1px -1px 3px rgba(67,67,104,.4);
+}
+
+.system-footer-btn:hover,
+.system-footer-btn.active {
+  color: #fff;
+  border-color: rgba(176,110,243,.38);
+}
+
+.system-footer-btn.active {
+  color: var(--acc);
+  background: #1b1b2e;
+  box-shadow: inset 2px 2px 5px rgba(5,5,14,.72), inset -1px -1px 3px rgba(68,68,105,.34), 0 0 12px rgba(176,110,243,.12);
+}
+
+.system-footer-icon {
+  font-size: 15px;
+}
+
+/* Sidebar now provides track context instead of duplicate workspace navigation. */
+.sidebar-context-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 2px;
+  padding: 9px;
+  border-radius: 9px;
+  background: #18182a;
+  border: 1px solid rgba(255,255,255,.06);
+}
+
+.sidebar-context-card strong {
+  font-size: 11px;
+  color: var(--txt);
+}
+
+.sidebar-context-card > span:last-child {
+  font-size: 9px;
+  line-height: 1.35;
+  color: var(--txt2);
+}
+
+.sidebar-context-eyebrow {
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--acc);
+}
+
+/* Flat, precise visual language for timelines, grids, waveforms, and automation. */
+#center {
+  background: var(--precision-bg) !important;
+}
+
+#overview,
+#ruler,
+#tracks-area,
+.pr-grid-container,
+.pr-minimap-wrap,
+.pr-vel-wrap,
+.samp-wave,
+.auto-wrap,
+.rec-vu {
+  background: var(--precision-panel) !important;
+  border-color: var(--precision-line) !important;
+  box-shadow: none !important;
+}
+
+#overview {
+  background-image:
+    linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px),
+    linear-gradient(180deg, #18182a, #121220) !important;
+}
+
+#ruler {
+  background: #18182a !important;
+}
+
+#tracks-area {
+  background: #11111e !important;
+}
+
+#tracks-inner {
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.115) 1px, transparent 1px) var(--hdr-w) 0/calc(var(--beat-w,40px) * 4) 100%,
+    linear-gradient(90deg, rgba(255,255,255,.042) 1px, transparent 1px) var(--hdr-w) 0/var(--beat-w,40px) 100% !important;
+}
+
+.clip-el,
+.track-lane,
+.pr-note,
+.auto-wrap canvas {
+  box-shadow: none !important;
+}
+
+.clip-el {
+  border: 1px solid rgba(255,255,255,.15) !important;
+}
+
+.samp-wave {
+  min-height: 112px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 8px;
+  touch-action: none;
+}
+
+.samp-wave.slice-dragging canvas {
+  opacity: .45;
+}
+
+/* Full-height, 44px-wide invisible hit target with a sharp visual saddle. */
+.samp-slice-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 44px;
+  z-index: 16;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.slice-saddle-line {
+  position: absolute;
+  top: 7px;
+  bottom: 7px;
+  left: 21px;
+  width: 2px;
+  background: #fbbf24;
+  box-shadow: 0 0 8px rgba(251,191,36,.4);
+}
+
+.slice-saddle-top,
+.slice-saddle-bottom {
+  position: absolute;
+  left: 13px;
+  width: 18px;
+  height: 8px;
+  border: 1px solid rgba(255,255,255,.3);
+  background: #fbbf24;
+  box-shadow: 0 2px 7px rgba(0,0,0,.35);
+}
+
+.slice-saddle-top {
+  top: 2px;
+  border-radius: 4px 4px 2px 2px;
+}
+
+.slice-saddle-bottom {
+  bottom: 2px;
+  border-radius: 2px 2px 4px 4px;
+}
+
+.samp-slice-handle:hover .slice-saddle-line,
+.samp-slice-handle.active .slice-saddle-line,
+.samp-slice-handle:hover .slice-saddle-top,
+.samp-slice-handle:hover .slice-saddle-bottom,
+.samp-slice-handle.active .slice-saddle-top,
+.samp-slice-handle.active .slice-saddle-bottom {
+  background: #fff;
+  box-shadow: 0 0 12px rgba(255,255,255,.72);
+}
+
+.sampler-precision-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 7px;
+  min-height: 30px;
+}
+
+.precision-label {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--txt2);
+}
+
+.precision-toggle {
+  min-height: 28px;
+  padding: 4px 9px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: #202034;
+  color: var(--txt2);
+  font-size: 9px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.precision-toggle.active {
+  color: #4ade80;
+  border-color: rgba(74,222,128,.35);
+  background: rgba(74,222,128,.08);
+}
+
+.precision-help {
+  margin-left: auto;
+  font-size: 9px;
+  color: var(--txt3);
+}
+
+/* Tactile controls stay tactile. */
+.pad-btn,
+.mpc-pad,
+.tb-btn,
+.pr-tool-btn,
+.samp-mode,
+.chop-btn,
+.fx-toggle,
+.toggle-pill,
+.pmx-ms-btn,
+.knob {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pad-btn,
+.mpc-pad {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.knob {
+  cursor: ns-resize !important;
+  outline: none;
+}
+
+.knob:focus-visible,
+.knob.adjusting {
+  box-shadow: 0 0 0 2px rgba(176,110,243,.7), 4px 4px 9px var(--nsd), -2px -2px 6px var(--nsl) !important;
+}
+
+.knob-val,
+.clickable-readout,
+.parameter-readout {
+  cursor: text;
+  color: var(--acc) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.knob-val:hover,
+.clickable-readout:hover,
+.parameter-readout:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.parameter-inline-input {
+  width: 66px;
+  max-width: 100%;
+  padding: 3px 5px;
+  border-radius: 5px;
+  border: 1px solid var(--acc);
+  outline: none;
+  background: #0f0f1b;
+  color: #fff;
+  font-size: 10px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.parameter-inline-input.compact {
+  width: 54px;
+  padding: 2px 4px;
+  font-size: 9px;
+}
+
+.parameter-readout {
+  min-width: 42px;
+  padding: 2px 4px;
+  border: 0;
+  background: transparent;
+  font-size: 8px;
+  text-align: right;
+}
+
+.pmx-pan-row .parameter-readout {
+  margin-left: 2px;
+}
+
+/* Technical labels should remain explicit and readable. */
+.fx-name,
+.pmx-pan-lbl,
+.pr-tool-btn,
+.samp-mode,
+.chop-btn,
+.auto-btn {
+  letter-spacing: 0;
+}
+
+button[title],
+[role='slider'][title] {
+  position: relative;
+}
+
+@media (max-width: 767px) {
+  :root {
+    --workspace-footer-h: 62px;
+  }
+
+  #drawer.open {
+    height: min(52vh, 470px);
+  }
+
+  .dtabs {
+    min-height: 56px;
+    padding-inline: 8px;
+  }
+
+  .dtab.smart-workspace-tab {
+    min-height: 42px;
+    min-width: max-content;
+    padding-inline: 11px;
+  }
+
+  .dpanels {
+    height: calc(100% - 56px);
+  }
+
+  .workspace-context-bar {
+    min-height: 52px;
+  }
+
+  .workspace-context-hint,
+  .workspace-track-chip {
+    display: none;
+  }
+
+  .system-footer-btn {
+    flex: 1;
+    min-width: 0;
+    min-height: 44px;
+    padding-inline: 8px;
+  }
+
+  .samp-wave {
+    min-height: 132px;
+  }
+
+  .precision-help {
+    display: none;
+  }
+
+  .sampler-precision-row {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 430px) {
+  .system-footer-btn {
+    flex-direction: column;
+    gap: 2px;
+    font-size: 9px;
+  }
+
+  .system-footer-icon {
+    font-size: 17px;
+  }
+
+  .workspace-hide-btn {
+    padding-inline: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #drawer,
+  .dtab,
+  .system-footer-btn,
+  .pad-btn,
+  .mpc-pad {
+    transition: none !important;
+    animation: none !important;
+  }
+}
