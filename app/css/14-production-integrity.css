@@ -1,0 +1,147 @@
+/* Neusic Production Integrity — Phase A */
+.phase-a-drum-workspace .pad-grid {
+  grid-template-columns: repeat(8, minmax(52px, 64px));
+  width: 100%;
+  max-width: 600px;
+}
+
+.phase-a-drum-workspace .pad-btn {
+  width: 100%;
+  max-width: none;
+  min-height: 54px;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.phase-a-drum-workspace .pad-btn small {
+  font-size: 7px;
+  opacity: .42;
+}
+
+.phase-a-seq-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 9px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255,255,255,.075);
+  border-radius: 9px;
+  background: #151526;
+}
+
+.phase-a-seq-toolbar > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.phase-a-seq-toolbar strong {
+  color: var(--txt);
+  font-size: 11px;
+}
+
+.phase-a-seq-toolbar span:not(.phase-a-badge) {
+  color: var(--txt2);
+  font-size: 8px;
+}
+
+.phase-a-badge,
+.experimental-ai-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 18px;
+  padding: 2px 6px;
+  border: 1px solid rgba(251,191,36,.36);
+  border-radius: 999px;
+  background: rgba(251,191,36,.1);
+  color: var(--yel);
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .07em;
+}
+
+.phase-a-seq-area {
+  max-height: 320px;
+  overflow: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--txt3) transparent;
+}
+
+.phase-a-seq-label {
+  width: 48px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.phase-a-seq-label:hover {
+  filter: brightness(1.45);
+}
+
+.phase-a-seq-area .step {
+  min-width: 14px;
+  height: 22px;
+  position: relative;
+  touch-action: none;
+}
+
+.phase-a-seq-area .step.on::after {
+  content: '';
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  bottom: 2px;
+  height: calc((100% - 4px) * var(--step-velocity, .85));
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--step-color) 62%, transparent);
+  opacity: .58;
+  pointer-events: none;
+}
+
+.phase-a-seq-area .step.cur {
+  outline: 2px solid #fff;
+  outline-offset: 1px;
+}
+
+.experimental-ai-feature {
+  position: relative;
+}
+
+.experimental-ai-feature .experimental-ai-badge {
+  margin-left: 6px;
+  pointer-events: none;
+}
+
+.pmx-meter-col::after {
+  content: 'L  R';
+  display: block;
+  margin-top: 2px;
+  color: var(--txt3);
+  font-size: 7px;
+  letter-spacing: 3px;
+  white-space: pre;
+}
+
+@media (max-width: 900px) {
+  .phase-a-drum-workspace .pad-grid {
+    grid-template-columns: repeat(4, minmax(52px, 1fr));
+  }
+  .phase-a-seq-area {
+    overflow-x: auto;
+  }
+  .phase-a-seq-area .seq-row {
+    min-width: 620px;
+  }
+}
+
+@media (max-width: 520px) {
+  .phase-a-seq-toolbar {
+    align-items: flex-start;
+  }
+  .phase-a-seq-toolbar span:not(.phase-a-badge) {
+    max-width: 220px;
+  }
+}
