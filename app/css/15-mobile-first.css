@@ -258,8 +258,9 @@ body.mobile-sidebar-open .mobile-sidebar-scrim{
 .workspace-hide-btn{min-width:44px;min-height:38px;}
 
 /* ── Persistent bottom navigation. ── */
-#mobile-nav,
+#mobile-nav{display:none!important;}
 .neusic-system-footer{
+  display:flex!important;
   height:var(--mobile-footer-h)!important;
   min-height:var(--mobile-footer-h)!important;
   padding:5px max(8px,env(safe-area-inset-right)) max(5px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))!important;
@@ -375,6 +376,20 @@ body.mobile-sidebar-open .mobile-sidebar-scrim{
   font:700 10px/1.1 inherit;
 }
 .mobile-action-btn span{font-size:19px;}
+
+@media (max-width:599px){
+  #btn-rew{display:none!important;}
+  .brand{max-width:52px;font-size:15px;}
+  #topbar > .chip:not(.bpm-chip){flex-basis:64px;max-width:88px;padding-inline:4px;}
+  #topbar > .bpm-chip{flex-basis:50px;}
+  .mobile-more-btn{flex-basis:40px;width:40px;height:40px;}
+}
+
+@media (max-width:380px){
+  .brand{display:none;}
+  #topbar{gap:4px;padding-inline:5px;}
+  #topbar > .chip:not(.bpm-chip){max-width:82px;}
+}
 
 /* ── Landscape phones: preserve arrangement height and shorten the sheet. ── */
 body.neusic-landscape.neusic-mobile{--mobile-sheet-h:min(48dvh,330px);}
