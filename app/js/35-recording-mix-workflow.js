@@ -18,10 +18,11 @@ function userReturns(){return (S.tracks||[]).filter(track=>track.type==='return'
 function routeFor(trackId){return String(data().routing[trackId]||'master');}
 function returnKey(trackId){return `RT${trackId}`;}
 function queueSave(){window.NeusicSafety?.queueSave?.();}
+function restoreStoredMixState(){const meta=data();S.sends=clone(meta.sends||{});Object.entries(meta.returnStates||{}).forEach(([key,on])=>{if(S.returns?.[key])S.returns[key].on=!!on;});}
 function refreshAudio(){if(S.playing){window.stopAllScheduled?.();window.scheduleClipPlayback?.();window.applyAllTrackAutomation?.();}}
 
 function syncReturnTracks(){
-  S.returns=S.returns||{};
+  S.returns=S.returns||{};restoreStoredMixState();
   const valid=new Set();
   userReturns().forEach(track=>{
     const key=returnKey(track.id);valid.add(key);
@@ -74,6 +75,20 @@ function patchAudioRouting(){
   if(ensureReturn)Audio_.ensureReturn=function(retId){const cfg=S.returns?.[retId];if(cfg?.trackId)return this.trackInput(cfg.trackId);return ensureReturn(retId);};
   const setSend=Audio_.setSend?.bind(Audio_);
   if(setSend)Audio_.setSend=function(trackId,retId,value){const result=setSend(trackId,retId,value);data().sends=clone(S.sends||{});queueSave();return result;};
+}
+
+function soloFeeds(track){
+  if(!track)return false;
+  if(track.type==='bus')return (S.tracks||[]).some(source=>source.s&&routeFor(source.id)===String(track.id));
+  if(track.type==='return'){const key=returnKey(track.id);return (S.tracks||[]).some(source=>source.s&&Number(S.sends?.[source.id]?.[key]||0)>0);}
+  return false;
+}
+function patchSoloPropagation(){
+  if(Audio_._neusicSoloPatched)return;Audio_._neusicSoloPatched=true;
+  const refresh=Audio_.refreshTrackGain.bind(Audio_);
+  Audio_.refreshTrackGain=function(trackId){const track=trackById(trackId),anySolo=(S.tracks||[]).some(item=>item.s);if(!track||!anySolo||!['bus','return'].includes(track.type))return refresh(trackId);const gain=this.ensureTrackGain(trackId),dry=this.trackDry[trackId]??.85,silent=track.m||(!track.s&&!soloFeeds(track));gain.gain.setTargetAtTime(silent?0:dry,this.ctx.currentTime,.01);};
+  const render=window.renderProjectOfflineToBuffer;
+  if(typeof render==='function'&&!render._neusicSolo){const wrapped=async function(...args){const anySolo=(S.tracks||[]).some(track=>track.s),changed=[];if(anySolo)(S.tracks||[]).forEach(track=>{if(['bus','return'].includes(track.type)&&!track.s&&soloFeeds(track)){changed.push(track);track.s=true;}});try{return await render.apply(this,args);}finally{changed.forEach(track=>track.s=false);}};wrapped._neusicSolo=true;window.renderProjectOfflineToBuffer=wrapped;}
 }
 
 function patchOfflineRouting(){
@@ -150,7 +165,7 @@ function previewTake(trackId,takeId){
 function renameTake(trackId,takeId){const take=takesFor(trackId).find(item=>item.id===takeId),name=take&&prompt('Take name',take.name);if(!name?.trim())return;window.snapshot?.();take.name=name.trim();queueSave();if(S.activePanel==='rec')window.buildPanelContent?.('rec');}
 function deleteTake(trackId,takeId){
   const track=trackById(trackId),takes=takesFor(trackId),index=takes.findIndex(item=>item.id===takeId);if(!track||index<0)return;const take=takes[index];if(!confirm(`Delete “${take.name}” and its recorded clip${take.clipIds.length===1?'':'s'}?`))return;
-  window.snapshot?.();const ids=new Set(take.clipIds||[]);track.clips=(track.clips||[]).filter(clip=>!ids.has(clip.id));takes.splice(index,1);queueSave();window.renderTracks?.();refreshAudio();if(S.activePanel==='rec')window.buildPanelContent?.('rec');
+  window.snapshot?.();const ids=new Set(take.clipIds||[]),buffers=new Set((track.clips||[]).filter(clip=>ids.has(clip.id)&&clip.bufferId).map(clip=>clip.bufferId));track.clips=(track.clips||[]).filter(clip=>!ids.has(clip.id));takes.splice(index,1);buffers.forEach(bufferId=>{const used=(S.tracks||[]).some(item=>(item.clips||[]).some(clip=>clip.bufferId===bufferId));if(!used)delete S.buffers?.[bufferId];});queueSave();window.renderTracks?.();refreshAudio();if(S.activePanel==='rec')window.buildPanelContent?.('rec');
 }
 function renderTakes(el){
   const track=S.tracks?.[S.activeTrack],section=document.createElement('section');section.className='take-rack';
@@ -160,7 +175,7 @@ function renderTakes(el){
   section.onclick=event=>{const button=event.target.closest('button');if(!button)return;const id=button.dataset.preview||button.dataset.use||button.dataset.rename||button.dataset.delete;if(button.dataset.preview)previewTake(track.id,id);if(button.dataset.use)useTake(track.id,id);if(button.dataset.rename)renameTake(track.id,id);if(button.dataset.delete)deleteTake(track.id,id);};
   el.appendChild(section);
 }
-function escapeHtml(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));}
+function escapeHtml(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[char]));}
 function formatBars(start,end){const bars=Math.max(.25,(end-start)/4);return `${bars.toFixed(bars%1?1:0)} bars`;}
 function patchRecordPanel(){const base=window.buildRec;if(typeof base!=='function'||base._neusicTakes)return;const wrapped=function(el){const result=base(el);renderTakes(el);return result;};wrapped._neusicTakes=true;window.buildRec=wrapped;}
 
@@ -180,7 +195,7 @@ function enhanceMixer(el){
 function patchMixer(){
   const base=window.buildMixer;if(typeof base!=='function'||base._neusicRouting)return;
   const wrapped=function(el){syncReturnTracks();const result=base(el);enhanceMixer(el);return result;};wrapped._neusicRouting=true;window.buildMixer=wrapped;
-  const toggle=window.toggleReturn;if(typeof toggle==='function'&&!toggle._neusicRouting){const next=function(retId,button){const result=toggle(retId,button),cfg=S.returns?.[retId];data().returnStates[retId]=cfg?.on!==false;if(cfg?.trackId){const track=trackById(cfg.trackId);if(track){track.m=!cfg.on;Audio_.refreshTrackGain?.(track.id);}}else if(Audio_.returnGains?.[retId])Audio_.returnGains[retId].gain.setTargetAtTime(cfg?.on===false?0:.85,Audio_.ctx.currentTime,.01);queueSave();return result;};next._neusicRouting=true;window.toggleReturn=next;}
+  const toggle=window.toggleReturn;if(typeof toggle==='function'&&!toggle._neusicRouting){const next=function(retId,button){const result=toggle(retId,button),cfg=S.returns?.[retId];data().returnStates[retId]=cfg?.on!==false;if(cfg?.trackId){const track=trackById(cfg.trackId);if(track){track.m=!cfg.on;Audio_.refreshTrackGain?.(track.id);window.renderTracks?.();}}else if(Audio_.returnGains?.[retId])Audio_.returnGains[retId].gain.setTargetAtTime(cfg?.on===false?0:.85,Audio_.ctx.currentTime,.01);queueSave();return result;};next._neusicRouting=true;window.toggleReturn=next;}
 }
 
 async function bounceTrack(index=S.activeTrack){
@@ -212,13 +227,13 @@ function patchTrackApi(){
   ['create','delete','duplicate','fromPattern','fromPiano'].forEach(key=>{const base=api[key];if(typeof base!=='function')return;api[key]=function(...args){const result=base.apply(this,args);queueMicrotask(()=>{syncReturnTracks();rebuildRouting();if(S.activePanel==='mixer')window.buildMixer?.(document.getElementById('dp-mixer'));});return result;};});
 }
 function migrate(){
-  const meta=data();if(Object.keys(meta.sends||{}).length)S.sends=clone(meta.sends);else meta.sends=clone(S.sends||{});
+  const meta=data();S.sends=clone(meta.sends||{});
   const valid=new Set((S.tracks||[]).map(track=>String(track.id)));
   Object.keys(meta.takes).forEach(id=>{if(!valid.has(String(id)))delete meta.takes[id];else meta.takes[id]=(meta.takes[id]||[]).filter(take=>take.clipIds?.some(clipId=>clipFor(trackById(id),clipId)));});
   Object.keys(meta.routing).forEach(id=>{const target=String(meta.routing[id]);if(!valid.has(String(id))||target!=='master'&&!valid.has(target))delete meta.routing[id];});
 }
 function init(){
-  if(typeof S==='undefined'||typeof Audio_==='undefined')return;migrate();patchAudioRouting();patchOfflineRouting();patchTakePlayback();patchRecording();patchRecordPanel();patchMixer();patchRender();patchTrackApi();syncReturnTracks();rebuildRouting();installWorkflowButtons();decorateTimeline();
+  if(typeof S==='undefined'||typeof Audio_==='undefined')return;migrate();patchAudioRouting();patchSoloPropagation();patchOfflineRouting();patchTakePlayback();patchRecording();patchRecordPanel();patchMixer();patchRender();patchTrackApi();syncReturnTracks();rebuildRouting();installWorkflowButtons();decorateTimeline();
   window.NeusicRecordingMix={version:'1.0.0',data,routeFor,setRoute,rebuildRouting,takesFor,useTake,previewTake,deleteTake,bounceTrack,syncReturnTracks};
   window.toast?.('Recording and routing workflow ready');
 }
