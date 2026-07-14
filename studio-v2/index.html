@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#04060a">
+  <meta name="description" content="Neusic Studio v2 combines the Wave Loom with the complete Neusic production engine in a contextual focus-mode interface.">
+  <title>Neusic Studio v2 — Wave-Native Production</title>
+  <link rel="preconnect" href="https://api.fontshare.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="creator-credit creator-credit-top" data-neusic-creator>Made by Anderson Paulino</div>
+  <div class="creator-credit creator-credit-bottom" data-neusic-creator>Made by Anderson Paulino</div>
+  <div class="nebula" aria-hidden="true"></div>
+
+  <div class="studio-shell">
+    <header class="top-bar">
+      <a class="brand" href="../" aria-label="Neusic home">
+        <span class="brand-mark">N</span>
+        <span class="brand-copy"><b>NEUSIC</b><small>STUDIO V2 · WAVE-NATIVE LAB</small></span>
+      </a>
+
+      <div class="project-chip">
+        <small>ACTIVE PROJECT</small>
+        <b id="projectName">Untitled Neusic Session</b>
+      </div>
+
+      <div class="transport" aria-label="Transport controls">
+        <button class="transport-button" data-command="rewind" title="Rewind">⏮</button>
+        <button class="transport-button primary" id="playButton" data-command="play" title="Play or pause">▶</button>
+        <button class="transport-button record" id="recordButton" data-command="record" title="Record">●</button>
+        <div class="time-display"><small>POSITION</small><b id="timeDisplay">00:00.000</b></div>
+        <div class="time-display tempo"><small>TEMPO</small><b><span id="bpmDisplay">120</span> BPM</b></div>
+      </div>
+
+      <div class="top-actions">
+        <button data-panel="left" title="Open objects and tracks">OBJECTS</button>
+        <button data-command="save" title="Save project">SAVE</button>
+        <button data-command="export" title="Export WAV">EXPORT</button>
+        <a href="../studio/" title="Open the original working Studio">CLASSIC</a>
+      </div>
+    </header>
+
+    <main class="stage">
+      <button class="edge-toggle edge-left" data-panel="left" aria-label="Toggle object panel">›</button>
+      <button class="edge-toggle edge-right" data-panel="right" aria-label="Toggle inspector panel">‹</button>
+
+      <aside class="context-panel left-panel" id="leftPanel" aria-label="Objects and track creation">
+        <div class="panel-heading"><small>NEUSIC OBJECTS</small><b>Create without leaving the flow.</b></div>
+        <section>
+          <h2>New source</h2>
+          <div class="object-grid">
+            <button data-create="audio"><i>AUD</i><span>Audio Track</span></button>
+            <button data-create="midi"><i>INST</i><span>Instrument</span></button>
+            <button data-create="beat"><i>DRM</i><span>Drum Track</span></button>
+            <button data-create="bus"><i>BUS</i><span>Mix Bus</span></button>
+            <button data-create="return"><i>RET</i><span>Return</span></button>
+            <button data-mode-target="loom"><i>WAV</i><span>Wave Object</span></button>
+          </div>
+        </section>
+        <section>
+          <h2>Focus shortcuts</h2>
+          <div class="panel-list">
+            <button data-mode-target="record"><b>NeuCapture</b><small>Microphone, takes and MIDI input</small></button>
+            <button data-mode-target="perform"><b>Performance Surface</b><small>Drums, pads and patterns</small></button>
+            <button data-mode-target="piano"><b>Instrument Editor</b><small>Piano Roll v2 and MIDI clips</small></button>
+            <button data-mode-target="mix"><b>Mix Environment</b><small>Buses, returns and effects</small></button>
+          </div>
+        </section>
+        <div class="panel-note">Objects created here are real Neusic tracks and remain compatible with the existing Studio, autosave, export and recovery systems.</div>
+      </aside>
+
+      <section class="workspace">
+        <div class="workspace-heading">
+          <div>
+            <small id="modeEyebrow">WAVE-NATIVE INSTRUMENT</small>
+            <h1 id="modeTitle">The Wave Loom</h1>
+          </div>
+          <p id="modeDescription">Sculpt sound, timing and harmony directly. Switch modes without leaving the project.</p>
+          <div class="engine-state"><i id="engineLed"></i><span id="engineState">LOOM READY</span></div>
+        </div>
+
+        <div class="frame-stack" id="frameStack">
+          <iframe id="loomFrame" class="experience-frame active" src="../wave-loom/" title="Neusic Wave Loom" allow="microphone;autoplay;midi;clipboard-read;clipboard-write"></iframe>
+          <iframe id="studioFrame" class="experience-frame" src="../studio/" title="Neusic production engine" allow="microphone;autoplay;midi;clipboard-read;clipboard-write"></iframe>
+          <div class="frame-vignette" aria-hidden="true"></div>
+          <div class="loading-panel" id="loadingPanel"><span></span><b>Connecting Neusic engines</b><small>The working Studio remains intact beneath this contextual shell.</small></div>
+        </div>
+      </section>
+
+      <aside class="context-panel right-panel" id="rightPanel" aria-label="Context inspector">
+        <div class="panel-heading"><small>CONTEXT INSPECTOR</small><b id="inspectorTitle">Wave controls</b></div>
+        <section>
+          <h2>Project actions</h2>
+          <div class="command-grid">
+            <button data-command="undo">↩<span>Undo</span></button>
+            <button data-command="redo">↪<span>Redo</span></button>
+            <button data-command="theme">◐<span>Theme</span></button>
+            <button data-command="copilot">AI<span>Copilot</span></button>
+            <button data-command="effects">FX<span>Effects</span></button>
+            <button data-command="save">⇩<span>Save</span></button>
+          </div>
+        </section>
+        <section>
+          <h2>Current context</h2>
+          <div class="context-readout">
+            <span><small>MODE</small><b id="contextMode">LOOM</b></span>
+            <span><small>TRACKS</small><b id="trackCount">—</b></span>
+            <span><small>CLIPS</small><b id="clipCount">—</b></span>
+            <span><small>ENGINE</small><b id="engineType">WAVE</b></span>
+          </div>
+        </section>
+        <section>
+          <h2>Workflow principle</h2>
+          <p class="inspector-copy" id="inspectorCopy">The wave is the instrument. Drag nodes for timing and pitch, sculpt the surface for harmonic shape, then move into Arrange or Mix without rebuilding the idea.</p>
+        </section>
+      </aside>
+    </main>
+
+    <nav class="mode-switcher" aria-label="Studio focus modes">
+      <button class="mode-button active" data-mode="loom"><i>WAV</i><span>Loom</span></button>
+      <button class="mode-button" data-mode="arrange"><i>ARR</i><span>Arrange</span></button>
+      <button class="mode-button" data-mode="perform"><i>PLAY</i><span>Perform</span></button>
+      <button class="mode-button" data-mode="piano"><i>MIDI</i><span>Piano</span></button>
+      <button class="mode-button" data-mode="record"><i>REC</i><span>Record</span></button>
+      <button class="mode-button" data-mode="mix"><i>MIX</i><span>Mix</span></button>
+    </nav>
+
+    <div class="shortcut-hint"><kbd>SPACE</kbd> Play · <kbd>1–6</kbd> Modes · <kbd>[</kbd><kbd>]</kbd> Panels</div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
