@@ -1,0 +1,73 @@
+/* Neusic Phase B: autosave, recovery, and project-safety UI. */
+.neusic-save-status{
+  min-width:62px;
+  min-height:30px;
+  padding:4px 8px;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:9px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  background:#19192b;
+  color:#aaa6bd;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:.03em;
+  white-space:nowrap;
+}
+.neusic-save-status::before{content:'●';font-size:7px;color:#7c7890;}
+.neusic-save-status[data-state="saving"]::before{color:#fbbf24;animation:neusic-save-pulse .8s infinite alternate;}
+.neusic-save-status[data-state="saved"]::before{color:#4ade80;}
+.neusic-save-status[data-state="error"]::before{color:#f87171;}
+@keyframes neusic-save-pulse{to{opacity:.25;}}
+
+.neusic-recovery-banner{
+  position:fixed;
+  z-index:990;
+  left:10px;
+  right:10px;
+  top:calc(var(--mobile-topbar-h,58px) + 8px);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:11px;
+  border:1px solid rgba(167,139,250,.38);
+  border-radius:14px;
+  background:rgba(24,22,42,.97);
+  box-shadow:0 18px 48px rgba(0,0,0,.52),0 0 24px rgba(167,139,250,.12);
+  backdrop-filter:blur(16px);
+}
+.neusic-recovery-icon{
+  width:38px;height:38px;flex:0 0 38px;border-radius:11px;display:grid;place-items:center;
+  background:#27223c;color:#c4b5fd;font-size:18px;
+}
+.neusic-recovery-copy{min-width:0;flex:1;}
+.neusic-recovery-copy strong{display:block;color:#fff;font-size:11px;}
+.neusic-recovery-copy span{display:block;margin-top:2px;color:#aaa6bd;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.neusic-recovery-actions{display:flex;gap:6px;}
+.neusic-recovery-btn{
+  min-height:38px;padding:0 11px;border:1px solid rgba(255,255,255,.08);border-radius:9px;
+  background:#222238;color:#d8d5e4;font:800 9px/1 inherit;
+}
+.neusic-recovery-btn.primary{background:#8b5cf6;color:#fff;border-color:#a78bfa;}
+
+.neusic-storage-warning{
+  position:fixed;z-index:995;left:50%;bottom:calc(var(--mobile-footer-h,62px) + 10px);
+  transform:translateX(-50%);max-width:min(520px,calc(100vw - 20px));padding:9px 12px;border-radius:10px;
+  background:#3a1d24;color:#fecaca;border:1px solid rgba(248,113,113,.35);font-size:9px;font-weight:700;
+}
+
+@media(max-width:599px){
+  .neusic-save-status{min-width:44px;padding:3px 6px;font-size:0;}
+  .neusic-save-status::after{content:'SAVE';font-size:7px;}
+  .neusic-recovery-banner{align-items:flex-start;flex-wrap:wrap;}
+  .neusic-recovery-actions{width:100%;justify-content:flex-end;}
+  .neusic-recovery-btn{min-height:42px;}
+}
+
+@media(min-width:900px){
+  .neusic-recovery-banner{left:50%;right:auto;width:min(620px,calc(100vw - 40px));transform:translateX(-50%);top:calc(var(--hdr) + 14px);}
+}
+
+@media(prefers-reduced-motion:reduce){.neusic-save-status[data-state="saving"]::before{animation:none;}}
