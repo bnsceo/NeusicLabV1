@@ -28,13 +28,31 @@ jobs:
       - name: Prepare production site
         run: |
           rm -rf _site
-          mkdir -p _site/studio
+          mkdir -p _site/studio _site/wave-loom
           cp index.html _site/index.html
           cp -R app/. _site/studio/
+          cp -R wave-loom/. _site/wave-loom/
           mv _site/studio/index.html _site/studio/core.html
           mv _site/studio/phase-a.html _site/studio/index.html
+          python - <<'PY'
+          from pathlib import Path
+          page = Path('_site/index.html')
+          html = page.read_text()
+          html = html.replace(
+              '<div class="actions">',
+              '<div class="actions"><a class="btn" href="./wave-loom/">Wave Loom Lab</a>',
+              1,
+          )
+          html = html.replace(
+              '<div class="hero-actions">',
+              '<div class="hero-actions"><a class="btn" href="./wave-loom/">Enter Wave Loom Lab <span aria-hidden="true">✦</span></a>',
+              1,
+          )
+          page.write_text(html)
+          PY
           touch _site/.nojekyll
           touch _site/studio/.nojekyll
+          touch _site/wave-loom/.nojekyll
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
