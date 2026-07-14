@@ -1,0 +1,428 @@
+/* ═══════════════════════════════════════════════════════════════
+   Neusic Mobile-First Shell
+   Touch-first defaults; larger screens progressively enhance them.
+═══════════════════════════════════════════════════════════════ */
+
+:root{
+  --mobile-topbar-h:58px;
+  --mobile-footer-h:calc(62px + env(safe-area-inset-bottom,0px));
+  --mobile-sheet-h:min(58dvh,560px);
+  --touch-target:44px;
+  --app-vh:100dvh;
+}
+
+html,body{
+  width:100%;
+  height:100%;
+  min-height:100%;
+  overscroll-behavior:none;
+  -webkit-text-size-adjust:100%;
+  touch-action:manipulation;
+}
+
+body{
+  min-height:var(--app-vh);
+  overflow:hidden;
+  background:#10101c;
+}
+
+#app{
+  width:100%;
+  height:var(--app-vh);
+  min-height:0;
+  overflow:hidden;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+
+button,input,select,[role="button"],[role="slider"]{
+  -webkit-tap-highlight-color:transparent;
+}
+
+button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{
+  outline:2px solid var(--acc);
+  outline-offset:2px;
+}
+
+/* ── Mobile transport: essentials stay visible; secondary commands move to a sheet. ── */
+#topbar{
+  height:var(--mobile-topbar-h);
+  min-height:var(--mobile-topbar-h);
+  padding:calc(5px + env(safe-area-inset-top,0px)) 8px 5px;
+  gap:5px;
+  overflow:hidden;
+  isolation:isolate;
+}
+
+.brand{
+  max-width:68px;
+  font-size:17px;
+  letter-spacing:-.8px;
+}
+
+.tb-btn,
+.zoom-btn{
+  min-width:var(--touch-target);
+  width:var(--touch-target);
+  min-height:var(--touch-target);
+  height:var(--touch-target);
+  border-radius:11px;
+}
+
+#btn-play{
+  width:48px;
+  min-width:48px;
+  color:#06120a;
+}
+
+#btn-rec{color:#f87171;}
+
+#topbar > .tb-sep,
+#topbar > .tb-spacer,
+#topbar > .zoom-group,
+#topbar > .mobile-secondary,
+#topbar > .tb-btn-wrap.mobile-secondary{
+  display:none!important;
+}
+
+#topbar > .chip{
+  min-width:0;
+  padding:4px 6px;
+  flex:1 1 80px;
+}
+
+#topbar > .chip:not(.bpm-chip){
+  max-width:112px;
+}
+
+#topbar > .bpm-chip{
+  flex:0 0 58px;
+}
+
+.chip-main{font-size:11px;letter-spacing:.25px;}
+.bpm-chip .chip-main{font-size:14px;}
+.chip-sub{font-size:7px;}
+
+.mobile-more-btn{
+  flex:0 0 var(--touch-target);
+  width:var(--touch-target);
+  height:var(--touch-target);
+  border:0;
+  border-radius:11px;
+  background:#202034;
+  color:#f4f1ff;
+  font-size:20px;
+  font-weight:800;
+  box-shadow:3px 3px 7px rgba(4,4,12,.72),-1px -1px 3px rgba(74,74,110,.34);
+}
+
+/* ── Main editing canvas owns the full phone width. ── */
+#main{min-height:0;position:relative;}
+#center{width:100%;min-width:0;}
+
+#overview{
+  height:28px;
+  margin:5px 5px 4px;
+  border-radius:6px;
+}
+
+#ruler{
+  height:30px;
+  margin:0 5px;
+  border-radius:6px 6px 0 0;
+}
+
+#tracks-area{
+  margin:0 5px 5px;
+  border-radius:0 0 6px 6px;
+}
+
+#tracks-scroll{
+  -webkit-overflow-scrolling:touch;
+  scroll-snap-type:y proximity;
+}
+
+.track-row{scroll-snap-align:start;}
+
+:root{
+  --hdr-w:96px;
+  --track-h:66px;
+}
+
+.track-hdr{
+  width:var(--hdr-w)!important;
+  min-width:var(--hdr-w)!important;
+  padding:5px 6px!important;
+  gap:4px!important;
+}
+
+.track-name,.sb-name{font-size:10px!important;}
+.track-kind,.track-icon{display:none!important;}
+.track-btn,.trk-btn,.track-control{min-width:28px;min-height:28px;}
+
+.clip-el{
+  min-width:24px;
+  border-radius:5px!important;
+  touch-action:none;
+}
+
+.clip-label{font-size:9px!important;}
+.clip-sub{display:none!important;}
+.clip-resize-r{width:18px!important;}
+.clip-fade-in-zone,.clip-fade-out-zone{width:30px!important;}
+
+/* ── Sidebar becomes an off-canvas track browser on phones/tablets. ── */
+#sidebar{
+  display:flex!important;
+  position:fixed;
+  z-index:880;
+  inset:var(--mobile-topbar-h) auto var(--mobile-footer-h) 0;
+  width:min(82vw,320px)!important;
+  max-width:320px;
+  transform:translateX(-105%);
+  transition:transform .22s ease;
+  box-shadow:18px 0 46px rgba(0,0,0,.48);
+}
+
+body.mobile-sidebar-open #sidebar{transform:translateX(0);}
+
+.mobile-sidebar-scrim{
+  position:fixed;
+  z-index:870;
+  inset:var(--mobile-topbar-h) 0 var(--mobile-footer-h);
+  border:0;
+  background:rgba(4,4,12,.62);
+  backdrop-filter:blur(3px);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .18s ease;
+}
+
+body.mobile-sidebar-open .mobile-sidebar-scrim{
+  opacity:1;
+  pointer-events:auto;
+}
+
+/* ── Workspaces are a draggable bottom sheet. ── */
+#drawer-handle{
+  height:20px!important;
+  min-height:20px;
+  cursor:ns-resize;
+  touch-action:none;
+}
+
+#drawer-handle .drawer-pill{width:56px;height:4px;border-radius:4px;}
+
+#drawer{
+  position:relative;
+  z-index:500;
+  max-height:calc(var(--app-vh) - var(--mobile-topbar-h) - 30px);
+}
+
+#drawer.open{
+  height:var(--mobile-sheet-h)!important;
+  border-radius:16px 16px 0 0;
+}
+
+.dtabs{
+  min-height:56px!important;
+  padding:7px 8px!important;
+  overflow-x:auto;
+  overflow-y:hidden;
+  scroll-snap-type:x proximity;
+  -webkit-overflow-scrolling:touch;
+}
+
+.dtabs::-webkit-scrollbar{display:none;}
+
+.dtab.smart-workspace-tab{
+  min-height:42px!important;
+  min-width:max-content;
+  padding:7px 12px!important;
+  scroll-snap-align:start;
+}
+
+.dpanel{
+  padding:0 8px calc(12px + env(safe-area-inset-bottom,0px))!important;
+  overflow:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+
+.workspace-context-bar{
+  min-height:48px!important;
+  margin:0 -8px 8px!important;
+  padding:6px 8px!important;
+}
+
+.workspace-context-hint,.workspace-track-chip{display:none!important;}
+.workspace-hide-btn{min-width:44px;min-height:38px;}
+
+/* ── Persistent bottom navigation. ── */
+#mobile-nav,
+.neusic-system-footer{
+  height:var(--mobile-footer-h)!important;
+  min-height:var(--mobile-footer-h)!important;
+  padding:5px max(8px,env(safe-area-inset-right)) max(5px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))!important;
+  gap:5px!important;
+  flex-shrink:0;
+}
+
+.system-footer-btn{
+  min-width:0!important;
+  min-height:48px!important;
+  flex:1 1 0;
+  padding:5px 4px!important;
+  flex-direction:column;
+  gap:2px!important;
+  font-size:9px!important;
+}
+.system-footer-icon{font-size:17px!important;}
+
+/* ── Drum machine and sequencer. ── */
+.phase-a-drum-workspace{min-width:0;}
+.pad-grid{
+  width:100%!important;
+  max-width:none!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:7px!important;
+}
+.pad-btn,.mpc-pad{
+  min-width:0!important;
+  min-height:64px!important;
+  aspect-ratio:1.15/1;
+  touch-action:none;
+}
+.pad-btn span{font-size:10px;}
+
+.phase-a-seq-area,.seq-area{
+  max-width:100%;
+  overflow:auto;
+  overscroll-behavior-x:contain;
+  -webkit-overflow-scrolling:touch;
+}
+.seq-row{min-width:720px;}
+.seq-lbl{
+  position:sticky;
+  left:0;
+  z-index:4;
+  min-width:72px!important;
+  background:#171728!important;
+}
+.step{
+  min-width:34px!important;
+  width:34px!important;
+  min-height:34px!important;
+  height:34px!important;
+  touch-action:none;
+}
+
+/* ── Sampler, piano roll, mixer and browser are horizontal-safe. ── */
+.samp-layout,.sampler-layout,.pr-layout,.mixer-layout{min-width:0!important;}
+.samp-wave{min-height:148px!important;}
+.samp-controls,.samp-actions,.pr-toolbar,.fx-toolbar{flex-wrap:wrap;}
+.chop-btn,.samp-mode,.pr-tool-btn,.auto-btn,.fx-add-btn{min-height:40px;}
+
+.pr-grid-container,.pr-vel-wrap,.pr-minimap-wrap{max-width:100%;overflow:auto;}
+.pr-grid-container canvas{min-width:720px;}
+
+.mix-strips,.pmx-scroll,.pmx-strips{
+  overflow-x:auto!important;
+  overscroll-behavior-x:contain;
+  -webkit-overflow-scrolling:touch;
+  scroll-snap-type:x proximity;
+}
+.mix-ch,.pmx-strip{scroll-snap-align:start;min-width:78px!important;}
+
+.browser-grid,.sample-grid{grid-template-columns:1fr!important;}
+.browser-item,.sample-item{min-height:52px;}
+
+/* ── Mobile action sheet. ── */
+.mobile-action-scrim{
+  position:fixed;
+  z-index:940;
+  inset:0;
+  border:0;
+  background:rgba(4,4,12,.66);
+  backdrop-filter:blur(4px);
+}
+.mobile-action-sheet{
+  position:fixed;
+  z-index:950;
+  left:8px;
+  right:8px;
+  bottom:calc(var(--mobile-footer-h) + 8px);
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+  padding:12px;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:16px;
+  background:#19192b;
+  box-shadow:0 24px 70px rgba(0,0,0,.55);
+}
+.mobile-action-sheet[hidden],.mobile-action-scrim[hidden]{display:none!important;}
+.mobile-action-btn{
+  min-height:58px;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:12px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  background:#222238;
+  color:#f5f3ff;
+  font:700 10px/1.1 inherit;
+}
+.mobile-action-btn span{font-size:19px;}
+
+/* ── Landscape phones: preserve arrangement height and shorten the sheet. ── */
+body.neusic-landscape.neusic-mobile{--mobile-sheet-h:min(48dvh,330px);}
+body.neusic-landscape.neusic-mobile #overview{display:none;}
+body.neusic-landscape.neusic-mobile #topbar{height:52px;min-height:52px;padding-top:4px;}
+body.neusic-landscape.neusic-mobile{--mobile-topbar-h:52px;}
+
+/* ── Progressive enhancement for tablets. ── */
+@media (min-width:600px){
+  :root{--hdr-w:118px;--track-h:72px;--mobile-sheet-h:min(52dvh,520px);}
+  #overview{height:34px;margin:7px 8px 5px;}
+  #ruler{margin-inline:8px;}
+  #tracks-area{margin-inline:8px;margin-bottom:7px;}
+  .pad-grid{grid-template-columns:repeat(8,minmax(0,1fr))!important;}
+  .pad-btn,.mpc-pad{min-height:70px!important;}
+  .mobile-action-sheet{left:50%;right:auto;width:min(520px,calc(100vw - 24px));transform:translateX(-50%);}
+}
+
+/* ── Desktop restores the wider productivity layout. ── */
+@media (min-width:900px){
+  :root{--mobile-topbar-h:var(--hdr);--mobile-footer-h:58px;--hdr-w:168px;--track-h:74px;}
+  #topbar{height:var(--hdr);min-height:var(--hdr);padding:0 14px;gap:8px;overflow:visible;}
+  .brand{max-width:none;font-size:20px;}
+  #topbar > .tb-sep,#topbar > .tb-spacer,#topbar > .zoom-group,#topbar > .mobile-secondary,#topbar > .tb-btn-wrap.mobile-secondary{display:flex!important;}
+  .tb-btn{width:32px;min-width:32px;height:32px;min-height:32px;border-radius:var(--rsm);}
+  .zoom-btn{width:26px;min-width:26px;height:26px;min-height:26px;}
+  #btn-play{width:32px;min-width:32px;}
+  #topbar > .chip{flex:0 0 auto;max-width:none;padding:4px 9px;}
+  .chip-main{font-size:13px;letter-spacing:.8px;}.bpm-chip .chip-main{font-size:15px;}.chip-sub{font-size:8px;}
+  .mobile-more-btn,.mobile-sidebar-scrim{display:none!important;}
+  #sidebar{position:static;display:flex!important;width:200px!important;max-width:none;transform:none;box-shadow:none;}
+  #sidebar.collapsed{width:50px!important;}
+  #overview{height:38px;margin:8px 12px 6px;}
+  #ruler{height:32px;margin-inline:12px;}
+  #tracks-area{margin:0 12px 10px;}
+  .track-hdr{width:var(--hdr-w)!important;min-width:var(--hdr-w)!important;padding:7px 9px!important;}
+  .track-kind,.track-icon{display:initial!important;}
+  .clip-sub{display:block!important;}
+  #drawer.open{height:clamp(300px,42vh,440px)!important;border-radius:0;}
+  .dpanel{padding:0 12px 12px!important;}
+  .workspace-context-bar{margin:0 -12px 10px!important;padding:7px 12px!important;}
+  .workspace-context-hint,.workspace-track-chip{display:block!important;}
+  .system-footer-btn{min-width:105px!important;min-height:40px!important;flex:0 0 auto;padding:6px 14px!important;flex-direction:row;font-size:10px!important;}
+  .pad-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;max-width:480px!important;}
+  .pad-btn,.mpc-pad{min-height:72px!important;}
+  .browser-grid,.sample-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))!important;}
+}
+
+@media (prefers-reduced-motion:reduce){
+  #sidebar,.mobile-sidebar-scrim,.mobile-action-sheet,.mobile-action-scrim{transition:none!important;animation:none!important;}
+}
