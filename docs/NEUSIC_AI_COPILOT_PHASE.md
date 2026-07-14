@@ -39,6 +39,19 @@ Hermes mode sends the same structured summary to a separately hosted bridge. The
 
 The included bridge calls Hermes scripted one-shot mode and selects `context_engine`, an empty toolset. The integration is advisory-only. Neusic remains the authority for project changes and requires the producer to press an action button.
 
+## Unified local runtime
+
+`python3 start_neusic.py` now verifies Hermes, starts the bridge, serves the landing page and Studio, opens the browser and lets the Copilot connect automatically through the same local origin.
+
+The runtime:
+
+- binds to `127.0.0.1` by default
+- refuses non-local binding unless `NEUSIC_HERMES_TOKEN` is configured
+- supports bearer-token authentication for remote bridges
+- stores an entered bridge token in browser `sessionStorage` only
+- serves `/`, `/studio/`, `/health` and `/api/hermes` from one process
+- keeps Hermes restricted to the empty `context_engine` toolset
+
 ## Next production layer
 
 1. Dedicated Neusic MCP server with schema-validated read tools.

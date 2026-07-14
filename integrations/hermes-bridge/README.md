@@ -1,39 +1,69 @@
-# Neusic Hermes Agent Bridge
+# Neusic Hermes Agent Runtime
 
-Neusic is a static browser DAW. Hermes Agent is a local or server-side process. The correct integration is a small bridge between them—not installing Hermes inside GitHub Pages and never putting provider keys in browser JavaScript.
+Neusic is a browser DAW and Hermes Agent is a local or server-side process. This integration keeps those boundaries separate while making local use a one-command experience.
 
-## What the bridge does
+## One-command local launch
 
-- Accepts a producer question plus structured Neusic project metadata.
-- Never receives raw audio buffers.
-- Invokes Hermes in scripted one-shot mode.
-- Restricts Hermes to the empty `context_engine` toolset.
-- Returns only the final advisory response.
-- Applies no DAW changes automatically.
-
-## Requirements
-
-1. Install and configure Hermes Agent.
-2. Confirm this works in a terminal:
+From the Neusic repository root:
 
 ```bash
-hermes -z "Reply READY" --toolsets context_engine
+python3 start_neusic.py
 ```
 
-3. Start the bridge:
+The launcher will:
+
+1. Verify that the `hermes` command is installed and configured.
+2. Start the restricted Hermes bridge.
+3. Serve the Neusic landing page and Studio from the same local origin.
+4. Open `http://127.0.0.1:8787/studio/` in the default browser.
+5. Let the Production Copilot detect and connect to Hermes automatically.
+
+Stop it with `Ctrl+C` in the terminal.
+
+## Required Hermes setup
+
+Hermes must already have a working provider or OAuth session. Confirm or repair that separately with:
 
 ```bash
-cd integrations/hermes-bridge
-python3 server.py
+hermes model
+hermes doctor
 ```
 
-Default endpoint:
+A direct bridge check is available with:
 
-```text
-http://127.0.0.1:8787/api/hermes
+```bash
+python3 integrations/hermes-bridge/server.py --check-only
 ```
 
-For a locally served Neusic build, paste that endpoint into **Copilot → Hermes Bridge**.
+## What is exposed to Hermes
+
+Neusic sends structured metadata only:
+
+- project name and tempo
+- track names, types, instruments and fader values
+- mute, solo and record-arm state
+- active effect names
+- clip types, positions and lengths
+- arranger section names and lengths
+
+Raw `AudioBuffer` data, recordings, sample files and provider credentials are never included.
+
+## Security model
+
+Hermes is invoked in scripted one-shot mode with the empty `context_engine` toolset. Neusic requests therefore receive no terminal, file, browser, cron, messaging or computer-control tools.
+
+The local runtime binds to `127.0.0.1` by default. A non-local bind is refused unless `NEUSIC_HERMES_TOKEN` is set.
+
+For a protected bridge:
+
+```bash
+export NEUSIC_HERMES_TOKEN="use-a-long-random-secret"
+python3 integrations/hermes-bridge/server.py --host 0.0.0.0
+```
+
+Enter the same token in **Copilot → Hermes Bridge → Bridge Token**. The browser keeps that token in `sessionStorage`, not persistent project data.
+
+A public deployment also requires HTTPS, a reverse proxy or secure tunnel, authentication and an exact `NEUSIC_ALLOWED_ORIGINS` allowlist.
 
 ## Configuration
 
@@ -41,19 +71,31 @@ For a locally served Neusic build, paste that endpoint into **Copilot → Hermes
 export NEUSIC_HERMES_PROFILE="default"
 export NEUSIC_HERMES_MODEL=""
 export NEUSIC_HERMES_PROVIDER=""
-export NEUSIC_ALLOWED_ORIGINS="http://localhost:8000,https://bnsceo.github.io"
 export NEUSIC_HERMES_TIMEOUT="90"
-python3 server.py
+export NEUSIC_ALLOWED_ORIGINS="https://bnsceo.github.io"
 ```
 
-Set provider and model together when overriding the configured Hermes default.
+Set provider and model together when overriding Hermes's configured default.
 
-## GitHub Pages
+## Manual bridge-only mode
 
-The public Neusic site is HTTPS. A production bridge must also use HTTPS through a reverse proxy, secure tunnel, VPS, or serverless container. Add authentication before exposing the bridge to other users. Never publish an unrestricted Hermes bridge to the public internet.
+```bash
+python3 integrations/hermes-bridge/server.py
+```
 
-## Security
+Default API endpoint:
 
-Hermes scripted one-shot mode automatically bypasses interactive approvals, so the bridge explicitly selects `context_engine`, an empty toolset. Terminal, file, browser, cron, messaging, computer-control, and automation tools are therefore unavailable to Neusic requests.
+```text
+http://127.0.0.1:8787/api/hermes
+```
 
-A future advanced integration should use a dedicated Neusic MCP server with narrowly defined read tools and confirmation-required write tools.
+## Local URLs
+
+When using `python3 start_neusic.py`:
+
+- Landing page: `http://127.0.0.1:8787/`
+- Studio: `http://127.0.0.1:8787/studio/`
+- Health check: `http://127.0.0.1:8787/health`
+- Hermes endpoint: `http://127.0.0.1:8787/api/hermes`
+
+Hermes remains advisory-only. DAW changes still require explicit Neusic controls and remain subject to undo/autosave.
