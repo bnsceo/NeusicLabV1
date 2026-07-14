@@ -1,10 +1,9 @@
-name: Deploy Neusic Studio Pages
+name: Deploy Neusic Pages
 
 on:
   push:
     branches:
       - main
-      - agent/phase-a-production-integrity
   workflow_dispatch:
 
 permissions:
@@ -29,10 +28,13 @@ jobs:
       - name: Prepare production site
         run: |
           rm -rf _site
-          cp -R app _site
-          mv _site/index.html _site/core.html
-          mv _site/phase-a.html _site/index.html
+          mkdir -p _site/studio
+          cp index.html _site/index.html
+          cp -R app/. _site/studio/
+          mv _site/studio/index.html _site/studio/core.html
+          mv _site/studio/phase-a.html _site/studio/index.html
           touch _site/.nojekyll
+          touch _site/studio/.nojekyll
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
