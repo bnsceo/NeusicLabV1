@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="wave-polish.css">
   <link rel="stylesheet" href="loom-pro.css">
+  <link rel="stylesheet" href="sample-import.css">
 </head>
 <body>
   <div class="nebula" aria-hidden="true"></div>
@@ -53,6 +54,15 @@
       <button id="captureBtn" class="action-button accent" type="button" disabled>
         <span>◉</span><b>CAPTURE LAST 5S</b>
       </button>
+      <div class="capture-divider"><span>OR ADD YOUR OWN SAMPLE</span></div>
+      <button id="recordSampleBtn" class="action-button" type="button">
+        <span class="led"></span><b>RECORD FULL SAMPLE</b>
+      </button>
+      <button id="uploadSampleBtn" class="action-button accent" type="button">
+        <span>＋</span><b>UPLOAD AUDIO FILE</b>
+      </button>
+      <input id="sampleFileInput" type="file" accept="audio/*,.wav,.wave,.mp3,.m4a,.aac,.flac,.ogg,.oga,.opus,.webm,.mp4" multiple hidden>
+      <div class="sample-input-status" id="sampleInputStatus" role="status">WAV, MP3, M4A, AAC, FLAC, OGG, OPUS, WEBM and other browser-decodable audio.</div>
       <div class="input-meter" aria-label="Input level">
         <span id="inputMeter"></span>
       </div>
@@ -189,6 +199,10 @@
         </div>
       </div>
       <div class="sample-shelf" id="sampleShelf" aria-live="polite"></div>
+      <section class="uploaded-samples" id="uploadedSamples" aria-live="polite">
+        <header><span>YOUR IMPORTS</span><b id="uploadedSampleCount">0 SAMPLES</b></header>
+        <div class="uploaded-sample-shelf" id="uploadedSampleShelf"></div>
+      </section>
     </section>
   </main>
 
@@ -202,6 +216,7 @@
         <article><b>Sequence</b><p>Drag an orb for timing and pitch. Snap keeps nodes musical; hold Alt while dragging to move freely.</p></article>
         <article><b>Undo + presets</b><p>Use undo and redo for geometry, nodes and Sample Blocks. Load a starting wave when you do not want a blank canvas.</p></article>
         <article><b>Forge</b><p>Zoom into a waveform for tight cuts, or auto-slice a selected Sample Block by detected transients.</p></article>
+        <article><b>Record or upload</b><p>Record a sample of any length or upload any audio format your browser can decode, then preview or unfold it directly into the Loom.</p></article>
         <article><b>Export</b><p>Export renders four loop passes plus effect tail to a stereo WAV that can be imported into the Classic DAW.</p></article>
         <article><b>Patch files</b><p>Save or load geometry, nodes, tempo, scale, macros and loop boundaries as a portable JSON patch.</p></article>
       </div>
@@ -210,6 +225,7 @@
   </dialog>
 
   <script src="app.js"></script>
+  <script src="sample-import.js"></script>
   <script src="wave-polish.js"></script>
 </body>
 </html>
