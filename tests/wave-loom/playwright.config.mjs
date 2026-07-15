@@ -1,4 +1,7 @@
 import {defineConfig,devices} from '@playwright/test';
+import {fileURLToPath} from 'node:url';
+
+const repositoryRoot=fileURLToPath(new URL('../..',import.meta.url));
 
 export default defineConfig({
   testDir:'.',
@@ -23,6 +26,7 @@ export default defineConfig({
   ],
   webServer:{
     command:'python3 -m http.server 4173 --bind 127.0.0.1',
+    cwd:repositoryRoot,
     url:'http://127.0.0.1:4173/wave-loom/',
     reuseExistingServer:true,
     timeout:20_000
