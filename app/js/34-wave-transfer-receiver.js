@@ -18,11 +18,11 @@
   async function getTransfer(id){const db=await openDb();const value=await new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readonly'),request=tx.objectStore(STORE).get(id);request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});db.close();return value;}
   async function removeTransfer(id){const db=await openDb();await new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(id);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);});db.close();}
 
-  function waitForStudio(frame,timeout=18000){return new Promise((resolve,reject)=>{const started=Date.now();const inspect=()=>{try{const win=frame.contentWindow;if(win?.Audio_&&win?.S&&typeof win.renderTracks==='function'&&typeof win.secToBeat==='function')return resolve(win);}catch(_){}if(Date.now()-started>timeout)return reject(new Error('Classic Studio did not expose its audio workspace.'));setTimeout(inspect,90);};if(frame.contentDocument?.readyState==='complete')inspect();else frame.addEventListener('load',inspect,{once:true});setTimeout(inspect,120);});}
+  function waitForStudio(frame,timeout=18000){return new Promise((resolve,reject)=>{const started=Date.now();const inspect=()=>{try{const win=frame.contentWindow,bridge=win?.__NeusicStudioBridge;if(bridge?.Audio_&&bridge?.S&&typeof bridge.renderTracks==='function'&&typeof bridge.secToBeat==='function')return resolve({win,bridge});}catch(_){}if(Date.now()-started>timeout)return reject(new Error('Classic Studio did not expose its audio workspace.'));setTimeout(inspect,90);};if(frame.contentDocument?.readyState==='complete')inspect();else frame.addEventListener('load',inspect,{once:true});setTimeout(inspect,120);});}
 
-  function buildBuffer(win,pcm){
+  function buildBuffer(bridge,pcm){
     if(!pcm?.channels?.length)throw new Error('The Wave Loom transfer contains no PCM audio.');
-    const ctx=win.Audio_.ensure();
+    const ctx=bridge.Audio_.ensure();
     const channels=pcm.channels.map(channel=>new Float32Array(channel));
     const length=Math.max(1,...channels.map(channel=>channel.length));
     const buffer=ctx.createBuffer(Math.max(1,channels.length),length,pcm.sampleRate||ctx.sampleRate);
@@ -30,23 +30,23 @@
     return buffer;
   }
 
-  function uniqueTrackId(win){return Math.max(0,...win.S.tracks.map(track=>Number(track.id)||0))+1;}
+  function uniqueTrackId(bridge){return Math.max(0,...bridge.S.tracks.map(track=>Number(track.id)||0))+1;}
 
-  function importIntoStudio(win,record){
-    const buffer=buildBuffer(win,record.pcm);
+  function importIntoStudio(win,bridge,record){
+    const buffer=buildBuffer(bridge,record.pcm);
     const bufferId=`wave_${Date.now()}_${Math.floor(Math.random()*1e6)}`;
-    win.Audio_.registerBuffer(bufferId,buffer,record.name||'Wave Loom Audio');
-    win.snapshot?.();
-    const id=uniqueTrackId(win);
-    const color=(win.COLORS&&win.COLORS[(id-1)%win.COLORS.length])||'#29f3ff';
-    const track={id,name:record.name||`Wave Loom ${id}`,icon:'≈',color,type:'audio',m:false,s:false,arm:false,clips:[{id:`wave_clip_${Date.now()}`,start:0,len:Math.max(.25,win.secToBeat(buffer.duration)),label:record.name||'Wave Loom Audio',bufferId,wavePatch:record.patch||null,waveMetadata:{tempo:record.tempo,root:record.root,scale:record.scale,slices:record.slices||[],...(record.metadata||{})}}]};
-    win.S.tracks.push(track);
-    win.S.activeTrack=win.S.tracks.length-1;
-    win.S.trackVol[id]=.85;
-    win.S.trackFx[id]=[{type:'compressor',on:true,wet:.35}];
-    win.renderTracks();
-    win.Audio_.refreshAllTrackGains?.();
-    win.toast?.(`${track.name} imported from Wave Loom`);
+    bridge.Audio_.registerBuffer(bufferId,buffer,record.name||'Wave Loom Audio');
+    bridge.snapshot?.();
+    const id=uniqueTrackId(bridge);
+    const color=(bridge.COLORS&&bridge.COLORS[(id-1)%bridge.COLORS.length])||'#29f3ff';
+    const track={id,name:record.name||`Wave Loom ${id}`,icon:'≈',color,type:'audio',m:false,s:false,arm:false,clips:[{id:`wave_clip_${Date.now()}`,start:0,len:Math.max(.25,bridge.secToBeat(buffer.duration)),label:record.name||'Wave Loom Audio',bufferId,wavePatch:record.patch||null,waveMetadata:{tempo:record.tempo,root:record.root,scale:record.scale,slices:record.slices||[],...(record.metadata||{})}}]};
+    bridge.S.tracks.push(track);
+    bridge.S.activeTrack=bridge.S.tracks.length-1;
+    bridge.S.trackVol[id]=.85;
+    bridge.S.trackFx[id]=[{type:'compressor',on:true,wet:.35}];
+    bridge.renderTracks();
+    bridge.Audio_.refreshAllTrackGains?.();
+    bridge.toast?.(`${track.name} imported from Wave Loom`);
     win.NeusicWaveTransfer={record,trackId:id,bufferId};
     return track;
   }
@@ -58,8 +58,8 @@
       if(!record?.pcm)throw new Error('This Wave Loom transfer is missing or has expired.');
       const frame=document.getElementById('studio');
       if(!frame)throw new Error('The Studio frame is unavailable.');
-      const win=await waitForStudio(frame);
-      const track=importIntoStudio(win,record);
+      const {win,bridge}=await waitForStudio(frame);
+      const track=importIntoStudio(win,bridge,record);
       await removeTransfer(transferId);
       const url=new URL(location.href);url.searchParams.delete('waveTransfer');url.searchParams.delete('source');history.replaceState({},'',url);
       status(`${track.name} was added as a real audio track in Classic Studio.`);
