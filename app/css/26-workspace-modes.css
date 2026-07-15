@@ -1,0 +1,361 @@
+/* Neusic Workspace Modes — full-screen editors with hyper-real hardware chrome. */
+:root{
+  --ws-rail:86px;
+  --ws-inspector:254px;
+  --ws-header:54px;
+  --ws-status:27px;
+  --ws-metal-hi:#394247;
+  --ws-metal-mid:#20272b;
+  --ws-metal-low:#090c0e;
+  --ws-glass:rgba(8,12,14,.94);
+}
+
+#app{
+  height:100dvh!important;
+  min-height:0!important;
+  display:grid!important;
+  grid-template-rows:auto minmax(0,1fr) var(--ws-status)!important;
+  overflow:hidden!important;
+}
+#topbar{
+  position:relative!important;
+  inset:auto!important;
+  z-index:70!important;
+  flex:0 0 auto!important;
+}
+#main,#drawer{
+  position:relative!important;
+  inset:auto!important;
+  transform:none!important;
+  min-width:0!important;
+  min-height:0!important;
+}
+#toolbar,#drawer-handle,#mobile-nav{display:none!important}
+
+.neusic-workspace-shell{
+  min-width:0;
+  min-height:0;
+  display:grid;
+  grid-template-columns:var(--ws-rail) minmax(0,1fr) var(--ws-inspector);
+  overflow:hidden;
+  border-top:1px solid #050607;
+  background:
+    radial-gradient(circle at 52% -10%,color-mix(in srgb,var(--acc) 9%,transparent),transparent 35%),
+    linear-gradient(145deg,#121719,#080b0c 64%);
+}
+
+.neusic-workspace-rail{
+  min-width:0;
+  overflow:auto;
+  padding:8px 7px 10px;
+  border-right:1px solid #050607;
+  background:linear-gradient(90deg,#090c0e,#1c2225 48%,#080a0c);
+  box-shadow:inset -1px 0 #ffffff0b,5px 0 18px #0009;
+  scrollbar-width:none;
+}
+.neusic-workspace-rail::-webkit-scrollbar{display:none}
+.neusic-rail-label{
+  display:block;
+  padding:8px 3px 10px;
+  color:var(--txt3);
+  text-align:center;
+  font:800 6px/1 var(--mono);
+  letter-spacing:.16em;
+  text-transform:uppercase;
+}
+.neusic-workspace-button{
+  width:100%;
+  min-height:57px;
+  display:grid;
+  place-items:center;
+  gap:4px;
+  margin:0 0 6px;
+  padding:7px 3px;
+  border:1px solid #050607;
+  border-radius:7px;
+  background:linear-gradient(145deg,var(--ws-metal-hi),var(--ws-metal-mid) 42%,var(--ws-metal-low) 82%);
+  color:#899399;
+  cursor:pointer;
+  box-shadow:inset 0 1px #ffffff18,inset 0 -1px #000,0 4px 8px #000b;
+  transition:filter .13s ease,transform .13s ease,border-color .13s ease,color .13s ease;
+}
+.neusic-workspace-button:hover{filter:brightness(1.15);color:#d8e0e3}
+.neusic-workspace-button:active{transform:translateY(1px);box-shadow:inset 0 2px 5px #000}
+.neusic-workspace-button.active{
+  border-color:color-mix(in srgb,var(--acc) 70%,#342a19);
+  color:var(--acc-bright);
+  background:linear-gradient(145deg,color-mix(in srgb,var(--acc) 30%,#343b3e),#17130d 62%,#070809);
+  box-shadow:inset 0 1px #ffffff20,inset 3px 0 var(--acc),0 0 16px color-mix(in srgb,var(--acc) 18%,transparent),0 4px 9px #000c;
+}
+.neusic-workspace-button i{
+  width:26px;
+  height:22px;
+  display:grid;
+  place-items:center;
+  border:1px solid #050607;
+  border-radius:4px;
+  background:#090c0d;
+  color:inherit;
+  font:800 7px/1 var(--mono);
+  font-style:normal;
+  letter-spacing:.06em;
+  box-shadow:inset 0 1px #ffffff0b;
+}
+.neusic-workspace-button span{font:750 9px/1 var(--ui)}
+
+.neusic-workspace-stage{
+  min-width:0;
+  min-height:0;
+  display:grid;
+  grid-template-rows:var(--ws-header) minmax(0,1fr);
+  overflow:hidden;
+}
+.neusic-workspace-header{
+  min-width:0;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  gap:13px;
+  padding:7px 12px;
+  border-bottom:1px solid #050607;
+  background:linear-gradient(#293034,#111517 68%,#0a0d0e);
+  box-shadow:inset 0 1px #ffffff12,inset 0 -1px #ffffff08,0 6px 18px #0008;
+}
+.neusic-workspace-back{
+  display:none;
+  width:38px;
+  height:38px;
+  border:1px solid #050607;
+  border-radius:6px;
+  background:linear-gradient(#353d41,#101315);
+  color:#a8b1b6;
+  box-shadow:inset 0 1px #ffffff15,0 3px 7px #0009;
+}
+.neusic-workspace-title{min-width:0}
+.neusic-workspace-title small{
+  display:block;
+  color:var(--acc);
+  font:800 6px/1 var(--mono);
+  letter-spacing:.16em;
+  text-transform:uppercase;
+}
+.neusic-workspace-title b{
+  display:block;
+  margin-top:5px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font:650 20px/1 var(--display);
+  letter-spacing:-.015em;
+}
+.neusic-workspace-meta{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:#687279;
+  font:700 7px/1 var(--mono);
+  letter-spacing:.08em;
+  white-space:nowrap;
+}
+.neusic-workspace-meta i{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#80a889;
+  box-shadow:0 0 8px #80a889;
+}
+.neusic-workspace-content{position:relative;min-width:0;min-height:0;overflow:hidden;background:#080a0b}
+.neusic-workspace-content>#main,
+.neusic-workspace-content>#drawer{width:100%!important;height:100%!important;min-height:0!important}
+.neusic-workspace-shell[data-workspace="arrange"] #main{display:flex!important}
+.neusic-workspace-shell[data-workspace="arrange"] #drawer{display:none!important}
+.neusic-workspace-shell:not([data-workspace="arrange"]) #main{display:none!important}
+.neusic-workspace-shell:not([data-workspace="arrange"]) #drawer{
+  display:grid!important;
+  grid-template-rows:minmax(0,1fr)!important;
+  overflow:hidden!important;
+  border:0!important;
+  border-radius:0!important;
+  background:#080a0b!important;
+  box-shadow:none!important;
+}
+.neusic-workspace-shell #drawer.open{height:100%!important;max-height:none!important}
+.neusic-workspace-shell #drawer .dtabs{display:none!important}
+.neusic-workspace-shell #drawer .dpanels{
+  min-height:0!important;
+  height:100%!important;
+  overflow:hidden!important;
+  padding:0!important;
+  background:#080a0b!important;
+}
+.neusic-workspace-shell #drawer .dpanel{
+  position:relative!important;
+  inset:auto!important;
+  width:100%!important;
+  height:100%!important;
+  max-height:none!important;
+  min-height:0!important;
+  overflow:auto!important;
+  padding:14px!important;
+  border:0!important;
+  background:
+    radial-gradient(circle at 50% -15%,color-mix(in srgb,var(--acc) 6%,transparent),transparent 34%),
+    linear-gradient(#121719,#080a0b 44%)!important;
+}
+.neusic-workspace-shell #drawer .dpanel:not(.active){display:none!important}
+.neusic-workspace-shell #drawer .dpanel.active{display:block!important}
+
+.neusic-context-inspector{
+  min-width:0;
+  overflow:auto;
+  border-left:1px solid #050607;
+  background:linear-gradient(90deg,#080b0c,#181e21 56%,#0a0d0e);
+  box-shadow:inset 1px 0 #ffffff0b,-5px 0 18px #0008;
+}
+.neusic-inspector-head{padding:15px 14px;border-bottom:1px solid #050607;background:linear-gradient(#2b3236,#101416)}
+.neusic-inspector-head small{color:var(--txt3);font:800 6px/1 var(--mono);letter-spacing:.15em}
+.neusic-inspector-head b{display:block;margin-top:7px;font:650 17px/1 var(--display)}
+.neusic-inspector-section{padding:13px;border-bottom:1px solid #050607}
+.neusic-inspector-section>small{display:block;margin-bottom:9px;color:#626c72;font:800 6px/1 var(--mono);letter-spacing:.14em}
+.neusic-inspector-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.neusic-inspector-readout{
+  padding:9px;
+  border:1px solid #050607;
+  border-radius:5px;
+  background:#090c0d;
+  box-shadow:inset 0 1px #ffffff08;
+}
+.neusic-inspector-readout small{display:block;color:#59636a;font:700 6px/1 var(--mono)}
+.neusic-inspector-readout b{display:block;margin-top:6px;color:#b6cfbb;font:750 11px/1 var(--mono);font-variant-numeric:tabular-nums}
+.neusic-inspector-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.neusic-inspector-actions button,.neusic-inspector-actions a{
+  min-height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 8px;
+  border:1px solid #050607;
+  border-radius:5px;
+  background:linear-gradient(#30383c,#101315);
+  color:#a6afb4;
+  text-decoration:none;
+  font:800 7px/1 var(--mono);
+  letter-spacing:.06em;
+  box-shadow:inset 0 1px #ffffff14,0 3px 7px #0009;
+  cursor:pointer;
+}
+.neusic-inspector-actions button:hover,.neusic-inspector-actions a:hover{color:var(--acc-bright);filter:brightness(1.12)}
+.neusic-inspector-note{margin:0;color:#768187;font-size:10px;line-height:1.6}
+
+.neusic-status-bar{
+  min-width:0;
+  display:grid;
+  grid-template-columns:auto 1fr auto auto;
+  align-items:center;
+  gap:14px;
+  padding:0 12px;
+  border-top:1px solid #050607;
+  background:linear-gradient(#202629,#0a0d0e);
+  color:#657076;
+  font:700 6px/1 var(--mono);
+  letter-spacing:.08em;
+  box-shadow:inset 0 1px #ffffff0d;
+}
+.neusic-status-bar b{color:#98a2a7;font-weight:800}.neusic-status-bar i{display:inline-block;width:6px;height:6px;margin-right:6px;border-radius:50%;background:#80a889;box-shadow:0 0 7px #80a889}
+
+.neusic-mobile-nav,.neusic-action-layer{display:none}
+
+@media(max-width:1180px){
+  :root{--ws-inspector:218px;--ws-rail:78px}
+  .neusic-workspace-button span{font-size:8px}
+  .neusic-workspace-meta span:last-child{display:none}
+}
+
+@media(max-width:900px){
+  :root{--ws-header:48px;--ws-status:0px}
+  #app{grid-template-rows:auto minmax(0,1fr)!important;padding-bottom:calc(62px + env(safe-area-inset-bottom))}
+  .neusic-workspace-shell{grid-template-columns:minmax(0,1fr)}
+  .neusic-workspace-rail,.neusic-context-inspector,.neusic-status-bar{display:none!important}
+  .neusic-workspace-header{padding:5px 8px;gap:8px}
+  .neusic-workspace-back{display:grid;place-items:center}
+  .neusic-workspace-shell[data-workspace="arrange"] .neusic-workspace-back{visibility:hidden}
+  .neusic-workspace-title b{font-size:17px}.neusic-workspace-title small{font-size:5px}
+  .neusic-workspace-meta{font-size:6px}.neusic-workspace-meta span:last-child{display:none}
+  .neusic-workspace-shell #drawer .dpanel{padding:8px!important;padding-bottom:18px!important}
+  .neusic-empty-state{left:8px!important;right:8px!important}
+  .neusic-mobile-nav{
+    position:fixed;
+    z-index:1000;
+    left:0;
+    right:0;
+    bottom:0;
+    height:calc(62px + env(safe-area-inset-bottom));
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    padding:5px 5px env(safe-area-inset-bottom);
+    border-top:1px solid #050607;
+    background:linear-gradient(#252c30f5,#090c0ef8);
+    backdrop-filter:blur(18px);
+    box-shadow:0 -10px 28px #000a,inset 0 1px #ffffff10;
+  }
+  .neusic-mobile-nav button{
+    min-width:0;
+    border:1px solid transparent;
+    border-radius:7px;
+    background:transparent;
+    color:#778187;
+    font-size:9px;
+    font-weight:750;
+  }
+  .neusic-mobile-nav button i{display:block;margin-bottom:4px;font:800 10px/1 var(--mono);font-style:normal}
+  .neusic-mobile-nav button.active{border-color:color-mix(in srgb,var(--acc) 42%,#050607);background:color-mix(in srgb,var(--acc) 10%,#101416);color:var(--acc-bright);box-shadow:inset 0 -2px var(--acc)}
+  .neusic-action-layer{position:fixed;z-index:1100;inset:0;display:block;pointer-events:none;background:#0000;transition:background .18s}.neusic-action-layer.open{pointer-events:auto;background:#0009}
+  .neusic-action-menu{
+    position:absolute;
+    left:8px;
+    right:8px;
+    bottom:calc(70px + env(safe-area-inset-bottom));
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:7px;
+    padding:11px;
+    border:1px solid #424b50;
+    border-radius:13px;
+    background:linear-gradient(145deg,#30383c,#101416 38%,#080a0b);
+    box-shadow:0 26px 70px #000d,inset 0 1px #ffffff18;
+    transform:translateY(18px);
+    opacity:0;
+    transition:transform .2s ease,opacity .2s ease;
+  }
+  .neusic-action-layer.open .neusic-action-menu{transform:none;opacity:1}
+  .neusic-action-menu header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:3px 2px 7px;color:#9ca6aa;font:800 7px/1 var(--mono);letter-spacing:.12em}
+  .neusic-action-menu header button{width:32px;height:32px;border:1px solid #050607;border-radius:50%;background:#111517;color:#fff}
+  .neusic-action-menu>button,.neusic-action-menu>a{
+    min-height:48px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid #050607;
+    border-radius:7px;
+    background:linear-gradient(#323a3e,#101315);
+    color:#aab3b7;
+    text-decoration:none;
+    font:800 8px/1 var(--mono);
+    letter-spacing:.05em;
+    box-shadow:inset 0 1px #ffffff14,0 4px 8px #0009;
+  }
+  .neusic-action-menu>button:active,.neusic-action-menu>a:active{transform:translateY(1px);box-shadow:inset 0 2px 5px #000}
+}
+
+@media(orientation:landscape) and (max-height:520px){
+  :root{--ws-header:40px}
+  #app{padding-bottom:50px}
+  .neusic-mobile-nav{height:50px;grid-template-columns:repeat(5,1fr);padding-block:3px}
+  .neusic-mobile-nav button i{display:inline;margin-right:4px}.neusic-mobile-nav button{font-size:8px}
+  .neusic-action-menu{bottom:55px;grid-template-columns:repeat(4,1fr)}
+  .neusic-workspace-title b{font-size:15px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .neusic-workspace-button,.neusic-action-layer,.neusic-action-menu{transition:none!important}
+}
