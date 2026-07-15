@@ -9,12 +9,12 @@
   navWrap.insertBefore(menu,navWrap.querySelector('.actions'));
   const drawer=document.createElement('div');drawer.className='neusic-mobile-menu';drawer.setAttribute('aria-label','Mobile navigation');
   (links?[...links.querySelectorAll('a')]:[]).forEach(link=>drawer.append(link.cloneNode(true)));
-  [['Studio','./studio/'],['Wave Loom','./wave-loom/']].forEach(([label,href])=>{const a=document.createElement('a');a.href=href;a.textContent=label;drawer.append(a)});
+  [['Open Studio','./studio/'],['Live Loop','./live-loop/'],['Wave Loom','./wave-loom/']].forEach(([label,href])=>{const a=document.createElement('a');a.href=href;a.textContent=label;drawer.append(a)});
   document.body.append(drawer);
   menu.addEventListener('click',()=>{const open=drawer.classList.toggle('open');menu.setAttribute('aria-expanded',String(open));menu.textContent=open?'×':'☰'});
   drawer.addEventListener('click',event=>{if(event.target.closest('a')){drawer.classList.remove('open');menu.setAttribute('aria-expanded','false');menu.textContent='☰'}});
   document.addEventListener('keydown',event=>{if(event.key==='Escape'){drawer.classList.remove('open');menu.setAttribute('aria-expanded','false');menu.textContent='☰'}});
-  const launch=document.createElement('div');launch.className='neusic-mobile-launch';launch.innerHTML='<a href="./studio/">OPEN STUDIO ▶</a><a href="./wave-loom/">WAVE LOOM ⌁</a>';document.body.append(launch);
+  const launch=document.createElement('div');launch.className='neusic-mobile-launch';launch.innerHTML='<a href="./studio/">OPEN STUDIO ▶</a><a href="#projects">VIEW PROJECTS ↓</a>';document.body.append(launch);
   const updateNav=()=>nav.classList.toggle('scrolled',scrollY>24);updateNav();addEventListener('scroll',updateNav,{passive:true});
   const targets=[...document.querySelectorAll('section .section-head,.feature,.flow-card,.road,.theme-picker,.brain,.cta-box')];
   if('IntersectionObserver' in window&&!matchMedia('(prefers-reduced-motion: reduce)').matches){targets.forEach(el=>el.classList.add('reveal-ready'));const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('revealed');observer.unobserve(entry.target)}}),{threshold:.08});targets.forEach(el=>observer.observe(el));}else targets.forEach(el=>el.classList.add('revealed'));

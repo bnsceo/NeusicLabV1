@@ -68,18 +68,10 @@ jobs:
 
           landing = Path('_site/index.html')
           html = landing.read_text()
-          html = html.replace(
-              '<div class="actions">',
-              '<div class="actions"><a class="btn" href="./live-loop/">Live Loop Lab</a><a class="btn" href="./wave-loom/">Wave Loom Lab</a>',
-              1,
-          )
-          html = html.replace(
-              '<div class="hero-actions">',
-              '<div class="hero-actions"><a class="btn" href="./live-loop/">Enter Live Loop Lab <span aria-hidden="true">●</span></a><a class="btn" href="./wave-loom/">Enter Wave Loom Lab <span aria-hidden="true">✦</span></a>',
-              1,
-          )
-          html = html.replace('</head>', '<link rel="stylesheet" href="./site-polish.css?v=4"></head>', 1)
-          html = html.replace('</body>', '<script src="./site-polish.js?v=4"></script></body>', 1)
+          if 'site-polish.css' not in html:
+              html = html.replace('</head>', '<link rel="stylesheet" href="./site-polish.css?v=5"></head>', 1)
+          if 'site-polish.js' not in html:
+              html = html.replace('</body>', '<script src="./site-polish.js?v=5"></script></body>', 1)
           landing.write_text(html)
 
           for page in Path('_site').rglob('*.html'):
