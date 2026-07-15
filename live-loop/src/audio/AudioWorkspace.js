@@ -28,9 +28,9 @@ class AudioWorkspace {
     await this.init();
     if (this.micStream) return this.micStream;
     if (!navigator.mediaDevices?.getUserMedia) throw new Error('Microphone capture is not supported in this browser.');
-    this.micStream = await navigator.mediaDevices.getUserMedia({
-      audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:2}
-    });
+    const preferred={echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:{ideal:2}};
+    try {this.micStream = await navigator.mediaDevices.getUserMedia({audio:preferred});}
+    catch (_) {this.micStream = await navigator.mediaDevices.getUserMedia({audio:true});}
     this.micSource = this.context.createMediaStreamSource(this.micStream);
     this.monitor = this.context.createGain();
     this.monitor.gain.value = 0;
