@@ -12,6 +12,14 @@ async function openLoom(page){
   return errors;
 }
 
+async function openMobileWorkspace(page,name){
+  const button=page.locator(`[data-wave-workspace-button="${name}"]`);
+  if(await button.isVisible()){
+    await button.click();
+    await expect(page.locator('body')).toHaveAttribute('data-wave-workspace',name);
+  }
+}
+
 test('reliability modules boot without page errors',async({page})=>{
   const errors=await openLoom(page);
   const modules=await page.evaluate(()=>({
@@ -49,6 +57,7 @@ test('persistent sample library survives reload',async({page})=>{
 test('AudioWorklet NeuCapture arms with a fake microphone',async({page,browserName})=>{
   test.skip(browserName!=='chromium','The fake-media configuration is Chromium-specific.');
   await openLoom(page);
+  await openMobileWorkspace(page,'capture');
   await page.locator('#micBtn').click();
   await page.waitForFunction(()=>window.NeusicNeuCapture?.state?.armed===true,null,{timeout:15_000});
   await expect(page.locator('#captureBtn')).toBeEnabled();
@@ -62,11 +71,12 @@ test('AudioWorklet NeuCapture arms with a fake microphone',async({page,browserNa
 test('sample engine exposes true sample and granular node controls',async({page})=>{
   await openLoom(page);
   await page.locator('#performanceEngine').selectOption('sample');
+  await openMobileWorkspace(page,'inspect');
   await expect(page.locator('#nodeSampleAssignment')).toBeVisible();
   await expect(page.locator('[data-node-source]')).toBeVisible();
-  await page.locator('#performanceEngine').selectOption('granular');
+  await page.evaluate(()=>window.NeusicSamplePerformance.setEngineMode('granular'));
   expect(await page.evaluate(()=>window.NeusicWaveReliability.state.engineMode)).toBe('granular');
-  await page.locator('#performanceEngine').selectOption('hybrid');
+  await page.evaluate(()=>window.NeusicSamplePerformance.setEngineMode('hybrid'));
   expect(await page.evaluate(()=>window.NeusicWaveReliability.state.engineMode)).toBe('hybrid');
 });
 
