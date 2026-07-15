@@ -8,32 +8,73 @@
   <style>
     @import url('https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&f[]=satoshi@400,500,600,700&display=swap');
     @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
-    html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#0b0d0f;font-family:"Satoshi","Manrope",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-    #boot{position:fixed;inset:0;z-index:2;display:grid;place-items:center;color:#e8ebee;background:radial-gradient(circle at 50% 28%,#1c2024,#0b0d0f 58%);transition:opacity .25s}
-    #boot.hidden{opacity:0;pointer-events:none}.boot-card{width:min(360px,84vw);text-align:center}.logo{font:650 30px/1 "Clash Display","Manrope",sans-serif;letter-spacing:.08em;text-transform:uppercase}.logo span{color:#d4a354}.sub{margin-top:9px;color:#747d83;font:700 8px/1.5 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase}.bar{height:2px;margin:22px auto 0;overflow:hidden;border:1px solid rgba(255,255,255,.06);background:#080a0c}.bar:after{content:"";display:block;width:32%;height:100%;background:#d4a354;animation:load 1.05s ease-in-out infinite alternate}@keyframes load{to{transform:translateX(215%)}}.boot-error{display:none;margin-top:18px;padding:12px;border:1px solid #7f3949;border-radius:7px;background:#210d13;color:#ffd8df;font-size:11px;line-height:1.5}.boot-error.show{display:block}.boot-error a{display:inline-flex;margin-top:10px;color:#f0c77d;font-weight:800}iframe{width:100%;height:100%;border:0;background:#0b0d0f}
+    *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#0b0d0f;font-family:"Satoshi","Manrope",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    #boot{position:fixed;inset:0;z-index:2;display:grid;place-items:center;color:#e8ebee;background:radial-gradient(circle at 50% 28%,#1c2024,#0b0d0f 58%);transition:opacity .22s}
+    #boot.hidden{opacity:0;pointer-events:none}.boot-card{width:min(390px,86vw);text-align:center}.logo{font:650 30px/1 "Clash Display","Manrope",sans-serif;letter-spacing:.08em;text-transform:uppercase}.logo span{color:#d4a354}.sub{margin-top:9px;color:#747d83;font:700 8px/1.5 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase}.bar{height:2px;margin:22px auto 0;overflow:hidden;border:1px solid rgba(255,255,255,.06);background:#080a0c}.bar:after{content:"";display:block;width:32%;height:100%;background:#d4a354;animation:load 1.05s ease-in-out infinite alternate}@keyframes load{to{transform:translateX(215%)}}.boot-error{display:none;margin-top:18px;padding:12px;border:1px solid #7f3949;border-radius:7px;background:#210d13;color:#ffd8df;font-size:11px;line-height:1.5}.boot-error.show{display:block}.boot-error a{display:inline-flex;margin-top:10px;color:#f0c77d;font-weight:800}iframe{display:block;width:100%;height:100%;border:0;background:#0b0d0f}body>.neusic-creator-top~#boot{inset:12px 0!important}body>.neusic-creator-top~iframe#studio{height:calc(100dvh - 24px)!important;margin-top:12px!important;margin-bottom:12px!important}
   </style>
 </head>
 <body>
-  <div id="boot"><div class="boot-card"><div class="logo">Neu<span>sic</span></div><div class="sub" id="boot-status">Loading the production engine</div><div class="bar"></div><div class="boot-error" id="boot-error">Neusic could not finish loading this page.<br><a href="core.html">Open the core Studio directly</a></div></div></div>
-  <iframe id="studio" src="core.html" title="Neusic digital audio workstation" allow="microphone; autoplay; clipboard-read; clipboard-write; midi"></iframe>
+  <div id="boot"><div class="boot-card"><div class="logo">Neu<span>sic</span></div><div class="sub" id="boot-status">Loading the production engine</div><div class="bar"></div><div class="boot-error" id="boot-error">The core Studio itself could not be reached.<br><a id="core-fallback" href="core.html">Open the core Studio directly</a></div></div></div>
+  <iframe id="studio" title="Neusic digital audio workstation" allow="microphone; autoplay; clipboard-read; clipboard-write; midi"></iframe>
   <script>
-    const frame=document.getElementById('studio');
-    const boot=document.getElementById('boot');
-    const status=document.getElementById('boot-status');
-    const fail=(message)=>{status.textContent=message||'Studio loading problem';document.getElementById('boot-error').classList.add('show');};
-    const timeout=setTimeout(()=>fail('The Studio is taking longer than expected.'),15000);
-    frame.addEventListener('load',async()=>{
-      const d=frame.contentDocument;
-      const css=['css/13-workspace-ux.css','css/14-production-integrity.css','css/15-mobile-first.css','css/16-project-safety.css','css/17a-studio-foundation.css','css/17b-studio-navigation.css','css/17c-studio-controls.css','css/17d-studio-mixer-mobile.css','css/18-producer-flow.css','css/19-professional-arranger.css','css/20a-hyperreal-shell.css','css/20b-hyperreal-tracks.css','css/20c-hyperreal-creator.css','css/21-production-copilot.css','css/22-premium-studio.css','css/23-recording-mix-workflow.css','css/24-piano-roll-v2.css','css/25-experience-polish.css','css/26-workspace-modes.css'];
-      css.forEach(href=>{if(!d.querySelector(`link[href="${href}"]`)){const link=d.createElement('link');link.rel='stylesheet';link.href=href;d.head.appendChild(link);}});
-      const load=src=>new Promise((resolve,reject)=>{if(d.querySelector(`script[src="${src}"]`))return resolve();const script=d.createElement('script');script.src=src;script.onload=resolve;script.onerror=()=>reject(new Error(src));d.body.appendChild(script);});
-      try{
-        const scripts=['js/22-workspace-ux.js','js/23-production-integrity.js','js/24-mobile-first.js','js/25-project-safety.js','js/26-producer-flow.js','js/27-producer-flow-hardening.js','js/28-professional-arranger.js','js/29-arranger-recovery-sync.js','js/30-track-engine.js','js/31-midi-clips.js','js/32-track-workspace.js','js/33-production-copilot.js','js/34-theme-personalization.js','js/35-recording-mix-workflow.js','js/36-piano-roll-v2.js','js/37-experience-polish.js','js/38-workspace-modes.js'];
-        for(let i=0;i<scripts.length;i++){status.textContent=`Preparing Studio ${i+1} of ${scripts.length}`;await load(scripts[i]);}
-        clearTimeout(timeout);boot.classList.add('hidden');setTimeout(()=>boot.style.display='none',300);
-      }catch(error){clearTimeout(timeout);console.error(error);fail(`A Studio enhancement failed to load: ${error.message}`);}
-    });
-    frame.addEventListener('error',()=>fail('The Studio frame could not load.'));
+    (()=>{
+      'use strict';
+      const BUILD='loader-20260715-3';
+      const frame=document.getElementById('studio');
+      const boot=document.getElementById('boot');
+      const status=document.getElementById('boot-status');
+      const errorBox=document.getElementById('boot-error');
+      const requested=new URLSearchParams(location.search).get('v')||'';
+      const cacheKey=[requested,BUILD].filter(Boolean).join('-');
+      const assetUrl=(path,base=location.href)=>{const url=new URL(path,base);url.searchParams.set('v',cacheKey);return url.href;};
+      const coreUrl=assetUrl('core.html');
+      document.getElementById('core-fallback').href=coreUrl;
+      let coreLoaded=false;
+      let bootHidden=false;
+      const hideBoot=()=>{if(bootHidden)return;bootHidden=true;boot.classList.add('hidden');setTimeout(()=>boot.style.display='none',260);};
+      const fatal=message=>{if(coreLoaded)return;status.textContent=message||'Studio loading problem';errorBox.classList.add('show');};
+      const warnInFrame=(doc,message)=>{
+        if(!doc?.body)return;
+        let warning=doc.getElementById('neusic-loader-warning');
+        if(!warning){warning=doc.createElement('div');warning.id='neusic-loader-warning';warning.setAttribute('role','status');warning.style.cssText='position:fixed;z-index:999999;right:10px;bottom:12px;max-width:min(360px,calc(100vw - 20px));padding:9px 11px;border:1px solid #72552a;border-radius:7px;background:#1b140bcc;color:#f3d89d;font:700 9px/1.45 "JetBrains Mono",monospace;box-shadow:0 12px 35px #000b;backdrop-filter:blur(12px)';doc.body.appendChild(warning);}warning.textContent=message;
+      };
+      const removeInnerCredits=doc=>{doc?.querySelectorAll?.('[data-neusic-creator]').forEach(node=>node.remove());};
+      const injectCss=(doc,href)=>{if(doc.querySelector(`link[data-neusic-enhancement="${href}"]`))return;const link=doc.createElement('link');link.rel='stylesheet';link.dataset.neusicEnhancement=href;link.href=assetUrl(href,doc.baseURI);doc.head.appendChild(link);};
+      const loadScript=(doc,src)=>new Promise(resolve=>{
+        if(doc.querySelector(`script[data-neusic-enhancement="${src}"]`))return resolve({src,ok:true,cached:true});
+        const script=doc.createElement('script');script.dataset.neusicEnhancement=src;script.src=assetUrl(src,doc.baseURI);script.async=false;
+        let settled=false;
+        const finish=ok=>{if(settled)return;settled=true;clearTimeout(timer);resolve({src,ok});};
+        const timer=setTimeout(()=>finish(false),10000);
+        script.onload=()=>finish(true);script.onerror=()=>finish(false);doc.body.appendChild(script);
+      });
+      const css=['css/13-workspace-ux.css','css/14-production-integrity.css','css/15-mobile-first.css','css/16-project-safety.css','css/17a-studio-foundation.css','css/17b-studio-navigation.css','css/17c-studio-controls.css','css/17d-studio-mixer-mobile.css','css/18-producer-flow.css','css/19-professional-arranger.css','css/20a-hyperreal-shell.css','css/20b-hyperreal-tracks.css','css/20c-hyperreal-creator.css','css/21-production-copilot.css','css/22-premium-studio.css','css/23-recording-mix-workflow.css','css/24-piano-roll-v2.css','css/25-experience-polish.css','css/26-workspace-modes.css','css/27-clarity-mobile.css'];
+      const scripts=['js/22-workspace-ux.js','js/23-production-integrity.js','js/24-mobile-first.js','js/25-project-safety.js','js/26-producer-flow.js','js/27-producer-flow-hardening.js','js/28-professional-arranger.js','js/29-arranger-recovery-sync.js','js/30-track-engine.js','js/31-midi-clips.js','js/32-track-workspace.js','js/33-production-copilot.js','js/34-theme-personalization.js','js/35-recording-mix-workflow.js','js/36-piano-roll-v2.js','js/37-experience-polish.js','js/38-workspace-modes.js','js/39-clarity-mobile.js'];
+      const timeout=setTimeout(()=>fatal('The core Studio is taking longer than expected.'),18000);
+      frame.addEventListener('load',async()=>{
+        try{if(frame.contentWindow?.location?.href==='about:blank')return;}catch(_){}
+        coreLoaded=true;clearTimeout(timeout);hideBoot();
+        const doc=frame.contentDocument;
+        if(!doc){return;}
+        removeInnerCredits(doc);
+        status.textContent='Studio ready · preparing enhancements';
+        css.forEach(href=>injectCss(doc,href));
+        const failed=[];
+        try{
+          for(let index=0;index<scripts.length;index++){
+            const result=await loadScript(doc,scripts[index]);
+            if(!result.ok)failed.push(result.src);
+          }
+        }catch(error){console.error('Neusic enhancement loader',error);failed.push('unexpected loader error');}
+        if(failed.length){
+          console.warn('Neusic loaded with optional enhancement failures:',failed);
+          warnInFrame(doc,`Studio core is running. Optional UI modules unavailable: ${failed.map(path=>path.split('/').pop()).join(', ')}`);
+        }
+      });
+      frame.addEventListener('error',()=>fatal('The Studio frame could not load.'));
+      if('serviceWorker' in navigator&&requested){navigator.serviceWorker.getRegistrations().then(registrations=>registrations.forEach(registration=>{if(registration.scope.includes('/NeusicLabV1/'))registration.unregister();})).catch(()=>{});}
+      frame.src=coreUrl;
+    })();
   </script>
 </body>
 </html>

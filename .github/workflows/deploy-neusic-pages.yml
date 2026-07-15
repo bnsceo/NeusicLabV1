@@ -40,7 +40,17 @@ jobs:
           from pathlib import Path
 
           creator_style = '''<style id="neusic-creator-credit-style">
-          .neusic-creator-credit{position:fixed;z-index:100000;pointer-events:none;color:rgba(196,225,232,.52);font:700 7px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;text-shadow:0 1px 6px #000}.neusic-creator-top{top:5px;left:10px}.neusic-creator-bottom{right:10px;bottom:7px}
+          :root{--neusic-credit-safe:12px}
+          .neusic-creator-credit{position:fixed;z-index:100000;max-width:calc(100vw - 16px);padding:2px 6px;pointer-events:none;border:1px solid rgba(110,151,160,.18);background:rgba(2,7,10,.88);color:rgba(196,225,232,.62);font:700 6px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;text-shadow:0 1px 6px #000;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.35)}
+          .neusic-creator-top{top:0;left:0;border-width:0 1px 1px 0;border-radius:0 0 4px 0}.neusic-creator-bottom{right:0;bottom:0;border-width:1px 0 0 1px;border-radius:4px 0 0 0}
+          body>.neusic-creator-top~#boot{inset:var(--neusic-credit-safe) 0!important}
+          body>.neusic-creator-top~iframe#studio{height:calc(100dvh - (var(--neusic-credit-safe) * 2))!important;margin-top:var(--neusic-credit-safe)!important;margin-bottom:var(--neusic-credit-safe)!important}
+          body>.neusic-creator-top~#app{height:calc(100dvh - (var(--neusic-credit-safe) * 2))!important;max-height:calc(100dvh - (var(--neusic-credit-safe) * 2))!important;margin-top:var(--neusic-credit-safe)!important;margin-bottom:var(--neusic-credit-safe)!important}
+          body>.neusic-creator-top~.topbar{top:var(--neusic-credit-safe)!important}
+          body>.neusic-creator-top~nav:first-of-type{top:var(--neusic-credit-safe)!important}
+          body>.neusic-creator-top~.workspace{padding-bottom:calc(8px + var(--neusic-credit-safe))!important}
+          body>.neusic-creator-bottom~#app #mobile-nav,body>.neusic-creator-bottom~#app .neusic-mobile-nav,body>.neusic-creator-bottom~.wave-mobile-dock{bottom:var(--neusic-credit-safe)!important}
+          @media(max-width:580px){.neusic-creator-credit{font-size:5px;letter-spacing:.08em;padding:2px 4px}:root{--neusic-credit-safe:10px}}
           </style>'''
           creator_markup = '<div class="neusic-creator-credit neusic-creator-top" data-neusic-creator>Made by Anderson Paulino</div><div class="neusic-creator-credit neusic-creator-bottom" data-neusic-creator>Made by Anderson Paulino</div>'
 
@@ -56,8 +66,8 @@ jobs:
               '<div class="hero-actions"><a class="btn" href="./wave-loom/">Enter Wave Loom Lab <span aria-hidden="true">✦</span></a>',
               1,
           )
-          html = html.replace('</head>', '<link rel="stylesheet" href="./site-polish.css?v=1"></head>', 1)
-          html = html.replace('</body>', '<script src="./site-polish.js?v=1"></script></body>', 1)
+          html = html.replace('</head>', '<link rel="stylesheet" href="./site-polish.css?v=2"></head>', 1)
+          html = html.replace('</body>', '<script src="./site-polish.js?v=2"></script></body>', 1)
           landing.write_text(html)
 
           for page in Path('_site').rglob('*.html'):
