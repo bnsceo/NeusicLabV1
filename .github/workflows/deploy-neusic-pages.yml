@@ -28,12 +28,13 @@ jobs:
       - name: Prepare production site
         run: |
           rm -rf _site
-          mkdir -p _site/studio _site/wave-loom
+          mkdir -p _site/studio _site/wave-loom _site/live-loop
           cp index.html _site/index.html
           cp site-polish.css _site/site-polish.css
           cp site-polish.js _site/site-polish.js
           cp -R app/. _site/studio/
           cp -R wave-loom/. _site/wave-loom/
+          cp -R live-loop/. _site/live-loop/
           mv _site/studio/index.html _site/studio/core.html
           mv _site/studio/phase-a.html _site/studio/index.html
           python - <<'PY'
@@ -49,6 +50,7 @@ jobs:
           body>.neusic-creator-top~.topbar{top:var(--neusic-credit-safe)!important}
           body>.neusic-creator-top~nav:first-of-type{top:var(--neusic-credit-safe)!important}
           body>.neusic-creator-top~.workspace{padding-bottom:calc(8px + var(--neusic-credit-safe))!important}
+          body>.neusic-creator-top~.performance-shell{padding-top:calc(28px + var(--neusic-credit-safe))!important;padding-bottom:calc(40px + var(--neusic-credit-safe))!important}
           body>.neusic-creator-bottom~#app #mobile-nav,body>.neusic-creator-bottom~#app .neusic-mobile-nav,body>.neusic-creator-bottom~.wave-mobile-dock{bottom:var(--neusic-credit-safe)!important}
           @media(max-width:580px){.neusic-creator-credit{font-size:5px;letter-spacing:.08em;padding:2px 4px}:root{--neusic-credit-safe:10px}}
           </style>'''
@@ -58,16 +60,16 @@ jobs:
           html = landing.read_text()
           html = html.replace(
               '<div class="actions">',
-              '<div class="actions"><a class="btn" href="./wave-loom/">Wave Loom Lab</a>',
+              '<div class="actions"><a class="btn" href="./live-loop/">Live Loop Lab</a><a class="btn" href="./wave-loom/">Wave Loom Lab</a>',
               1,
           )
           html = html.replace(
               '<div class="hero-actions">',
-              '<div class="hero-actions"><a class="btn" href="./wave-loom/">Enter Wave Loom Lab <span aria-hidden="true">✦</span></a>',
+              '<div class="hero-actions"><a class="btn" href="./live-loop/">Enter Live Loop Lab <span aria-hidden="true">●</span></a><a class="btn" href="./wave-loom/">Enter Wave Loom Lab <span aria-hidden="true">✦</span></a>',
               1,
           )
-          html = html.replace('</head>', '<link rel="stylesheet" href="./site-polish.css?v=2"></head>', 1)
-          html = html.replace('</body>', '<script src="./site-polish.js?v=2"></script></body>', 1)
+          html = html.replace('</head>', '<link rel="stylesheet" href="./site-polish.css?v=3"></head>', 1)
+          html = html.replace('</body>', '<script src="./site-polish.js?v=3"></script></body>', 1)
           landing.write_text(html)
 
           for page in Path('_site').rglob('*.html'):
@@ -85,6 +87,7 @@ jobs:
           touch _site/.nojekyll
           touch _site/studio/.nojekyll
           touch _site/wave-loom/.nojekyll
+          touch _site/live-loop/.nojekyll
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

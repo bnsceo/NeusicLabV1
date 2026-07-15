@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="wave-polish.css">
   <link rel="stylesheet" href="loom-pro.css">
   <link rel="stylesheet" href="sample-import.css">
+  <link rel="stylesheet" href="forge-receiver.css">
 </head>
 <body>
   <div class="nebula" aria-hidden="true"></div>
@@ -30,6 +31,7 @@
       <button id="exportBtn" class="command-button accent-command" type="button">EXPORT WAV</button>
       <button id="savePatchBtn" class="command-button" type="button">SAVE PATCH</button>
       <button id="loadPatchBtn" class="command-button" type="button">LOAD PATCH</button>
+      <a href="../live-loop/">LIVE LOOP LAB</a>
       <a href="../studio/">CLASSIC DAW</a>
       <a href="../">LANDING</a>
       <button id="helpBtn" type="button" aria-label="Open Wave Loom help">?</button>
@@ -199,8 +201,12 @@
         </div>
       </div>
       <div class="sample-shelf" id="sampleShelf" aria-live="polite"></div>
+      <section class="uploaded-samples" id="forgeTransfers" aria-live="polite" hidden>
+        <header><span>LIVE LOOP TRANSFERS</span><b id="forgeTransferCount">0 TRANSFERS</b></header>
+        <div class="uploaded-sample-shelf" id="forgeTransferShelf"></div>
+      </section>
       <section class="uploaded-samples" id="uploadedSamples" aria-live="polite">
-        <header><span>YOUR IMPORTS</span><b id="uploadedSampleCount">0 SAMPLES</b></header>
+        <header><span>FORGE INBOX</span><b id="uploadedSampleCount">0 SAMPLES</b></header>
         <div class="uploaded-sample-shelf" id="uploadedSampleShelf"></div>
       </section>
     </section>
@@ -215,7 +221,7 @@
         <article><b>Sculpt + hear</b><p>Drag the luminous wave. Each gesture rewrites the oscillator and previews the current timbre immediately.</p></article>
         <article><b>Sequence</b><p>Drag an orb for timing and pitch. Snap keeps nodes musical; hold Alt while dragging to move freely.</p></article>
         <article><b>Undo + presets</b><p>Use undo and redo for geometry, nodes and Sample Blocks. Load a starting wave when you do not want a blank canvas.</p></article>
-        <article><b>Forge</b><p>Zoom into a waveform for tight cuts, or auto-slice a selected Sample Block by detected transients.</p></article>
+        <article><b>Forge</b><p>Zoom into a waveform for tight cuts, auto-slice by transients, or receive a recorded lane directly from Live Loop Lab.</p></article>
         <article><b>Record or upload</b><p>Record a sample of any length or upload any audio format your browser can decode, then preview or unfold it directly into the Loom.</p></article>
         <article><b>Export</b><p>Export renders four loop passes plus effect tail to a stereo WAV that can be imported into the Classic DAW.</p></article>
         <article><b>Patch files</b><p>Save or load geometry, nodes, tempo, scale, macros and loop boundaries as a portable JSON patch.</p></article>
@@ -226,6 +232,7 @@
 
   <script src="app.js"></script>
   <script src="sample-import.js"></script>
+  <script src="forge-receiver.js"></script>
   <script src="wave-polish.js"></script>
 </body>
 </html>
