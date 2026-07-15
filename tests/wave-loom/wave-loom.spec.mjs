@@ -3,6 +3,10 @@ import {test,expect} from '@playwright/test';
 async function openLoom(page){
   const errors=[];
   page.on('pageerror',error=>errors.push(error.message));
+  await page.addInitScript(()=>{
+    localStorage.setItem('neusic-wave-onboarding','1');
+    localStorage.setItem('neusic-wave-mobile-workspace','loom');
+  });
   await page.goto('/wave-loom/?automation=1',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>window.NeusicWaveReliability?.state?.ready===true,null,{timeout:20_000});
   return errors;
@@ -101,6 +105,12 @@ test('Wave Loom transfer creates a real Classic Studio audio track',async({page}
   });
   await page.goto(`/app/phase-a.html?waveTransfer=${encodeURIComponent(transferId)}&source=wave-loom`,{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.getElementById('studio')?.contentWindow?.NeusicWaveTransfer?.trackId,null,{timeout:25_000});
-  const result=await page.evaluate(()=>{const win=document.getElementById('studio').contentWindow,transfer=win.NeusicWaveTransfer,track=win.S.tracks.find(item=>item.id===transfer.trackId);return{name:track?.name,buffer:Boolean(win.S.buffers[transfer.bufferId]?.buffer),clips:track?.clips?.length};});
+  const result=await page.evaluate(()=>{
+    const win=document.getElementById('studio').contentWindow;
+    const bridge=win.__NeusicStudioBridge;
+    const transfer=win.NeusicWaveTransfer;
+    const track=bridge.S.tracks.find(item=>item.id===transfer.trackId);
+    return{name:track?.name,buffer:Boolean(bridge.S.buffers[transfer.bufferId]?.buffer),clips:track?.clips?.length};
+  });
   expect(result).toEqual({name:'Automation Wave Transfer',buffer:true,clips:1});
 });
