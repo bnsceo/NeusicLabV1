@@ -25,6 +25,9 @@
       const load=src=>new Promise((resolve,reject)=>{if(d.querySelector(`script[src="${src}"]`))return resolve();const script=d.createElement('script');script.src=src;script.onload=resolve;script.onerror=reject;d.body.appendChild(script);});
       try{
         for(const src of ['js/22-workspace-ux.js','js/23-production-integrity.js','js/24-mobile-first.js','js/25-project-safety.js','js/26-producer-flow.js','js/27-producer-flow-hardening.js','js/28-professional-arranger.js','js/29-arranger-recovery-sync.js','js/30-track-engine.js','js/31-midi-clips.js','js/32-track-workspace.js','js/33-production-copilot.js'])await load(src);
+        const expose=d.createElement('script');
+        expose.textContent='window.__NeusicStudioBridge={Audio_:Audio_,S:S,renderTracks:renderTracks,secToBeat:secToBeat,snapshot:typeof snapshot==="function"?snapshot:null,toast:typeof toast==="function"?toast:null,COLORS:typeof COLORS!=="undefined"?COLORS:[]};';
+        d.body.appendChild(expose);
       }finally{
         document.getElementById('boot').style.display='none';
       }
