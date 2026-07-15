@@ -1,0 +1,52 @@
+name: Wave Loom Reliability
+
+on:
+  push:
+    branches:
+      - main
+      - agent/wave-loom-reliability-phase
+  pull_request:
+    paths:
+      - 'wave-loom/**'
+      - 'app/**'
+      - 'tests/wave-loom/**'
+      - 'package.json'
+      - '.github/workflows/wave-loom-reliability.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reliability:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install test dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Validate source modules
+        run: npm run test:wave
+
+      - name: Run browser and audio smoke tests
+        run: npm run test:browser
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wave-loom-playwright-report
+          path: tests/wave-loom/playwright-report
+          if-no-files-found: ignore
+          retention-days: 7

@@ -1,0 +1,11 @@
+(() => {
+  'use strict';
+  const R=window.NeusicWaveReliability;
+  const transferId=new URLSearchParams(location.search).get('forgeTransfer');
+  if(!transferId||!window.indexedDB||!R)return;
+  const DB='neusic-forge-bridge',STORE='transfers';
+  const openDb=()=>new Promise((resolve,reject)=>{const request=indexedDB.open(DB,1);request.onupgradeneeded=()=>{if(!request.result.objectStoreNames.contains(STORE))request.result.createObjectStore(STORE,{keyPath:'id'});};request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});
+  const getTransfer=async id=>{const db=await openDb();const value=await new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readonly'),request=tx.objectStore(STORE).get(id);request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});db.close();return value;};
+  const removeTransfer=async id=>{const db=await openDb();await new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(id);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);});db.close();};
+  R.ready.then(async value=>{if(!value)return;try{const record=await getTransfer(transferId);if(!record?.blob)throw new Error('This Live Loop transfer has expired.');R.setStatus(`Receiving ${record.name||'Live Loop audio'}…`,'live');const buffer=await R.workspace.decode(record.blob);const sample=await R.addSample({buffer,name:record.name||`Live Loop ${R.state.samples.length+1}`,mime:record.blob.type,source:'live-loop',color:'#f0c77d'});await removeTransfer(transferId);const url=new URL(location.href);url.searchParams.delete('forgeTransfer');url.searchParams.delete('source');history.replaceState({},'',url);window.NeusicWaveMobileWorkspaces?.setWorkspace?.('forge');document.getElementById('persistentForgeLibrary')?.scrollIntoView({behavior:'smooth',block:'center'});R.setStatus(`${sample.name} arrived from Live Loop and is now saved persistently.`,'live');}catch(error){console.error(error);R.setStatus(error.message||'The Live Loop transfer could not be received.','error');}});
+})();

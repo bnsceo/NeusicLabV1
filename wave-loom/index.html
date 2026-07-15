@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="loom-pro.css">
   <link rel="stylesheet" href="sample-import.css">
   <link rel="stylesheet" href="forge-receiver.css">
+  <link rel="stylesheet" href="reliability-phase.css">
 </head>
 <body>
   <div class="nebula" aria-hidden="true"></div>
@@ -65,9 +66,7 @@
       </button>
       <input id="sampleFileInput" type="file" accept="audio/*,.wav,.wave,.mp3,.m4a,.aac,.flac,.ogg,.oga,.opus,.webm,.mp4" multiple hidden>
       <div class="sample-input-status" id="sampleInputStatus" role="status">WAV, MP3, M4A, AAC, FLAC, OGG, OPUS, WEBM and other browser-decodable audio.</div>
-      <div class="input-meter" aria-label="Input level">
-        <span id="inputMeter"></span>
-      </div>
+      <div class="input-meter" aria-label="Input level"><span id="inputMeter"></span></div>
       <div class="capture-notes">
         <span><i>01</i> Arm the microphone</span>
         <span><i>02</i> Make a sound</span>
@@ -168,17 +167,9 @@
       <section class="inspector-card">
         <header><span>LOOM PARAMETERS</span><b id="patchState">AUTOSAVED</b></header>
         <label class="field-row">TEMPO<input id="tempoInput" type="number" min="40" max="220" value="112"><em>BPM</em></label>
-        <label class="field-row">ROOT<select id="rootSelect">
-          <option>C</option><option>C#</option><option>D</option><option>D#</option><option>E</option><option>F</option>
-          <option>F#</option><option>G</option><option>G#</option><option>A</option><option>A#</option><option>B</option>
-        </select></label>
-        <label class="field-row">SCALE<select id="scaleSelect">
-          <option value="minor">Minor</option><option value="major">Major</option><option value="dorian">Dorian</option>
-          <option value="pentatonic">Pentatonic</option><option value="chromatic">Chromatic</option>
-        </select></label>
-        <label class="field-row">NODE GRID<select id="snapSteps">
-          <option value="8">1/8</option><option value="16" selected>1/16</option><option value="32">1/32</option>
-        </select></label>
+        <label class="field-row">ROOT<select id="rootSelect"><option>C</option><option>C#</option><option>D</option><option>D#</option><option>E</option><option>F</option><option>F#</option><option>G</option><option>G#</option><option>A</option><option>A#</option><option>B</option></select></label>
+        <label class="field-row">SCALE<select id="scaleSelect"><option value="minor">Minor</option><option value="major">Major</option><option value="dorian">Dorian</option><option value="pentatonic">Pentatonic</option><option value="chromatic">Chromatic</option></select></label>
+        <label class="field-row">NODE GRID<select id="snapSteps"><option value="8">1/8</option><option value="16" selected>1/16</option><option value="32">1/32</option></select></label>
         <label class="toggle-row"><span>ZERO-CROSS PERCUSSION</span><input id="zeroPerc" type="checkbox" checked></label>
         <label class="toggle-row"><span>LIVE SCULPT PREVIEW</span><input id="livePreview" type="checkbox" checked></label>
       </section>
@@ -221,18 +212,26 @@
         <article><b>Sculpt + hear</b><p>Drag the luminous wave. Each gesture rewrites the oscillator and previews the current timbre immediately.</p></article>
         <article><b>Sequence</b><p>Drag an orb for timing and pitch. Snap keeps nodes musical; hold Alt while dragging to move freely.</p></article>
         <article><b>Undo + presets</b><p>Use undo and redo for geometry, nodes and Sample Blocks. Load a starting wave when you do not want a blank canvas.</p></article>
-        <article><b>Forge</b><p>Zoom into a waveform for tight cuts, auto-slice by transients, or receive a recorded lane directly from Live Loop Lab.</p></article>
-        <article><b>Record or upload</b><p>Record a sample of any length or upload any audio format your browser can decode, then preview or unfold it directly into the Loom.</p></article>
-        <article><b>Export</b><p>Export renders four loop passes plus effect tail to a stereo WAV that can be imported into the Classic DAW.</p></article>
-        <article><b>Patch files</b><p>Save or load geometry, nodes, tempo, scale, macros and loop boundaries as a portable JSON patch.</p></article>
+        <article><b>Forge</b><p>Trim, fade, normalize, reverse, detect transients, audition slices, and map true audio to trigger nodes.</p></article>
+        <article><b>Record or upload</b><p>AudioWorklet NeuCapture records sample-accurate PCM. Uploaded and recorded audio persists through refreshes.</p></article>
+        <article><b>Export</b><p>Render configurable mix and stems at 44.1/48 kHz and 16/24-bit, or send a real audio track directly to Studio.</p></article>
+        <article><b>Patch files</b><p>Geometry, nodes, tempo, scale, macros, assignments and persistent sample metadata recover automatically.</p></article>
       </div>
-      <p class="dialog-note">Wave Loom stays offline-first. Browser autosave, patch files, transient analysis and WAV rendering require no API key.</p>
+      <p class="dialog-note">Wave Loom stays offline-first. Audio capture, IndexedDB persistence, transient analysis, WAV rendering and Studio transfer require no API key.</p>
     </form>
   </dialog>
 
+  <script src="audio-workspace.js"></script>
+  <script src="wave-project-store.js"></script>
   <script src="app.js"></script>
-  <script src="sample-import.js"></script>
-  <script src="forge-receiver.js"></script>
+  <script src="reliability-core.js"></script>
+  <script src="neucapture-controller.js"></script>
+  <script src="sample-performance.js"></script>
+  <script src="forge-editor.js"></script>
+  <script src="studio-transfer.js"></script>
+  <script src="expanded-export.js"></script>
+  <script src="mobile-workspaces.js"></script>
+  <script src="live-loop-receiver-v3.js"></script>
   <script src="wave-polish.js"></script>
 </body>
 </html>
