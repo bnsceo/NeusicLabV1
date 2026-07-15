@@ -20,7 +20,7 @@ from urllib.parse import unquote, urlparse
 ROOT = Path(__file__).resolve().parents[2]
 APP_ROOT = ROOT / "app"
 WAVE_ROOT = ROOT / "wave-loom"
-STUDIO_V2_ROOT = ROOT / "studio-v2"
+LIVE_ROOT = ROOT / "live-loop"
 HOST = os.getenv("NEUSIC_HERMES_HOST", "127.0.0.1")
 PORT = int(os.getenv("NEUSIC_HERMES_PORT", "8787"))
 PROFILE = os.getenv("NEUSIC_HERMES_PROFILE", "").strip()
@@ -40,9 +40,30 @@ ALLOWED = {
 }
 
 CREATOR_STYLE = """<style id="neusic-creator-credit-style">
-.neusic-creator-credit{position:fixed;z-index:100000;pointer-events:none;color:rgba(196,225,232,.52);font:700 7px/1 \"JetBrains Mono\",ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;text-shadow:0 1px 6px #000}.neusic-creator-top{top:5px;left:10px}.neusic-creator-bottom{right:10px;bottom:7px}
+:root{--neusic-credit-safe:14px;--neusic-credit-primary:#d4a354;--neusic-credit-secondary:#f0c77d;--neusic-credit-tertiary:#68d8ff}
+.neusic-creator-credit{position:fixed;z-index:100000;max-width:calc(100vw - 16px);padding:3px 7px;pointer-events:none;border:1px solid color-mix(in srgb,var(--neusic-credit-primary) 30%,transparent);background:rgba(2,7,10,.9);font:700 6px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.42),inset 0 0 12px color-mix(in srgb,var(--neusic-credit-primary) 8%,transparent);isolation:isolate}
+.neusic-creator-credit span{display:block;color:transparent;background:linear-gradient(90deg,var(--neusic-credit-primary),var(--neusic-credit-secondary),var(--neusic-credit-tertiary),var(--neusic-credit-secondary),var(--neusic-credit-primary));background-size:320% 100%;background-position:0 50%;-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 0 3px color-mix(in srgb,var(--neusic-credit-primary) 65%,transparent));animation:neusic-credit-flow 5.2s linear infinite,neusic-credit-pulse 2.6s ease-in-out infinite alternate}
+.neusic-creator-top{top:0;left:0;border-width:0 1px 1px 0;border-radius:0 0 5px 0}.neusic-creator-bottom{right:0;bottom:0;border-width:1px 0 0 1px;border-radius:5px 0 0 0}
+@keyframes neusic-credit-flow{to{background-position:320% 50%}}@keyframes neusic-credit-pulse{from{opacity:.76;filter:drop-shadow(0 0 2px var(--neusic-credit-primary))}to{opacity:1;filter:drop-shadow(0 0 6px var(--neusic-credit-secondary))}}
+body>.neusic-creator-top~#boot{inset:var(--neusic-credit-safe) 0!important}
+body>.neusic-creator-top~iframe#studio{height:calc(100dvh - (var(--neusic-credit-safe) * 2))!important;margin-top:var(--neusic-credit-safe)!important;margin-bottom:var(--neusic-credit-safe)!important}
+body>.neusic-creator-top~#app{height:calc(100dvh - (var(--neusic-credit-safe) * 2))!important;max-height:calc(100dvh - (var(--neusic-credit-safe) * 2))!important;margin-top:var(--neusic-credit-safe)!important;margin-bottom:var(--neusic-credit-safe)!important}
+body>.neusic-creator-top~.topbar{top:var(--neusic-credit-safe)!important}
+body>.neusic-creator-top~nav:first-of-type{top:var(--neusic-credit-safe)!important}
+body>.neusic-creator-top~.workspace{padding-bottom:calc(8px + var(--neusic-credit-safe))!important}
+body>.neusic-creator-top~.performance-shell{padding-top:calc(28px + var(--neusic-credit-safe))!important;padding-bottom:calc(40px + var(--neusic-credit-safe))!important}
+body>.neusic-creator-bottom~#app #mobile-nav,body>.neusic-creator-bottom~#app .neusic-mobile-nav,body>.neusic-creator-bottom~.wave-mobile-dock{bottom:var(--neusic-credit-safe)!important}
+@media(max-width:580px){.neusic-creator-credit{font-size:5px;letter-spacing:.08em;padding:2px 5px}:root{--neusic-credit-safe:11px}}
+@media(prefers-reduced-motion:reduce){.neusic-creator-credit span{animation:none;background-position:50% 50%}}
 </style>"""
-CREATOR_MARKUP = """<div class="neusic-creator-credit neusic-creator-top" data-neusic-creator>Made by Anderson Paulino</div><div class="neusic-creator-credit neusic-creator-bottom" data-neusic-creator>Made by Anderson Paulino</div>"""
+CREATOR_MARKUP = """<div class="neusic-creator-credit neusic-creator-top" data-neusic-creator><span>Made by Anderson Paulino</span></div><div class="neusic-creator-credit neusic-creator-bottom" data-neusic-creator><span>Made by Anderson Paulino</span></div>"""
+CREATOR_SCRIPT = """<script id="neusic-creator-credit-script">
+(()=>{const root=document.documentElement,store="neusic-theme-v1";let last="";
+const hex=v=>{const m=String(v||"").trim().match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);if(!m)return null;let s=m[1];if(s.length===3)s=[...s].map(x=>x+x).join("");return "#"+s.toLowerCase()};
+const hsl=(value,turn=0,light=0)=>{const v=hex(value);if(!v)return null;let r=parseInt(v.slice(1,3),16)/255,g=parseInt(v.slice(3,5),16)/255,b=parseInt(v.slice(5,7),16)/255,max=Math.max(r,g,b),min=Math.min(r,g,b),h=0,s=0,l=(max+min)/2,d=max-min;if(d){s=d/(1-Math.abs(2*l-1));if(max===r)h=60*(((g-b)/d)%6);else if(max===g)h=60*((b-r)/d+2);else h=60*((r-g)/d+4)}h=(h+turn+360)%360;l=Math.max(.2,Math.min(.82,l+light));const c=(1-Math.abs(2*l-1))*s,x=c*(1-Math.abs((h/60)%2-1)),m=l-c/2;let a=0,q=0,z=0;if(h<60){a=c;q=x}else if(h<120){a=x;q=c}else if(h<180){q=c;z=x}else if(h<240){q=x;z=c}else if(h<300){a=x;z=c}else{a=c;z=x}return "#"+[a,q,z].map(n=>Math.round((n+m)*255).toString(16).padStart(2,"0")).join("")};
+const css=()=>getComputedStyle(root),pick=()=>{let saved={};try{saved=JSON.parse(localStorage.getItem(store)||"{}")}catch(_){}const c=css(),read=n=>hex(c.getPropertyValue(n));const primary=hex(saved.accent)||read("--studio-accent")||read("--acc")||read("--accent")||read("--cyan")||"#d4a354";const secondary=hex(saved.bright)||read("--studio-accent-bright")||read("--accent-bright")||hsl(primary,18,.16)||primary;const tertiary=hsl(primary,118,.08)||"#68d8ff";return[primary,secondary,tertiary]};
+const apply=()=>{const colors=pick(),key=colors.join("|");if(key===last)return;last=key;root.style.setProperty("--neusic-credit-primary",colors[0]);root.style.setProperty("--neusic-credit-secondary",colors[1]);root.style.setProperty("--neusic-credit-tertiary",colors[2])};apply();addEventListener("storage",apply);setInterval(apply,1000)})();
+</script>"""
 
 
 def compact(value: Any, limit: int = 24000) -> str:
@@ -145,10 +166,10 @@ def static_target(path: str) -> Path | None:
         return WAVE_ROOT / "index.html"
     if clean.startswith("/wave-loom/"):
         return safe_child(WAVE_ROOT, clean.removeprefix("/wave-loom/"))
-    if clean in {"/studio-v2", "/studio-v2/"}:
-        return STUDIO_V2_ROOT / "index.html"
-    if clean.startswith("/studio-v2/"):
-        return safe_child(STUDIO_V2_ROOT, clean.removeprefix("/studio-v2/"))
+    if clean in {"/live-loop", "/live-loop/"}:
+        return LIVE_ROOT / "index.html"
+    if clean.startswith("/live-loop/"):
+        return safe_child(LIVE_ROOT, clean.removeprefix("/live-loop/"))
     return None
 
 
@@ -161,11 +182,13 @@ def inject_creator_credit(html: str) -> str:
         close = html.find(">", html.find("<body"))
         if close >= 0:
             html = html[: close + 1] + CREATOR_MARKUP + html[close + 1 :]
+    if "</body>" in html:
+        html = html.replace("</body>", f"{CREATOR_SCRIPT}</body>", 1)
     return html
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "NeusicHermesRuntime/2.2"
+    server_version = "NeusicHermesRuntime/2.3"
 
     def security_headers(self) -> None:
         self.send_header("X-Content-Type-Options", "nosniff")
@@ -233,12 +256,12 @@ class Handler(BaseHTTPRequestHandler):
                     "auth": "required" if TOKEN else "local-only",
                     "servingApp": bool(getattr(self.server, "serve_app", False)),
                     "hermesInstalled": installed,
-                    "pages": ["/studio/", "/wave-loom/", "/studio-v2/"],
+                    "pages": ["/studio/", "/wave-loom/", "/live-loop/"],
                 },
             )
             return
         if getattr(self.server, "serve_app", False):
-            redirects = {"/studio": "/studio/", "/wave-loom": "/wave-loom/", "/studio-v2": "/studio-v2/"}
+            redirects = {"/studio": "/studio/", "/wave-loom": "/wave-loom/", "/live-loop": "/live-loop/"}
             if request_path in redirects:
                 self.redirect(redirects[request_path])
                 return
@@ -345,7 +368,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.serve_app:
         print(f"Classic Studio: {base}/studio/")
         print(f"Wave Loom Lab: {base}/wave-loom/")
-        print(f"Studio v2 Hybrid: {base}/studio-v2/")
+        print(f"Live Loop Lab: {base}/live-loop/")
         if args.open_browser:
             threading.Timer(0.5, lambda: webbrowser.open(f"{base}/studio/")).start()
     try:
