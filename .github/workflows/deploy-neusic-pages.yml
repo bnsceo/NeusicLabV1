@@ -30,6 +30,8 @@ jobs:
           rm -rf _site
           mkdir -p _site/studio _site/wave-loom
           cp index.html _site/index.html
+          cp site-polish.css _site/site-polish.css
+          cp site-polish.js _site/site-polish.js
           cp -R app/. _site/studio/
           cp -R wave-loom/. _site/wave-loom/
           mv _site/studio/index.html _site/studio/core.html
@@ -54,6 +56,8 @@ jobs:
               '<div class="hero-actions"><a class="btn" href="./wave-loom/">Enter Wave Loom Lab <span aria-hidden="true">✦</span></a>',
               1,
           )
+          html = html.replace('</head>', '<link rel="stylesheet" href="./site-polish.css?v=1"></head>', 1)
+          html = html.replace('</body>', '<script src="./site-polish.js?v=1"></script></body>', 1)
           landing.write_text(html)
 
           for page in Path('_site').rglob('*.html'):
