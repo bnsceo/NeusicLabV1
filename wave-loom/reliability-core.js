@@ -173,7 +173,7 @@
   }
 
   async function restore() {
-    await workspace.resume().catch(()=>workspace.ensure());
+    workspace.ensure();
     const [samples, project] = await Promise.all([
       store.loadSamples(state.projectId).catch(error => { console.warn(error); return []; }),
       store.loadProject(state.projectId).catch(error => { console.warn(error); return null; })
