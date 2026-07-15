@@ -4,19 +4,20 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#02060a">
-  <meta name="description" content="Wave Loom Lab is Neusic's experimental wave-native instrument, sequencer and sampling environment.">
+  <meta name="description" content="Wave Loom Lab is Neusic's wave-native instrument, sequencer, sampler and sound-design environment.">
   <title>Neusic Wave Loom Lab</title>
   <link rel="preconnect" href="https://api.fontshare.com">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="wave-polish.css">
+  <link rel="stylesheet" href="loom-pro.css">
 </head>
 <body>
   <div class="nebula" aria-hidden="true"></div>
   <header class="topbar">
     <a class="brand" href="../" aria-label="Back to Neusic">
       <span class="brand-mark">N</span>
-      <span><b>NEUSIC</b><small>WAVE LOOM LAB</small></span>
+      <span><b>NEUSIC</b><small>WAVE LOOM · PRODUCTION LAB</small></span>
     </a>
     <div class="transport" aria-label="Wave Loom transport">
       <button id="playBtn" class="transport-key primary" type="button"><span>▶</span><b>PLAY</b></button>
@@ -24,11 +25,15 @@
       <div class="lcd"><small>TEMPO</small><b id="tempoReadout">112</b><em>BPM</em></div>
       <div class="lcd wide"><small>LOOP</small><b id="loopReadout">01.1 — 04.4</b></div>
     </div>
-    <nav class="top-actions">
+    <nav class="top-actions" aria-label="Wave Loom project actions">
+      <button id="exportBtn" class="command-button accent-command" type="button">EXPORT WAV</button>
+      <button id="savePatchBtn" class="command-button" type="button">SAVE PATCH</button>
+      <button id="loadPatchBtn" class="command-button" type="button">LOAD PATCH</button>
       <a href="../studio/">CLASSIC DAW</a>
       <a href="../">LANDING</a>
-      <button id="helpBtn" type="button">?</button>
+      <button id="helpBtn" type="button" aria-label="Open Wave Loom help">?</button>
     </nav>
+    <input id="patchFileInput" type="file" accept=".json,.neusic-loom.json,application/json" hidden>
   </header>
 
   <main class="workspace">
@@ -60,14 +65,32 @@
 
     <section class="loom-stage">
       <div class="loom-titlebar">
-        <div>
+        <div class="loom-heading">
           <span class="kicker">WAVE-NATIVE INSTRUMENT + SEQUENCER</span>
           <h1>The Wave Loom</h1>
         </div>
-        <div class="mode-switch" role="group" aria-label="Interaction mode">
-          <button class="mode active" data-tool="sculpt" type="button">SCULPT</button>
-          <button class="mode" data-tool="nodes" type="button">NODES</button>
-          <button class="mode" data-tool="boundaries" type="button">BOUNDARIES</button>
+        <div class="loom-command-cluster">
+          <label class="preset-control">STARTING WAVE
+            <select id="presetSelect">
+              <option value="custom">Custom</option>
+              <option value="default">Neusic Default</option>
+              <option value="sine">Pure Sine</option>
+              <option value="saw">Soft Saw</option>
+              <option value="formant">Formant Voice</option>
+              <option value="glass">Glass Harmonics</option>
+              <option value="noise">Noise Texture</option>
+            </select>
+          </label>
+          <div class="history-controls" role="group" aria-label="Undo and redo">
+            <button id="undoBtn" type="button" title="Undo (Ctrl/Cmd+Z)">↶ <span>UNDO</span></button>
+            <button id="redoBtn" type="button" title="Redo (Ctrl/Cmd+Shift+Z)">↷ <span>REDO</span></button>
+          </div>
+          <label class="snap-control"><input id="snapGrid" type="checkbox" checked><span>SNAP NODES</span></label>
+          <div class="mode-switch" role="group" aria-label="Interaction mode">
+            <button class="mode active" data-tool="sculpt" type="button">SCULPT</button>
+            <button class="mode" data-tool="nodes" type="button">NODES</button>
+            <button class="mode" data-tool="boundaries" type="button">BOUNDARIES</button>
+          </div>
         </div>
       </div>
 
@@ -82,12 +105,17 @@
           <b id="nodeCount">8 NODES</b>
           <span id="crossCount">24 CROSSINGS</span>
         </div>
+        <section class="spectrum-panel" aria-label="Real-time harmonic spectrum">
+          <header><span>LIVE SPECTRUM</span><b id="spectrumMode">GEOMETRY</b></header>
+          <canvas id="spectrumCanvas"></canvas>
+          <footer><span>SUB</span><span>BODY</span><span>AIR</span></footer>
+        </section>
         <div class="drop-message" id="dropMessage">
           <b>DROP SAMPLE BLOCK</b>
           <span>The Forge will unfold it into this wave.</span>
         </div>
         <div class="gesture-card">
-          <span><b>DRAG WAVE</b> sculpt harmonics</span>
+          <span><b>DRAG WAVE</b> sculpt + hear</span>
           <span><b>DRAG ORB</b> pitch + timing</span>
           <span><b>DOUBLE CLICK</b> add trigger</span>
         </div>
@@ -118,7 +146,7 @@
         <header><span>SELECTED NODE</span><b id="selectedNodeLabel">NODE 01</b></header>
         <div class="readout-grid">
           <label>PITCH <output id="pitchOut">C4</output></label>
-          <label>TIME <output id="timeOut">01.1.00</output></label>
+          <label>TIME <output id="timeOut">01/16</output></label>
           <label>VELOCITY <output id="velocityOut">96</output></label>
           <label>COLOR <output id="colorOut">CYAN</output></label>
         </div>
@@ -126,7 +154,7 @@
         <button id="deleteNodeBtn" class="danger-button" type="button">DELETE NODE</button>
       </section>
       <section class="inspector-card">
-        <header><span>LOOM PARAMETERS</span><b>LIVE</b></header>
+        <header><span>LOOM PARAMETERS</span><b id="patchState">AUTOSAVED</b></header>
         <label class="field-row">TEMPO<input id="tempoInput" type="number" min="40" max="220" value="112"><em>BPM</em></label>
         <label class="field-row">ROOT<select id="rootSelect">
           <option>C</option><option>C#</option><option>D</option><option>D#</option><option>E</option><option>F</option>
@@ -135,6 +163,9 @@
         <label class="field-row">SCALE<select id="scaleSelect">
           <option value="minor">Minor</option><option value="major">Major</option><option value="dorian">Dorian</option>
           <option value="pentatonic">Pentatonic</option><option value="chromatic">Chromatic</option>
+        </select></label>
+        <label class="field-row">NODE GRID<select id="snapSteps">
+          <option value="8">1/8</option><option value="16" selected>1/16</option><option value="32">1/32</option>
         </select></label>
         <label class="toggle-row"><span>ZERO-CROSS PERCUSSION</span><input id="zeroPerc" type="checkbox" checked></label>
         <label class="toggle-row"><span>LIVE SCULPT PREVIEW</span><input id="livePreview" type="checkbox" checked></label>
@@ -150,8 +181,12 @@
     <section class="forge panel">
       <div class="forge-head">
         <div><span class="kicker">SAMPLE OBJECTS</span><h2>The Forge</h2></div>
-        <p>Draw across a block to split it. Drag a block into the Wave Loom to unfold its transient and harmonic shape.</p>
-        <button id="demoSampleBtn" type="button">+ DEMO SAMPLE</button>
+        <p>Zoom for precise slices, auto-detect transients, or drag a Sample Block into the Loom to unfold its harmonic shape.</p>
+        <div class="forge-tools">
+          <label>WAVE ZOOM <input id="forgeZoom" type="range" min="1" max="8" step="1" value="1"><output id="forgeZoomOut">1×</output></label>
+          <button id="autoSliceBtn" type="button">AUTO-SLICE SELECTED</button>
+          <button id="demoSampleBtn" type="button">+ DEMO SAMPLE</button>
+        </div>
       </div>
       <div class="sample-shelf" id="sampleShelf" aria-live="polite"></div>
     </section>
@@ -160,15 +195,17 @@
   <dialog id="helpDialog">
     <form method="dialog">
       <button class="dialog-close" aria-label="Close">×</button>
-      <span class="kicker">EXPERIMENTAL INSTRUMENT</span>
+      <span class="kicker">WAVE-NATIVE PRODUCTION</span>
       <h2>Wave Loom controls</h2>
       <div class="help-grid">
-        <article><b>Sculpt</b><p>Drag directly on the luminous wave. Vertical movement rewrites harmonic geometry in a soft brush radius.</p></article>
-        <article><b>Sequence</b><p>Drag an orb horizontally for timing and vertically for pitch. Double-click empty space to create another trigger.</p></article>
-        <article><b>Capture</b><p>Arm NeuCapture. It retains a rolling microphone window. Capture it, then drag the Sample Block into the Loom.</p></article>
-        <article><b>Slice</b><p>Click or draw on a Sample Block waveform to split the audio into independent objects.</p></article>
+        <article><b>Sculpt + hear</b><p>Drag the luminous wave. Each gesture rewrites the oscillator and previews the current timbre immediately.</p></article>
+        <article><b>Sequence</b><p>Drag an orb for timing and pitch. Snap keeps nodes musical; hold Alt while dragging to move freely.</p></article>
+        <article><b>Undo + presets</b><p>Use undo and redo for geometry, nodes and Sample Blocks. Load a starting wave when you do not want a blank canvas.</p></article>
+        <article><b>Forge</b><p>Zoom into a waveform for tight cuts, or auto-slice a selected Sample Block by detected transients.</p></article>
+        <article><b>Export</b><p>Export renders four loop passes plus effect tail to a stereo WAV that can be imported into the Classic DAW.</p></article>
+        <article><b>Patch files</b><p>Save or load geometry, nodes, tempo, scale, macros and loop boundaries as a portable JSON patch.</p></article>
       </div>
-      <p class="dialog-note">This page is an experimental Wave-Native prototype. The existing Neusic multitrack DAW remains available through “Classic DAW.”</p>
+      <p class="dialog-note">Wave Loom stays offline-first. Browser autosave, patch files, transient analysis and WAV rendering require no API key.</p>
     </form>
   </dialog>
 
