@@ -1,0 +1,266 @@
+/* Wave Loom Production Upgrade — preserves the bioluminescent hyper-real hardware style. */
+.top-actions .command-button{
+  width:auto;
+  min-width:78px;
+  border-radius:0;
+  padding:0 10px;
+}
+.top-actions .accent-command{
+  border-color:#2c6e78;
+  color:#b9fbff;
+  background:linear-gradient(#12343d,#061216);
+  box-shadow:inset 0 -2px var(--cyan),0 0 18px rgba(41,243,255,.1);
+}
+.top-actions .command-button:disabled{opacity:.48;cursor:wait}
+
+.loom-titlebar{
+  min-height:82px;
+  padding:9px 12px;
+}
+.loom-heading{min-width:175px}
+.loom-command-cluster{
+  min-width:0;
+  display:flex;
+  align-items:end;
+  justify-content:flex-end;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.preset-control{
+  min-width:150px;
+  display:grid;
+  gap:5px;
+  color:#50717a;
+  font:800 6px/1 var(--mono);
+  letter-spacing:.12em;
+}
+.preset-control select{
+  height:31px;
+  padding:0 28px 0 8px;
+  border:1px solid #17343e;
+  border-radius:0;
+  background:#061015;
+  color:#a6dfe3;
+  font:750 8px/1 var(--mono);
+}
+.history-controls{display:flex;gap:3px}
+.history-controls button{
+  height:31px;
+  min-width:58px;
+  padding:0 8px;
+  border:1px solid #17343e;
+  background:linear-gradient(#12232a,#050b0e);
+  color:#6f8b94;
+  font:800 7px/1 var(--mono);
+  box-shadow:inset 0 1px #ffffff0a,0 3px 8px #0007;
+}
+.history-controls button:hover:not(:disabled){border-color:#2f6974;color:#c6fbff}
+.history-controls button:disabled{opacity:.3;cursor:not-allowed}
+.history-controls button span{margin-left:4px;font-size:6px}
+.snap-control{
+  height:31px;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:0 9px;
+  border:1px solid #17343e;
+  background:#061015;
+  color:#698791;
+  font:800 6px/1 var(--mono);
+  letter-spacing:.08em;
+}
+.snap-control input{accent-color:var(--cyan)}
+
+.spectrum-panel{
+  position:absolute;
+  z-index:6;
+  right:13px;
+  bottom:13px;
+  width:min(270px,36%);
+  height:130px;
+  display:grid;
+  grid-template-rows:25px minmax(0,1fr) 18px;
+  border:1px solid #173b45;
+  background:linear-gradient(145deg,rgba(8,21,27,.94),rgba(1,7,10,.96));
+  box-shadow:0 12px 35px #000a,inset 0 1px #ffffff0a,0 0 25px rgba(41,243,255,.07);
+  pointer-events:none;
+}
+.spectrum-panel header,.spectrum-panel footer{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 8px;
+  color:#4f717a;
+  font:800 6px/1 var(--mono);
+  letter-spacing:.1em;
+}
+.spectrum-panel header{border-bottom:1px solid #102a32}
+.spectrum-panel header b{color:#77dce1}
+.spectrum-panel footer{border-top:1px solid #102a32}
+#spectrumCanvas{display:block;width:100%;height:100%}
+
+.field-row select#snapSteps{min-width:64px}
+#patchState{color:var(--green);text-shadow:0 0 7px rgba(101,255,156,.28)}
+
+.forge-head{
+  min-width:240px;
+  align-content:start;
+}
+.forge-tools{
+  display:grid;
+  gap:7px;
+  margin-top:12px;
+}
+.forge-tools label{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:5px;
+  color:#55757e;
+  font:800 6px/1 var(--mono);
+  letter-spacing:.1em;
+}
+.forge-tools input{
+  grid-column:1/3;
+  width:100%;
+  height:3px;
+  appearance:none;
+  background:#10272e;
+}
+.forge-tools input::-webkit-slider-thumb{
+  appearance:none;
+  width:11px;
+  height:11px;
+  border-radius:50%;
+  background:var(--cyan);
+  box-shadow:0 0 8px var(--cyan);
+}
+.forge-tools output{color:#9beff1}
+.forge-tools button{
+  min-height:34px;
+  border:1px solid #21434d;
+  background:linear-gradient(#102129,#050c10);
+  color:#7e9da5;
+  font:800 7px/1 var(--mono);
+  letter-spacing:.07em;
+}
+.forge-tools button:hover{border-color:#3a7480;color:#c7fbff}
+
+.sample-shelf{
+  align-items:stretch;
+  overflow-x:auto;
+  overflow-y:hidden;
+  scrollbar-color:#24505a #061015;
+}
+.sample-block{
+  flex:0 0 min(560px,72vw);
+  min-width:260px;
+  cursor:pointer;
+  transition:border-color .16s,box-shadow .16s,transform .16s;
+}
+.sample-block.selected{
+  border-color:color-mix(in srgb,var(--sample-color) 76%,#fff 8%);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--sample-color) 20%,transparent),0 0 24px color-mix(in srgb,var(--sample-color) 16%,transparent),0 12px 25px #0009;
+}
+.sample-block.dragging{opacity:.6;transform:scale(.985)}
+.sample-wave-scroll{
+  width:100%;
+  overflow-x:auto;
+  overflow-y:hidden;
+  border-top:1px solid #102a32;
+  border-bottom:1px solid #102a32;
+  background:#03090c;
+  scrollbar-width:thin;
+  scrollbar-color:var(--sample-color) #02070a;
+  touch-action:pan-x;
+}
+.sample-wave-scroll canvas{
+  display:block;
+  width:auto;
+  min-width:100%;
+  height:96px;
+  touch-action:none;
+  cursor:crosshair;
+}
+.sample-actions{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:4px;
+}
+.sample-actions button{
+  min-width:0;
+  padding:0 5px!important;
+  white-space:nowrap;
+}
+.sample-actions [data-auto-slice]{color:#a8f8bd}
+.sample-actions [data-unfold]{color:#b9a4ff}
+.slice-line{
+  top:30px!important;
+  bottom:36px!important;
+  width:1px!important;
+  background:#fff!important;
+  box-shadow:0 0 9px #fff,0 0 18px var(--sample-color);
+}
+.sample-empty{min-width:100%;display:grid;place-items:center}
+
+@media(max-width:1260px){
+  .top-actions a:nth-of-type(2){display:none}
+  .top-actions .command-button{min-width:66px;padding-inline:7px;font-size:6px}
+  .loom-command-cluster{justify-content:flex-start}
+  .spectrum-panel{width:230px}
+}
+@media(max-width:1000px){
+  .topbar{grid-template-columns:minmax(160px,1fr) auto}
+  .top-actions{grid-column:1/3;justify-self:stretch;justify-content:flex-end;overflow-x:auto;padding-top:2px}
+  .loom-titlebar{align-items:start}
+  .loom-heading{min-width:150px}
+  .preset-control{min-width:132px}
+  .history-controls button span{display:none}
+  .history-controls button{min-width:34px}
+}
+@media(max-width:830px){
+  .top-actions{grid-column:1/3;display:flex!important}
+  .top-actions a{display:none!important}
+  .top-actions .command-button{display:grid;min-width:0;flex:1}
+  .top-actions #loadPatchBtn{display:grid}
+  .loom-titlebar{display:grid;gap:10px}
+  .loom-command-cluster{justify-content:stretch}
+  .preset-control{flex:1 1 150px}
+  .mode-switch{flex:1 1 100%;justify-content:stretch}
+  .mode{flex:1}
+  .spectrum-panel{width:250px;max-width:46%}
+  .forge-head{display:grid!important;grid-template-columns:minmax(150px,.7fr) minmax(200px,1fr)!important}
+  .forge-tools{grid-column:1/3;grid-template-columns:minmax(150px,1fr) auto auto;align-items:end}
+  .forge-tools label{align-self:center}
+  .forge-tools button{padding-inline:10px}
+}
+@media(max-width:580px){
+  .top-actions .command-button{font-size:5.5px;padding:0 5px}
+  .loom-stage{grid-template-rows:auto minmax(500px,1fr) auto!important}
+  .loom-heading h1{font-size:22px}
+  .loom-command-cluster{display:grid;grid-template-columns:1fr auto auto}
+  .preset-control{grid-column:1/-1;min-width:0}
+  .snap-control span{display:none}
+  .snap-control{padding-inline:7px}
+  .mode-switch{grid-column:1/-1}
+  .spectrum-panel{
+    right:8px;
+    bottom:8px;
+    width:calc(100% - 16px);
+    max-width:none;
+    height:105px;
+    opacity:.92;
+  }
+  .canvas-hud.top-right{top:8px;right:8px}
+  .forge-head{grid-template-columns:1fr!important}
+  .forge-tools{grid-column:1;grid-template-columns:1fr 1fr}
+  .forge-tools label{grid-column:1/-1}
+  .sample-block{flex-basis:calc(100vw - 32px)}
+  .sample-actions{grid-template-columns:1fr 1fr}
+}
+@media(orientation:landscape) and (max-height:560px){
+  .spectrum-panel{height:92px;width:210px}
+  .loom-stage{grid-template-rows:auto minmax(330px,1fr) auto!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .sample-block{transition:none}
+}
