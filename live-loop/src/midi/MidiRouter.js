@@ -1,0 +1,5 @@
+export class MidiRouter {
+  constructor(handlers={}) {this.handlers=handlers;this.access=null;this.enabled=false;}
+  async enable() {if(!navigator.requestMIDIAccess)throw new Error('Web MIDI is not available in this browser.');this.access=await navigator.requestMIDIAccess();this.access.inputs.forEach(input=>input.onmidimessage=event=>this.message(event));this.access.onstatechange=()=>this.access.inputs.forEach(input=>input.onmidimessage=event=>this.message(event));this.enabled=true;return this.access.inputs.size;}
+  message(event){const [status,data1,data2]=event.data,command=status&0xf0;if(command===0x90&&data2>0){if(data1>=36&&data1<=40)this.handlers.record?.(data1-36);else if(data1>=41&&data1<=45)this.handlers.mute?.(data1-41);else this.handlers.noteOn?.(data1,data2);}else if(command===0x80||(command===0x90&&data2===0))this.handlers.noteOff?.(data1);else if(command===0xb0){if(data1>=20&&data1<=24)this.handlers.volume?.(data1-20,data2/127);if(data1===64&&data2>63)this.handlers.transport?.();}}
+}
