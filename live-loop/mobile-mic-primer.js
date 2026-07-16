@@ -6,10 +6,12 @@
   if (!window.isSecureContext || !mediaDevices?.getUserMedia) return;
 
   const nativeGetUserMedia = mediaDevices.getUserMedia.bind(mediaDevices);
+  const isTouchDevice = matchMedia?.('(pointer: coarse)')?.matches || navigator.maxTouchPoints > 0;
   let primedStream = null;
   let primedPromise = null;
   let sharedContext = null;
   let unlockPromise = null;
+  let replaying = false;
 
   const streamIsLive = stream => Boolean(
     stream?.getAudioTracks?.().some(track => track.readyState === 'live' && track.enabled)
@@ -107,15 +109,33 @@
   };
 
   const activate = event => {
+    if (!isTouchDevice || replaying || !event.isTrusted) return;
     const target = event.target instanceof Element ? event.target : null;
-    if (!target?.closest('#micBtn, .loop-track [data-action="record"]')) return;
+    const button = target?.closest('#micBtn, .loop-track [data-action="record"]');
+    if (!button) return;
+
+    // On mobile, opening a permission sheet from pointerdown can cancel the
+    // browser's later click event. Prevent the native click, finish priming,
+    // then replay one synthetic click so the lane action always executes.
+    event.preventDefault();
+    event.stopImmediatePropagation();
+
     const appContext = currentAppContext();
     if (appContext) adoptContext(appContext);
-    primeMic();
+
+    primeMic()
+      .then(() => {
+        replaying = true;
+        button.click();
+      })
+      .catch(() => {})
+      .finally(() => {
+        queueMicrotask(() => { replaying = false; });
+      });
   };
 
-  document.addEventListener('pointerdown', activate, {capture:true, passive:true});
-  if (!('PointerEvent' in window)) document.addEventListener('touchstart', activate, {capture:true, passive:true});
+  document.addEventListener('pointerdown', activate, {capture:true, passive:false});
+  if (!('PointerEvent' in window)) document.addEventListener('touchstart', activate, {capture:true, passive:false});
 
   window.__neusicPrimeMic = primeMic;
   window.__neusicUnlockAudio = unlockAudio;
