@@ -4,29 +4,41 @@ async function openLiveLoop(page){
   await page.setViewportSize({width:390,height:844});
   await page.goto('/live-loop/',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>window.NeusicLiveLoop?.state?.().ready===true,null,{timeout:25_000});
-  await expect(page.locator('#mobileLaneNav')).toBeVisible();
-  await expect(page.locator('#mobilePerformanceControls')).toBeVisible();
+  await expect(page.locator('#stageMacroDeck')).toBeVisible();
+  await expect(page.locator('.loop-track')).toHaveCount(5);
 }
 
-test('mobile Live Loop records synchronized lanes without MIDI',async({page,browserName})=>{
+test('mobile Live Loop keeps all five lanes visible and records without MIDI',async({page,browserName})=>{
   test.skip(browserName!=='chromium','Fake microphone configuration is Chromium-specific.');
   await openLiveLoop(page);
-  await expect(page.locator('.mobile-lane-button')).toHaveCount(5);
-  await expect(page.locator('.loop-track.mobile-active')).toHaveCount(1);
-  await expect(page.locator('[data-mobile-action="midi"]')).toContainText('MIDI OPTIONAL');
+  for(let index=0;index<5;index++)await expect(page.locator(`.loop-track[data-index="${index}"]`)).toBeVisible();
+  await expect(page.locator('#midiBtn')).toBeVisible();
+  await expect(page.locator('.mobile-lane-nav')).toHaveCount(0);
+  await expect(page.locator('.mobile-performance-controls')).toHaveCount(0);
 
-  await page.locator('[data-lane-index="0"]').click();
-  await page.locator('[data-mobile-action="record"]').click();
-  await expect.poll(()=>page.locator('.loop-track.mobile-active').getAttribute('data-state'),{timeout:15_000}).toBe('Recording');
+  const lane1=page.locator('.loop-track[data-index="0"]');
+  await lane1.locator('[data-action="record"]').click();
+  await expect.poll(()=>lane1.getAttribute('data-state'),{timeout:15_000}).toBe('Recording');
   await page.waitForTimeout(720);
-  await page.locator('[data-mobile-action="record"]').click();
+  await lane1.locator('[data-action="record"]').click();
   await expect.poll(()=>page.evaluate(()=>window.NeusicLiveLoop.state().lanes[0]),{timeout:15_000}).toMatchObject({state:'Playing',hasAudio:true});
 
-  await page.locator('[data-lane-index="1"]').click();
-  await expect(page.locator('.loop-track.mobile-active')).toHaveAttribute('data-index','1');
-  await page.locator('[data-mobile-action="record"]').click();
+  const lane2=page.locator('.loop-track[data-index="1"]');
+  await lane2.locator('[data-action="record"]').click();
   await expect.poll(()=>page.evaluate(()=>window.NeusicLiveLoop.state().lanes[1].state),{timeout:15_000}).toMatch(/Queued|Recording/);
   await expect.poll(()=>page.evaluate(()=>window.NeusicLiveLoop.state().lanes[1]),{timeout:15_000}).toMatchObject({state:'Playing',hasAudio:true});
+});
+
+test('phone stage exposes tactile faders, pan, macro effects, and synth',async({page})=>{
+  await openLiveLoop(page);
+  await expect(page.locator('.loop-track input[data-control="volume"]')).toHaveCount(5);
+  await expect(page.locator('.loop-track input[data-control="pan"]')).toHaveCount(5);
+  await expect(page.locator('.stage-xy')).toHaveCount(2);
+  await expect(page.locator('#keyboard button')).toHaveCount(13);
+  for(const action of ['lofi','octave','reverse','freeze','load','wave'])await expect(page.locator(`[data-stage-action="${action}"]`)).toBeVisible();
+  await page.locator('[data-stage-action="lofi"]').click();
+  await expect(page.locator('[data-stage-action="lofi"]')).toHaveClass(/active/);
+  expect(await page.evaluate(()=>window.NeusicLiveLoop.state().lofi)).toBe(true);
 });
 
 test('shared Neusic Agent works offline and explains touch recording',async({page})=>{

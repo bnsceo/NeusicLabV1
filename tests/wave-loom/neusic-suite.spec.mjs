@@ -31,7 +31,8 @@ test('Live Loop and Wave share the suite rail while remaining distinct',async({p
   await page.goto('/live-loop/',{waitUntil:'domcontentloaded'});
   await expect(page.locator('.neusic-suite-rail')).toBeVisible();
   await expect(page.locator('.neusic-suite-path a[aria-current="page"]')).toContainText('Neusic Live Loop');
-  await expect(page.locator('h1')).toContainText('Build the song');
+  await expect(page.locator('h1')).toContainText('Capture lightning');
+  await expect(page.locator('#trackGrid .loop-track')).toHaveCount(5);
 
   await page.goto('/wave-loom/',{waitUntil:'domcontentloaded'});
   await page.evaluate(()=>localStorage.setItem('neusic-wave-onboarding','1'));

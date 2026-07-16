@@ -11,9 +11,11 @@ const scripts=[
   'neusic-agent.js',
   'site-polish.js',
   'live-loop/app.js',
-  'live-loop/mobile-performance.js',
+  'live-loop/stage-performance.js',
   'live-loop/src/audio/PcmRecorder.js',
   'live-loop/src/audio/Looper.js',
+  'live-loop/src/audio/effects/PerformanceFx.js',
+  'live-loop/src/audio/effects/BitcrusherWorklet.js',
   'app/js/39-studio-workspace-v4.js',
   'app/js/40-studio-v4-hardening.js',
   'wave-loom/wave-polish.js'
@@ -31,19 +33,35 @@ test('Hermes and CrewAI bridge compiles without importing optional providers',()
   assert.equal(result.status,0,result.stderr);
 });
 
-test('Live Loop uses raw PCM capture and keeps MIDI optional',async()=>{
+test('Live Loop uses raw PCM capture, five visible lanes, and optional MIDI',async()=>{
   const looper=await read('live-loop/src/audio/Looper.js');
   const recorder=await read('live-loop/src/audio/PcmRecorder.js');
-  const mobile=await read('live-loop/mobile-performance.js');
+  const stage=await read('live-loop/stage-performance.js');
+  const css=await read('live-loop/stage-performance.css');
+  const app=await read('live-loop/app.js');
   const html=await read('live-loop/index.html');
   assert.doesNotMatch(looper,/MediaRecorder/);
   assert.match(looper,/new PcmRecorder/);
   assert.match(recorder,/AudioWorkletNode/);
   assert.match(recorder,/createScriptProcessor/);
-  assert.match(mobile,/MIDI OPTIONAL/);
-  assert.match(mobile,/data-mobile-action="record"/);
-  assert.match(html,/mobile-performance-v2\.css/);
-  assert.match(html,/touch REC control/i);
+  assert.match(html,/stage-performance\.css/);
+  assert.match(html,/stage-performance\.js/);
+  assert.doesNotMatch(html,/mobile-performance\.js/);
+  assert.match(css,/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
+  assert.match(css,/loop-track\.mobile-active\{display:block!important/);
+  for(const action of ['lofi','octave','reverse','freeze','load','wave'])assert.ok(stage.includes(`'${action}'`)||stage.includes(`\"${action}\"`),`stage macro missing ${action}`);
+  assert.match(app,/new PerformanceFx/);
+  assert.match(app,/MIDI is optional/);
+});
+
+test('global lo-fi performance chain includes a real AudioWorklet bitcrusher',async()=>{
+  const effect=await read('live-loop/src/audio/effects/PerformanceFx.js');
+  const processor=await read('live-loop/src/audio/effects/BitcrusherWorklet.js');
+  assert.match(effect,/audioWorklet\.addModule/);
+  assert.match(effect,/neusic-bitcrusher/);
+  assert.match(effect,/setLoFi/);
+  assert.match(processor,/registerProcessor\('neusic-bitcrusher'/);
+  assert.match(processor,/Math\.round\(sample\*step\)\/step/);
 });
 
 test('Lab V4 keeps one sidebar and one dedicated center workspace',async()=>{
