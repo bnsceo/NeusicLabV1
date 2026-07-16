@@ -1,6 +1,6 @@
 import {PcmRecorder} from './PcmRecorder.js';
 
-const STATES={EMPTY:'Empty',RECORDING:'Recording',OVERDUBBING:'Overdubbing',PLAYING:'Playing',MUTED:'Muted',STOPPED:'Stopped',QUEUED:'Queued'};
+const STATES={EMPTY:'Empty',ARMING:'Arming',RECORDING:'Recording',OVERDUBBING:'Overdubbing',PLAYING:'Playing',MUTED:'Muted',STOPPED:'Stopped',QUEUED:'Queued'};
 const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
 
 export class FiveTrackLooper extends EventTarget {
@@ -18,6 +18,7 @@ export class FiveTrackLooper extends EventTarget {
     this.transportStart=0;
     this.playing=false;
     this.activeRecording=null;
+    this.arming=null;
     this.fxBypassed=false;
     this.tracks=Array.from({length:5},(_,index)=>this.makeTrack(index));
     this.scheduler.callback=()=>this.dispatchEvent(new CustomEvent('tick'));
@@ -72,14 +73,45 @@ export class FiveTrackLooper extends EventTarget {
 
   async toggleRecord(index){
     const track=this.tracks[index];
+    if(this.arming){
+      if(this.arming.index===index){
+        this.arming.cancelled=true;
+        this.arming=null;
+        track.state=track.buffer?(this.playing?STATES.PLAYING:STATES.STOPPED):STATES.EMPTY;
+        this.emit('track',{index});
+        this.emit('status',{message:`${track.name} microphone arming cancelled.`});
+      }else{
+        this.emit('status',{message:'A different lane is waiting for microphone permission. Finish or cancel it first.'});
+      }
+      return;
+    }
     if(this.activeRecording){
       if(this.activeRecording.index===index)await this.stopRecording();
       else this.emit('status',{message:'Finish the active recording before arming another lane.'});
       return;
     }
-    await this.workspace.initMic();
-    await this.workspace.init();
-    const mode=track.buffer?'overdub':'record',startAt=this.masterLength?this.nextBoundary():this.context.currentTime+.05;
+
+    const token={index,cancelled:false};
+    this.arming=token;
+    track.state=STATES.ARMING;
+    this.emit('track',{index});
+    this.emit('status',{message:`Opening the microphone for ${track.name}… Allow access when asked.`});
+    try{
+      await this.workspace.init();
+      await this.workspace.resume({required:true});
+      await this.workspace.initMic();
+      await this.workspace.resume({required:true});
+    }catch(error){
+      if(this.arming===token)this.arming=null;
+      track.state=track.buffer?(this.playing?STATES.PLAYING:STATES.STOPPED):STATES.EMPTY;
+      this.emit('track',{index});
+      this.emit('status',{message:error.message||'Microphone access failed.'});
+      throw error;
+    }
+    if(this.arming!==token||token.cancelled)return;
+    this.arming=null;
+
+    const mode=track.buffer?'overdub':'record',startAt=this.masterLength?this.nextBoundary():this.context.currentTime+.04;
     track.state=STATES.QUEUED;this.emit('track',{index});
     const session={index,mode,queued:true,timer:0,autoTimer:0,startedAt:0,startPromise:null};
     this.activeRecording=session;
@@ -93,7 +125,13 @@ export class FiveTrackLooper extends EventTarget {
     const track=this.tracks[session.index];
     session.queued=false;
     session.startPromise=this.capture.start();
-    try{await session.startPromise;}catch(error){this.activeRecording=null;track.state=track.buffer?STATES.STOPPED:STATES.EMPTY;this.emit('track',{index:session.index});this.emit('status',{message:error.message||'Microphone capture could not start.'});return;}
+    try{await session.startPromise;}catch(error){
+      this.activeRecording=null;
+      track.state=track.buffer?STATES.STOPPED:STATES.EMPTY;
+      this.emit('track',{index:session.index});
+      this.emit('status',{message:error.message||'Microphone capture could not start.'});
+      return;
+    }
     if(this.activeRecording!==session){this.capture.cancel();return;}
     session.startedAt=performance.now();
     track.state=session.mode==='overdub'?STATES.OVERDUBBING:STATES.RECORDING;
@@ -120,6 +158,7 @@ export class FiveTrackLooper extends EventTarget {
   async finishRecording(session,decoded){
     const track=this.tracks[session.index];
     track.recording=null;
+    if(!decoded)throw new Error('The recorder returned no audio.');
     const duration=decoded.duration||Math.max(.05,(performance.now()-session.startedAt)/1000);
     if(!this.masterLength)this.masterLength=this.quantizedLength(duration);
     track.buffer=session.mode==='overdub'&&track.buffer?this.mixBuffers(track.buffer,decoded,this.masterLength):this.fitBuffer(decoded,this.masterLength);
@@ -136,7 +175,7 @@ export class FiveTrackLooper extends EventTarget {
   restartTrack(track){if(this.playing)this.startTrack(track,this.context.currentTime+.02);}
   toggleMute(index){const track=this.tracks[index];track.muted=!track.muted;track.gain.gain.setTargetAtTime(track.muted?0:track.volume,this.context.currentTime,.02);track.state=track.muted?STATES.MUTED:(this.playing&&track.buffer?STATES.PLAYING:track.buffer?STATES.STOPPED:STATES.EMPTY);this.emit('track',{index});}
   clear(index){const track=this.tracks[index];this.stopSource(track);track.buffer=null;track.state=STATES.EMPTY;track.muted=false;track.rate=1;track.reverse=false;track.name=`LOOP ${index+1}`;if(!this.tracks.some(item=>item.buffer))this.masterLength=0;this.emit('track',{index});this.emit('change');}
-  clearAll(){this.capture.cancel();this.activeRecording=null;this.stop();this.tracks.forEach((_,index)=>this.clear(index));this.masterLength=0;this.emit('change');}
+  clearAll(){this.capture.cancel();if(this.arming)this.arming.cancelled=true;this.arming=null;this.activeRecording=null;this.stop();this.tracks.forEach((_,index)=>this.clear(index));this.masterLength=0;this.emit('change');}
   reverse(index){const track=this.tracks[index];if(!track.buffer)return;const clone=this.context.createBuffer(track.buffer.numberOfChannels,track.buffer.length,track.buffer.sampleRate);for(let channel=0;channel<clone.numberOfChannels;channel++)clone.copyToChannel(Float32Array.from(track.buffer.getChannelData(channel)).reverse(),channel);track.buffer=clone;track.reverse=!track.reverse;this.restartTrack(track);this.emit('track',{index});}
   halfSpeed(index){const track=this.tracks[index];if(!track.buffer)return;track.rate=track.rate===.5?1:.5;this.restartTrack(track);this.emit('track',{index});}
   setTrackValue(index,key,value){const track=this.tracks[index];if(key==='volume'){track.volume=value;track.gain.gain.setTargetAtTime(track.muted?0:value,this.context.currentTime,.02);}if(key==='pan'){track.panValue=value;track.pan.pan.setTargetAtTime(value,this.context.currentTime,.02);}if(key==='delay'){track.delay=value;track.delaySend.gain.setTargetAtTime(value,this.context.currentTime,.02);}if(key==='reverb'){track.reverb=value;track.reverbSend.gain.setTargetAtTime(value,this.context.currentTime,.02);}this.emit('track',{index});}
