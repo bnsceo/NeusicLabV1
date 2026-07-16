@@ -4,6 +4,39 @@
   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const status=(preview,message)=>{const el=preview.querySelector('.preview-demo-status');if(el)el.textContent=message;};
 
+  function installStudioIdentity(){
+    document.title='Neusic — Connected DAW & Music Production Studio';
+    const description=document.querySelector('meta[name="description"]');
+    if(description)description.content='Neusic is a connected digital audio workstation and music production studio for live looping, sound design, recording, arranging, mixing, mastering, and export.';
+
+    const hero=document.querySelector('.hero-content');
+    const statement=hero?.querySelector('.hero-statement');
+    const copy=hero?.querySelector('.hero-copy');
+    if(!hero||hero.querySelector('.daw-identity'))return;
+
+    const identity=document.createElement('div');
+    identity.className='daw-identity';
+    identity.setAttribute('aria-label','Neusic is digital audio workstation and studio software');
+    identity.innerHTML='<span class="daw-pulse" aria-hidden="true"></span><div><small>DIGITAL AUDIO WORKSTATION · MUSIC PRODUCTION STUDIO</small><b>A complete studio system for capturing, shaping, arranging, mixing, and finishing music.</b></div>';
+    hero.insertBefore(identity,statement||hero.firstChild);
+
+    if(statement)statement.textContent='Capture the performance. Design the sound. Produce the record.';
+    if(copy)copy.textContent='Neusic is a connected DAW and studio environment built as three focused creative instruments: Live Loop for performance capture, Wave for sound design, and Lab for recording, arrangement, mixing, mastering, and delivery.';
+
+    const style=document.createElement('style');
+    style.textContent=`
+      .daw-identity{display:inline-flex;align-items:center;gap:12px;max-width:min(760px,100%);margin:18px auto 22px;padding:11px 15px 11px 12px;border:1px solid rgba(206,224,233,.22);border-radius:999px;background:linear-gradient(110deg,rgba(15,22,27,.84),rgba(28,37,43,.42));box-shadow:inset 0 1px rgba(255,255,255,.05),0 14px 44px rgba(0,0,0,.28);backdrop-filter:blur(14px);text-align:left}
+      .daw-pulse{position:relative;flex:0 0 34px;width:34px;height:34px;border:1px solid rgba(222,239,246,.34);border-radius:50%;background:radial-gradient(circle at 42% 38%,rgba(255,255,255,.2),rgba(113,153,173,.08) 42%,rgba(0,0,0,.12) 68%)}
+      .daw-pulse:before,.daw-pulse:after{content:"";position:absolute;inset:8px;border:1px solid rgba(210,232,242,.42);border-radius:50%}
+      .daw-pulse:after{inset:14px;background:#d7e7ed;box-shadow:0 0 16px rgba(178,220,237,.7)}
+      .daw-identity div{display:grid;gap:3px;min-width:0}
+      .daw-identity small{color:#aebdc4;font:700 9px/1.2 var(--mono,"JetBrains Mono",monospace);letter-spacing:.17em}
+      .daw-identity b{color:#e9f0f3;font:650 clamp(11px,1.15vw,14px)/1.35 var(--sans,"Satoshi",sans-serif);letter-spacing:.01em}
+      @media(max-width:680px){.daw-identity{width:100%;border-radius:12px;margin:14px 0 18px;padding:10px}.daw-pulse{flex-basis:30px;width:30px;height:30px}.daw-identity small{font-size:7px;letter-spacing:.11em}.daw-identity b{font-size:11px}}
+    `;
+    document.head.appendChild(style);
+  }
+
   function panel(preview,actions){
     const root=document.createElement('div');root.className='preview-demo-panel';
     root.innerHTML=actions.map(([id,label])=>`<button type="button" data-demo-action="${id}">${label}</button>`).join('')+'<span class="preview-demo-status" aria-live="polite">MOCK READY</span>';
@@ -46,5 +79,6 @@
     });tracks[0]?.classList.add('mock-selected');preview.dataset.labView='arrange';
   }
 
+  installStudioIdentity();
   previews.forEach(preview=>{preview.classList.add('interactive-preview');preview.tabIndex=0;preview.setAttribute('aria-description','Interactive visual mockup. It does not record, process, or save audio.');const type=preview.dataset.preview;if(type==='live-loop')live(preview);if(type==='wave')wave(preview);if(type==='lab')lab(preview);if(!reduced)preview.addEventListener('pointermove',event=>{const r=preview.getBoundingClientRect();preview.style.setProperty('--mock-x',`${((event.clientX-r.left)/r.width*100).toFixed(1)}%`);preview.style.setProperty('--mock-y',`${((event.clientY-r.top)/r.height*100).toFixed(1)}%`);});});
 })();
