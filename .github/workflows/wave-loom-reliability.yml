@@ -1,17 +1,25 @@
-name: Wave Loom Reliability
+name: Neusic Product Reliability
 
 on:
   push:
     branches:
       - main
       - agent/wave-loom-reliability-phase
+      - agent/unify-neusic-product-journey
   pull_request:
     paths:
+      - 'index.html'
+      - 'site-polish.*'
+      - 'landing-experience.*'
+      - 'neusic-suite.*'
+      - 'live-loop/**'
       - 'wave-loom/**'
       - 'app/**'
       - 'tests/wave-loom/**'
+      - 'tests/neusic-suite/**'
       - 'package.json'
       - '.github/workflows/wave-loom-reliability.yml'
+      - '.github/workflows/deploy-neusic-pages.yml'
   workflow_dispatch:
 
 permissions:
@@ -46,7 +54,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: wave-loom-playwright-report
+          name: neusic-playwright-report
           path: tests/wave-loom/playwright-report
           if-no-files-found: ignore
           retention-days: 7
