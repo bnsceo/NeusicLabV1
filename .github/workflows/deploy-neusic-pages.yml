@@ -28,7 +28,7 @@ jobs:
       - name: Prepare production site
         run: |
           rm -rf _site
-          mkdir -p _site/studio _site/wave-loom _site/live-loop
+          mkdir -p _site/studio _site/wave-loom _site/live-loop _site/social
           cp index.html _site/index.html
           cp site-polish.css _site/site-polish.css
           cp site-polish.js _site/site-polish.js
@@ -36,6 +36,9 @@ jobs:
           cp landing-experience.js _site/landing-experience.js
           cp neusic-suite.css _site/neusic-suite.css
           cp neusic-suite.js _site/neusic-suite.js
+          cp neusic-agent.css _site/neusic-agent.css
+          cp neusic-agent.js _site/neusic-agent.js
+          cp -R social/. _site/social/
           cp -R app/. _site/studio/
           cp -R wave-loom/. _site/wave-loom/
           cp -R live-loop/. _site/live-loop/
@@ -54,10 +57,9 @@ jobs:
           body>.neusic-creator-top~iframe#studio{height:calc(100dvh - (var(--neusic-credit-safe) * 2))!important;margin-top:var(--neusic-credit-safe)!important;margin-bottom:var(--neusic-credit-safe)!important}
           body>.neusic-creator-top~#app{height:calc(100dvh - (var(--neusic-credit-safe) * 2))!important;max-height:calc(100dvh - (var(--neusic-credit-safe) * 2))!important;margin-top:var(--neusic-credit-safe)!important;margin-bottom:var(--neusic-credit-safe)!important}
           body>.neusic-creator-top~.topbar{top:var(--neusic-credit-safe)!important}
-          body>.neusic-creator-top~nav:first-of-type{top:var(--neusic-credit-safe)!important}
           body>.neusic-creator-top~.workspace{padding-bottom:calc(8px + var(--neusic-credit-safe))!important}
           body>.neusic-creator-top~.performance-shell{padding-top:calc(28px + var(--neusic-credit-safe))!important;padding-bottom:calc(40px + var(--neusic-credit-safe))!important}
-          body>.neusic-creator-bottom~#app #mobile-nav,body>.neusic-creator-bottom~#app .neusic-mobile-nav,body>.neusic-creator-bottom~.wave-mobile-dock{bottom:var(--neusic-credit-safe)!important}
+          body>.neusic-creator-bottom~#app #mobile-nav,body>.neusic-creator-bottom~#app .neusic-mobile-nav,body>.neusic-creator-bottom~.wave-mobile-dock,body>.neusic-creator-bottom~#studio-v4-mobile-nav{bottom:var(--neusic-credit-safe)!important}
           @media(max-width:580px){.neusic-creator-credit{font-size:5px;letter-spacing:.08em;padding:2px 5px}:root{--neusic-credit-safe:11px}}
           @media(prefers-reduced-motion:reduce){.neusic-creator-credit span{animation:none;background-position:50% 50%}}
           </style>'''
@@ -70,12 +72,33 @@ jobs:
           const apply=()=>{const colors=pick(),key=colors.join("|");if(key===last)return;last=key;root.style.setProperty("--neusic-credit-primary",colors[0]);root.style.setProperty("--neusic-credit-secondary",colors[1]);root.style.setProperty("--neusic-credit-tertiary",colors[2])};apply();addEventListener("storage",apply);setInterval(apply,1000)})();
           </script>'''
 
+          def add_head(path: Path, tags: str) -> None:
+              html = path.read_text()
+              if 'property="og:image"' not in html:
+                  html = html.replace('</head>', tags + '</head>', 1)
+              path.write_text(html)
+
+          add_head(Path('_site/index.html'), '''
+          <link rel="canonical" href="https://bnsceo.github.io/NeusicLabV1/">
+          <meta property="og:type" content="website"><meta property="og:site_name" content="Neusic">
+          <meta property="og:url" content="https://bnsceo.github.io/NeusicLabV1/">
+          <meta property="og:image" content="https://bnsceo.github.io/NeusicLabV1/social/neusic-suite-card.svg"><meta property="og:image:type" content="image/svg+xml"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+          <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Neusic — Live Loop, Wave, and Lab"><meta name="twitter:description" content="Start anywhere. Capture in Live Loop, refine in Wave, and finish in Lab."><meta name="twitter:image" content="https://bnsceo.github.io/NeusicLabV1/social/neusic-suite-card.svg">
+          ''')
+          add_head(Path('_site/wave-loom/index.html'), '''
+          <link rel="canonical" href="https://bnsceo.github.io/NeusicLabV1/wave-loom/">
+          <meta property="og:type" content="website"><meta property="og:site_name" content="Neusic">
+          <meta property="og:title" content="Neusic Wave — True Sample Performance and Sound Design"><meta property="og:description" content="Record or upload sound, refine it in The Forge, perform it through Wave, Sample, Granular, or Hybrid engines, and send it to Lab.">
+          <meta property="og:url" content="https://bnsceo.github.io/NeusicLabV1/wave-loom/"><meta property="og:image" content="https://bnsceo.github.io/NeusicLabV1/social/wave-card.svg"><meta property="og:image:type" content="image/svg+xml"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+          <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Neusic Wave"><meta name="twitter:description" content="Sculpt, slice, map, and transform recorded sound."><meta name="twitter:image" content="https://bnsceo.github.io/NeusicLabV1/social/wave-card.svg">
+          ''')
+
           landing = Path('_site/index.html')
           html = landing.read_text()
           if 'site-polish.css' not in html:
-              html = html.replace('</head>', '<link rel="stylesheet" href="./site-polish.css?v=7"></head>', 1)
+              html = html.replace('</head>', '<link rel="stylesheet" href="./site-polish.css?v=8"></head>', 1)
           if 'site-polish.js' not in html:
-              html = html.replace('</body>', '<script src="./site-polish.js?v=7"></script></body>', 1)
+              html = html.replace('</body>', '<script src="./site-polish.js?v=8"></script></body>', 1)
           landing.write_text(html)
 
           for page in Path('_site').rglob('*.html'):
