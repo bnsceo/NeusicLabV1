@@ -38,7 +38,7 @@ export class PerformanceFx {
     this.lofi=Boolean(enabled);
     const now=this.context.currentTime;
     this.filter.frequency.setTargetAtTime(this.lofi?4300:18000,now,.025);
-    this.drive.curve=this.makeCurve(this.lofi?.42:0);
+    this.drive.curve=this.makeCurve(this.lofi ? .42 : 0);
     this.crusher?.port.postMessage({type:'settings',enabled:this.lofi,bits:6,reduction:5});
   }
   toggleLoFi(){this.setLoFi(!this.lofi);return this.lofi;}
