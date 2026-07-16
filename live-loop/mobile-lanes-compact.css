@@ -5,49 +5,49 @@
     height:auto!important;
   }
   body.stage-performance #trackGrid{
-    height:clamp(440px,72svh,590px)!important;
-    min-height:440px!important;
-    max-height:590px!important;
+    height:clamp(400px,64svh,520px)!important;
+    min-height:400px!important;
+    max-height:520px!important;
   }
   body.stage-performance #trackGrid>.loop-track,
   body.stage-performance #trackGrid>.loop-track.mobile-active{
     height:100%!important;
   }
   body.stage-performance .loop-track header{
-    flex-basis:24px!important;
+    flex-basis:22px!important;
   }
   body.stage-performance .track-number{
-    width:21px!important;
-    height:21px!important;
+    width:20px!important;
+    height:20px!important;
     font-size:7px!important;
   }
   body.stage-performance .progress-control{
-    width:min(46px,88%)!important;
+    width:min(42px,86%)!important;
     margin:0 auto 2px!important;
   }
   body.stage-performance .track-actions button[data-action="record"]{
-    min-height:44px!important;
+    min-height:42px!important;
   }
   body.stage-performance .track-actions button[data-action="mute"]{
-    min-height:38px!important;
+    min-height:36px!important;
   }
   body.stage-performance .track-controls{
-    grid-template-rows:minmax(92px,1fr) auto!important;
+    grid-template-rows:minmax(82px,1fr) auto!important;
     gap:2px!important;
   }
   body.stage-performance .track-controls label:has(input[data-control="volume"]){
-    min-height:92px!important;
-    grid-template-rows:auto minmax(64px,1fr) auto!important;
+    min-height:82px!important;
+    grid-template-rows:auto minmax(56px,1fr) auto!important;
   }
   body.stage-performance .track-controls input[data-control="volume"]{
-    min-height:64px!important;
+    min-height:56px!important;
   }
   body.stage-performance .track-controls label:has(input[data-control="pan"]){
-    min-height:38px!important;
-    grid-template-rows:auto 16px auto!important;
+    min-height:36px!important;
+    grid-template-rows:auto 15px auto!important;
   }
   body.stage-performance .track-controls input[data-control="pan"]{
-    height:16px!important;
+    height:15px!important;
   }
   .mobile-recording-toast{
     position:fixed;
@@ -81,17 +81,17 @@
 
 @media (max-width:760px) and (max-height:700px){
   body.stage-performance #trackGrid{
-    height:430px!important;
-    min-height:430px!important;
+    height:380px!important;
+    min-height:380px!important;
   }
   body.stage-performance .progress-control{
-    width:min(40px,84%)!important;
+    width:min(38px,82%)!important;
   }
   body.stage-performance .track-controls label:has(input[data-control="volume"]){
-    min-height:78px!important;
-    grid-template-rows:auto minmax(52px,1fr) auto!important;
+    min-height:72px!important;
+    grid-template-rows:auto minmax(48px,1fr) auto!important;
   }
   body.stage-performance .track-controls input[data-control="volume"]{
-    min-height:52px!important;
+    min-height:48px!important;
   }
 }
