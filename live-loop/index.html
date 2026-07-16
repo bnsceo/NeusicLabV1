@@ -19,11 +19,12 @@
   <link rel="preconnect" href="https://api.fontshare.com">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="styles.css?v=3">
-  <link rel="stylesheet" href="stage-performance.css?v=1">
+  <link rel="stylesheet" href="stage-performance.css?v=2">
+  <link rel="stylesheet" href="mobile-lanes-imperative.css?v=1">
   <link rel="stylesheet" href="../neusic-suite.css?v=2">
   <link rel="stylesheet" href="../neusic-agent.css?v=1">
 </head>
-<body>
+<body class="stage-performance" data-neusic-product="live-loop">
   <div class="noise" aria-hidden="true"></div>
   <header class="topbar">
     <a class="brand" href="../" aria-label="Neusic home"><span class="brand-mark">N</span><span><b>NEUSIC</b><small>LIVE LOOP · PERFORMANCE INSTRUMENT</small></span></a>
@@ -46,7 +47,7 @@
 
     <section class="loop-deck panel" aria-labelledby="loopDeckTitle">
       <header class="panel-header"><div><span class="eyebrow">PRIMARY PERFORMANCE SURFACE</span><h2 id="loopDeckTitle">Five synchronized loop lanes</h2></div><div class="legend"><span><i class="empty"></i>EMPTY</span><span><i class="recording"></i>RECORDING</span><span><i class="playing"></i>PLAYING</span><span><i class="muted"></i>MUTED</span></div></header>
-      <div id="trackGrid" class="track-grid"></div>
+      <div id="trackGrid" class="track-grid" aria-label="Five synchronized loop lanes"></div>
     </section>
 
     <section class="lower-grid">
@@ -76,13 +77,13 @@
     <section class="session-tools panel">
       <div><span class="eyebrow">SAMPLE INPUT + NEUSIC WAVE BRIDGE</span><h2>Capture here. Refine in Wave.</h2><p>Upload audio into the selected lane or send a recorded and overdubbed loop directly into the persistent Neusic Wave Forge.</p></div>
       <div class="tool-actions"><button id="uploadBtn" class="primary-action" type="button">UPLOAD TO SELECTED TRACK</button><input id="fileInput" type="file" accept="audio/*,.wav,.wave,.mp3,.m4a,.aac,.flac,.ogg,.oga,.opus,.webm,.mp4" multiple hidden><button id="sendSelectedBtn" type="button">SEND SELECTED TO NEUSIC WAVE</button><button id="downloadSelectedBtn" type="button">DOWNLOAD SELECTED WAV</button></div>
-      <div id="statusMessage" class="status-message" role="status">All five lanes are touch-ready. MIDI is optional.</div>
+      <div id="statusMessage" class="status-message" role="status">Five loop lanes are visible. Tap REC on any lane; MIDI is optional.</div>
     </section>
   </main>
 
   <template id="trackTemplate">
     <article class="loop-track" data-state="Empty">
-      <header><div><span class="track-number"></span><b class="track-name"></b></div><span class="track-state">EMPTY</span></header>
+      <header><div><span class="track-number"></span><b class="track-name"></b></div><span class="track-state">READY</span></header>
       <button class="progress-control" data-action="select" type="button" aria-label="Select track"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="progress-bg" cx="50" cy="50" r="43"></circle><circle class="progress-ring" cx="50" cy="50" r="43"></circle></svg><span class="progress-center"><b class="progress-time">00.0</b><small>SECONDS</small></span></button>
       <div class="track-actions"><button data-action="record" class="record-action" type="button">REC</button><button data-action="mute" type="button">MUTE</button><button data-action="upload" type="button">LOAD</button><button data-action="forge" type="button">WAVE</button><button data-action="clear" class="danger" type="button">CLEAR</button></div>
       <div class="track-controls"><label>LEVEL<input data-control="volume" type="range" min="0" max="125" value="90"><output>90</output></label><label>PAN<input data-control="pan" type="range" min="-100" max="100" value="0"><output>C</output></label><label>DELAY<input data-control="delay" type="range" min="0" max="100" value="22"><output>22</output></label><label>SPACE<input data-control="reverb" type="range" min="0" max="100" value="18"><output>18</output></label></div>
@@ -90,8 +91,8 @@
   </template>
 
   <footer class="legal-note">Performance workflow inspired by modern improvisational loop artists and hardware loop stations. Neusic is not affiliated with Reggie Watts, Boss, Line 6, Nord, or their manufacturers.</footer>
-  <script type="module" src="app.js?v=3"></script>
-  <script src="stage-performance.js?v=1"></script>
+  <script type="module" src="app.js?v=4"></script>
+  <script src="stage-performance.js?v=2"></script>
   <script src="../neusic-suite.js?v=2"></script>
   <script src="../neusic-agent.js?v=1"></script>
 </body>

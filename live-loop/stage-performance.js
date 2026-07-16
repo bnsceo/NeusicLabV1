@@ -1,5 +1,6 @@
 (() => {
   'use strict';
+  document.body?.classList.add('stage-performance');
   const ready=()=>window.NeusicLiveLoop?.state?.().ready;
   const setRange=(id,value)=>{
     const input=document.getElementById(id);if(!input)return;
@@ -26,8 +27,10 @@
     element.addEventListener('pointermove',event=>{if(element.hasPointerCapture?.(event.pointerId))apply(event);});
   }
   function build(){
-    if(document.getElementById('stageMacroDeck'))return;
     document.body.classList.add('stage-performance');
+    if(document.getElementById('stageMacroDeck'))return;
+    const loopDeck=document.querySelector('.loop-deck');
+    if(!loopDeck)return;
     const deck=document.createElement('section');deck.id='stageMacroDeck';deck.className='stage-macro-deck';deck.setAttribute('aria-label','Live performance macro controls');
     const actions=document.createElement('div');actions.className='stage-macro-actions';
     actions.innerHTML='<div class="stage-selected"><span>SELECTED LANE</span><b id="stageSelectedLane">01</b></div>';
@@ -42,11 +45,16 @@
     const delay=document.createElement('div');delay.className='stage-xy stage-delay';delay.style.setProperty('--x','28%');delay.style.setProperty('--y','72%');delay.innerHTML='<header><span>TAPE DELAY</span><b>XY</b></header><div class="stage-xy-dot"></div><footer><span>TIME →</span><span>↑ MIX</span></footer>';
     const space=document.createElement('div');space.className='stage-xy stage-space';space.style.setProperty('--x','36%');space.style.setProperty('--y','76%');space.innerHTML='<header><span>SPACE REVERB</span><b>XY</b></header><div class="stage-xy-dot"></div><footer><span>SIZE →</span><span>↑ MIX</span></footer>';
     deck.append(actions,delay,space);
-    document.querySelector('.loop-deck')?.after(deck);
+    loopDeck.after(deck);
     bindXY(delay,{xId:'delayTime',xMin:40,xMax:1200,yId:'delayMix',yMin:0,yMax:100});
     bindXY(space,{xId:'reverbSize',xMin:20,xMax:500,yId:'reverbMix',yMin:0,yMax:100});
     actions.addEventListener('click',event=>{
-      const button=event.target.closest('[data-stage-action]');if(!button||!ready())return;
+      const button=event.target.closest('[data-stage-action]');if(!button)return;
+      if(!ready()){
+        document.querySelector('.loop-track.selected [data-action="record"]')?.focus();
+        document.getElementById('statusMessage').textContent='Tap REC or MIC once to activate audio, then use this effect.';
+        return;
+      }
       const api=window.NeusicLiveLoop,action=button.dataset.stageAction;
       if(action==='lofi')button.classList.toggle('active',api.toggleLoFi());
       if(action==='octave'){api.toggleOctave();button.classList.toggle('active',api.state().lanes[api.selectedTrack].rate===.5);}
@@ -58,15 +66,17 @@
     syncSelection();
   }
   function syncSelection(){
-    if(!ready())return;
-    const state=window.NeusicLiveLoop.state(),selected=state.selected,lane=state.lanes[selected];
+    const selected=window.NeusicLiveLoop?.selectedTrack??0;
+    const state=ready()?window.NeusicLiveLoop.state():null;
+    const lane=state?.lanes?.[selected];
     const output=document.getElementById('stageSelectedLane');if(output)output.textContent=String(selected+1).padStart(2,'0');
     const octave=document.querySelector('[data-stage-action="octave"]');if(octave)octave.classList.toggle('active',lane?.rate===.5);
     const reverse=document.querySelector('[data-stage-action="reverse"]');if(reverse)reverse.classList.toggle('active',Boolean(lane?.reverse));
-    const lofi=document.querySelector('[data-stage-action="lofi"]');if(lofi)lofi.classList.toggle('active',Boolean(state.lofi));
+    const lofi=document.querySelector('[data-stage-action="lofi"]');if(lofi)lofi.classList.toggle('active',Boolean(state?.lofi));
   }
-  addEventListener('neusic:live-loop-ready',build);
+  addEventListener('neusic:live-loop-ui-ready',build);
+  addEventListener('neusic:live-loop-ready',()=>{build();syncSelection();});
   addEventListener('neusic:live-loop-select',syncSelection);
   addEventListener('neusic:live-loop-track',syncSelection);
-  if(ready())build();else document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>ready()?build():null,200));
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build,{once:true});else build();
 })();
