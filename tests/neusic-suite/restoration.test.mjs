@@ -13,6 +13,7 @@ const scripts=[
   'live-loop/src/audio/PcmRecorder.js',
   'live-loop/src/audio/Looper.js',
   'app/js/39-studio-workspace-v4.js',
+  'app/js/40-studio-v4-hardening.js',
   'wave-loom/wave-polish.js'
 ];
 
@@ -40,7 +41,7 @@ test('Live Loop uses raw PCM capture and keeps MIDI optional',async()=>{
   assert.match(mobile,/MIDI OPTIONAL/);
   assert.match(mobile,/data-mobile-action="record"/);
   assert.match(html,/mobile-performance-v2\.css/);
-  assert.match(html,/Touch REC to capture/);
+  assert.match(html,/touch REC control/i);
 });
 
 test('Lab V4 keeps one sidebar and one dedicated center workspace',async()=>{
@@ -53,6 +54,7 @@ test('Lab V4 keeps one sidebar and one dedicated center workspace',async()=>{
   assert.match(css,/#studio-v4-shell/);
   assert.match(wrapper,/css\/23-studio-workspace-v4\.css/);
   assert.match(wrapper,/js\/39-studio-workspace-v4\.js/);
+  assert.match(wrapper,/js\/40-studio-v4-hardening\.js/);
 });
 
 test('all public products expose the shared Agent and share-preview assets',async()=>{
