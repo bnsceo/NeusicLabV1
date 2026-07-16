@@ -1,0 +1,42 @@
+.track-actions .undo-action{
+  border-color:#6f5b31;
+  color:#f1d38f;
+}
+
+.track-actions .undo-action:not(:disabled):active{
+  transform:translateY(1px);
+}
+
+.track-actions .undo-action:disabled{
+  opacity:.32;
+  cursor:not-allowed;
+}
+
+@media (max-width:760px){
+  body.stage-performance .track-actions button[data-action="undo"]{
+    display:block!important;
+    width:100%!important;
+    min-height:32px!important;
+    padding:0 1px!important;
+    font-size:5.5px!important;
+    touch-action:manipulation!important;
+  }
+
+  body.stage-performance .track-actions{
+    gap:2px!important;
+  }
+
+  body.stage-performance .track-actions button[data-action="record"]{
+    min-height:40px!important;
+  }
+
+  body.stage-performance .track-actions button[data-action="mute"]{
+    min-height:32px!important;
+  }
+}
+
+@media (max-width:360px){
+  body.stage-performance .track-actions button[data-action="undo"]{
+    font-size:5px!important;
+  }
+}
