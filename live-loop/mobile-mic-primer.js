@@ -28,7 +28,11 @@
     return context;
   };
 
+  const currentAppContext = () => window.NeusicLiveLoop?.workspace?.context || null;
+
   const ensureContext = () => {
+    const appContext = currentAppContext();
+    if (appContext?.state !== 'closed') return adoptContext(appContext);
     if (sharedContext?.state !== 'closed') return sharedContext;
     if (!NativeAudioContext) return null;
     return adoptContext(new NativeAudioContext({latencyHint:'interactive'}));
@@ -116,6 +120,8 @@
   const activate = event => {
     const target = event.target instanceof Element ? event.target : null;
     if (!target?.closest('#micBtn, .loop-track [data-action="record"]')) return;
+    const appContext = currentAppContext();
+    if (appContext) adoptContext(appContext);
     primeMic();
   };
 
@@ -134,7 +140,8 @@
       secureContext:window.isSecureContext,
       contextState:sharedContext?.state || 'not-created',
       microphoneLive:streamIsLive(primedStream),
-      trackState:primedStream?.getAudioTracks?.()[0]?.readyState || 'none'
+      trackState:primedStream?.getAudioTracks?.()[0]?.readyState || 'none',
+      appContextState:currentAppContext()?.state || 'not-created'
     })
   };
 })();
