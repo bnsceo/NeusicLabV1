@@ -48,8 +48,14 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Validate source modules
-        run: npm run test:wave
+      - name: Validate Wave reliability source
+        run: npm run test:wave-core
+
+      - name: Validate shared product source
+        run: npm run test:suite-core
+
+      - name: Validate restoration source
+        run: npm run test:restoration
 
       - name: Run browser and audio smoke tests
         run: npm run test:browser
