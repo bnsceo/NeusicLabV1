@@ -17,4 +17,13 @@
     </div>
     <div class="suite-context">3 products · 1 project <b>Finish here</b></div>`;
   document.body.prepend(rail);
+
+  const app=document.getElementById('app');
+  rail.style.setProperty('top','var(--neusic-credit-safe,0px)','important');
+  if(app){
+    app.style.setProperty('height','calc(100dvh - var(--suite-h) - (var(--neusic-credit-safe,0px) * 2))','important');
+    app.style.setProperty('max-height','calc(100dvh - var(--suite-h) - (var(--neusic-credit-safe,0px) * 2))','important');
+    app.style.setProperty('margin-top','calc(var(--suite-h) + var(--neusic-credit-safe,0px))','important');
+    app.style.setProperty('margin-bottom','var(--neusic-credit-safe,0px)','important');
+  }
 })();
