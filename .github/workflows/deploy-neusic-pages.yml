@@ -46,6 +46,7 @@ jobs:
           mv _site/studio/phase-a.html _site/studio/index.html
           python - <<'PY'
           from pathlib import Path
+          import re
 
           creator_style = '''<style id="neusic-creator-credit-style">
           :root{--neusic-credit-safe:14px;--neusic-credit-primary:#d4a354;--neusic-credit-secondary:#f0c77d;--neusic-credit-tertiary:#68d8ff}
@@ -72,33 +73,76 @@ jobs:
           const apply=()=>{const colors=pick(),key=colors.join("|");if(key===last)return;last=key;root.style.setProperty("--neusic-credit-primary",colors[0]);root.style.setProperty("--neusic-credit-secondary",colors[1]);root.style.setProperty("--neusic-credit-tertiary",colors[2])};apply();addEventListener("storage",apply);setInterval(apply,1000)})();
           </script>'''
 
-          def add_head(path: Path, tags: str) -> None:
+          def upsert_tag(html: str, pattern: str, tag: str) -> str:
+              if re.search(pattern, html, flags=re.I | re.S):
+                  return re.sub(pattern, tag, html, count=1, flags=re.I | re.S)
+              return html.replace('</head>', f'  {tag}\n</head>', 1)
+
+          def set_meta(html: str, attribute: str, key: str, value: str) -> str:
+              tag = f'<meta {attribute}="{key}" content="{value}">'
+              pattern = rf'<meta\b[^>]*\b{attribute}=["\']{re.escape(key)}["\'][^>]*>'
+              return upsert_tag(html, pattern, tag)
+
+          def set_preview(path: Path, *, title: str, description: str, url: str, image: str, image_type: str = 'image/svg+xml') -> None:
               html = path.read_text()
-              if 'property="og:image"' not in html:
-                  html = html.replace('</head>', tags + '</head>', 1)
+              html = upsert_tag(html, r'<title\b[^>]*>.*?</title>', f'<title>{title}</title>')
+              html = upsert_tag(html, r'<link\b[^>]*\brel=["\']canonical["\'][^>]*>', f'<link rel="canonical" href="{url}">')
+              html = set_meta(html, 'name', 'description', description)
+              html = set_meta(html, 'property', 'og:type', 'website')
+              html = set_meta(html, 'property', 'og:site_name', 'Neusic')
+              html = set_meta(html, 'property', 'og:title', title)
+              html = set_meta(html, 'property', 'og:description', description)
+              html = set_meta(html, 'property', 'og:url', url)
+              html = set_meta(html, 'property', 'og:image', image)
+              html = set_meta(html, 'property', 'og:image:type', image_type)
+              html = set_meta(html, 'property', 'og:image:width', '1200')
+              html = set_meta(html, 'property', 'og:image:height', '630')
+              html = set_meta(html, 'property', 'og:image:alt', f'{title} link preview')
+              html = set_meta(html, 'name', 'twitter:card', 'summary_large_image')
+              html = set_meta(html, 'name', 'twitter:title', title)
+              html = set_meta(html, 'name', 'twitter:description', description)
+              html = set_meta(html, 'name', 'twitter:image', image)
+              html = set_meta(html, 'name', 'twitter:image:alt', f'{title} link preview')
               path.write_text(html)
 
-          add_head(Path('_site/index.html'), '''
-          <link rel="canonical" href="https://bnsceo.github.io/NeusicLabV1/">
-          <meta property="og:type" content="website"><meta property="og:site_name" content="Neusic">
-          <meta property="og:url" content="https://bnsceo.github.io/NeusicLabV1/">
-          <meta property="og:image" content="https://bnsceo.github.io/NeusicLabV1/social/neusic-suite-card.svg"><meta property="og:image:type" content="image/svg+xml"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
-          <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Neusic — Live Loop, Wave, and Lab"><meta name="twitter:description" content="Start anywhere. Capture in Live Loop, refine in Wave, and finish in Lab."><meta name="twitter:image" content="https://bnsceo.github.io/NeusicLabV1/social/neusic-suite-card.svg">
-          ''')
-          add_head(Path('_site/wave-loom/index.html'), '''
-          <link rel="canonical" href="https://bnsceo.github.io/NeusicLabV1/wave-loom/">
-          <meta property="og:type" content="website"><meta property="og:site_name" content="Neusic">
-          <meta property="og:title" content="Neusic Wave — True Sample Performance and Sound Design"><meta property="og:description" content="Record or upload sound, refine it in The Forge, perform it through Wave, Sample, Granular, or Hybrid engines, and send it to Lab.">
-          <meta property="og:url" content="https://bnsceo.github.io/NeusicLabV1/wave-loom/"><meta property="og:image" content="https://bnsceo.github.io/NeusicLabV1/social/wave-card.svg"><meta property="og:image:type" content="image/svg+xml"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
-          <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Neusic Wave"><meta name="twitter:description" content="Sculpt, slice, map, and transform recorded sound."><meta name="twitter:image" content="https://bnsceo.github.io/NeusicLabV1/social/wave-card.svg">
-          ''')
+          previews = {
+              Path('_site/index.html'): {
+                  'title': 'Neusic — Live Loop, Wave & Lab',
+                  'description': 'Three connected music apps: capture synchronized loops, transform sound, and finish the record in one creative workflow.',
+                  'url': 'https://bnsceo.github.io/NeusicLabV1/',
+                  'image': 'https://bnsceo.github.io/NeusicLabV1/social/neusic-suite-card.svg',
+              },
+              Path('_site/live-loop/index.html'): {
+                  'title': 'Neusic Live Loop — Synchronized Mobile Looping',
+                  'description': 'Record voice, rhythm, harmony, instruments, and samples across five synchronized touch-first loop lanes. MIDI is optional.',
+                  'url': 'https://bnsceo.github.io/NeusicLabV1/live-loop/',
+                  'image': 'https://bnsceo.github.io/NeusicLabV1/social/live-loop-card.svg',
+              },
+              Path('_site/wave-loom/index.html'): {
+                  'title': 'Neusic Wave — Sample Performance & Sound Design',
+                  'description': 'Record or upload sound, trim and slice it in The Forge, perform it through Wave, Sample, Granular, or Hybrid engines, and send it to Lab.',
+                  'url': 'https://bnsceo.github.io/NeusicLabV1/wave-loom/',
+                  'image': 'https://bnsceo.github.io/NeusicLabV1/social/wave-card.svg',
+              },
+              Path('_site/studio/index.html'): {
+                  'title': 'Neusic Lab — Music Production Workspace',
+                  'description': 'Arrange, record, edit, mix, master, recover, and export a connected Neusic project with a persistent track sidebar and dedicated workspace.',
+                  'url': 'https://bnsceo.github.io/NeusicLabV1/studio/',
+                  'image': 'https://bnsceo.github.io/NeusicLabV1/social/lab-card.svg',
+              },
+          }
+          for page, data in previews.items():
+              set_preview(page, **data)
 
           landing = Path('_site/index.html')
           html = landing.read_text()
+          html = re.sub(r'\s*<nav\b[^>]*class=["\']desktop-nav["\'][^>]*>.*?</nav>', '', html, flags=re.I | re.S)
+          html = re.sub(r'\s*<button\b[^>]*id=["\']menuButton["\'][^>]*>.*?</button>', '', html, flags=re.I | re.S)
+          html = re.sub(r'\s*<nav\b[^>]*id=["\']mobileMenu["\'][^>]*>.*?</nav>', '', html, flags=re.I | re.S)
           if 'site-polish.css' not in html:
-              html = html.replace('</head>', '<link rel="stylesheet" href="./site-polish.css?v=8"></head>', 1)
+              html = html.replace('</head>', '<link rel="stylesheet" href="./site-polish.css?v=9"></head>', 1)
           if 'site-polish.js' not in html:
-              html = html.replace('</body>', '<script src="./site-polish.js?v=8"></script></body>', 1)
+              html = html.replace('</body>', '<script src="./site-polish.js?v=9"></script></body>', 1)
           landing.write_text(html)
 
           for page in Path('_site').rglob('*.html'):
