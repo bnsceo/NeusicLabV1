@@ -36,6 +36,39 @@ function outputFor(control,value){
   return Math.round(value*100);
 }
 
+function primeMicrophoneFromGesture(){
+  if(window.NeusicMobileMicPrimer?.prime)return window.NeusicMobileMicPrimer.prime();
+  if(!navigator.mediaDevices?.getUserMedia)return Promise.reject(new Error('Microphone capture is unavailable in this browser.'));
+  return navigator.mediaDevices.getUserMedia({audio:true});
+}
+
+async function startRecordFromGesture(index,button){
+  if(button.dataset.recordBusy==='1')return;
+  button.dataset.recordBusy='1';
+  selectTrack(index);
+  status(`Preparing LOOP ${index+1}… Keep this page open.`);
+
+  // Both operations begin immediately in the original trusted finger gesture.
+  // Do not await one before launching the other on iPhone Safari.
+  const microphonePromise=primeMicrophoneFromGesture();
+  const audioEnginePromise=ensureEngine();
+
+  try{
+    const [readyLooper,stream]=await Promise.all([audioEnginePromise,microphonePromise]);
+    if(stream?.getAudioTracks?.().length){
+      workspace.micStream=stream;
+      await workspace.initMic();
+    }
+    await workspace.resume({required:true});
+    await readyLooper.toggleRecord(index);
+  }catch(error){
+    console.error(error);
+    status(error.message||'The iPhone could not start this lane.');
+  }finally{
+    delete button.dataset.recordBusy;
+  }
+}
+
 function buildTracks(){
   trackGrid.innerHTML='';
   for(let index=0;index<5;index++){
@@ -47,6 +80,13 @@ function buildTracks(){
       event.stopPropagation();
       await handleTrackAction(index,button.dataset.action);
     }));
+    const recordButton=card.querySelector('[data-action="record"]');
+    recordButton.addEventListener('pointerdown',event=>{
+      if(event.pointerType==='mouse')return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      startRecordFromGesture(index,recordButton);
+    },{passive:false});
     card.querySelectorAll('[data-control]').forEach(input=>input.addEventListener('input',async()=>{
       const key=input.dataset.control;
       const raw=Number(input.value);
@@ -72,8 +112,16 @@ async function handleTrackAction(index,action){
   selectTrack(index);
   if(action==='select')return;
   try{
+    if(action==='record'){
+      const microphonePromise=primeMicrophoneFromGesture();
+      const readyLooper=await ensureEngine();
+      const stream=await microphonePromise;
+      if(stream?.getAudioTracks?.().length){workspace.micStream=stream;await workspace.initMic();}
+      await workspace.resume({required:true});
+      await readyLooper.toggleRecord(index);
+      return;
+    }
     await ensureEngine();
-    if(action==='record')await looper.toggleRecord(index);
     if(action==='mute')looper.toggleMute(index);
     if(action==='clear')looper.clear(index);
     if(action==='upload')$('fileInput').click();
@@ -143,7 +191,10 @@ function updateProgress(){
 function bindGlobal(){
   $('micBtn').addEventListener('click',async()=>{
     try{
+      const microphonePromise=primeMicrophoneFromGesture();
       await ensureEngine();
+      const stream=await microphonePromise;
+      if(stream?.getAudioTracks?.().length)workspace.micStream=stream;
       await workspace.initMic();
       workspace.setMonitor(!$('micBtn').classList.contains('active'));
       $('micBtn').classList.toggle('active');
@@ -302,7 +353,6 @@ function boot(){
   updateProgress();
   status('Five loop lanes are visible. Tap REC on any lane; MIDI is optional.');
   window.dispatchEvent(new CustomEvent('neusic:live-loop-ui-ready',{detail:{lanes:5}}));
-  requestAnimationFrame(()=>ensureEngine().catch(()=>{}));
 }
 
 boot();
