@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFile} from 'node:fs/promises';
+import {cp,mkdir,mkdtemp,readFile,rename,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
 import {spawnSync} from 'node:child_process';
 
 const read=path=>readFile(path,'utf8');
@@ -78,22 +80,46 @@ test('landing menu is removed while direct product links remain',async()=>{
   for(const href of ['./live-loop/','./wave-loom/','./studio/'])assert.ok(landingHtml.includes(href),`landing lost direct product link ${href}`);
 });
 
-test('Pages deployment enforces complete link preview metadata',async()=>{
+test('Pages build produces complete link previews and a menu-free landing',async()=>{
   const workflow=await read('.github/workflows/deploy-neusic-pages.yml');
-  for(const token of [
-    'cp neusic-agent.css _site/neusic-agent.css',
-    'cp neusic-agent.js _site/neusic-agent.js',
-    'cp -R social/. _site/social/',
-    "set_meta(html, 'property', 'og:title', title)",
-    "set_meta(html, 'property', 'og:description', description)",
-    "set_meta(html, 'property', 'og:image', image)",
-    "set_meta(html, 'name', 'twitter:title', title)",
-    "set_meta(html, 'name', 'twitter:description', description)",
-    "set_meta(html, 'name', 'twitter:image', image)",
-    "Path('_site/live-loop/index.html')",
-    "Path('_site/wave-loom/index.html')",
-    "Path('_site/studio/index.html')",
-    'menuButton',
-    'mobileMenu'
-  ])assert.ok(workflow.includes(token),`deployment missing ${token}`);
+  const block=workflow.match(/python - <<'PY'\n([\s\S]*?)\n\s*PY/);
+  assert.ok(block,'Pages workflow Python build block is missing');
+  const python=block[1].split('\n').map(line=>line.startsWith('          ')?line.slice(10):line).join('\n');
+  const root=await mkdtemp(join(tmpdir(),'neusic-pages-'));
+  try{
+    const site=join(root,'_site');
+    await mkdir(site,{recursive:true});
+    await cp('index.html',join(site,'index.html'));
+    await cp('live-loop',join(site,'live-loop'),{recursive:true});
+    await cp('wave-loom',join(site,'wave-loom'),{recursive:true});
+    await cp('app',join(site,'studio'),{recursive:true});
+    await rename(join(site,'studio','index.html'),join(site,'studio','core.html'));
+    await rename(join(site,'studio','phase-a.html'),join(site,'studio','index.html'));
+    const result=spawnSync('python3',['-c',python],{cwd:root,encoding:'utf8'});
+    assert.equal(result.status,0,`Pages metadata build failed:\n${result.stderr}`);
+
+    const landing=await readFile(join(site,'index.html'),'utf8');
+    assert.doesNotMatch(landing,/class="desktop-nav"/);
+    assert.doesNotMatch(landing,/id="menuButton"/);
+    assert.doesNotMatch(landing,/id="mobileMenu"/);
+
+    const expected=[
+      ['index.html','Neusic — Live Loop, Wave & Lab','neusic-suite-card.svg'],
+      ['live-loop/index.html','Neusic Live Loop — Synchronized Mobile Looping','live-loop-card.svg'],
+      ['wave-loom/index.html','Neusic Wave — Sample Performance & Sound Design','wave-card.svg'],
+      ['studio/index.html','Neusic Lab — Music Production Workspace','lab-card.svg']
+    ];
+    for(const [relative,title,image] of expected){
+      const html=await readFile(join(site,...relative.split('/')),'utf8');
+      assert.ok(html.includes(`<title>${title}</title>`),`${relative} missing HTML title`);
+      assert.ok(html.includes(`<meta property="og:title" content="${title}">`),`${relative} missing og:title`);
+      assert.ok(html.includes('<meta property="og:description" content="'),`${relative} missing og:description`);
+      assert.ok(html.includes(`<meta property="og:image" content="https://bnsceo.github.io/NeusicLabV1/social/${image}">`),`${relative} missing og:image`);
+      assert.ok(html.includes(`<meta name="twitter:title" content="${title}">`),`${relative} missing twitter:title`);
+      assert.ok(html.includes('<meta name="twitter:description" content="'),`${relative} missing twitter:description`);
+      assert.ok(html.includes(`<meta name="twitter:image" content="https://bnsceo.github.io/NeusicLabV1/social/${image}">`),`${relative} missing twitter:image`);
+    }
+  }finally{
+    await rm(root,{recursive:true,force:true});
+  }
 });
