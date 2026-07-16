@@ -26,7 +26,7 @@ test('landing clearly presents three products and one connected project',async()
 test('landing thumbnail interactions remain mock-only',async()=>{
   const source=await read('landing-experience.js');
   for(const forbidden of ['getUserMedia','MediaRecorder','AudioContext','webkitAudioContext','indexedDB'])assert.equal(source.includes(forbidden),false,`landing mock unexpectedly uses ${forbidden}`);
-  for(const token of ['demo-recording','demo-sculpting','data-lab-view','MOCK READY'])assert.ok(source.includes(token),`mock interaction missing ${token}`);
+  for(const token of ['demo-recording','demo-sculpting','dataset.labView','MOCK READY'])assert.ok(source.includes(token),`mock interaction missing ${token}`);
 });
 
 test('all product pages load the shared suite identity',async()=>{
