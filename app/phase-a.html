@@ -4,27 +4,27 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
   <meta name="theme-color" content="#0b0d0f">
-  <title>Neusic Studio</title>
+  <title>Neusic Lab</title>
   <style>
     html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#0b0d0f;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
     #boot{position:fixed;inset:0;z-index:2;display:grid;place-items:center;color:#e8ebee;background:radial-gradient(circle at 50% 28%,#1c2024,#0b0d0f 58%)}
-    .boot-card{width:min(280px,76vw);text-align:center}.logo{font-size:24px;font-weight:800;letter-spacing:.18em;text-transform:uppercase}.logo span{color:#d4a354}.sub{margin-top:8px;color:#697178;font:600 9px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.16em;text-transform:uppercase}.bar{height:2px;margin:22px auto 0;overflow:hidden;border:1px solid rgba(255,255,255,.06);background:#080a0c}.bar:after{content:"";display:block;width:32%;height:100%;background:#d4a354;animation:load 1.05s ease-in-out infinite alternate}@keyframes load{to{transform:translateX(215%)}}iframe{width:100%;height:100%;border:0;background:#0b0d0f}
+    .boot-card{width:min(320px,80vw);text-align:center}.logo{font-size:28px;font-weight:800;letter-spacing:.18em;text-transform:uppercase}.logo span{color:#d4a354}.sub{margin-top:9px;color:#80898f;font:700 8px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase}.journey{margin-top:11px;color:#5f696f;font:650 7px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;text-transform:uppercase}.bar{height:2px;margin:22px auto 0;overflow:hidden;border:1px solid rgba(255,255,255,.06);background:#080a0c}.bar:after{content:"";display:block;width:32%;height:100%;background:#d4a354;animation:load 1.05s ease-in-out infinite alternate}@keyframes load{to{transform:translateX(215%)}}iframe{width:100%;height:100%;border:0;background:#0b0d0f}
   </style>
 </head>
 <body>
-  <div id="boot"><div class="boot-card"><div class="logo">Neu<span>sic</span></div><div class="sub">Initializing production copilot</div><div class="bar"></div></div></div>
-  <iframe id="studio" title="Neusic digital audio workstation" allow="microphone; autoplay; clipboard-read; clipboard-write; midi"></iframe>
+  <div id="boot"><div class="boot-card"><div class="logo">Neu<span>sic</span> Lab</div><div class="sub">Initializing the production workspace</div><div class="journey">Live Loop → Wave → Lab · Start anywhere</div><div class="bar"></div></div></div>
+  <iframe id="studio" title="Neusic Lab digital audio workstation" allow="microphone; autoplay; clipboard-read; clipboard-write; midi"></iframe>
   <script>
     const frame=document.getElementById('studio');
     const studioSrc=location.pathname.includes('/app/phase-a.html')?'index.html':'core.html';
     frame.src=studioSrc;
     frame.addEventListener('load',async()=>{
       const d=frame.contentDocument;
-      const css=['css/13-workspace-ux.css','css/14-production-integrity.css','css/15-mobile-first.css','css/16-project-safety.css','css/17a-studio-foundation.css','css/17b-studio-navigation.css','css/17c-studio-controls.css','css/17d-studio-mixer-mobile.css','css/18-producer-flow.css','css/19-professional-arranger.css','css/20a-hyperreal-shell.css','css/20b-hyperreal-tracks.css','css/20c-hyperreal-creator.css','css/21-production-copilot.css'];
+      const css=['css/13-workspace-ux.css','css/14-production-integrity.css','css/15-mobile-first.css','css/16-project-safety.css','css/17a-studio-foundation.css','css/17b-studio-navigation.css','css/17c-studio-controls.css','css/17d-studio-mixer-mobile.css','css/18-producer-flow.css','css/19-professional-arranger.css','css/20a-hyperreal-shell.css','css/20b-hyperreal-tracks.css','css/20c-hyperreal-creator.css','css/21-production-copilot.css','css/22-neusic-suite-identity.css'];
       css.forEach(href=>{if(!d.querySelector(`link[href="${href}"]`)){const link=d.createElement('link');link.rel='stylesheet';link.href=href;d.head.appendChild(link);}});
       const load=src=>new Promise((resolve,reject)=>{if(d.querySelector(`script[src="${src}"]`))return resolve();const script=d.createElement('script');script.src=src;script.onload=resolve;script.onerror=reject;d.body.appendChild(script);});
       try{
-        for(const src of ['js/22-workspace-ux.js','js/23-production-integrity.js','js/24-mobile-first.js','js/25-project-safety.js','js/26-producer-flow.js','js/27-producer-flow-hardening.js','js/28-professional-arranger.js','js/29-arranger-recovery-sync.js','js/30-track-engine.js','js/31-midi-clips.js','js/32-track-workspace.js','js/33-production-copilot.js'])await load(src);
+        for(const src of ['js/22-workspace-ux.js','js/23-production-integrity.js','js/24-mobile-first.js','js/25-project-safety.js','js/26-producer-flow.js','js/27-producer-flow-hardening.js','js/28-professional-arranger.js','js/29-arranger-recovery-sync.js','js/30-track-engine.js','js/31-midi-clips.js','js/32-track-workspace.js','js/33-production-copilot.js','js/35-neusic-suite-identity.js'])await load(src);
         const expose=d.createElement('script');
         expose.textContent='window.__NeusicStudioBridge={Audio_:Audio_,S:S,renderTracks:renderTracks,secToBeat:secToBeat,snapshot:typeof snapshot==="function"?snapshot:null,toast:typeof toast==="function"?toast:null,COLORS:typeof COLORS!=="undefined"?COLORS:[]};';
         d.body.appendChild(expose);
