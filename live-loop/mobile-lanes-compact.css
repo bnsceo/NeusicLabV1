@@ -1,0 +1,97 @@
+/* Compact mobile performance fit: all five lanes stay visible but no longer consume the full phone height. */
+@media (max-width:760px){
+  body.stage-performance .loop-deck{
+    min-height:0!important;
+    height:auto!important;
+  }
+  body.stage-performance #trackGrid{
+    height:clamp(440px,72svh,590px)!important;
+    min-height:440px!important;
+    max-height:590px!important;
+  }
+  body.stage-performance #trackGrid>.loop-track,
+  body.stage-performance #trackGrid>.loop-track.mobile-active{
+    height:100%!important;
+  }
+  body.stage-performance .loop-track header{
+    flex-basis:24px!important;
+  }
+  body.stage-performance .track-number{
+    width:21px!important;
+    height:21px!important;
+    font-size:7px!important;
+  }
+  body.stage-performance .progress-control{
+    width:min(46px,88%)!important;
+    margin:0 auto 2px!important;
+  }
+  body.stage-performance .track-actions button[data-action="record"]{
+    min-height:44px!important;
+  }
+  body.stage-performance .track-actions button[data-action="mute"]{
+    min-height:38px!important;
+  }
+  body.stage-performance .track-controls{
+    grid-template-rows:minmax(92px,1fr) auto!important;
+    gap:2px!important;
+  }
+  body.stage-performance .track-controls label:has(input[data-control="volume"]){
+    min-height:92px!important;
+    grid-template-rows:auto minmax(64px,1fr) auto!important;
+  }
+  body.stage-performance .track-controls input[data-control="volume"]{
+    min-height:64px!important;
+  }
+  body.stage-performance .track-controls label:has(input[data-control="pan"]){
+    min-height:38px!important;
+    grid-template-rows:auto 16px auto!important;
+  }
+  body.stage-performance .track-controls input[data-control="pan"]{
+    height:16px!important;
+  }
+  .mobile-recording-toast{
+    position:fixed;
+    z-index:1000;
+    top:calc(var(--neusic-credit-safe,0px) + 58px);
+    left:50%;
+    width:min(94vw,560px);
+    transform:translate(-50%,-8px);
+    padding:9px 12px;
+    border:1px solid #67522f;
+    border-radius:6px;
+    background:rgba(7,10,12,.96);
+    color:#f6d89c;
+    box-shadow:0 10px 28px rgba(0,0,0,.55),inset 0 1px rgba(255,255,255,.05);
+    font:750 9px/1.35 var(--mono,"JetBrains Mono",monospace);
+    letter-spacing:.03em;
+    text-align:center;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .16s ease,transform .16s ease;
+  }
+  .mobile-recording-toast.show{
+    opacity:1;
+    transform:translate(-50%,0);
+  }
+  .mobile-recording-toast.error{
+    border-color:#934152;
+    color:#ffbac5;
+  }
+}
+
+@media (max-width:760px) and (max-height:700px){
+  body.stage-performance #trackGrid{
+    height:430px!important;
+    min-height:430px!important;
+  }
+  body.stage-performance .progress-control{
+    width:min(40px,84%)!important;
+  }
+  body.stage-performance .track-controls label:has(input[data-control="volume"]){
+    min-height:78px!important;
+    grid-template-rows:auto minmax(52px,1fr) auto!important;
+  }
+  body.stage-performance .track-controls input[data-control="volume"]{
+    min-height:52px!important;
+  }
+}
