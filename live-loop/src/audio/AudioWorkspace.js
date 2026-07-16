@@ -58,52 +58,89 @@ class AudioWorkspace {
     this.monitor = null;
   }
 
-  async initMic() {
-    await this.init();
-    await this.resume({required:true});
-    if (this.micIsLive() && this.micSource) return this.micStream;
-    if (!navigator.mediaDevices?.getUserMedia) throw new Error('Microphone capture is not supported in this browser.');
+  microphoneError(error) {
+    if (error?.name === 'NotAllowedError' || error?.name === 'SecurityError') {
+      return new Error('Microphone permission is blocked. Allow microphone access for this site, then tap REC again.');
+    }
+    if (error?.name === 'NotFoundError' || error?.name === 'DevicesNotFoundError') {
+      return new Error('No microphone was found on this device.');
+    }
+    if (error?.name === 'NotReadableError' || error?.name === 'TrackStartError') {
+      return new Error('The microphone is busy in another app. Close the other app, then tap REC again.');
+    }
+    return new Error(error?.message || 'The microphone could not be opened.');
+  }
 
-    this.releaseMicGraph();
-    this.micStream?.getTracks?.().forEach(track => track.stop());
-    this.micStream = null;
-
+  async requestMicStream() {
     const preferred = {
       echoCancellation:false,
       noiseSuppression:false,
       autoGainControl:false,
-      channelCount:{ideal:1},
-      sampleRate:{ideal:this.context.sampleRate}
+      channelCount:{ideal:1}
     };
     try {
-      this.micStream = await navigator.mediaDevices.getUserMedia({audio:preferred});
+      return await navigator.mediaDevices.getUserMedia({audio:preferred});
     } catch (preferredError) {
+      if (preferredError?.name === 'NotAllowedError' || preferredError?.name === 'SecurityError') {
+        throw this.microphoneError(preferredError);
+      }
       try {
-        this.micStream = await navigator.mediaDevices.getUserMedia({audio:true});
+        return await navigator.mediaDevices.getUserMedia({audio:true});
       } catch (error) {
-        if (error?.name === 'NotAllowedError' || error?.name === 'SecurityError') {
-          throw new Error('Microphone permission is blocked. Allow microphone access for this site, then tap REC again.');
-        }
-        if (error?.name === 'NotFoundError') throw new Error('No microphone was found on this device.');
-        throw new Error(error?.message || 'The microphone could not be opened.');
+        throw this.microphoneError(error);
       }
     }
+  }
 
-    const track = this.micStream.getAudioTracks()[0];
-    if (!track) throw new Error('No microphone audio track was returned by this device.');
-    track.enabled = true;
-    track.addEventListener('ended', () => {
+  async initMic() {
+    if (!window.isSecureContext) {
+      throw new Error('Microphone recording requires HTTPS. Open the secure Neusic Live Loop page and tap REC again.');
+    }
+    if (!navigator.mediaDevices?.getUserMedia) {
+      throw new Error('Microphone capture is unavailable in this browser. Open Neusic Live Loop in Safari or Chrome.');
+    }
+
+    let stream = this.micIsLive() ? this.micStream : null;
+    let permissionRequest = null;
+
+    if (!stream) {
       this.releaseMicGraph();
+      this.micStream?.getTracks?.().forEach(track => track.stop());
       this.micStream = null;
-    }, {once:true});
+
+      // Start getUserMedia before awaiting AudioContext work. This keeps the
+      // permission request attached to the original mobile tap.
+      permissionRequest = this.requestMicStream();
+    }
+
+    await this.init();
+
+    if (!stream) {
+      stream = await permissionRequest;
+      this.micStream = stream;
+      const track = stream.getAudioTracks()[0];
+      if (!track) {
+        stream.getTracks().forEach(item => item.stop());
+        this.micStream = null;
+        throw new Error('No microphone audio track was returned by this device.');
+      }
+      track.enabled = true;
+      track.addEventListener('ended', () => {
+        this.releaseMicGraph();
+        this.micStream = null;
+      }, {once:true});
+    }
 
     await this.resume({required:true});
-    this.micSource = this.context.createMediaStreamSource(this.micStream);
+    if (this.micSource) return stream;
+
+    this.releaseMicGraph();
+    this.micSource = this.context.createMediaStreamSource(stream);
     this.monitor = this.context.createGain();
     this.monitor.gain.value = 0;
     this.micSource.connect(this.monitor);
     this.monitor.connect(this.master);
-    return this.micStream;
+    return stream;
   }
 
   setMonitor(enabled) {
