@@ -1,20 +1,19 @@
 (() => {
   'use strict';
   const header=document.querySelector('.site-header');
-  const menuButton=document.getElementById('menuButton');
-  const mobileMenu=document.getElementById('mobileMenu');
   const form=document.getElementById('waitlistForm');
   const emailInput=document.getElementById('waitlistEmail');
   const status=document.getElementById('waitlistStatus');
   const STORE='neusic-waitlist-v1';
 
+  document.querySelector('.desktop-nav')?.remove();
+  document.getElementById('menuButton')?.remove();
+  document.getElementById('mobileMenu')?.remove();
+  header?.classList.add('menu-free');
+
   if(!document.querySelector('link[href*="neusic-agent.css"]')){const link=document.createElement('link');link.rel='stylesheet';link.href='./neusic-agent.css?v=1';document.head.appendChild(link)}
   if(!document.querySelector('script[src*="neusic-agent.js"]')){const script=document.createElement('script');script.src='./neusic-agent.js?v=1';script.defer=true;document.body.appendChild(script)}
 
-  const setMenu=open=>{mobileMenu?.classList.toggle('open',open);menuButton?.setAttribute('aria-expanded',String(open));if(menuButton)menuButton.textContent=open?'CLOSE':'MENU';};
-  menuButton?.addEventListener('click',()=>setMenu(!mobileMenu.classList.contains('open')));
-  mobileMenu?.addEventListener('click',event=>{if(event.target.closest('a'))setMenu(false)});
-  document.addEventListener('keydown',event=>{if(event.key==='Escape')setMenu(false)});
   const updateHeader=()=>header?.classList.toggle('scrolled',scrollY>18);
   updateHeader();addEventListener('scroll',updateHeader,{passive:true});
 
