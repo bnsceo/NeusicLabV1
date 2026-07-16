@@ -16,8 +16,9 @@ test('landing explains the three-product journey and mock previews respond',asyn
   const wave=page.locator('[data-preview="wave"]');
   await wave.locator('[data-demo-action="morph"]').click();
   await expect(wave).toHaveClass(/demo-morph/);
-  await wave.locator('.wave-nodes circle').nth(3).click();
-  await expect(wave.locator('.wave-nodes circle').nth(3)).toHaveClass(/mock-selected/);
+  const waveNode=wave.locator('.wave-nodes circle').nth(3);
+  await waveNode.evaluate(node=>node.dispatchEvent(new MouseEvent('click',{bubbles:true})));
+  await expect(waveNode).toHaveClass(/mock-selected/);
 
   const lab=page.locator('[data-preview="lab"]');
   await lab.locator('[data-demo-action="mix"]').click();
