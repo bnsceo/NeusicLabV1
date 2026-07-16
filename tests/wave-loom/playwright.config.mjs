@@ -5,7 +5,7 @@ const repositoryRoot=fileURLToPath(new URL('../..',import.meta.url));
 
 export default defineConfig({
   testDir:'.',
-  testMatch:'wave-loom.spec.mjs',
+  testMatch:'*.spec.mjs',
   timeout:45_000,
   expect:{timeout:10_000},
   fullyParallel:false,
@@ -27,7 +27,7 @@ export default defineConfig({
   webServer:{
     command:'python3 -m http.server 4173 --bind 127.0.0.1',
     cwd:repositoryRoot,
-    url:'http://127.0.0.1:4173/wave-loom/',
+    url:'http://127.0.0.1:4173/',
     reuseExistingServer:true,
     timeout:20_000
   }

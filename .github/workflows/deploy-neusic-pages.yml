@@ -32,6 +32,10 @@ jobs:
           cp index.html _site/index.html
           cp site-polish.css _site/site-polish.css
           cp site-polish.js _site/site-polish.js
+          cp landing-experience.css _site/landing-experience.css
+          cp landing-experience.js _site/landing-experience.js
+          cp neusic-suite.css _site/neusic-suite.css
+          cp neusic-suite.js _site/neusic-suite.js
           cp -R app/. _site/studio/
           cp -R wave-loom/. _site/wave-loom/
           cp -R live-loop/. _site/live-loop/
@@ -69,9 +73,9 @@ jobs:
           landing = Path('_site/index.html')
           html = landing.read_text()
           if 'site-polish.css' not in html:
-              html = html.replace('</head>', '<link rel="stylesheet" href="./site-polish.css?v=5"></head>', 1)
+              html = html.replace('</head>', '<link rel="stylesheet" href="./site-polish.css?v=7"></head>', 1)
           if 'site-polish.js' not in html:
-              html = html.replace('</body>', '<script src="./site-polish.js?v=5"></script></body>', 1)
+              html = html.replace('</body>', '<script src="./site-polish.js?v=7"></script></body>', 1)
           landing.write_text(html)
 
           for page in Path('_site').rglob('*.html'):

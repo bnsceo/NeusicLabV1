@@ -4,17 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#07090b">
-  <meta name="description" content="Neusic Live Loop Lab is a five-track browser looper for voice, samples, effects, synth performance and Wave Loom Forge transfer.">
-  <title>Neusic Live Loop Lab</title>
+  <meta name="description" content="Neusic Live Loop is a five-track browser performance looper for voice, samples, effects, synth performance, and direct Neusic Wave transfer.">
+  <title>Neusic Live Loop</title>
   <link rel="preconnect" href="https://api.fontshare.com">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="mobile-performance.css?v=1">
+  <link rel="stylesheet" href="../neusic-suite.css?v=1">
 </head>
 <body>
   <div class="noise" aria-hidden="true"></div>
   <header class="topbar">
-    <a class="brand" href="../" aria-label="Neusic home"><span class="brand-mark">N</span><span><b>NEUSIC</b><small>LIVE LOOP LAB</small></span></a>
+    <a class="brand" href="../" aria-label="Neusic home"><span class="brand-mark">N</span><span><b>NEUSIC</b><small>LIVE LOOP · PERFORMANCE</small></span></a>
     <div class="transport" aria-label="Live loop transport">
       <button id="micBtn" class="hardware-button" type="button"><i class="led"></i><span>MIC</span></button>
       <button id="playBtn" class="hardware-button transport-play" type="button"><span>▶</span><b>START</b></button>
@@ -23,12 +24,12 @@
       <label class="switch-control"><input id="quantizeToggle" type="checkbox" checked><span>QUANTIZE</span></label>
       <button id="midiBtn" class="hardware-button" type="button"><i class="led"></i><span>MIDI</span></button>
     </div>
-    <nav class="top-actions" aria-label="Neusic pages"><a href="../wave-loom/">WAVE LOOM</a><a href="../studio/">CLASSIC DAW</a><a href="../">LANDING</a></nav>
+    <nav class="top-actions" aria-label="Neusic pages"><a href="../wave-loom/">NEUSIC WAVE</a><a href="../studio/">NEUSIC LAB</a><a href="../">HOME</a></nav>
   </header>
 
   <main class="performance-shell">
     <section class="performance-head">
-      <div><span class="eyebrow">FIVE-LANE VOICE + SAMPLE PERFORMANCE SYSTEM</span><h1>Build the song <em>while it is happening.</em></h1><p>Record voice, beatbox, harmony or instruments. Stack overdubs, reshape loops with tape-style delay and space, then send any track directly to the Wave Loom Forge.</p></div>
+      <div><span class="eyebrow">NEUSIC PRODUCT 01 · LIVE PERFORMANCE CAPTURE</span><h1>Build the song <em>while it is happening.</em></h1><p>Record voice, beatbox, harmony, instruments, or samples. Stack overdubs, reshape loops with tape-style delay and space, then transfer any track directly into Neusic Wave for refinement.</p></div>
       <div class="master-display"><div><small>MASTER LOOP</small><b id="masterLength">—</b></div><div><small>GLOBAL STATE</small><b id="globalState">READY</b></div><div class="master-meter"><span id="masterMeter"></span></div></div>
     </section>
 
@@ -62,8 +63,8 @@
     </section>
 
     <section class="session-tools panel">
-      <div><span class="eyebrow">SAMPLE INPUT + FORGE BRIDGE</span><h2>Bring in any browser-decodable audio</h2><p>Upload audio into the selected lane or send a recorded/overdubbed loop to Wave Loom. Forge transfers stay on this device through IndexedDB.</p></div>
-      <div class="tool-actions"><button id="uploadBtn" class="primary-action" type="button">UPLOAD TO SELECTED TRACK</button><input id="fileInput" type="file" accept="audio/*,.wav,.wave,.mp3,.m4a,.aac,.flac,.ogg,.oga,.opus,.webm,.mp4" multiple hidden><button id="sendSelectedBtn" type="button">SEND SELECTED TO FORGE</button><button id="downloadSelectedBtn" type="button">DOWNLOAD SELECTED WAV</button></div>
+      <div><span class="eyebrow">SAMPLE INPUT + NEUSIC WAVE BRIDGE</span><h2>Capture here. Refine in Wave.</h2><p>Upload audio into the selected lane or send a recorded and overdubbed loop directly into the persistent Neusic Wave Forge. You may also remain in Live Loop and perform without transferring.</p></div>
+      <div class="tool-actions"><button id="uploadBtn" class="primary-action" type="button">UPLOAD TO SELECTED TRACK</button><input id="fileInput" type="file" accept="audio/*,.wav,.wave,.mp3,.m4a,.aac,.flac,.ogg,.oga,.opus,.webm,.mp4" multiple hidden><button id="sendSelectedBtn" type="button">SEND SELECTED TO NEUSIC WAVE</button><button id="downloadSelectedBtn" type="button">DOWNLOAD SELECTED WAV</button></div>
       <div id="statusMessage" class="status-message" role="status">Arm the microphone, select a track, and press REC.</div>
     </section>
   </main>
@@ -72,7 +73,7 @@
     <article class="loop-track" data-state="Empty">
       <header><div><span class="track-number"></span><b class="track-name"></b></div><span class="track-state">EMPTY</span></header>
       <button class="progress-control" data-action="select" type="button" aria-label="Select track"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="progress-bg" cx="50" cy="50" r="43"></circle><circle class="progress-ring" cx="50" cy="50" r="43"></circle></svg><span class="progress-center"><b class="progress-time">00.0</b><small>SECONDS</small></span></button>
-      <div class="track-actions"><button data-action="record" class="record-action" type="button">REC</button><button data-action="mute" type="button">MUTE</button><button data-action="upload" type="button">LOAD</button><button data-action="forge" type="button">FORGE</button><button data-action="clear" class="danger" type="button">CLEAR</button></div>
+      <div class="track-actions"><button data-action="record" class="record-action" type="button">REC</button><button data-action="mute" type="button">MUTE</button><button data-action="upload" type="button">LOAD</button><button data-action="forge" type="button">WAVE</button><button data-action="clear" class="danger" type="button">CLEAR</button></div>
       <div class="track-controls"><label>LEVEL<input data-control="volume" type="range" min="0" max="125" value="90"><output>90</output></label><label>PAN<input data-control="pan" type="range" min="-100" max="100" value="0"><output>C</output></label><label>DELAY<input data-control="delay" type="range" min="0" max="100" value="22"><output>22</output></label><label>SPACE<input data-control="reverb" type="range" min="0" max="100" value="18"><output>18</output></label></div>
     </article>
   </template>
@@ -80,5 +81,6 @@
   <footer class="legal-note">Performance workflow inspired by modern live-loop artists and hardware loop stations. Neusic is not affiliated with Reggie Watts, Boss, Line 6, Nord, or their manufacturers.</footer>
   <script type="module" src="app.js"></script>
   <script src="mobile-performance.js?v=1"></script>
+  <script src="../neusic-suite.js?v=1"></script>
 </body>
 </html>
