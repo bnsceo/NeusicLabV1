@@ -1,0 +1,75 @@
+/* Neusic Lab mobile hardening — loaded after Workspace V4. */
+@media (max-width:860px){
+  html,body{width:100%!important;max-width:100%!important;height:100%!important;overflow:hidden!important;overscroll-behavior:none!important}
+  body.neusic-studio-v4{--mobile-nav-height:64px;min-width:0!important;max-width:100vw!important}
+  body.neusic-studio-v4 #app{width:100vw!important;max-width:100vw!important;height:100dvh!important;max-height:100dvh!important;overflow:hidden!important;padding:0!important}
+  body.neusic-studio-v4 #topbar{width:100%!important;min-width:0!important;min-height:52px!important;max-height:64px!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none!important;-webkit-overflow-scrolling:touch!important}
+  body.neusic-studio-v4 #topbar::-webkit-scrollbar{display:none!important}
+
+  #studio-v4-shell{position:relative!important;width:100%!important;max-width:100vw!important;height:auto!important;min-height:0!important;display:block!important;overflow:hidden!important;padding:0 0 calc(var(--mobile-nav-height) + env(safe-area-inset-bottom))!important}
+  .studio-v4-center{position:absolute!important;inset:0 0 calc(var(--mobile-nav-height) + env(safe-area-inset-bottom)) 0!important;width:100%!important;max-width:100vw!important;height:auto!important;min-width:0!important;min-height:0!important;display:grid!important;grid-template-rows:auto minmax(0,1fr)!important;overflow:hidden!important}
+  .studio-v4-center-head{width:100%!important;min-width:0!important;min-height:54px!important;display:grid!important;grid-template-columns:42px minmax(88px,.7fr) minmax(0,1.5fr) 42px!important;gap:5px!important;padding:6px!important;overflow:hidden!important}
+  .studio-v4-center-title{min-width:0!important;overflow:hidden!important}
+  .studio-v4-center-title small,.studio-v4-center-title b{overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+  .studio-v4-subtools{width:100%!important;min-width:0!important;gap:4px!important;overflow-x:auto!important;overscroll-behavior-x:contain!important;-webkit-overflow-scrolling:touch!important;scroll-snap-type:x proximity!important}
+  .studio-v4-subtool{min-width:max-content!important;min-height:40px!important;padding:0 10px!important;scroll-snap-align:start!important}
+  .studio-v4-mobile-toggle,.studio-v4-inspector-toggle{display:grid!important;width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;padding:0!important;place-items:center!important;touch-action:manipulation!important}
+  .studio-v4-center-actions{display:none!important}
+
+  .studio-v4-workspace{width:100%!important;max-width:100vw!important;height:100%!important;min-width:0!important;min-height:0!important;overflow:hidden!important}
+  .studio-v4-workspace #main,.studio-v4-workspace #main #center{width:100%!important;max-width:100vw!important;height:100%!important;min-width:0!important;min-height:0!important;overflow:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important}
+  .studio-v4-workspace #drawer,.studio-v4-workspace #drawer .dpanels,.studio-v4-workspace #drawer .dpanel{width:100%!important;max-width:100vw!important;height:100%!important;min-width:0!important;min-height:0!important;overflow:auto!important;-webkit-overflow-scrolling:touch!important}
+
+  .studio-v4-left{position:absolute!important;z-index:1000!important;inset:0 auto calc(var(--mobile-nav-height) + env(safe-area-inset-bottom)) 0!important;width:min(342px,92vw)!important;max-width:92vw!important;height:auto!important;min-width:0!important;grid-template-columns:70px minmax(0,1fr)!important;overflow:hidden!important;transform:translateX(-105%)!important;visibility:hidden!important;pointer-events:none!important;transition:transform .2s ease,visibility 0s linear .2s!important}
+  .studio-v4-left.open{transform:none!important;visibility:visible!important;pointer-events:auto!important;transition:transform .2s ease!important}
+  .studio-v4-stage-rail{min-width:0!important;padding:7px 5px!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch!important}
+  .studio-v4-stage-button{min-height:52px!important;padding:5px 2px!important;touch-action:manipulation!important}
+  .studio-v4-stage-button i{width:28px!important;height:28px!important}
+  .studio-v4-track-column{min-width:0!important;width:100%!important;overflow:hidden!important}
+  .studio-v4-track-head{height:50px!important;min-width:0!important;padding:0 8px!important}
+  .studio-v4-track-rack{width:100%!important;min-width:0!important;overflow:auto!important;-webkit-overflow-scrolling:touch!important}
+  .studio-v4-track-rack #sidebar{width:100%!important;min-width:0!important;max-width:100%!important;overflow:visible!important}
+  .studio-v4-track-rack #sidebar button,.studio-v4-track-rack #sidebar [role="button"],.studio-v4-track-rack .sidebar-add{min-height:44px!important;touch-action:manipulation!important}
+
+  .studio-v4-inspector{position:absolute!important;z-index:999!important;inset:0 0 calc(var(--mobile-nav-height) + env(safe-area-inset-bottom)) auto!important;width:min(320px,90vw)!important;max-width:90vw!important;height:auto!important;min-width:0!important;overflow:hidden!important;transform:translateX(105%)!important;visibility:hidden!important;pointer-events:none!important;transition:transform .2s ease,visibility 0s linear .2s!important}
+  .studio-v4-inspector.open{transform:none!important;visibility:visible!important;pointer-events:auto!important;transition:transform .2s ease!important}
+  .studio-v4-inspector-head{padding:11px!important}
+  .studio-v4-inspector-body{padding:8px!important;overflow:auto!important;-webkit-overflow-scrolling:touch!important}
+  .studio-v4-inspector-actions button,.studio-v4-inspector-actions a{min-height:44px!important;touch-action:manipulation!important}
+
+  #studio-v4-mobile-nav{position:fixed!important;z-index:1001!important;left:0!important;right:0!important;bottom:var(--neusic-credit-safe,0px)!important;width:100%!important;max-width:100vw!important;height:calc(var(--mobile-nav-height) + env(safe-area-inset-bottom))!important;display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:3px!important;padding:5px 5px calc(5px + env(safe-area-inset-bottom))!important;overflow:hidden!important}
+  #studio-v4-mobile-nav button{min-width:0!important;min-height:48px!important;padding:3px 1px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;touch-action:manipulation!important}
+  #studio-v4-mobile-nav button i{margin-bottom:4px!important;font-size:9px!important}
+
+  #studio-v4-deliver{width:100%!important;max-width:100vw!important;height:100%!important;padding:10px!important;overflow:auto!important;-webkit-overflow-scrolling:touch!important}
+  .studio-v4-deliver-grid{width:100%!important;grid-template-columns:1fr!important;gap:8px!important}
+  .studio-v4-deliver-card{min-height:0!important;padding:14px!important}
+  .studio-v4-deliver-card button{width:100%!important;min-height:44px!important}
+
+  /* Preserve desktop-width timelines and mixer strips inside a controlled horizontal scroller. */
+  .arranger,.timeline,.timeline-wrap,.mixer,.mixer-wrap,.mixer-channels,[class*="arrange-grid"],[class*="timeline-grid"],[class*="mixer-strip"]{max-width:none!important}
+  .timeline-wrap,.arranger-scroll,.mixer-wrap,.mixer-scroll,[class*="timeline-scroll"],[class*="mixer-scroll"]{overflow-x:auto!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior-x:contain!important}
+  canvas,svg{max-width:none}
+
+  button,input,select,[role="button"]{touch-action:manipulation}
+}
+
+@media (max-width:480px){
+  body.neusic-studio-v4{--mobile-nav-height:60px}
+  .studio-v4-center-head{grid-template-columns:40px minmax(74px,.62fr) minmax(0,1.38fr) 40px!important;gap:3px!important;padding:5px 4px!important}
+  .studio-v4-center-title small{font-size:5px!important;letter-spacing:.08em!important}
+  .studio-v4-center-title b{font-size:12px!important}
+  .studio-v4-subtool{min-height:38px!important;padding:0 8px!important;font-size:6px!important}
+  .studio-v4-left{width:94vw!important;max-width:94vw!important;grid-template-columns:62px minmax(0,1fr)!important}
+  .studio-v4-stage-button{min-height:48px!important;font-size:5.5px!important}
+  .studio-v4-inspector{width:92vw!important;max-width:92vw!important}
+  #studio-v4-mobile-nav button{font-size:5.5px!important}
+}
+
+@media (orientation:landscape) and (max-height:560px){
+  body.neusic-studio-v4{--mobile-nav-height:52px}
+  body.neusic-studio-v4 #topbar{min-height:46px!important;max-height:52px!important}
+  .studio-v4-center-head{min-height:46px!important;padding-block:3px!important}
+  .studio-v4-subtool{min-height:36px!important}
+  #studio-v4-mobile-nav button{min-height:40px!important}
+}
