@@ -1,4 +1,4 @@
-const isIOSWebKit = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const isMobileBrowser = () => /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || navigator.maxTouchPoints > 1;
 
 export class PcmRecorder {
   constructor(workspace) {
@@ -12,6 +12,9 @@ export class PcmRecorder {
     this.recording = false;
     this.mode = 'none';
     this.watchdog = 0;
+    this.mediaRecorder = null;
+    this.mediaChunks = [];
+    this.mediaStopPromise = null;
   }
 
   disconnectNode() {
@@ -22,19 +25,49 @@ export class PcmRecorder {
     if (this.node?.port) this.node.port.onmessage = null;
     this.node = null;
     this.source = null;
-    this.mode = 'none';
+    if (!this.mediaRecorder) this.mode = 'none';
   }
 
   ensureSink(context) {
     if (this.sink && this.sink.context === context) return;
     try { this.sink?.disconnect(); } catch (_) {}
     this.sink = context.createGain();
-    this.sink.gain.value = 1;
+    this.sink.gain.value = 0;
     this.sink.connect(context.destination);
   }
 
+  preferredMimeType() {
+    if (!window.MediaRecorder) return '';
+    const candidates = ['audio/webm;codecs=opus','audio/mp4','audio/webm','audio/ogg;codecs=opus'];
+    return candidates.find(type => MediaRecorder.isTypeSupported?.(type)) || '';
+  }
+
+  canUseMediaRecorder() {
+    const stream = this.workspace.micStream;
+    return Boolean(window.MediaRecorder && stream?.getAudioTracks?.().some(track => track.readyState === 'live'));
+  }
+
+  async startMediaRecorder() {
+    const stream = this.workspace.micStream;
+    if (!stream) throw new Error('The microphone stream is unavailable.');
+    const mimeType = this.preferredMimeType();
+    const options = mimeType ? {mimeType, audioBitsPerSecond:128000} : {audioBitsPerSecond:128000};
+    const recorder = new MediaRecorder(stream, options);
+    this.mediaChunks = [];
+    this.mediaRecorder = recorder;
+    this.mode = 'media-recorder';
+    recorder.addEventListener('dataavailable', event => {
+      if (event.data?.size) this.mediaChunks.push(event.data);
+    });
+    this.mediaStopPromise = new Promise((resolve, reject) => {
+      recorder.addEventListener('stop', resolve, {once:true});
+      recorder.addEventListener('error', event => reject(event.error || new Error('Mobile recorder failed.')), {once:true});
+    });
+    recorder.start(100);
+  }
+
   attachScriptProcessor(context) {
-    const processor = context.createScriptProcessor?.(1024, 1, 1);
+    const processor = context.createScriptProcessor?.(2048, 1, 1);
     if (!processor) throw new Error('This browser cannot create a compatible live PCM recorder.');
     processor.onaudioprocess = event => {
       const output = event.outputBuffer;
@@ -73,16 +106,13 @@ export class PcmRecorder {
     this.mode = 'audio-worklet';
   }
 
-  async ensure({forceCompatibility=false}={}) {
-    await this.workspace.initMic();
-    await this.workspace.resume({required:true});
+  async ensurePcm({forceCompatibility=false}={}) {
     const context = this.workspace.context;
     this.context = context;
     this.ensureSink(context);
     if (this.node && this.source === this.workspace.micSource) return;
     this.disconnectNode();
-
-    const useCompatibility = forceCompatibility || isIOSWebKit() || !context.audioWorklet || !window.AudioWorkletNode;
+    const useCompatibility = forceCompatibility || !context.audioWorklet || !window.AudioWorkletNode;
     if (!useCompatibility) {
       try {
         await this.attachWorklet(context);
@@ -95,36 +125,76 @@ export class PcmRecorder {
     this.attachScriptProcessor(context);
   }
 
-  async switchToCompatibility() {
-    if (!this.recording || this.mode === 'script-processor') return;
-    this.disconnectNode();
-    await this.ensure({forceCompatibility:true});
-  }
-
   async start() {
-    await this.ensure();
+    await this.workspace.initMic();
     await this.workspace.resume({required:true});
+    this.context = this.workspace.context;
     this.left = [];
     this.right = [];
     this.recording = true;
+
+    if (isMobileBrowser() && this.canUseMediaRecorder()) {
+      try {
+        await this.startMediaRecorder();
+        return this.mode;
+      } catch (error) {
+        console.warn('MediaRecorder unavailable; falling back to PCM capture.', error);
+        this.mediaRecorder = null;
+        this.mediaChunks = [];
+      }
+    }
+
+    await this.ensurePcm();
     this.node?.port?.postMessage?.({type:'start'});
     clearTimeout(this.watchdog);
-    this.watchdog = setTimeout(() => {
+    this.watchdog = setTimeout(async () => {
       if (!this.recording || this.left.length || this.mode !== 'audio-worklet') return;
-      this.switchToCompatibility().catch(error => console.warn('PCM compatibility fallback failed.', error));
-    }, 650);
+      try {
+        this.disconnectNode();
+        await this.ensurePcm({forceCompatibility:true});
+      } catch (error) {
+        console.warn('PCM compatibility fallback failed.', error);
+      }
+    }, 700);
     return this.mode;
+  }
+
+  async stopMediaRecorder() {
+    const recorder = this.mediaRecorder;
+    if (!recorder) return null;
+    if (recorder.state !== 'inactive') {
+      try { recorder.requestData(); } catch (_) {}
+      recorder.stop();
+    }
+    await this.mediaStopPromise;
+    const chunks = this.mediaChunks.slice();
+    const mimeType = recorder.mimeType || chunks[0]?.type || 'audio/webm';
+    this.mediaRecorder = null;
+    this.mediaStopPromise = null;
+    this.mediaChunks = [];
+    this.mode = 'none';
+    if (!chunks.length) throw new Error('The phone recorder stopped without producing audio data.');
+    const blob = new Blob(chunks, {type:mimeType});
+    const arrayBuffer = await blob.arrayBuffer();
+    try {
+      return await this.context.decodeAudioData(arrayBuffer.slice(0));
+    } catch (error) {
+      throw new Error('The phone captured audio, but this browser could not decode the recording.');
+    }
   }
 
   async stop() {
     if (!this.recording) return null;
-    this.node?.port?.postMessage?.({type:'stop'});
     clearTimeout(this.watchdog);
-    await new Promise(resolve => setTimeout(resolve, 80));
     this.recording = false;
+
+    if (this.mode === 'media-recorder') return this.stopMediaRecorder();
+
+    this.node?.port?.postMessage?.({type:'stop'});
+    await new Promise(resolve => setTimeout(resolve, 100));
     const frames = this.left.reduce((total, chunk) => total + chunk.length, 0);
     if (!frames) {
-      throw new Error('No microphone audio arrived. Check the site microphone permission, turn off Bluetooth audio temporarily, and tap REC again.');
+      throw new Error('Permission is enabled, but no microphone samples reached the lane recorder. Close Bluetooth audio and retry in Safari or Chrome.');
     }
     const buffer = this.context.createBuffer(2, frames, this.context.sampleRate);
     let offset = 0;
@@ -142,7 +212,14 @@ export class PcmRecorder {
     this.node?.port?.postMessage?.({type:'stop'});
     clearTimeout(this.watchdog);
     this.recording = false;
+    if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+      try { this.mediaRecorder.stop(); } catch (_) {}
+    }
+    this.mediaRecorder = null;
+    this.mediaStopPromise = null;
+    this.mediaChunks = [];
     this.left = [];
     this.right = [];
+    this.mode = 'none';
   }
 }
