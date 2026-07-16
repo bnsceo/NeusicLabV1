@@ -71,7 +71,29 @@ test('all public products expose the shared Agent and share-preview assets',asyn
   }
 });
 
-test('Pages deployment publishes social and Agent assets',async()=>{
+test('landing menu is removed while direct product links remain',async()=>{
+  const landingScript=await read('site-polish.js');
+  const landingHtml=await read('index.html');
+  for(const token of ["document.querySelector('.desktop-nav')?.remove()","document.getElementById('menuButton')?.remove()","document.getElementById('mobileMenu')?.remove()"])assert.ok(landingScript.includes(token),`landing removal missing ${token}`);
+  for(const href of ['./live-loop/','./wave-loom/','./studio/'])assert.ok(landingHtml.includes(href),`landing lost direct product link ${href}`);
+});
+
+test('Pages deployment enforces complete link preview metadata',async()=>{
   const workflow=await read('.github/workflows/deploy-neusic-pages.yml');
-  for(const token of ['cp neusic-agent.css _site/neusic-agent.css','cp neusic-agent.js _site/neusic-agent.js','cp -R social/. _site/social/','social/neusic-suite-card.svg','social/wave-card.svg'])assert.ok(workflow.includes(token),`deployment missing ${token}`);
+  for(const token of [
+    'cp neusic-agent.css _site/neusic-agent.css',
+    'cp neusic-agent.js _site/neusic-agent.js',
+    'cp -R social/. _site/social/',
+    "set_meta(html, 'property', 'og:title', title)",
+    "set_meta(html, 'property', 'og:description', description)",
+    "set_meta(html, 'property', 'og:image', image)",
+    "set_meta(html, 'name', 'twitter:title', title)",
+    "set_meta(html, 'name', 'twitter:description', description)",
+    "set_meta(html, 'name', 'twitter:image', image)",
+    "Path('_site/live-loop/index.html')",
+    "Path('_site/wave-loom/index.html')",
+    "Path('_site/studio/index.html')",
+    'menuButton',
+    'mobileMenu'
+  ])assert.ok(workflow.includes(token),`deployment missing ${token}`);
 });
