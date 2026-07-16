@@ -42,6 +42,7 @@ test('shared Neusic Agent works offline and explains touch recording',async({pag
 });
 
 test('Neusic Lab restores one track sidebar and one dedicated center workspace',async({page})=>{
+  await page.setViewportSize({width:1440,height:900});
   await page.goto('/app/phase-a.html?v=restoration-test',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.getElementById('studio')?.contentDocument?.body?.classList.contains('neusic-studio-v4'),null,{timeout:30_000});
   const frame=page.frameLocator('#studio');
@@ -52,6 +53,8 @@ test('Neusic Lab restores one track sidebar and one dedicated center workspace',
   await expect(frame.locator('.studio-v4-workspace > #main')).toHaveCount(1);
   await expect(frame.locator('.studio-v4-inspector')).toBeVisible();
   await expect(frame.locator('.neusic-workspace-shell')).toHaveCount(0);
+  await expect(frame.locator('.flow-modal')).toHaveCount(0);
+  await expect(frame.locator('[aria-label="Primary tools"]')).toHaveCount(0);
 
   await frame.locator('[data-studio-stage="create"]').click();
   await expect(frame.locator('#studio-v4-title')).toHaveText('Create');
@@ -70,6 +73,7 @@ test('mobile Lab keeps stage navigation and track drawer reachable',async({page}
   await page.waitForFunction(()=>document.getElementById('studio')?.contentDocument?.body?.classList.contains('neusic-studio-v4'),null,{timeout:30_000});
   const frame=page.frameLocator('#studio');
   await expect(frame.locator('#studio-v4-mobile-nav')).toBeVisible();
+  await expect(frame.locator('[aria-label="Primary tools"]')).toHaveCount(0);
   await frame.locator('[data-v4-tracks]').click();
   await expect(frame.locator('.studio-v4-left')).toHaveClass(/open/);
   await frame.locator('[data-mobile-stage="capture"]').click();
