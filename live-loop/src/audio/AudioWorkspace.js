@@ -14,7 +14,8 @@ class AudioWorkspace {
     if (!this.context) {
       const Context = window.AudioContext || window.webkitAudioContext;
       if (!Context) throw new Error('Web Audio is not supported in this browser.');
-      this.context = new Context({latencyHint:'interactive'});
+      this.context = window.NeusicMobileMicPrimer?.context || new Context({latencyHint:'interactive'});
+      window.NeusicMobileMicPrimer?.adoptContext?.(this.context);
       this.master = this.context.createGain();
       this.master.gain.value = .82;
       this.analyser = this.context.createAnalyser();
@@ -30,7 +31,10 @@ class AudioWorkspace {
   async resume({required=false}={}) {
     if (!this.context) return this.init();
     try {
-      if (this.context.state !== 'running') await this.context.resume();
+      if (this.context.state !== 'running') {
+        if (window.NeusicMobileMicPrimer?.context === this.context) await window.NeusicMobileMicPrimer.unlock();
+        else await this.context.resume();
+      }
       if (this.context.state === 'running' && !this.unlocked) {
         const pulse = this.context.createBufferSource();
         pulse.buffer = this.context.createBuffer(1, 1, this.context.sampleRate);
@@ -39,16 +43,16 @@ class AudioWorkspace {
         this.unlocked = true;
       }
     } catch (error) {
-      if (required) throw new Error('Audio is still locked. Tap REC or MIC again to unlock it.');
+      if (required) throw new Error(error?.message || 'Audio is still locked. Tap REC again to unlock it.');
     }
     if (required && this.context.state !== 'running') {
-      throw new Error('Audio is still locked. Tap REC or MIC again to unlock it.');
+      throw new Error('Audio is still locked. Tap REC again to unlock it.');
     }
     return this;
   }
 
-  micIsLive() {
-    return Boolean(this.micStream?.getAudioTracks?.().some(track => track.readyState === 'live' && track.enabled));
+  micIsLive(stream=this.micStream) {
+    return Boolean(stream?.getAudioTracks?.().some(track => track.readyState === 'live' && track.enabled));
   }
 
   releaseMicGraph() {
@@ -60,18 +64,32 @@ class AudioWorkspace {
 
   microphoneError(error) {
     if (error?.name === 'NotAllowedError' || error?.name === 'SecurityError') {
-      return new Error('Microphone permission is blocked. Allow microphone access for this site, then tap REC again.');
+      return new Error('Microphone permission is blocked. Allow microphone access for this site, reload, and tap REC again.');
     }
     if (error?.name === 'NotFoundError' || error?.name === 'DevicesNotFoundError') {
       return new Error('No microphone was found on this device.');
     }
     if (error?.name === 'NotReadableError' || error?.name === 'TrackStartError') {
-      return new Error('The microphone is busy in another app. Close the other app, then tap REC again.');
+      return new Error('The microphone is busy in another app. Close the other app and tap REC again.');
+    }
+    if (error?.name === 'AbortError') {
+      return new Error('The phone interrupted microphone startup. Tap REC again.');
     }
     return new Error(error?.message || 'The microphone could not be opened.');
   }
 
   async requestMicStream() {
+    const primed = window.NeusicMobileMicPrimer?.stream || window.__neusicPrimedMicStream;
+    if (this.micIsLive(primed)) return primed;
+    if (window.NeusicMobileMicPrimer?.prime) {
+      try {
+        const stream = await window.NeusicMobileMicPrimer.prime();
+        if (this.micIsLive(stream)) return stream;
+      } catch (error) {
+        throw this.microphoneError(error);
+      }
+    }
+
     const preferred = {
       echoCancellation:false,
       noiseSuppression:false,
@@ -100,40 +118,28 @@ class AudioWorkspace {
       throw new Error('Microphone capture is unavailable in this browser. Open Neusic Live Loop in Safari or Chrome.');
     }
 
-    let stream = this.micIsLive() ? this.micStream : null;
-    let permissionRequest = null;
+    await this.init();
+    await this.resume({required:true});
 
+    let stream = this.micIsLive() ? this.micStream : null;
     if (!stream) {
       this.releaseMicGraph();
       this.micStream?.getTracks?.().forEach(track => track.stop());
-      this.micStream = null;
-
-      // Start getUserMedia before awaiting AudioContext work. This keeps the
-      // permission request attached to the original mobile tap.
-      permissionRequest = this.requestMicStream();
-    }
-
-    await this.init();
-
-    if (!stream) {
-      stream = await permissionRequest;
+      stream = await this.requestMicStream();
+      if (!this.micIsLive(stream)) {
+        stream?.getTracks?.().forEach(item => item.stop());
+        throw new Error('The phone granted microphone permission but no live audio reached Neusic.');
+      }
       this.micStream = stream;
       const track = stream.getAudioTracks()[0];
-      if (!track) {
-        stream.getTracks().forEach(item => item.stop());
-        this.micStream = null;
-        throw new Error('No microphone audio track was returned by this device.');
-      }
       track.enabled = true;
       track.addEventListener('ended', () => {
         this.releaseMicGraph();
-        this.micStream = null;
+        if (this.micStream === stream) this.micStream = null;
       }, {once:true});
     }
 
-    await this.resume({required:true});
     if (this.micSource) return stream;
-
     this.releaseMicGraph();
     this.micSource = this.context.createMediaStreamSource(stream);
     this.monitor = this.context.createGain();
