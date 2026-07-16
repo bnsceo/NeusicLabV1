@@ -28,6 +28,7 @@ test('landing explains the three-product journey and mock previews respond',asyn
 });
 
 test('Live Loop and Wave share the suite rail while remaining distinct',async({page})=>{
+  await page.setViewportSize({width:1280,height:800});
   await page.goto('/live-loop/',{waitUntil:'domcontentloaded'});
   await expect(page.locator('.neusic-suite-rail')).toBeVisible();
   await expect(page.locator('.neusic-suite-path a[aria-current="page"]')).toContainText('Neusic Live Loop');
