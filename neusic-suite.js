@@ -19,9 +19,11 @@
   ];
   const currentIndex = products.findIndex(item => item.id === product);
   const next = products[currentIndex + 1] || null;
-  const rail = document.createElement('nav');
+  const rail = document.createElement('div');
   rail.className = 'neusic-suite-rail';
+  rail.setAttribute('role','navigation');
   rail.setAttribute('aria-label','Neusic product journey');
+  rail.style.marginTop='var(--neusic-credit-safe,0px)';
   rail.innerHTML = `
     <a class="neusic-suite-intro" href="${href('/')}">
       <b>NEUSIC</b><span>3 products · 1 connected project</span>
