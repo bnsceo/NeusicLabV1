@@ -3,9 +3,25 @@ import {test,expect} from '@playwright/test';
 async function openLiveLoop(page){
   await page.setViewportSize({width:390,height:844});
   await page.goto('/live-loop/',{waitUntil:'domcontentloaded'});
-  await page.waitForFunction(()=>window.NeusicLiveLoop?.state?.().ready===true,null,{timeout:25_000});
-  await expect(page.locator('#stageMacroDeck')).toBeVisible();
+  await expect(page.locator('body')).toHaveClass(/stage-performance/);
   await expect(page.locator('.loop-track')).toHaveCount(5);
+  for(let index=0;index<5;index++)await expect(page.locator(`.loop-track[data-index="${index}"]`)).toBeVisible();
+  const positions=await page.locator('.loop-track').evaluateAll(items=>items.map(item=>{
+    const rect=item.getBoundingClientRect();
+    return{top:rect.top,bottom:rect.bottom,left:rect.left,right:rect.right,width:rect.width,height:rect.height};
+  }));
+  expect(positions).toHaveLength(5);
+  for(const [index,rect] of positions.entries()){
+    expect(rect.top,`lane ${index+1} starts outside the phone viewport`).toBeGreaterThanOrEqual(0);
+    expect(rect.top,`lane ${index+1} is below the first phone screen`).toBeLessThan(844);
+    expect(rect.left,`lane ${index+1} starts outside the phone width`).toBeGreaterThanOrEqual(0);
+    expect(rect.right,`lane ${index+1} extends beyond the phone width`).toBeLessThanOrEqual(391);
+    expect(rect.width,`lane ${index+1} collapsed`).toBeGreaterThan(45);
+    expect(rect.height,`lane ${index+1} is not a usable channel strip`).toBeGreaterThan(480);
+  }
+  await expect(page.locator('.neusic-suite-rail')).toBeHidden();
+  await page.waitForFunction(()=>window.NeusicLiveLoop?.state?.().ready===true,null,{timeout:25_000});
+  await expect(page.locator('#stageMacroDeck')).toBeAttached();
 }
 
 test('mobile Live Loop keeps all five lanes visible and records without MIDI',async({page,browserName})=>{
@@ -33,9 +49,15 @@ test('phone stage exposes tactile faders, pan, macro effects, and synth',async({
   await openLiveLoop(page);
   await expect(page.locator('.loop-track input[data-control="volume"]')).toHaveCount(5);
   await expect(page.locator('.loop-track input[data-control="pan"]')).toHaveCount(5);
+  for(let index=0;index<5;index++){
+    await expect(page.locator(`.loop-track[data-index="${index}"] [data-action="record"]`)).toBeVisible();
+    await expect(page.locator(`.loop-track[data-index="${index}"] [data-action="mute"]`)).toBeVisible();
+    await expect(page.locator(`.loop-track[data-index="${index}"] input[data-control="volume"]`)).toBeVisible();
+    await expect(page.locator(`.loop-track[data-index="${index}"] input[data-control="pan"]`)).toBeVisible();
+  }
   await expect(page.locator('.stage-xy')).toHaveCount(2);
   await expect(page.locator('#keyboard button')).toHaveCount(13);
-  for(const action of ['lofi','octave','reverse','freeze','load','wave'])await expect(page.locator(`[data-stage-action="${action}"]`)).toBeVisible();
+  for(const action of ['lofi','octave','reverse','freeze','load','wave'])await expect(page.locator(`[data-stage-action="${action}"]`)).toBeAttached();
   await page.locator('[data-stage-action="lofi"]').click();
   await expect(page.locator('[data-stage-action="lofi"]')).toHaveClass(/active/);
   expect(await page.evaluate(()=>window.NeusicLiveLoop.state().lofi)).toBe(true);
