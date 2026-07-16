@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field
 app = FastAPI(title="Neusic Agent Bridge", version="1.0.0")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[origin.strip() for origin in os.getenv("NEUSIC_AGENT_ORIGINS", "http://127.0.0.1:8000,http://localhost:8000").split(",") if origin.strip()],
+    allow_origins=[origin.strip() for origin in os.getenv("NEUSIC_AGENT_ORIGINS", "http://127.0.0.1:8000,http://localhost:8000,https://bnsceo.github.io").split(",") if origin.strip()],
     allow_credentials=False,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Content-Type"],
