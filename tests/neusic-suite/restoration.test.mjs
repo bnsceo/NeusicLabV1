@@ -28,9 +28,11 @@ test('restoration JavaScript parses',()=>{
   }
 });
 
-test('Hermes and CrewAI bridge compiles without importing optional providers',()=>{
-  const result=spawnSync('python3',['-m','py_compile','agents/neusic_agent_server.py'],{encoding:'utf8'});
-  assert.equal(result.status,0,result.stderr);
+test('Hermes, CrewAI, and Pages builders compile without optional providers',()=>{
+  for(const file of ['agents/neusic_agent_server.py','scripts/build_pages.py']){
+    const result=spawnSync('python3',['-m','py_compile',file],{encoding:'utf8'});
+    assert.equal(result.status,0,`${file} failed Python validation:\n${result.stderr}`);
+  }
 });
 
 test('Live Loop uses raw PCM capture, five visible lanes, and optional MIDI',async()=>{
@@ -49,7 +51,7 @@ test('Live Loop uses raw PCM capture, five visible lanes, and optional MIDI',asy
   assert.doesNotMatch(html,/mobile-performance\.js/);
   assert.match(css,/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
   assert.match(css,/loop-track\.mobile-active\{display:block!important/);
-  for(const action of ['lofi','octave','reverse','freeze','load','wave'])assert.ok(stage.includes(`'${action}'`)||stage.includes(`\"${action}\"`),`stage macro missing ${action}`);
+  for(const action of ['lofi','octave','reverse','freeze','load','wave'])assert.ok(stage.includes(`'${action}'`)||stage.includes(`"${action}"`),`stage macro missing ${action}`);
   assert.match(app,/new PerformanceFx/);
   assert.match(app,/MIDI is optional/);
 });
@@ -77,18 +79,17 @@ test('Lab V4 keeps one sidebar and one dedicated center workspace',async()=>{
   assert.match(wrapper,/js\/40-studio-v4-hardening\.js/);
 });
 
-test('all public products expose the shared Agent and share-preview assets',async()=>{
+test('all public products expose the shared Agent and preview builder',async()=>{
   const live=await read('live-loop/index.html');
   const lab=await read('app/phase-a.html');
   const wave=await read('wave-loom/wave-polish.js');
   const landing=await read('site-polish.js');
+  const builder=await read('scripts/build_pages.py');
   for(const source of [live,lab,wave,landing])assert.match(source,/neusic-agent/);
-  assert.match(live,/social\/live-loop-card\.svg/);
-  assert.match(lab,/social\/lab-card\.svg/);
-  for(const card of ['neusic-suite-card.svg','live-loop-card.svg','wave-card.svg','lab-card.svg']){
-    const svg=await read(`social/${card}`);
-    assert.match(svg,/width="1200"/);assert.match(svg,/height="630"/);assert.match(svg,/<\/svg>$/);
-  }
+  for(const image of ['neusic-suite-card-v3.png','live-loop-card-v3.png','wave-card-v3.png','lab-card-v3.png'])assert.ok(builder.includes(image),`preview builder missing ${image}`);
+  assert.match(builder,/og:image:secure_url/);
+  assert.match(builder,/twitter:image:src/);
+  assert.match(builder,/image\/png/);
 });
 
 test('landing menu is removed while direct product links remain',async()=>{
@@ -98,11 +99,9 @@ test('landing menu is removed while direct product links remain',async()=>{
   for(const href of ['./live-loop/','./wave-loom/','./studio/'])assert.ok(landingHtml.includes(href),`landing lost direct product link ${href}`);
 });
 
-test('Pages build produces complete link previews and a menu-free landing',async()=>{
+test('Pages build produces PNG link previews and a menu-free landing',async()=>{
   const workflow=await read('.github/workflows/deploy-neusic-pages.yml');
-  const block=workflow.match(/python - <<'PY'\n([\s\S]*?)\n\s*PY/);
-  assert.ok(block,'Pages workflow Python build block is missing');
-  const python=block[1].split('\n').map(line=>line.startsWith('          ')?line.slice(10):line).join('\n');
+  assert.match(workflow,/python3 scripts\/build_pages\.py _site/);
   const root=await mkdtemp(join(tmpdir(),'neusic-pages-'));
   try{
     const site=join(root,'_site');
@@ -113,7 +112,8 @@ test('Pages build produces complete link previews and a menu-free landing',async
     await cp('app',join(site,'studio'),{recursive:true});
     await rename(join(site,'studio','index.html'),join(site,'studio','core.html'));
     await rename(join(site,'studio','phase-a.html'),join(site,'studio','index.html'));
-    const result=spawnSync('python3',['-c',python],{cwd:root,encoding:'utf8'});
+    const builder=join(process.cwd(),'scripts','build_pages.py');
+    const result=spawnSync('python3',[builder,site],{encoding:'utf8'});
     assert.equal(result.status,0,`Pages metadata build failed:\n${result.stderr}`);
 
     const landing=await readFile(join(site,'index.html'),'utf8');
@@ -122,20 +122,27 @@ test('Pages build produces complete link previews and a menu-free landing',async
     assert.doesNotMatch(landing,/id="mobileMenu"/);
 
     const expected=[
-      ['index.html','Neusic — Live Loop, Wave & Lab','neusic-suite-card.svg'],
-      ['live-loop/index.html','Neusic Live Loop — Synchronized Mobile Looping','live-loop-card.svg'],
-      ['wave-loom/index.html','Neusic Wave — Sample Performance & Sound Design','wave-card.svg'],
-      ['studio/index.html','Neusic Lab — Music Production Workspace','lab-card.svg']
+      ['index.html','Neusic — Live Loop, Wave & Lab','neusic-suite-card-v3.png'],
+      ['live-loop/index.html','Neusic Live Loop — Five-Lane Performance Instrument','live-loop-card-v3.png'],
+      ['wave-loom/index.html','Neusic Wave — Sample Performance & Sound Design','wave-card-v3.png'],
+      ['studio/index.html','Neusic Lab — Music Production Workspace','lab-card-v3.png']
     ];
     for(const [relative,title,image] of expected){
       const html=await readFile(join(site,...relative.split('/')),'utf8');
+      const imageUrl=`https://bnsceo.github.io/NeusicLabV1/social/${image}`;
       assert.ok(html.includes(`<title>${title}</title>`),`${relative} missing HTML title`);
       assert.ok(html.includes(`<meta property="og:title" content="${title}">`),`${relative} missing og:title`);
       assert.ok(html.includes('<meta property="og:description" content="'),`${relative} missing og:description`);
-      assert.ok(html.includes(`<meta property="og:image" content="https://bnsceo.github.io/NeusicLabV1/social/${image}">`),`${relative} missing og:image`);
+      assert.ok(html.includes(`<meta property="og:image" content="${imageUrl}">`),`${relative} missing og:image`);
+      assert.ok(html.includes(`<meta property="og:image:secure_url" content="${imageUrl}">`),`${relative} missing og:image:secure_url`);
+      assert.ok(html.includes('<meta property="og:image:type" content="image/png">'),`${relative} missing PNG type`);
       assert.ok(html.includes(`<meta name="twitter:title" content="${title}">`),`${relative} missing twitter:title`);
-      assert.ok(html.includes('<meta name="twitter:description" content="'),`${relative} missing twitter:description`);
-      assert.ok(html.includes(`<meta name="twitter:image" content="https://bnsceo.github.io/NeusicLabV1/social/${image}">`),`${relative} missing twitter:image`);
+      assert.ok(html.includes(`<meta name="twitter:image" content="${imageUrl}">`),`${relative} missing twitter:image`);
+
+      const png=await readFile(join(site,'social',image));
+      assert.deepEqual([...png.subarray(0,8)],[137,80,78,71,13,10,26,10],`${image} is not a PNG`);
+      assert.equal(png.readUInt32BE(16),1200,`${image} width is not 1200`);
+      assert.equal(png.readUInt32BE(20),630,`${image} height is not 630`);
     }
   }finally{
     await rm(root,{recursive:true,force:true});
