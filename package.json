@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test:wave": "node --test tests/wave-loom/source-integrity.test.mjs tests/neusic-suite/source-integrity.test.mjs",
+    "test:wave": "node --test tests/wave-loom/source-integrity.test.mjs tests/neusic-suite/source-integrity.test.mjs tests/neusic-suite/restoration.test.mjs",
     "test:browser": "playwright test --config tests/wave-loom/playwright.config.mjs",
     "test": "npm run test:wave && npm run test:browser"
   },
