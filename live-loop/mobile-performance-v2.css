@@ -1,0 +1,27 @@
+@media(max-width:760px){
+  body{overflow-x:hidden;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+  .topbar{position:relative!important;grid-template-columns:1fr!important;padding:8px!important;min-height:54px!important}
+  .topbar .brand{justify-content:flex-start!important}.topbar .brand-mark{width:34px!important;height:34px!important}.topbar .transport{display:none!important}.topbar .top-actions{display:none!important}
+  .neusic-suite-rail{position:relative!important;margin-top:var(--neusic-credit-safe,0px)!important}
+  .performance-shell{padding-top:0!important}
+  .loop-deck>.panel-header{padding-bottom:8px!important}.loop-deck>.panel-header .legend{display:none!important}
+  .mobile-lane-nav{position:sticky;top:0;z-index:76;border-top:1px solid #263036;box-shadow:0 10px 24px #000b,inset 0 1px #ffffff0c}
+  .mobile-lane-nav-head span{color:#aab4b8}.mobile-lane-nav-head b{color:var(--gold2)}
+  .mobile-lane-button{touch-action:manipulation}.mobile-lane-button.active{transform:none!important}
+  .mobile-performance-controls{display:grid;gap:8px;padding:10px;border-bottom:1px solid #050607;background:linear-gradient(145deg,#20282c,#090c0e 72%);box-shadow:inset 0 1px #ffffff0d}
+  .mobile-performance-primary{display:grid;grid-template-columns:1fr 1.25fr 1fr 1fr;gap:6px}.mobile-performance-primary button,.mobile-performance-secondary button{min-width:0;min-height:48px;border:1px solid #050607;border-radius:6px;background:linear-gradient(#30383d,#0d1113);color:#c0c9cd;box-shadow:inset 0 1px #ffffff17,0 5px 10px #0008;font:800 7px/1 var(--mono);letter-spacing:.05em;padding:0 5px}
+  .mobile-performance-primary .mobile-record{border-color:#7a3340;background:linear-gradient(#5c2430,#1c0b0f);color:#ffd4db;font-size:9px}.mobile-performance-primary .mobile-record.active{background:linear-gradient(#a9384d,#3b1019);box-shadow:0 0 18px #ef657466,inset 0 1px #ffffff28}.mobile-performance-primary button.active,.mobile-performance-secondary button.active{border-color:#36734d;color:#bff0ce;background:linear-gradient(#28523a,#0e2116)}
+  .mobile-performance-secondary{display:grid;grid-template-columns:90px 82px minmax(0,1fr);gap:6px}.mobile-performance-secondary label{min-height:44px;display:flex;align-items:center;justify-content:center;gap:6px;padding:6px;border:1px solid #050607;border-radius:6px;background:#070b0d;color:#78848a;font:800 6px/1 var(--mono)}.mobile-performance-secondary input[type="number"]{width:52px;border:0;background:transparent;color:#f0d49b;text-align:center;font:800 15px/1 var(--mono);outline:0}.mobile-performance-secondary input[type="checkbox"]{accent-color:var(--gold)}
+  .mobile-performance-controls p{margin:0;padding:8px 9px;border:1px solid #1f292e;border-radius:5px;background:#06090b;color:#9ba6ab;font:750 7px/1.45 var(--mono);letter-spacing:.04em;text-align:center}
+  .track-grid{display:block!important;width:100%!important;overflow:visible!important;padding:8px!important;touch-action:pan-y!important}
+  .loop-track{display:none!important;width:100%!important;max-width:none!important;min-height:0!important;margin:0!important;scroll-snap-align:none!important;padding:13px!important}
+  .loop-track.mobile-active{display:block!important;animation:mobileLaneIn .16s ease-out}
+  .progress-control{width:min(56vw,210px)!important;margin:8px auto 14px!important}
+  .track-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important}.track-actions button{min-height:52px!important;font-size:7px!important}.track-actions .record-action{grid-column:span 2!important;font-size:10px!important}
+  .track-controls{grid-template-columns:1fr 1fr!important}.track-controls label{min-height:68px!important}
+  .performance-head{margin-top:8px!important}
+  .neusic-agent-launcher{bottom:calc(12px + var(--neusic-credit-safe,0px) + env(safe-area-inset-bottom))!important}
+}
+@media(max-width:390px){.mobile-performance-primary{grid-template-columns:1fr 1.35fr 1fr}.mobile-performance-primary [data-mobile-action="next"]{grid-column:1/-1;min-height:42px}.mobile-performance-secondary{grid-template-columns:1fr 1fr}.mobile-performance-secondary [data-mobile-action="midi"]{grid-column:1/-1}.mobile-performance-controls p{font-size:6.5px}}
+@keyframes mobileLaneIn{from{opacity:.45;transform:translateX(8px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.loop-track.mobile-active{animation:none}}
