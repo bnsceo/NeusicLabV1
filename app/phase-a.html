@@ -17,7 +17,8 @@
   <style>
     html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#0b0d0f;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
     #boot{position:fixed;inset:0;z-index:2;display:grid;place-items:center;color:#e8ebee;background:radial-gradient(circle at 50% 28%,#1c2024,#0b0d0f 58%)}
-    .boot-card{width:min(320px,80vw);text-align:center}.logo{font-size:28px;font-weight:800;letter-spacing:.18em;text-transform:uppercase}.logo span{color:#d4a354}.sub{margin-top:9px;color:#80898f;font:700 8px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase}.journey{margin-top:11px;color:#5f696f;font:650 7px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;text-transform:uppercase}.bar{height:2px;margin:22px auto 0;overflow:hidden;border:1px solid rgba(255,255,255,.06);background:#080a0c}.bar:after{content:"";display:block;width:32%;height:100%;background:#d4a354;animation:load 1.05s ease-in-out infinite alternate}@keyframes load{to{transform:translateX(215%)}}iframe{width:100%;height:100%;border:0;background:#0b0d0f}
+    .boot-card{width:min(320px,80vw);text-align:center}.logo{font-size:28px;font-weight:800;letter-spacing:.18em;text-transform:uppercase}.logo span{color:#d4a354}.sub{margin-top:9px;color:#80898f;font:700 8px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase}.journey{margin-top:11px;color:#5f696f;font:650 7px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;text-transform:uppercase}.bar{height:2px;margin:22px auto 0;overflow:hidden;border:1px solid rgba(255,255,255,.06);background:#080a0c}.bar:after{content:"";display:block;width:32%;height:100%;background:#d4a354;animation:load 1.05s ease-in-out infinite alternate}@keyframes load{to{transform:translateX(215%)}}iframe{display:block;width:100%;height:100%;height:100dvh;border:0;background:#0b0d0f}
+    @media(max-width:860px){html,body{height:100dvh;max-width:100vw;overflow:hidden}iframe{width:100vw;max-width:100vw;height:100dvh;max-height:100dvh}.boot-card{width:min(300px,84vw)}.logo{font-size:23px}.sub{font-size:7px}.journey{font-size:6px}}
   </style>
 </head>
 <body data-neusic-product="lab">
@@ -25,12 +26,12 @@
   <iframe id="studio" title="Neusic Lab digital audio workstation" allow="microphone; autoplay; clipboard-read; clipboard-write; midi"></iframe>
   <script>
     const frame=document.getElementById('studio');
-    const cache=new URLSearchParams(location.search).get('v')||'v4';
+    const cache=new URLSearchParams(location.search).get('v')||'v5-mobile';
     const studioSrc=location.pathname.includes('/app/phase-a.html')?'index.html':'core.html';
     frame.src=studioSrc+'?v='+encodeURIComponent(cache);
     frame.addEventListener('load',async()=>{
       const d=frame.contentDocument;if(!d)return;
-      const css=['css/13-workspace-ux.css','css/14-production-integrity.css','css/15-mobile-first.css','css/16-project-safety.css','css/17a-studio-foundation.css','css/17b-studio-navigation.css','css/17c-studio-controls.css','css/17d-studio-mixer-mobile.css','css/18-producer-flow.css','css/19-professional-arranger.css','css/20a-hyperreal-shell.css','css/20b-hyperreal-tracks.css','css/20c-hyperreal-creator.css','css/21-production-copilot.css','css/22-neusic-suite-identity.css','css/23-studio-workspace-v4.css'];
+      const css=['css/13-workspace-ux.css','css/14-production-integrity.css','css/15-mobile-first.css','css/16-project-safety.css','css/17a-studio-foundation.css','css/17b-studio-navigation.css','css/17c-studio-controls.css','css/17d-studio-mixer-mobile.css','css/18-producer-flow.css','css/19-professional-arranger.css','css/20a-hyperreal-shell.css','css/20b-hyperreal-tracks.css','css/20c-hyperreal-creator.css','css/21-production-copilot.css','css/22-neusic-suite-identity.css','css/23-studio-workspace-v4.css','css/24-mobile-responsive.css'];
       css.forEach(href=>{if(!d.querySelector(`link[href^="${href}"]`)){const link=d.createElement('link');link.rel='stylesheet';link.href=href+'?v='+encodeURIComponent(cache);d.head.appendChild(link);}});
       const load=src=>new Promise((resolve,reject)=>{if(d.querySelector(`script[src^="${src}"]`))return resolve();const script=d.createElement('script');script.src=src+'?v='+encodeURIComponent(cache);script.onload=resolve;script.onerror=()=>reject(new Error('Could not load '+src));d.body.appendChild(script);});
       const unavailable=[];
