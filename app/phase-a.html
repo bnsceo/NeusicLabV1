@@ -4,35 +4,43 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
   <meta name="theme-color" content="#0b0d0f">
+  <meta name="description" content="Neusic Lab is the professional production workspace for arranging, recording, editing, mixing, mastering, and delivering connected Neusic projects.">
+  <link rel="canonical" href="https://bnsceo.github.io/NeusicLabV1/studio/">
+  <meta property="og:type" content="website"><meta property="og:site_name" content="Neusic">
+  <meta property="og:title" content="Neusic Lab — Professional Production Workspace">
+  <meta property="og:description" content="A persistent track sidebar and dedicated center workspace for arranging, recording, editing, mixing, mastering, and export.">
+  <meta property="og:url" content="https://bnsceo.github.io/NeusicLabV1/studio/">
+  <meta property="og:image" content="https://bnsceo.github.io/NeusicLabV1/social/lab-card.svg"><meta property="og:image:type" content="image/svg+xml"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Neusic Lab"><meta name="twitter:description" content="Arrange, record, edit, mix, master, and deliver a connected Neusic project."><meta name="twitter:image" content="https://bnsceo.github.io/NeusicLabV1/social/lab-card.svg">
   <title>Neusic Lab</title>
+  <link rel="stylesheet" href="../neusic-agent.css?v=1">
   <style>
     html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#0b0d0f;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
     #boot{position:fixed;inset:0;z-index:2;display:grid;place-items:center;color:#e8ebee;background:radial-gradient(circle at 50% 28%,#1c2024,#0b0d0f 58%)}
     .boot-card{width:min(320px,80vw);text-align:center}.logo{font-size:28px;font-weight:800;letter-spacing:.18em;text-transform:uppercase}.logo span{color:#d4a354}.sub{margin-top:9px;color:#80898f;font:700 8px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase}.journey{margin-top:11px;color:#5f696f;font:650 7px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;text-transform:uppercase}.bar{height:2px;margin:22px auto 0;overflow:hidden;border:1px solid rgba(255,255,255,.06);background:#080a0c}.bar:after{content:"";display:block;width:32%;height:100%;background:#d4a354;animation:load 1.05s ease-in-out infinite alternate}@keyframes load{to{transform:translateX(215%)}}iframe{width:100%;height:100%;border:0;background:#0b0d0f}
   </style>
 </head>
-<body>
-  <div id="boot"><div class="boot-card"><div class="logo">Neu<span>sic</span> Lab</div><div class="sub">Initializing the production workspace</div><div class="journey">Live Loop → Wave → Lab · Start anywhere</div><div class="bar"></div></div></div>
+<body data-neusic-product="lab">
+  <div id="boot"><div class="boot-card"><div class="logo">Neu<span>sic</span> Lab</div><div class="sub">Restoring tracks and production workspace</div><div class="journey">Persistent sidebar · Dedicated center workspace</div><div class="bar"></div></div></div>
   <iframe id="studio" title="Neusic Lab digital audio workstation" allow="microphone; autoplay; clipboard-read; clipboard-write; midi"></iframe>
   <script>
     const frame=document.getElementById('studio');
+    const cache=new URLSearchParams(location.search).get('v')||'v4';
     const studioSrc=location.pathname.includes('/app/phase-a.html')?'index.html':'core.html';
-    frame.src=studioSrc;
+    frame.src=studioSrc+'?v='+encodeURIComponent(cache);
     frame.addEventListener('load',async()=>{
-      const d=frame.contentDocument;
-      const css=['css/13-workspace-ux.css','css/14-production-integrity.css','css/15-mobile-first.css','css/16-project-safety.css','css/17a-studio-foundation.css','css/17b-studio-navigation.css','css/17c-studio-controls.css','css/17d-studio-mixer-mobile.css','css/18-producer-flow.css','css/19-professional-arranger.css','css/20a-hyperreal-shell.css','css/20b-hyperreal-tracks.css','css/20c-hyperreal-creator.css','css/21-production-copilot.css','css/22-neusic-suite-identity.css'];
-      css.forEach(href=>{if(!d.querySelector(`link[href="${href}"]`)){const link=d.createElement('link');link.rel='stylesheet';link.href=href;d.head.appendChild(link);}});
-      const load=src=>new Promise((resolve,reject)=>{if(d.querySelector(`script[src="${src}"]`))return resolve();const script=d.createElement('script');script.src=src;script.onload=resolve;script.onerror=reject;d.body.appendChild(script);});
-      try{
-        for(const src of ['js/22-workspace-ux.js','js/23-production-integrity.js','js/24-mobile-first.js','js/25-project-safety.js','js/26-producer-flow.js','js/27-producer-flow-hardening.js','js/28-professional-arranger.js','js/29-arranger-recovery-sync.js','js/30-track-engine.js','js/31-midi-clips.js','js/32-track-workspace.js','js/33-production-copilot.js','js/35-neusic-suite-identity.js'])await load(src);
-        const expose=d.createElement('script');
-        expose.textContent='window.__NeusicStudioBridge={Audio_:Audio_,S:S,renderTracks:renderTracks,secToBeat:secToBeat,snapshot:typeof snapshot==="function"?snapshot:null,toast:typeof toast==="function"?toast:null,COLORS:typeof COLORS!=="undefined"?COLORS:[]};';
-        d.body.appendChild(expose);
-      }finally{
-        document.getElementById('boot').style.display='none';
-      }
+      const d=frame.contentDocument;if(!d)return;
+      const css=['css/13-workspace-ux.css','css/14-production-integrity.css','css/15-mobile-first.css','css/16-project-safety.css','css/17a-studio-foundation.css','css/17b-studio-navigation.css','css/17c-studio-controls.css','css/17d-studio-mixer-mobile.css','css/18-producer-flow.css','css/19-professional-arranger.css','css/20a-hyperreal-shell.css','css/20b-hyperreal-tracks.css','css/20c-hyperreal-creator.css','css/21-production-copilot.css','css/22-neusic-suite-identity.css','css/23-studio-workspace-v4.css'];
+      css.forEach(href=>{if(!d.querySelector(`link[href^="${href}"]`)){const link=d.createElement('link');link.rel='stylesheet';link.href=href+'?v='+encodeURIComponent(cache);d.head.appendChild(link);}});
+      const load=src=>new Promise((resolve,reject)=>{if(d.querySelector(`script[src^="${src}"]`))return resolve();const script=d.createElement('script');script.src=src+'?v='+encodeURIComponent(cache);script.onload=resolve;script.onerror=()=>reject(new Error('Could not load '+src));d.body.appendChild(script);});
+      const unavailable=[];
+      for(const src of ['js/22-workspace-ux.js','js/23-production-integrity.js','js/24-mobile-first.js','js/25-project-safety.js','js/26-producer-flow.js','js/27-producer-flow-hardening.js','js/28-professional-arranger.js','js/29-arranger-recovery-sync.js','js/30-track-engine.js','js/31-midi-clips.js','js/32-track-workspace.js','js/33-production-copilot.js','js/35-neusic-suite-identity.js','js/39-studio-workspace-v4.js','js/40-studio-v4-hardening.js']){try{await load(src)}catch(error){console.warn(error);unavailable.push(src)}}
+      const expose=d.createElement('script');expose.textContent='window.__NeusicStudioBridge={Audio_:Audio_,S:S,renderTracks:renderTracks,secToBeat:secToBeat,snapshot:typeof snapshot==="function"?snapshot:null,toast:typeof toast==="function"?toast:null,COLORS:typeof COLORS!=="undefined"?COLORS:[]};';d.body.appendChild(expose);
+      document.getElementById('boot').style.display='none';
+      if(unavailable.length)console.warn('Optional Studio modules unavailable:',unavailable);
     });
   </script>
-  <script src="js/34-wave-transfer-receiver.js"></script>
+  <script src="js/34-wave-transfer-receiver.js?v=4"></script>
+  <script src="../neusic-agent.js?v=1"></script>
 </body>
 </html>

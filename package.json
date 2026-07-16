@@ -4,7 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test:wave": "node --test tests/wave-loom/source-integrity.test.mjs tests/neusic-suite/source-integrity.test.mjs",
+    "test:wave-core": "node --test tests/wave-loom/source-integrity.test.mjs",
+    "test:suite-core": "node --test tests/neusic-suite/source-integrity.test.mjs",
+    "test:restoration": "node --test tests/neusic-suite/restoration.test.mjs",
+    "test:wave": "npm run test:wave-core && npm run test:suite-core && npm run test:restoration",
     "test:browser": "playwright test --config tests/wave-loom/playwright.config.mjs",
     "test": "npm run test:wave && npm run test:browser"
   },
