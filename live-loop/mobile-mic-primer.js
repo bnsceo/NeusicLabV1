@@ -28,7 +28,11 @@
     return context;
   };
 
+  const currentAppContext = () => window.NeusicLiveLoop?.workspace?.context || null;
+
   const ensureContext = () => {
+    const appContext = currentAppContext();
+    if (appContext?.state !== 'closed') return adoptContext(appContext);
     if (sharedContext?.state !== 'closed') return sharedContext;
     if (!NativeAudioContext) return null;
     return adoptContext(new NativeAudioContext({latencyHint:'interactive'}));
@@ -58,12 +62,7 @@
   const requestNativeMic = async () => {
     try {
       return await nativeGetUserMedia({
-        audio:{
-          echoCancellation:false,
-          noiseSuppression:false,
-          autoGainControl:false,
-          channelCount:{ideal:1}
-        }
+        audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:{ideal:1}}
       });
     } catch (preferredError) {
       if (preferredError?.name === 'NotAllowedError' || preferredError?.name === 'SecurityError') throw preferredError;
@@ -73,12 +72,8 @@
 
   const primeMic = () => {
     const audioRequest = unlockAudio();
-    if (streamIsLive(primedStream)) {
-      return Promise.all([audioRequest, Promise.resolve(primedStream)]).then(([,stream]) => stream);
-    }
-    if (primedPromise) {
-      return Promise.all([audioRequest, primedPromise]).then(([,stream]) => stream);
-    }
+    if (streamIsLive(primedStream)) return Promise.all([audioRequest, Promise.resolve(primedStream)]).then(([,stream]) => stream);
+    if (primedPromise) return Promise.all([audioRequest, primedPromise]).then(([,stream]) => stream);
 
     announce('Opening the microphone and audio engine…');
     primedPromise = requestNativeMic()
@@ -103,9 +98,7 @@
       .catch(error => {
         primedPromise = null;
         const blocked = error?.name === 'NotAllowedError' || error?.name === 'SecurityError';
-        announce(blocked
-          ? 'Microphone blocked. Enable it for this site, reload, and tap REC.'
-          : (error?.message || 'The microphone or audio engine could not start.'));
+        announce(blocked ? 'Microphone blocked. Enable it for this site, reload, and tap REC.' : (error?.message || 'The microphone or audio engine could not start.'));
         throw error;
       });
 
@@ -116,6 +109,8 @@
   const activate = event => {
     const target = event.target instanceof Element ? event.target : null;
     if (!target?.closest('#micBtn, .loop-track [data-action="record"]')) return;
+    const appContext = currentAppContext();
+    if (appContext) adoptContext(appContext);
     primeMic();
   };
 
@@ -134,7 +129,8 @@
       secureContext:window.isSecureContext,
       contextState:sharedContext?.state || 'not-created',
       microphoneLive:streamIsLive(primedStream),
-      trackState:primedStream?.getAudioTracks?.()[0]?.readyState || 'none'
+      trackState:primedStream?.getAudioTracks?.()[0]?.readyState || 'none',
+      appContextState:currentAppContext()?.state || 'not-created'
     })
   };
 })();
