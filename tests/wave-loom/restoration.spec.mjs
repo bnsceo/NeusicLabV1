@@ -17,7 +17,9 @@ async function openLiveLoop(page){
     expect(rect.left,`lane ${index+1} starts outside the phone width`).toBeGreaterThanOrEqual(0);
     expect(rect.right,`lane ${index+1} extends beyond the phone width`).toBeLessThanOrEqual(391);
     expect(rect.width,`lane ${index+1} collapsed`).toBeGreaterThan(45);
-    expect(rect.height,`lane ${index+1} is not a usable channel strip`).toBeGreaterThan(480);
+    expect(rect.height,`lane ${index+1} is too short to use`).toBeGreaterThan(420);
+    expect(rect.height,`lane ${index+1} did not become compact`).toBeLessThanOrEqual(600);
+    expect(rect.bottom,`lane ${index+1} extends too far down the first screen`).toBeLessThan(700);
   }
   await expect(page.locator('.neusic-suite-rail')).toBeHidden();
   await page.waitForFunction(()=>window.NeusicLiveLoop?.state?.().ready===true,null,{timeout:25_000});
@@ -31,13 +33,16 @@ test('mobile Live Loop keeps all five lanes visible and records without MIDI',as
   await expect(page.locator('#midiBtn')).toBeVisible();
   await expect(page.locator('.mobile-lane-nav')).toHaveCount(0);
   await expect(page.locator('.mobile-performance-controls')).toHaveCount(0);
+  await expect(page.locator('.mobile-recording-toast')).toBeAttached();
 
   const lane1=page.locator('.loop-track[data-index="0"]');
   await lane1.locator('[data-action="record"]').click();
+  await expect.poll(()=>lane1.getAttribute('data-state'),{timeout:15_000}).toMatch(/Arming|Queued|Recording/);
   await expect.poll(()=>lane1.getAttribute('data-state'),{timeout:15_000}).toBe('Recording');
   await page.waitForTimeout(720);
   await lane1.locator('[data-action="record"]').click();
   await expect.poll(()=>page.evaluate(()=>window.NeusicLiveLoop.state().lanes[0]),{timeout:15_000}).toMatchObject({state:'Playing',hasAudio:true});
+  expect(await page.evaluate(()=>window.NeusicLiveLoop.looper.capture.mode)).toMatch(/audio-worklet|script-processor/);
 
   const lane2=page.locator('.loop-track[data-index="1"]');
   await lane2.locator('[data-action="record"]').click();
