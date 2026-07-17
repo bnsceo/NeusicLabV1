@@ -5,6 +5,8 @@
   const emailInput=document.getElementById('waitlistEmail');
   const status=document.getElementById('waitlistStatus');
   const STORE='neusic-waitlist-v1';
+  const GOOGLE_FORM_ENDPOINT='https://docs.google.com/forms/d/e/1FAIpQLSeUFb-vNAOpIV4E4slFvlyS2v90GbkhoC8OSdtkR1mTzlHSKA/formResponse';
+  const GOOGLE_EMAIL_FIELD='entry.1214627679';
 
   document.querySelector('.desktop-nav')?.remove();
   document.getElementById('menuButton')?.remove();
@@ -19,12 +21,31 @@
 
   const validEmail=value=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   const setStatus=(message,type='')=>{if(!status)return;status.textContent=message;status.className=`form-status${type?` ${type}`:''}`};
-  try{const saved=JSON.parse(localStorage.getItem(STORE)||'null');if(saved?.email&&emailInput){emailInput.value=saved.email;setStatus('This email is already saved for early-access updates.','success')}}catch(_){}
+  try{const saved=JSON.parse(localStorage.getItem(STORE)||'null');if(saved?.email&&emailInput){emailInput.value=saved.email;setStatus('This email is already on the Neusic early-access list.','success')}}catch(_){}
+
   form?.addEventListener('submit',async event=>{
-    event.preventDefault();const email=emailInput.value.trim().toLowerCase();
+    event.preventDefault();
+    const email=emailInput.value.trim().toLowerCase();
     if(!validEmail(email)){setStatus('Enter a valid email address.','error');emailInput.focus();return}
-    const button=form.querySelector('button');button.disabled=true;button.textContent='Saving…';const endpoint=form.dataset.endpoint?.trim();
-    try{if(endpoint){const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,source:'neusic-landing',createdAt:new Date().toISOString()})});if(!response.ok)throw new Error('Waitlist request failed');setStatus('You are on the Neusic early-access list.','success')}else{localStorage.setItem(STORE,JSON.stringify({email,createdAt:new Date().toISOString()}));setStatus('Interest saved on this device while the public waitlist connection is being completed.','success')}}catch(error){console.error(error);setStatus('The waitlist could not be reached. Your email was not sent.','error')}finally{button.disabled=false;button.innerHTML='Join Waitlist <span>→</span>'}
+
+    const button=form.querySelector('button');
+    button.disabled=true;
+    button.textContent='Joining…';
+
+    try{
+      const body=new URLSearchParams();
+      body.set(GOOGLE_EMAIL_FIELD,email);
+      await fetch(GOOGLE_FORM_ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},body:body.toString()});
+      localStorage.setItem(STORE,JSON.stringify({email,createdAt:new Date().toISOString(),provider:'google-forms'}));
+      setStatus('You are on the Neusic early-access list.','success');
+      emailInput.value=email;
+    }catch(error){
+      console.error(error);
+      setStatus('The waitlist could not be reached. Please try again.','error');
+    }finally{
+      button.disabled=false;
+      button.innerHTML='Join Waitlist <span>→</span>';
+    }
   });
 
   const targets=[...document.querySelectorAll('.mode-preview,.mode-copy,.companion-section>*')];
