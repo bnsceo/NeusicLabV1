@@ -1,0 +1,113 @@
+/* Neusic Lab mobile app shell v5 — phone-first, not desktop-shrunk. */
+@media (max-width:860px){
+  :root{
+    --lab-top:58px;
+    --lab-stage:58px;
+    --lab-bottom:72px;
+    --lab-safe-top:env(safe-area-inset-top,0px);
+    --lab-safe-bottom:env(safe-area-inset-bottom,0px);
+  }
+  html,body{position:fixed;inset:0;width:100%;height:100%;overflow:hidden;background:#080b0e}
+  body.neusic-studio-v4{background:radial-gradient(circle at 50% -20%,#202931 0,#0c1115 42%,#07090b 100%);color:#eef3f5}
+  body.neusic-studio-v4 #app{position:fixed!important;inset:0!important;display:flex!important;flex-direction:column!important;height:100dvh!important;background:transparent!important}
+
+  /* Compact mobile transport. Desktop utilities remain available in the action sheet. */
+  body.neusic-studio-v4 #topbar{
+    position:relative!important;z-index:1500!important;display:grid!important;
+    grid-template-columns:42px 42px 42px minmax(92px,1fr) 58px!important;
+    align-items:center!important;gap:5px!important;width:100%!important;height:calc(var(--lab-top) + var(--lab-safe-top))!important;
+    min-height:calc(var(--lab-top) + var(--lab-safe-top))!important;max-height:none!important;
+    padding:calc(7px + var(--lab-safe-top)) 8px 7px!important;overflow:hidden!important;
+    border-bottom:1px solid rgba(204,227,238,.12)!important;background:rgba(8,12,15,.94)!important;
+    backdrop-filter:blur(22px) saturate(125%)!important;-webkit-backdrop-filter:blur(22px) saturate(125%)!important;
+    box-shadow:0 12px 30px rgba(0,0,0,.28)!important;
+  }
+  body.neusic-studio-v4 #topbar>*{display:none!important;min-width:0!important}
+  body.neusic-studio-v4 #topbar #btn-rew,
+  body.neusic-studio-v4 #topbar #btn-play,
+  body.neusic-studio-v4 #topbar #btn-rec,
+  body.neusic-studio-v4 #topbar .chip:first-of-type,
+  body.neusic-studio-v4 #topbar .bpm-chip{display:flex!important}
+  body.neusic-studio-v4 #topbar #btn-rew{grid-column:1}
+  body.neusic-studio-v4 #topbar #btn-play{grid-column:2}
+  body.neusic-studio-v4 #topbar #btn-rec{grid-column:3}
+  body.neusic-studio-v4 #topbar .chip:first-of-type{grid-column:4;width:100%!important;justify-content:center!important}
+  body.neusic-studio-v4 #topbar .bpm-chip{grid-column:5;width:100%!important;justify-content:center!important}
+  body.neusic-studio-v4 #topbar .tb-btn{width:42px!important;height:42px!important;min-width:42px!important;min-height:42px!important;border-radius:13px!important;font-size:16px!important;touch-action:manipulation!important}
+  body.neusic-studio-v4 #topbar #btn-play{background:linear-gradient(145deg,#dce7ec,#93a8b2)!important;color:#071014!important;border-color:#e7f1f5!important;box-shadow:0 4px 18px rgba(179,214,228,.2)!important}
+  body.neusic-studio-v4 #topbar #btn-rec{color:#ff7b78!important}
+  body.neusic-studio-v4 #topbar .chip{height:42px!important;min-width:0!important;padding:5px 8px!important;border-radius:12px!important;overflow:hidden!important}
+  body.neusic-studio-v4 #topbar .chip-main{font-size:12px!important;white-space:nowrap!important}
+  body.neusic-studio-v4 #topbar .chip-sub{font-size:6px!important;white-space:nowrap!important}
+
+  #studio-v4-shell{position:relative!important;flex:1 1 auto!important;width:100%!important;height:auto!important;min-height:0!important;overflow:hidden!important}
+  .studio-v4-center{position:absolute!important;inset:0 0 calc(var(--lab-bottom) + var(--lab-safe-bottom)) 0!important;display:grid!important;grid-template-rows:var(--lab-stage) minmax(0,1fr)!important;height:auto!important;background:transparent!important}
+  .studio-v4-center-head{display:grid!important;grid-template-columns:44px minmax(0,1fr) 44px!important;gap:8px!important;height:var(--lab-stage)!important;min-height:var(--lab-stage)!important;padding:7px 8px!important;border-bottom:1px solid rgba(203,226,238,.1)!important;background:rgba(12,17,21,.9)!important}
+  .studio-v4-center-title{display:flex!important;flex-direction:column!important;justify-content:center!important;min-width:0!important}
+  .studio-v4-center-title small{font-size:6px!important;letter-spacing:.12em!important;color:#7f939e!important}
+  .studio-v4-center-title b{font-size:15px!important;line-height:1.15!important;letter-spacing:.01em!important}
+  .studio-v4-subtools{position:absolute!important;z-index:8!important;left:0!important;right:0!important;top:var(--lab-stage)!important;height:44px!important;padding:4px 8px!important;background:linear-gradient(180deg,rgba(10,15,18,.96),rgba(10,15,18,.82))!important;border-bottom:1px solid rgba(207,231,240,.08)!important}
+  .studio-v4-subtool{min-height:36px!important;height:36px!important;border-radius:12px!important;padding:0 13px!important;font-size:8px!important;letter-spacing:.08em!important}
+  .studio-v4-center-actions{display:none!important}
+  .studio-v4-mobile-toggle,.studio-v4-inspector-toggle{display:grid!important;width:44px!important;height:44px!important;border-radius:14px!important;background:rgba(127,159,174,.08)!important;border:1px solid rgba(200,226,237,.14)!important;font-size:15px!important}
+  .studio-v4-inspector-toggle{grid-column:3}
+  .studio-v4-workspace{position:relative!important;height:100%!important;min-height:0!important;padding-top:44px!important;overflow:hidden!important}
+  .studio-v4-workspace #main,.studio-v4-workspace #main #center,.studio-v4-workspace #drawer,.studio-v4-workspace #drawer .dpanels,.studio-v4-workspace #drawer .dpanel{height:100%!important;max-height:100%!important;min-height:0!important;border-radius:0!important}
+  .studio-v4-workspace #main #center{overflow:auto!important;-webkit-overflow-scrolling:touch!important}
+  #overview{height:34px!important;min-height:34px!important}
+  #ruler{height:30px!important;min-height:30px!important}
+  #tracks-area{min-height:calc(100% - 64px)!important}
+  #tracks-scroll{padding-bottom:28px!important}
+  .track-row,.track-header,[class*="track-row"]{min-height:64px}
+
+  /* Tracks and inspector become modal app sheets. */
+  .studio-v4-left,.studio-v4-inspector{
+    position:absolute!important;z-index:1700!important;top:10px!important;bottom:calc(10px + var(--lab-safe-bottom))!important;height:auto!important;
+    border:1px solid rgba(207,230,240,.16)!important;border-radius:22px!important;background:rgba(11,16,20,.98)!important;
+    box-shadow:0 24px 80px rgba(0,0,0,.65)!important;overflow:hidden!important;
+  }
+  .studio-v4-left{left:8px!important;right:24px!important;width:auto!important;max-width:none!important;grid-template-columns:64px minmax(0,1fr)!important}
+  .studio-v4-inspector{left:24px!important;right:8px!important;width:auto!important;max-width:none!important}
+  .studio-v4-left.open,.studio-v4-inspector.open{transform:translate3d(0,0,0)!important}
+  .studio-v4-track-head,.studio-v4-inspector-head{height:58px!important;padding:0 12px!important;background:rgba(255,255,255,.025)!important;border-bottom:1px solid rgba(207,230,240,.1)!important}
+  .studio-v4-track-rack,.studio-v4-inspector-body{overscroll-behavior:contain!important}
+  .studio-v4-stage-button{min-height:52px!important;border-radius:13px!important}
+
+  #studio-v4-mobile-nav{
+    position:absolute!important;z-index:1600!important;left:0!important;right:0!important;bottom:0!important;
+    display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;height:calc(var(--lab-bottom) + var(--lab-safe-bottom))!important;
+    padding:7px 6px calc(7px + var(--lab-safe-bottom))!important;gap:4px!important;
+    border-top:1px solid rgba(211,233,242,.13)!important;background:rgba(7,11,14,.96)!important;
+    backdrop-filter:blur(24px) saturate(130%)!important;-webkit-backdrop-filter:blur(24px) saturate(130%)!important;
+    box-shadow:0 -18px 42px rgba(0,0,0,.34)!important;
+  }
+  #studio-v4-mobile-nav button{position:relative!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:4px!important;min-width:0!important;min-height:54px!important;border-radius:15px!important;font-size:7px!important;letter-spacing:.08em!important;color:#81919a!important}
+  #studio-v4-mobile-nav button i{display:grid!important;place-items:center!important;width:30px!important;height:23px!important;margin:0!important;border-radius:9px!important;font-size:8px!important;font-style:normal!important}
+  #studio-v4-mobile-nav button.active{color:#eef5f7!important;background:linear-gradient(180deg,rgba(161,195,209,.13),rgba(98,135,151,.06))!important;border-color:rgba(201,228,238,.18)!important}
+  #studio-v4-mobile-nav button.active i{background:#d9e6eb!important;color:#071014!important;box-shadow:0 4px 16px rgba(183,217,230,.2)!important}
+
+  /* Mobile action sheet opened by More. */
+  .lab-mobile-backdrop{position:fixed;z-index:1800;inset:0;background:rgba(0,0,0,.58);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .18s ease,visibility 0s linear .18s}
+  .lab-mobile-backdrop.open{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .18s ease}
+  .lab-mobile-sheet{position:fixed;z-index:1810;left:8px;right:8px;bottom:calc(8px + var(--lab-safe-bottom));padding:10px;border:1px solid rgba(211,233,242,.17);border-radius:24px;background:linear-gradient(165deg,rgba(24,32,38,.99),rgba(9,13,16,.99));box-shadow:0 26px 90px rgba(0,0,0,.7);transform:translate3d(0,115%,0);visibility:hidden;transition:transform .22s cubic-bezier(.2,.8,.2,1),visibility 0s linear .22s}
+  .lab-mobile-sheet.open{transform:translate3d(0,0,0);visibility:visible;transition:transform .22s cubic-bezier(.2,.8,.2,1)}
+  .lab-mobile-sheet-handle{display:block;width:42px;height:4px;margin:1px auto 10px;border-radius:99px;background:rgba(218,236,243,.24)}
+  .lab-mobile-sheet header{display:flex;align-items:center;justify-content:space-between;padding:3px 4px 11px}.lab-mobile-sheet header div{display:grid;gap:3px}.lab-mobile-sheet header small{font:700 7px/1 ui-monospace,monospace;letter-spacing:.15em;color:#7f939e}.lab-mobile-sheet header b{font-size:17px}.lab-mobile-sheet-close{width:40px;height:40px;border-radius:13px}
+  .lab-mobile-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.lab-mobile-action{display:flex;align-items:center;gap:10px;min-height:58px;padding:9px 11px;border:1px solid rgba(207,230,240,.12);border-radius:16px;background:rgba(255,255,255,.035);color:#e9f0f3;text-align:left}.lab-mobile-action i{display:grid;place-items:center;flex:0 0 34px;width:34px;height:34px;border-radius:11px;background:rgba(153,190,205,.1);font:700 8px/1 ui-monospace,monospace;color:#cfe0e7}.lab-mobile-action span{display:grid;gap:2px;font-size:11px;font-weight:700}.lab-mobile-action small{font-size:7px;font-weight:600;color:#7f919b}.lab-mobile-action.primary{background:linear-gradient(145deg,#dce7ec,#9db1ba);color:#071014}.lab-mobile-action.primary i{background:rgba(7,16,20,.12);color:#071014}
+
+  #studio-v4-deliver{padding:12px!important}.studio-v4-deliver-grid{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}.studio-v4-deliver-card{border-radius:18px!important;padding:16px!important}
+}
+
+@media (max-width:390px){
+  :root{--lab-top:54px;--lab-stage:54px;--lab-bottom:68px}
+  body.neusic-studio-v4 #topbar{grid-template-columns:40px 40px 40px minmax(78px,1fr) 52px!important;gap:4px!important;padding-inline:5px!important}
+  body.neusic-studio-v4 #topbar .tb-btn{width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important}
+  .studio-v4-center-head{grid-template-columns:42px minmax(0,1fr) 42px!important;padding-inline:6px!important}
+  .lab-mobile-actions{grid-template-columns:1fr 1fr}.lab-mobile-action{padding-inline:8px}.lab-mobile-action small{display:none}
+}
+
+@media (orientation:landscape) and (max-height:560px){
+  :root{--lab-top:46px;--lab-stage:48px;--lab-bottom:54px}
+  body.neusic-studio-v4 #topbar{padding-top:4px!important;padding-bottom:4px!important}.studio-v4-subtools{height:40px!important}.studio-v4-workspace{padding-top:40px!important}.studio-v4-subtool{height:32px!important;min-height:32px!important}
+  #studio-v4-mobile-nav{grid-template-columns:repeat(5,minmax(70px,1fr))!important;overflow-x:auto!important}#studio-v4-mobile-nav button{min-height:40px!important;flex-direction:row!important}#studio-v4-mobile-nav button i{width:25px!important;height:22px!important}
+}
