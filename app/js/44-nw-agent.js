@@ -5,17 +5,19 @@
 'use strict';
 if (window.__nwAgent) return; window.__nwAgent = true;
 
+/* ── identity ── */
 const uid = p => p + '_' + Math.random().toString(36).slice(2, 10);
 const LSID = 'nw-identity';
 const identity = (() => {
   let i; try { i = JSON.parse(localStorage.getItem(LSID)); } catch (_) {}
   if (!i || !i.userId) i = { userId: uid('user'), workspaceId: uid('ws') };
   i.projectId = i.projectId || uid('proj');
-  i.sessionId = uid('sess');
+  i.sessionId = uid('sess'); /* fresh each launch — session memory scope */
   try { localStorage.setItem(LSID, JSON.stringify({ userId: i.userId, workspaceId: i.workspaceId, projectId: i.projectId })); } catch (_) {}
   return i;
 })();
 
+/* ── preferences (defaults per approved spec) ── */
 const LSPREF = 'nw-agent-prefs';
 const DEFAULTS = {
   verbosity: 'concise', suggestionFrequency: 'balanced',
@@ -34,6 +36,7 @@ let prefs = (() => { try { return { ...DEFAULTS, ...(JSON.parse(localStorage.get
 const savePrefs = () => { try { localStorage.setItem(LSPREF, JSON.stringify(prefs)); } catch (_) {} };
 window.NeusicAgentPreferences = { get: () => ({ verbosity: prefs.verbosity, suggestion_frequency: prefs.suggestionFrequency, intervention_level: prefs.interventionLevel }) };
 
+/* ── session memory (localStorage, per approved B-Lite scope) ── */
 const LSMEM = 'nw-session-mem-' + identity.projectId;
 let sessionMsgs = (() => { try { return JSON.parse(localStorage.getItem(LSMEM)) || []; } catch (_) { return []; } })();
 const remember = (role, content) => {
@@ -42,6 +45,7 @@ const remember = (role, content) => {
   try { localStorage.setItem(LSMEM, JSON.stringify(sessionMsgs)); } catch (_) {}
 };
 
+/* ── DAW context (structured metadata only — never raw audio) ── */
 function context() {
   if (typeof S === 'undefined') return {};
   return {
@@ -51,6 +55,7 @@ function context() {
   };
 }
 
+/* ── backend client ── */
 async function api(path, opts = {}) {
   const r = await fetch(prefs.backendUrl.replace(/\/$/, '') + path, {
     headers: { 'Content-Type': 'application/json', ...(prefs.apiKey ? { 'X-Neusic-Key': prefs.apiKey } : {}) },
@@ -79,6 +84,7 @@ async function chat(prompt) {
   }
 }
 
+/* ── provider status ── */
 async function refreshStatus() {
   const lamp = document.getElementById('nw-agent-lamp');
   const set = (cls, txt) => { if (lamp) { lamp.className = 'nw-lamp ' + cls; lamp.querySelector('span').textContent = txt; } };
@@ -93,6 +99,7 @@ async function refreshStatus() {
   } catch (_) { set('err', 'Backend offline'); return { backend: false, ollama: false, models: [] }; }
 }
 
+/* ── assistant panel (inline, with pop-out) ── */
 function openPanel() {
   let p = document.getElementById('nw-agent-panel');
   if (p) { p.remove(); return; }
@@ -130,6 +137,7 @@ function openPanel() {
   document.body.appendChild(p);
 }
 
+/* ── settings dialog: 6 sections + provider ── */
 const seg = (key, options, obj = prefs) => `<div class="nw-seg" data-seg="${key}">` +
   options.map(o => `<button data-v="${o}" class="${(obj[key] ?? '') === o ? 'on' : ''}">${o.replace(/-/g, ' ')}</button>`).join('') + '</div>';
 const check = (path, label) => { const v = path.split('.').reduce((a, k) => a?.[k], prefs);

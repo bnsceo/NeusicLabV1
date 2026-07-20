@@ -35,6 +35,7 @@ def _advisor(req: ChatRequest) -> str:
 
 async def chat(req: ChatRequest) -> ChatResponse:
     system = SYSTEM.format(verbosity=req.preferences.verbosity)
+    # 1) hosted Hermes
     if HERMES_API_URL:
         try:
             async with httpx.AsyncClient(timeout=45) as cx:
@@ -47,13 +48,15 @@ async def chat(req: ChatRequest) -> ChatResponse:
                                     memory_updates=data.get("memory_updates", []),
                                     proposed_actions=data.get("proposed_actions", []))
         except Exception:
-            pass
+            pass  # fall through
+    # 2) local Ollama
     convo = "\n".join(f"{m.get('role', '?')}: {m.get('content', '')}" for m in req.recent[-8:])
     local = await ollama_service.generate(
         prompt=f"DAW context: {req.context}\n\nRecent:\n{convo}\n\nUser: {req.prompt}",
         system=system)
     if local:
         return ChatResponse(reply=local, session_id=req.session_id, provider="ollama")
+    # 3) built-in advisor
     return ChatResponse(
         reply=_advisor(req), session_id=req.session_id, provider="local-advisor",
         proposed_actions=[ProposedAction(id=f"action_{uuid.uuid4().hex[:8]}", type="advice-only",

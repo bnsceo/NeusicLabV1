@@ -56,6 +56,7 @@
 .nw-tabs button.on{color:#e6e9e8;border-bottom-color:var(--nw-accent)}
 .nw-tabpage{display:none}.nw-tabpage.on{display:block}
 
+/* provider status lamp */
 .nw-lamp{display:inline-flex;align-items:center;gap:6px;font:700 var(--nw-small)/1 var(--nw-font);
   letter-spacing:.08em;text-transform:uppercase;color:#a9aeac}
 .nw-lamp i{width:8px;height:8px;border-radius:50%;background:#3a3e3c;border:1px solid #141514}
@@ -63,11 +64,13 @@
 .nw-lamp.err i{background:var(--nw-rec-ring)}
 .nw-lamp.busy i{background:var(--nw-clip-gold)}
 
+/* ── Save gate ── */
 #nw-gate .nw-body p{font:600 var(--nw-label)/1.5 var(--nw-font);color:#c2c6c4;margin:0 0 6px}
 #nw-gate .nw-up{font:700 var(--nw-ctl)/1 var(--nw-font);letter-spacing:.1em;text-transform:uppercase;
   background:var(--nw-accent);color:#141210;border:0;border-radius:2px;padding:10px 16px;cursor:pointer;
   box-shadow:inset 0 1px rgba(255,255,255,.3),0 0 8px color-mix(in srgb,var(--nw-accent) 40%,transparent)}
 
+/* ── Marketing landing (above the app) ── */
 #nw-landing{background:var(--nw-black);color:#c9cdcb;border-bottom:1px solid rgba(0,0,0,.7)}
 #nw-landing .wrap{max-width:880px;margin:0 auto;padding:52px 20px 40px;text-align:center}
 #nw-landing h1{font:700 var(--nw-hero)/1.1 var(--nw-font);letter-spacing:.04em;color:#e8eae9;margin:0 0 10px}

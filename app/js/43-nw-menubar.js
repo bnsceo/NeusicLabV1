@@ -72,6 +72,7 @@ function build() {
 }
 const close = (bar, except) => bar.querySelectorAll('.nw-menu.open').forEach(m => { if (m !== except) m.classList.remove('open'); });
 
+/* Shared dialog helpers */
 window.NWDialogs = {
   open(id, title, bodyHTML, footHTML) {
     this.closeAll();
