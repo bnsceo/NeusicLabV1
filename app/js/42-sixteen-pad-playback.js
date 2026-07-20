@@ -67,37 +67,3 @@
     }
   };
 })();
-
-/* Phase 2B/3 static Pages bootstrap. */
-(() => {
-  const styles = ['css/30-nw-tokens.css','css/31-nw-shell.css','css/32-nw-menubar.css'];
-  styles.forEach(href => {
-    if (document.querySelector(`link[href="${href}"]`)) return;
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = href;
-    document.head.appendChild(link);
-  });
-
-  const scripts = [
-    'js/41a-nw-landing.js',
-    'js/42-nw-shell.js',
-    'js/43-nw-menubar.js',
-    'js/44-nw-agent.js',
-    'js/45-nw-demo-gate.js'
-  ];
-
-  const load = i => {
-    if (i >= scripts.length) return;
-    if (document.querySelector(`script[src="${scripts[i]}"]`)) {
-      load(i + 1);
-      return;
-    }
-    const script = document.createElement('script');
-    script.src = scripts[i];
-    script.onload = () => load(i + 1);
-    document.body.appendChild(script);
-  };
-
-  load(0);
-})();
