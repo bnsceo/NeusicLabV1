@@ -13,6 +13,8 @@
   document.getElementById('mobileMenu')?.remove();
   header?.classList.add('menu-free');
 
+  document.querySelectorAll('a[href="./studio/"],a[href="studio/"]').forEach(link=>link.setAttribute('href','./App/'));
+
   if(!document.querySelector('link[href*="neusic-agent.css"]')){const link=document.createElement('link');link.rel='stylesheet';link.href='./neusic-agent.css?v=1';document.head.appendChild(link)}
   if(!document.querySelector('script[src*="neusic-agent.js"]')){const script=document.createElement('script');script.src='./neusic-agent.js?v=1';script.defer=true;document.body.appendChild(script)}
 
