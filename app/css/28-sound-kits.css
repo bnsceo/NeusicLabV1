@@ -1,0 +1,10 @@
+/* Kit picker — quiet chip row above the drum grid */
+.kit-picker{display:flex;gap:6px;flex-wrap:wrap;padding:8px 10px 6px;align-items:center}
+.kit-btn{font:600 11px/1 inherit;letter-spacing:.04em;text-transform:uppercase;
+  padding:7px 12px;border-radius:999px;border:1px solid var(--nsb,#333);
+  background:transparent;color:var(--nst,#bbb);cursor:pointer;transition:all .15s ease}
+.kit-btn:hover{border-color:var(--nsa,#d4a354);color:var(--nsa,#d4a354)}
+.kit-btn.kit-active{background:var(--nsa,#d4a354);border-color:var(--nsa,#d4a354);
+  color:#141210;box-shadow:0 0 12px color-mix(in srgb,var(--nsa,#d4a354) 40%,transparent)}
+@media (max-width:640px){.kit-picker{overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}
+  .kit-btn{flex:0 0 auto}}
