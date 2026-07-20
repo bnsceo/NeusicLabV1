@@ -120,7 +120,7 @@ function scheduleSeqSteps(horizonBeat){
     const stepBeat=S.nextSeqStepBeat;
     const stepIndex=Math.round(stepBeat/stepLenBeat)%16;
     const when=songSecToCtxTime(beatToSec(stepBeat));
-    PADS.slice(0,4).forEach(p=>{
+    PADS.forEach(p=>{
       if((S.seqSteps[p.id]||[])[stepIndex]){
         Audio_.synthDrum(p.n,null,when);
       }
@@ -139,7 +139,7 @@ function flashSeqStep(stepIndex){
     const rowSteps=row.querySelectorAll('.step');
     rowSteps.forEach((b,si)=>b.classList.toggle('cur',si===stepIndex));
   });
-  PADS.slice(0,4).forEach(p=>{
+  PADS.forEach(p=>{
     if((S.seqSteps[p.id]||[])[stepIndex]){
       const padBtn=document.getElementById('pad-'+p.id);
       if(padBtn){padBtn.style.filter='brightness(2.5)';setTimeout(()=>{if(padBtn)padBtn.style.filter='';},80);}
@@ -343,7 +343,7 @@ function scheduleOfflineSequencer(offlineCtx,trackInputs,durationSec){
   for(let step=0;step<totalSteps;step++){
     const stepIndex=step%16;
     const when=step*stepLenSec;
-    PADS.slice(0,4).forEach(p=>{
+    PADS.forEach(p=>{
       if((S.seqSteps[p.id]||[])[stepIndex]){
         Audio_.synthDrum(p.n,offlineCtx.__masterGain,when);
       }
