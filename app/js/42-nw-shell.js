@@ -48,6 +48,7 @@ function applyPanels() {
   const b = document.body;
   b.classList.toggle('nw-left-closed', !state.left);
   b.classList.toggle('nw-right-closed', !state.right);
+  // mobile open/close classes mirror desktop state
   b.classList.toggle('nw-left-open', state.left && window.innerWidth <= 768);
   b.classList.toggle('nw-right-open', state.right && window.innerWidth <= 768);
 }
@@ -56,6 +57,7 @@ function setMode(mode) {
   state.mode = mode; save();
   const b = document.body;
   ['arrange', 'mix', 'pads', 'keys'].forEach(m => b.classList.toggle('nw-mode-' + m, m === mode));
+  // steer the legacy drawer's active panel when a drawer mode opens
   if (typeof S !== 'undefined' && mode !== 'arrange') {
     S.drawerOpen = true;
     S.activePanel = mode === 'mix' ? 'mixer' : mode === 'pads' ? 'drums' : 'keys';
@@ -71,6 +73,7 @@ function boot() {
   document.body.classList.add('nw-shell');
   document.body.dataset.product = document.body.dataset.product || 'lab';
   buildInspector(main);
+  // left panel toggle
   const sb = document.getElementById('sidebar');
   if (sb && !sb.querySelector('.nw-panel-toggle')) {
     const t = el('button', 'nw-btn nw-panel-toggle', '‹'); t.onclick = () => togglePanel('left');

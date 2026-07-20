@@ -30,6 +30,7 @@ function trySave(saveAs) {
   return window.saveProjectToFile?.(saveAs);
 }
 
+/* Intercept legacy save triggers (buttons + ⌘S) so the gate is universal */
 function install() {
   if (typeof window.saveProjectToFile === 'function' && !window.saveProjectToFile.__nwGated) {
     const orig = window.saveProjectToFile;
@@ -39,7 +40,7 @@ function install() {
   window.addEventListener('keydown', e => {
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') { e.preventDefault(); trySave(); }
   }, true);
-  setPro(isPro());
+  setPro(isPro()); /* sync the DEMO tag */
 }
 
 window.NWDemoGate = { isDemo: () => !isPro(), trySave, unlock: () => setPro(true) };
