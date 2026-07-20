@@ -1,0 +1,51 @@
+name: Apply exact Phase 1 playback
+
+on:
+  push:
+    branches:
+      - design/phase2b-studio
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out exact branch
+        uses: actions/checkout@v4
+        with:
+          ref: design/phase2b-studio
+          fetch-depth: 0
+
+      - name: Reconstruct exact uploaded playback engine
+        shell: bash
+        run: |
+          cat .tmp/04-playback.b64.1 \
+              .tmp/04-playback.b64.2 \
+              .tmp/04-playback.b64.3 \
+              .tmp/04-playback.b64.4 \
+            | tr -d '\n\r ' \
+            | base64 --decode > app/js/04-playback.js
+
+      - name: Validate exact file
+        shell: bash
+        run: |
+          node --check app/js/04-playback.js
+          actual="$(git hash-object app/js/04-playback.js)"
+          expected="d93a2efb44b28f43fbc1e11d0404010373562558"
+          echo "actual=$actual"
+          test "$actual" = "$expected"
+
+      - name: Commit exact replacement and clean staging files
+        shell: bash
+        run: |
+          rm -rf .tmp
+          rm -f .github/workflows/apply-exact-04-playback.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/js/04-playback.js .tmp .github/workflows/apply-exact-04-playback.yml
+          git commit -m "Replace playback engine with exact Phase 1 build"
+          git push origin HEAD:design/phase2b-studio
