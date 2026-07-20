@@ -1,26 +1,304 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>Opening NeusicLab…</title>
+<base href="../app/">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Neusic DAW</title>
+<link rel="stylesheet" href="css/01-tokens.css">
+<link rel="stylesheet" href="css/02-base.css">
+<link rel="stylesheet" href="css/03-topbar.css">
+<link rel="stylesheet" href="css/04-layout.css">
+<link rel="stylesheet" href="css/05-clips.css">
+<link rel="stylesheet" href="css/06-drawer-shell.css">
+<link rel="stylesheet" href="css/07-drawer-panels.css">
+<link rel="stylesheet" href="css/08-overlays.css">
+<link rel="stylesheet" href="css/09-responsive.css">
+<link rel="stylesheet" href="css/10-browser.css">
+<link rel="stylesheet" href="css/11-mixer-pro.css">
+<link rel="stylesheet" href="css/12-timeline-pro.css">
+<link rel="stylesheet" href="css/13-workspace-ux.css">
+<link rel="stylesheet" href="css/14-production-integrity.css">
+<link rel="stylesheet" href="css/15-mobile-first.css">
+<link rel="stylesheet" href="css/16-project-safety.css">
+<link rel="stylesheet" href="css/17a-studio-foundation.css">
+<link rel="stylesheet" href="css/17b-studio-navigation.css">
+<link rel="stylesheet" href="css/17c-studio-controls.css">
+<link rel="stylesheet" href="css/17d-studio-mixer-mobile.css">
+<link rel="stylesheet" href="css/18-producer-flow.css">
+<link rel="stylesheet" href="css/19-professional-arranger.css">
+<link rel="stylesheet" href="css/20a-hyperreal-shell.css">
+<link rel="stylesheet" href="css/20b-hyperreal-tracks.css">
+<link rel="stylesheet" href="css/20c-hyperreal-creator.css">
+<link rel="stylesheet" href="css/21-production-copilot.css">
+<link rel="stylesheet" href="css/22-neusic-suite-identity.css">
+<link rel="stylesheet" href="css/22-premium-studio.css">
+<link rel="stylesheet" href="css/23-recording-mix-workflow.css">
+<link rel="stylesheet" href="css/24-piano-roll-v2.css">
+<link rel="stylesheet" href="css/25-experience-polish.css">
+<link rel="stylesheet" href="css/23-studio-workspace-v4.css">
+<link rel="stylesheet" href="css/26-workspace-modes.css">
+<link rel="stylesheet" href="css/24-mobile-responsive.css">
+<link rel="stylesheet" href="css/27-clarity-mobile.css">
+<link rel="stylesheet" href="css/28-sound-kits.css">
+<link rel="stylesheet" href="css/30-nw-tokens.css">
+<link rel="stylesheet" href="css/31-nw-shell.css">
+<link rel="stylesheet" href="css/32-nw-menubar.css">
 </head>
-<body>
+<body data-product="lab">
+<section id="nw-landing" class="nw-noise">
+  <div class="wrap">
+    <div class="nw-micro" style="margin-bottom:14px">NEUSICWAVE / PRODUCTION</div>
+    <h1>Arrange, record, mix, master.<br>All in your browser.</h1>
+    <p class="sub">NeusicLab is the finishing studio of the NeusicWave suite. No installation, no login — the demo is the full studio.</p>
+    <ul>
+      <li>Multi-track arrangement with waveform clips and full editing</li>
+      <li>5 drum kits, sampler, effects rack, and real-time mixing</li>
+      <li>File operations: Open, Export WAV — Save unlocks with Pro</li>
+    </ul>
+    <button class="cta" id="nw-enter"><i></i>Open NeusicLab</button>
+    <div class="more">
+      <h3>The studio</h3>
+      <p>Record tracks, arrange clips on the timeline, design sounds with the sampler, apply effects, and mix with live level meters. Export your finished project as a WAV file — straight from the browser.</p>
+      <div class="shot">SCREENSHOT — TIMELINE &amp; TRANSPORT</div>
+      <h3>File operations &amp; control</h3>
+      <p>Work like a desktop app. Open projects, export mixes, and tune the Neusic Agent from the File menu — verbosity, approvals, and what it may listen to are all yours to set.</p>
+      <div class="shot">SCREENSHOT — FILE MENU &amp; AGENT SETTINGS</div>
+      <h3>Neusic Agent</h3>
+      <p>Connect your API key to unlock AI mixing advice, auto-arrangement, and sound matching. A local model via Ollama keeps advice working offline — the agent stays quiet while you create and never edits without asking.</p>
+      <div class="shot">SCREENSHOT — AGENT PANEL</div>
+    </div>
+  </div>
+</section>
+<div id="app">
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <span class="brand">Neusic</span>
+  <div class="tb-sep"></div>
+
+  <div class="tb-btn-wrap">
+    <button class="tb-btn" id="btn-undo" onclick="undo()" title="Undo (Ctrl+Z)">↩</button>
+    <div class="undo-count" id="undo-badge" style="display:none">0</div>
+  </div>
+  <div class="tb-btn-wrap">
+    <button class="tb-btn" id="btn-redo" onclick="redo()" title="Redo (Ctrl+Y)">↪</button>
+    <div class="undo-count" id="redo-badge" style="display:none">0</div>
+  </div>
+
+  <div class="tb-sep"></div>
+
+  <button class="tb-btn" id="btn-rew" onclick="rewind()" title="Rewind (Home)">⏮</button>
+  <button class="tb-btn" id="btn-play" onclick="togglePlay()" title="Play/Pause (Space)">▶</button>
+  <button class="tb-btn" id="btn-rec"  onclick="toggleRecord()" title="Record (R)">⏺</button>
+
+  <div class="tb-sep"></div>
+
+  <div class="chip">
+    <div class="chip-main" id="time-disp">00:18.450</div>
+    <div class="chip-sub"  id="bar-disp">BAR 9 · BEAT 1</div>
+  </div>
+
+  <div class="chip bpm-chip" onclick="bpmTap(event)" title="Click ± to adjust BPM">
+    <div class="chip-main" id="bpm-disp">120</div>
+    <div class="chip-sub">BPM</div>
+  </div>
+
+  <div class="tb-spacer"></div>
+
+  <div class="zoom-group">
+    <button class="zoom-btn" onclick="zoom(-1)" title="Zoom out">−</button>
+    <span class="zoom-read" id="zoom-read">1.0×</span>
+    <button class="zoom-btn" onclick="zoom(1)"  title="Zoom in">+</button>
+  </div>
+  <div class="tb-sep"></div>
+  <button class="tb-btn" onclick="saveProjectToFile()" title="Save project (.json)">💾</button>
+  <button class="tb-btn" onclick="triggerLoadProject()" title="Load project (.json)">📂</button>
+  <input type="file" id="project-file-input" accept="application/json,.json" style="display:none"
+         onchange="loadProjectFromFile(this.files[0]);this.value='';">
+  <button class="tb-btn" onclick="exportWavFile()" title="Export full mix (.wav)">⬇</button>
+  <div class="tb-sep"></div>
+  <button class="tb-btn" id="btn-sb" onclick="toggleSidebar()" title="Toggle sidebar">☰</button>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+
+  <!-- SIDEBAR (desktop) -->
+  <div id="sidebar">
+    <div class="sb-section">Tracks</div>
+    <div class="sb-list" id="sb-list"></div>
+    <button class="sidebar-add" onclick="addTrack()" style="margin:5px 6px;padding:7px;border-radius:var(--rsm);border:1px dashed var(--txt3);background:none;color:var(--txt2);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;width:calc(100% - 12px);transition:all .12s;" onmouseover="this.style.borderColor='var(--acc)';this.style.color='var(--acc)';" onmouseout="this.style.borderColor='var(--txt3)';this.style.color='var(--txt2)';">＋ Add Track</button>
+    <div class="sb-nav" id="sb-nav"></div>
+  </div>
+
+  <!-- CENTER -->
+  <div id="center">
+
+    <!-- Overview -->
+    <div id="overview" onmousedown="seekOv(event)" ontouchstart="seekOvT(event)">
+      <div class="ov-segs" id="ov-segs"></div>
+      <div class="ov-window" id="ov-win" style="left:16%;width:30%"></div>
+      <div class="ov-cursor" id="ov-cur" style="left:30%"></div>
+    </div>
+
+    <!-- Ruler -->
+    <div id="ruler">
+      <div class="ruler-pad" id="ruler-pad" style="width:var(--hdr-w)"></div>
+      <canvas class="ruler-canvas" id="ruler-canvas"></canvas>
+    </div>
+
+    <!-- Tracks -->
+    <div id="tracks-area">
+      <div id="tracks-scroll">
+        <div id="tracks-inner">
+          <div class="playhead" id="playhead"></div>
+        </div>
+        <div class="add-track-row" onclick="addTrack()">
+          <span style="font-size:18px;font-weight:300">＋</span> Add Track
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /center -->
+</div><!-- /main -->
+
+<!-- TOOLBAR -->
+<div id="toolbar">
+  <button class="tool-btn active" id="tb-drums"  onclick="openDrawer('drums')"> <span class="ico">🥁</span>Drums</button>
+  <button class="tool-btn"        id="tb-piano"  onclick="openDrawer('piano')"> <span class="ico">🎹</span>Piano Roll</button>
+  <button class="tool-btn"        id="tb-sampler"onclick="openDrawer('sampler')"><span class="ico">✂️</span>Sampler</button>
+  <button class="tool-btn"        id="tb-browser"onclick="openDrawer('browser')"><span class="ico">🗂</span>Browser</button>
+  <button class="tool-btn"        id="tb-fx"     onclick="openDrawer('fx')">    <span class="ico">🎚️</span>Effects</button>
+  <button class="tool-btn"        id="tb-mixer"  onclick="openDrawer('mixer')"> <span class="ico">🎛️</span>Mixer</button>
+  <button class="tool-btn"        id="tb-auto"   onclick="openDrawer('auto')">  <span class="ico">〜</span>Automation</button>
+  <button class="tool-btn"        id="tb-rec"    onclick="openDrawer('rec')">   <span class="ico">🎤</span>Record</button>
+</div>
+
+<!-- DRAWER HANDLE -->
+<div id="drawer-handle" onclick="toggleDrawer()"><div class="drawer-pill"></div></div>
+
+<!-- DRAWER -->
+<div id="drawer" class="open">
+  <div class="dtabs" id="dtabs"></div>
+  <div class="dpanels">
+    <div class="dpanel active" id="dp-drums"></div>
+    <div class="dpanel"        id="dp-piano"></div>
+    <div class="dpanel"        id="dp-sampler"></div>
+    <div class="dpanel"        id="dp-fx"></div>
+    <div class="dpanel"        id="dp-mixer"></div>
+    <div class="dpanel"        id="dp-auto"></div>
+    <div class="dpanel"        id="dp-browser"></div>
+    <div class="dpanel"        id="dp-rec"></div>
+  </div>
+</div>
+
+<!-- MOBILE NAV -->
+<div id="mobile-nav">
+  <button class="mob-btn" onclick="mobNav('projects',this)"><span class="mob-ico">📂</span><span>Projects</span></button>
+  <button class="mob-btn" onclick="mobNav('browser',this)"><span class="mob-ico">🎵</span><span>Browser</span></button>
+  <button class="mob-btn active" id="mob-main">
+    <div class="mob-center-wrap">🎛️</div><span>Neusic</span>
+  </button>
+  <button class="mob-btn" onclick="mobNav('record',this)"><span class="mob-ico">🎤</span><span>Record</span></button>
+  <button class="mob-btn" onclick="mobNav('settings',this)"><span class="mob-ico">⚙️</span><span>Settings</span></button>
+</div>
+
+</div><!-- /app -->
+
+<!-- Context menu -->
+<div id="ctx-menu">
+  <div class="ctx-item" onclick="ctxSplit()">✂ Split at playhead</div>
+  <div class="ctx-item" onclick="ctxDuplicate()">⧉ Duplicate</div>
+  <div class="ctx-item" onclick="ctxReverse()">⇆ Reverse</div>
+  <div class="ctx-item" onclick="ctxNormalize()">⬆ Normalize</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="ctxFadeIn()">🌅 Fade in</div>
+  <div class="ctx-item" onclick="ctxFadeOut()">🌆 Fade out</div>
+  <div class="ctx-item" onclick="ctxClipGain()">🔊 Clip gain…</div>
+  <div class="ctx-item" onclick="ctxPitchShift()">🎵 Pitch shift…</div>
+  <div class="ctx-item" onclick="ctxStretch()">⏩ Stretch…</div>
+  <div class="ctx-item" onclick="ctxCrossfade()">⋈ Crossfade with next</div>
+  <div class="ctx-item" onclick="ctxBounce()">⬇ Bounce to clip</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item danger" onclick="ctxDelete()">🗑 Delete</div>
+</div>
+
+<!-- Note properties popover (piano roll) -->
+<div id="note-popover">
+  <div class="np-hdr">
+    <span class="np-notename" id="np-notename">C4</span>
+    <span class="np-midinum" id="np-midinum">MIDI 60</span>
+    <button class="np-close" onclick="closeNotePopover()">✕</button>
+  </div>
+  <div class="np-row"><span class="np-lbl">Beat</span><input class="np-val" id="np-beat" type="number" min="0" step="0.25" onchange="applyNoteEdit()"></div>
+  <div class="np-row"><span class="np-lbl">Length</span><input class="np-val" id="np-len"  type="number" min="0.125" step="0.125" onchange="applyNoteEdit()"></div>
+  <div class="np-row"><span class="np-lbl">Velocity</span><input class="np-val" id="np-vel"  type="number" min="1" max="127" step="1" onchange="applyNoteEdit()"></div>
+  <div class="np-btns">
+    <button class="np-btn prim" onclick="prPlayNoteFromPopover()">▶ Preview</button>
+    <button class="np-btn" onclick="applyNoteEdit();closeNotePopover()">Apply</button>
+    <button class="np-btn danger" onclick="deleteNoteFromPopover()">Delete</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+<div id="sel-box"></div>
+<script src="js/01-state.js"></script>
+<script src="js/02-audio-engine.js"></script>
+<script src="js/03-project-io.js"></script>
+<script src="js/04-playback.js"></script>
+<script src="js/05-timeline-core.js"></script>
+<script src="js/06-context-sidebar-drawer.js"></script>
+<script src="js/07-piano-roll.js"></script>
+<script src="js/08-sampler-mpc.js"></script>
+<script src="js/09-fx-mixer-automation.js"></script>
+<script src="js/10-recording-nav-init.js"></script>
+<script src="js/11-mpc-advanced.js"></script>
+<script src="js/12-piano-roll-advanced.js"></script>
+<script src="js/13-midi-devices.js"></script>
+<script src="js/14-clip-editing.js"></script>
+<script src="js/15-sample-browser.js"></script>
+<script src="js/16-mixer-pro.js"></script>
+<script src="js/17-mpc-pro.js"></script>
+<script src="js/18-timeline-pro.js"></script>
+<script src="js/19-dsp-advanced.js"></script>
+<script src="js/20-midi-advanced.js"></script>
+<script src="js/21-ai-assistant.js"></script>
+<script src="js/22-workspace-ux.js"></script>
+<script src="js/23-production-integrity.js"></script>
+<script src="js/24-mobile-first.js"></script>
+<script src="js/25-project-safety.js"></script>
+<script src="js/26-producer-flow.js"></script>
+<script src="js/27-producer-flow-hardening.js"></script>
+<script src="js/28-professional-arranger.js"></script>
+<script src="js/29-arranger-recovery-sync.js"></script>
+<script src="js/30-track-engine.js"></script>
+<script src="js/31-midi-clips.js"></script>
+<script src="js/32-track-workspace.js"></script>
+<script src="js/33-production-copilot.js"></script>
+<script src="js/34-theme-personalization.js"></script>
+<script src="js/34-wave-transfer-receiver.js"></script>
+<script src="js/35-neusic-suite-identity.js"></script>
+<script src="js/35-recording-mix-workflow.js"></script>
+<script src="js/36-piano-roll-v2.js"></script>
+<script src="js/37-experience-polish.js"></script>
+<script src="js/38-workspace-modes.js"></script>
+<script src="js/39-clarity-mobile.js"></script>
+<script src="js/39-studio-workspace-v4.js"></script>
+<script src="js/40-studio-v4-hardening.js"></script>
+<script src="js/41-sound-kits.js"></script>
+<script src="js/42-nw-shell.js"></script>
+<script src="js/43-nw-menubar.js"></script>
+<script src="js/44-nw-agent.js"></script>
+<script src="js/45-nw-demo-gate.js"></script>
 <script>
-fetch('../app/index.html', { cache: 'no-store' })
-  .then(function (response) {
-    if (!response.ok) throw new Error('Unable to load NeusicLab');
-    return response.text();
-  })
-  .then(function (html) {
-    html = html.replace('<head>', '<head><base href="../app/">');
-    document.open();
-    document.write(html);
-    document.close();
-  })
-  .catch(function () {
-    document.body.innerHTML = '<p>NeusicLab could not load. <a href="../app/">Open the studio</a>.</p>';
-  });
+/* landing → app handoff */
+(function(){
+  var b=document.getElementById('nw-enter');
+  var go=function(){document.body.classList.add('nw-in-app');try{localStorage.setItem('nw-entered','1')}catch(e){}window.scrollTo(0,0)};
+  if(b)b.addEventListener('click',go);
+  try{if(localStorage.getItem('nw-entered')==='1')document.body.classList.add('nw-in-app')}catch(e){}
+})();
 </script>
 </body>
 </html>
