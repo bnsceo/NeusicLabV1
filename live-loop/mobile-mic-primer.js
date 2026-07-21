@@ -32,8 +32,8 @@
 
   const ensureContext = () => {
     const appContext = currentAppContext();
-    if (appContext?.state !== 'closed') return adoptContext(appContext);
-    if (sharedContext?.state !== 'closed') return sharedContext;
+    if (appContext && appContext.state !== 'closed') return adoptContext(appContext);
+    if (sharedContext && sharedContext.state !== 'closed') return sharedContext;
     if (!NativeAudioContext) return null;
     return adoptContext(new NativeAudioContext({latencyHint:'interactive'}));
   };
