@@ -9,9 +9,11 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - .github/workflows/sandbox-mobile-browser-test.yml
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   responsive-browser-test:
@@ -23,18 +25,20 @@ jobs:
           ref: sandbox/landing-mobile-responsiveness
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
       - name: Install browser test runtime
         run: |
           npm init -y >/dev/null 2>&1
           npm install playwright@1.54.1 >/dev/null
           npx playwright install --with-deps chromium >/dev/null
-      - name: Run real viewport tests
+      - name: Run real viewport tests and save report
+        id: browser_test
+        continue-on-error: true
         run: |
           python3 -m http.server 4173 >/tmp/neusic-http.log 2>&1 &
           cat > /tmp/mobile-test.cjs <<'JS'
           const { chromium } = require('playwright');
-          const assert = require('assert');
+          const fs = require('fs');
           const viewports = [
             { name: '320x568', width: 320, height: 568 },
             { name: '375x667', width: 375, height: 667 },
@@ -45,10 +49,11 @@ jobs:
           (async () => {
             const browser = await chromium.launch({ headless: true });
             const results = [];
+            let passed = true;
             for (const vp of viewports) {
               const page = await browser.newPage({ viewport: { width: vp.width, height: vp.height }, deviceScaleFactor: 1 });
-              const errors = [];
-              page.on('pageerror', error => errors.push(error.message));
+              const pageErrors = [];
+              page.on('pageerror', error => pageErrors.push(error.message));
               await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
               await page.waitForTimeout(700);
               const result = await page.evaluate(() => {
@@ -71,26 +76,53 @@ jobs:
                   directApps: ['./live-loop/','./wave-loom/','./studio/'].every(href => links.includes(href)),
                 };
               });
-              assert(result.scrollWidth <= vp.width + 1, `${vp.name}: document horizontal overflow ${result.scrollWidth} > ${vp.width}`);
-              assert(result.bodyScrollWidth <= vp.width + 1, `${vp.name}: body horizontal overflow ${result.bodyScrollWidth} > ${vp.width}`);
-              assert(result.heroVisible, `${vp.name}: hero not visible`);
-              assert(result.titleVisible, `${vp.name}: title not visible`);
-              assert(result.cardsFit, `${vp.name}: journey card exceeds viewport`);
-              assert(result.hasDirectMobileCss, `${vp.name}: mobile CSS not linked directly`);
-              assert(!result.hasSuiteWrapperLink, `${vp.name}: suite wrapper link remains`);
-              assert(result.directApps, `${vp.name}: direct app links missing`);
+              const checks = {
+                documentFits: result.scrollWidth <= vp.width + 1,
+                bodyFits: result.bodyScrollWidth <= vp.width + 1,
+                heroVisible: result.heroVisible,
+                titleVisible: result.titleVisible,
+                cardsFit: result.cardsFit,
+                directMobileCss: result.hasDirectMobileCss,
+                noSuiteWrapperLinks: !result.hasSuiteWrapperLink,
+                directAppLinks: result.directApps,
+              };
               if (vp.width <= 430) {
-                assert(result.menuVisible, `${vp.name}: mobile menu button hidden`);
-                await page.click('#menuButton');
-                assert(await page.locator('#mobileMenu').evaluate(el => el.classList.contains('open')), `${vp.name}: mobile menu did not open`);
-                await page.click('#menuButton');
-                assert(!(await page.locator('#mobileMenu').evaluate(el => el.classList.contains('open'))), `${vp.name}: mobile menu did not close`);
+                checks.menuVisible = result.menuVisible;
+                if (result.menuVisible) {
+                  await page.click('#menuButton');
+                  checks.menuOpens = await page.locator('#mobileMenu').evaluate(el => el.classList.contains('open'));
+                  await page.click('#menuButton');
+                  checks.menuCloses = !(await page.locator('#mobileMenu').evaluate(el => el.classList.contains('open')));
+                } else {
+                  checks.menuOpens = false;
+                  checks.menuCloses = false;
+                }
               }
-              results.push({ viewport: vp.name, ...result, pageErrors: errors });
+              const viewportPassed = Object.values(checks).every(Boolean);
+              passed = passed && viewportPassed;
+              results.push({ viewport: vp.name, passed: viewportPassed, checks, measurements: result, pageErrors });
               await page.close();
             }
             await browser.close();
-            console.log(JSON.stringify({ passed: true, results }, null, 2));
-          })().catch(error => { console.error(error); process.exit(1); });
+            const report = { passed, testedAt: new Date().toISOString(), results };
+            fs.writeFileSync('responsive-test-report.json', JSON.stringify(report, null, 2) + '\n');
+            console.log(JSON.stringify(report, null, 2));
+            if (!passed) process.exitCode = 1;
+          })().catch(error => {
+            fs.writeFileSync('responsive-test-report.json', JSON.stringify({ passed:false, fatal:error.stack || String(error) }, null, 2) + '\n');
+            console.error(error);
+            process.exit(1);
+          });
           JS
           node /tmp/mobile-test.cjs
+      - name: Commit browser report to sandbox
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add responsive-test-report.json
+          git diff --cached --quiet || git commit -m "Record sandbox mobile browser test"
+          git push origin HEAD:sandbox/landing-mobile-responsiveness
+      - name: Enforce browser result
+        if: steps.browser_test.outcome != 'success'
+        run: exit 1
