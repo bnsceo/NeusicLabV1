@@ -1,0 +1,73 @@
+/* Mobile hardening for the hybrid NeusicWave landing. */
+html,body{max-width:100%;overflow-x:hidden}
+img,svg,canvas,video,iframe{max-width:100%}
+a,button,input,summary{touch-action:manipulation}
+
+@media(max-width:760px){
+  .site-header{position:sticky!important;top:0;z-index:80}
+  .header-inner{min-height:58px!important;padding:8px 14px!important;gap:10px!important}
+  .brand-copy small,.build-status{display:none!important}
+  .menu-button{min-width:44px;min-height:44px}
+
+  .hero{min-height:auto!important;padding:56px 14px 38px!important;overflow:hidden}
+  .hero-content{width:100%!important;max-width:100%!important}
+  #heroTitle{font-size:clamp(54px,20vw,94px)!important;line-height:.86!important;overflow-wrap:anywhere}
+  .nw-wave-sub{font-size:clamp(14px,5vw,20px)!important;letter-spacing:.26em!important;margin-left:.26em}
+  .hero-statement{font-size:clamp(20px,7vw,30px)!important;line-height:1.08!important}
+  .hero-copy{font-size:15px!important;line-height:1.6!important;max-width:36rem!important}
+  .section-code{font-size:10px!important;letter-spacing:.12em!important}
+  .hero-signals{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}
+  .hero-signals span{min-width:0!important;font-size:10px!important;padding:9px 8px!important}
+  .scroll-cue{display:none!important}
+
+  .product-journey{padding:14px!important;margin-top:22px!important}
+  .journey-heading{display:block!important}
+  .journey-heading small{display:block!important;margin-top:8px!important}
+  .journey-steps{display:grid!important;grid-template-columns:1fr!important;gap:9px!important}
+  .journey-step{width:100%!important;min-width:0!important;padding:13px!important}
+  .journey-transfer{display:none!important}
+
+  .waitlist-form{padding:14px!important;margin-top:18px!important}
+  .waitlist-row{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}
+  .waitlist-row input,.waitlist-row button{width:100%!important;min-height:48px!important}
+
+  .mode-section{padding:48px 14px!important;min-height:auto!important;overflow:hidden}
+  .mode-inner,.mode-inner.reverse{display:flex!important;flex-direction:column!important;gap:24px!important}
+  .mode-inner.reverse .mode-preview{order:0!important}
+  .mode-inner.reverse .mode-copy{order:1!important}
+  .mode-preview,.mode-copy{width:100%!important;min-width:0!important;transform:none!important}
+  .mode-copy h2{font-size:clamp(32px,10vw,48px)!important;line-height:1!important}
+  .mode-copy ul{padding-left:20px!important}
+  .mode-actions{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}
+  .mode-button{width:100%!important;min-height:48px!important;text-align:center!important}
+  .availability{display:block!important;text-align:center!important}
+  .mode-number{font-size:26vw!important;opacity:.035!important;right:-2vw!important}
+
+  .pulse-rings{gap:5px!important;overflow-x:auto!important;padding-bottom:6px!important}
+  .loop-ring{flex:0 0 68px!important;width:68px!important;height:68px!important}
+  .wave-readouts{display:grid!important;grid-template-columns:1fr 1fr!important}
+  .lab-toolbar{overflow-x:auto!important;white-space:nowrap!important}
+  .lab-preview{overflow-x:auto!important}
+  .lab-grid{min-width:620px!important}
+  .lab-console{min-width:560px!important}
+
+  .companion-section{padding:48px 14px!important}
+  .companion-flow{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}
+  .companion-flow>i{transform:rotate(90deg)!important;justify-self:center!important}
+
+  .nw-hub{padding:44px 14px 36px!important}
+  .product-cards{grid-template-columns:1fr!important;gap:14px!important}
+  .product-card .cta{min-height:48px!important;display:flex!important;align-items:center!important;justify-content:center!important}
+  .nw-faq details{padding:0 12px!important}
+  .nw-faq summary{min-height:48px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important}
+  .nw-faq summary::after{float:none!important;flex:0 0 auto!important}
+  .site-footer{padding:28px 14px!important;text-align:center!important}
+  .site-footer nav{display:flex!important;flex-wrap:wrap!important;justify-content:center!important;gap:14px!important}
+}
+
+@media(max-width:390px){
+  #heroTitle{font-size:52px!important}
+  .hero-signals{grid-template-columns:1fr!important}
+  .preview-top,.preview-foot{font-size:8px!important}
+  .product-card h3{font-size:17px!important}
+}
