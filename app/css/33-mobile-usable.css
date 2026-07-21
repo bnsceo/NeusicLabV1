@@ -1,0 +1,36 @@
+/* Final mobile usability layer for NeusicLab Studio. */
+@media (max-width: 900px){
+  html,body{width:100%;max-width:100%;height:100%;overflow:hidden!important}
+  body[data-product="lab"]{padding:0!important}
+  #app{height:100dvh!important;max-height:100dvh!important;overflow:hidden!important}
+  #topbar{position:relative!important;z-index:70!important;min-height:54px!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none!important;padding-right:54px!important}
+  #topbar::-webkit-scrollbar{display:none}
+  #main{min-height:0!important;overflow:hidden!important}
+  #sidebar,#nw-inspector{display:none!important}
+  #center{width:100%!important;min-width:0!important;overflow:hidden!important}
+  #overview,#ruler{width:100%!important;min-width:0!important}
+  #tracks-area,#tracks-scroll{width:100%!important;min-width:0!important;overflow:auto!important;-webkit-overflow-scrolling:touch!important}
+  #tracks-inner{min-width:max(720px,180vw)!important}
+  #toolbar{overflow-x:auto!important;overflow-y:hidden!important;white-space:nowrap!important;scrollbar-width:none!important;padding-inline:6px!important}
+  #toolbar::-webkit-scrollbar{display:none}
+  #toolbar .tool-btn{flex:0 0 76px!important;min-height:48px!important}
+  #drawer{left:0!important;right:0!important;width:100%!important;max-width:100%!important;max-height:52dvh!important;overflow:hidden!important;z-index:75!important}
+  #drawer .dpanels,#drawer .dpanel{min-width:0!important;overflow:auto!important;-webkit-overflow-scrolling:touch!important}
+  #mobile-nav,.neusic-mobile-nav{z-index:90!important;padding-bottom:env(safe-area-inset-bottom)!important}
+  #nw-agent-dot{right:12px!important;bottom:calc(72px + env(safe-area-inset-bottom))!important;width:34px!important;height:34px!important;z-index:95!important}
+  #nw-agent-panel{left:8px!important;right:8px!important;bottom:calc(76px + env(safe-area-inset-bottom))!important;width:auto!important;height:min(62dvh,520px)!important;max-width:none!important;border-radius:12px!important;z-index:100!important}
+  #nw-agent-panel form[data-f]{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important}
+  #nw-agent-panel input[data-in]{min-width:0!important;min-height:44px!important;font-size:16px!important}
+}
+@media (max-width: 560px){
+  #topbar{min-height:50px!important;padding-right:50px!important}
+  #tracks-inner{min-width:max(640px,205vw)!important}
+  #drawer{max-height:48dvh!important}
+  #mobile-nav .mob-btn,.neusic-mobile-nav button{min-width:0!important;min-height:54px!important;font-size:9px!important}
+  #nw-agent-panel{bottom:calc(70px + env(safe-area-inset-bottom))!important;height:min(58dvh,470px)!important}
+}
+@media (orientation:landscape) and (max-height:560px){
+  #drawer{max-height:58dvh!important}
+  #nw-agent-dot{bottom:10px!important;right:10px!important}
+  #nw-agent-panel{left:auto!important;right:8px!important;bottom:8px!important;width:min(390px,48vw)!important;height:calc(100dvh - 16px)!important}
+}
