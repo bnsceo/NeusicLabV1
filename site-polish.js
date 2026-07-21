@@ -4,16 +4,29 @@
   const form=document.getElementById('waitlistForm');
   const emailInput=document.getElementById('waitlistEmail');
   const status=document.getElementById('waitlistStatus');
+  const menuButton=document.getElementById('menuButton');
+  const mobileMenu=document.getElementById('mobileMenu');
   const STORE='neusic-waitlist-v1';
   const GOOGLE_FORM_URL='https://docs.google.com/forms/d/e/1FAIpQLSeUFb-vNAOpIV4E4slFvlyS2v90GbkhoC8OSdtkR1mTzlHSKA/viewform?usp=pp_url';
   const GOOGLE_EMAIL_FIELD='entry.1214627679';
 
-  document.querySelector('.desktop-nav')?.remove();
-  document.getElementById('menuButton')?.remove();
-  document.getElementById('mobileMenu')?.remove();
-  header?.classList.add('menu-free');
+  header?.classList.remove('menu-free');
 
-  // Use the proven direct app routes instead of the broken suite wrapper links.
+  const closeMobileMenu=()=>{
+    mobileMenu?.classList.remove('open');
+    menuButton?.setAttribute('aria-expanded','false');
+    document.body.classList.remove('mobile-menu-open');
+  };
+  menuButton?.addEventListener('click',()=>{
+    const open=!mobileMenu?.classList.contains('open');
+    mobileMenu?.classList.toggle('open',open);
+    menuButton.setAttribute('aria-expanded',String(open));
+    document.body.classList.toggle('mobile-menu-open',open);
+  });
+  mobileMenu?.querySelectorAll('a').forEach(link=>link.addEventListener('click',closeMobileMenu));
+  addEventListener('resize',()=>{if(innerWidth>760)closeMobileMenu()},{passive:true});
+
+  // Keep legacy suite links usable while preserving direct routes on the landing page.
   const routeMap={live:'./live-loop/',wave:'./wave-loom/',studio:'./studio/'};
   document.querySelectorAll('a[href*="suite/?suite="]').forEach(link=>{
     try{
@@ -22,7 +35,6 @@
     }catch(_){}
   });
 
-  if(!document.querySelector('link[href*="62-mobile-hotfix.css"]')){const link=document.createElement('link');link.rel='stylesheet';link.href='./css/62-mobile-hotfix.css?v=1';document.head.appendChild(link)}
   if(!document.querySelector('link[href*="neusic-agent.css"]')){const link=document.createElement('link');link.rel='stylesheet';link.href='./neusic-agent.css?v=1';document.head.appendChild(link)}
   if(!document.querySelector('script[src*="neusic-agent.js"]')){const script=document.createElement('script');script.src='./neusic-agent.js?v=1';script.defer=true;document.body.appendChild(script)}
 

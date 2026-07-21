@@ -18,7 +18,8 @@
   <link rel="stylesheet" href="./site-polish.css?v=7">
   <link rel="stylesheet" href="./landing-experience.css?v=1">
   <link rel="stylesheet" href="./app/css/30-nw-tokens.css">
-  <link rel="stylesheet" href="./css/61-landing-reskin.css?v=1">
+  <link rel="stylesheet" href="./css/61-landing-reskin.css?v=2">
+  <link rel="stylesheet" href="./css/62-mobile-hotfix.css?v=2">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to Neusic</a>
@@ -44,9 +45,9 @@
     <a href="#live-loop"><span>01</span>Neusic Live Loop</a>
     <a href="#wave"><span>02</span>Neusic Wave</a>
     <a href="#lab"><span>03</span>Neusic Lab</a>
-    <a href="./suite/?suite=live"><span>↗</span>Open Live Loop</a>
-    <a href="./suite/?suite=wave"><span>↗</span>Open Wave</a>
-    <a href="./suite/?suite=studio"><span>↗</span>Open Lab</a>
+    <a href="./live-loop/"><span>↗</span>Open Live Loop</a>
+    <a href="./wave-loom/"><span>↗</span>Open Wave</a>
+    <a href="./studio/"><span>↗</span>Open Lab</a>
   </nav>
 
   <main id="main">
@@ -65,11 +66,11 @@
             <small>Recommended workflow shown below. Start in any product and transfer forward when useful.</small>
           </div>
           <div class="journey-steps">
-            <a class="journey-step" href="./suite/?suite=live" style="--step-accent:#e2a84b"><span>01</span><div><b>Neusic Live Loop</b><small>Capture voice, rhythm, harmony, and performance energy</small></div></a>
+            <a class="journey-step" href="./live-loop/" style="--step-accent:#e2a84b"><span>01</span><div><b>Neusic Live Loop</b><small>Capture voice, rhythm, harmony, and performance energy</small></div></a>
             <i class="journey-transfer"><span>Transfer</span>→</i>
-            <a class="journey-step" href="./suite/?suite=wave" style="--step-accent:#32e7ff"><span>02</span><div><b>Neusic Wave</b><small>Refine, slice, sculpt, resample, and transform the sound</small></div></a>
+            <a class="journey-step" href="./wave-loom/" style="--step-accent:#32e7ff"><span>02</span><div><b>Neusic Wave</b><small>Refine, slice, sculpt, resample, and transform the sound</small></div></a>
             <i class="journey-transfer"><span>Transfer</span>→</i>
-            <a class="journey-step" href="./suite/?suite=studio" style="--step-accent:#aeb8bf"><span>03</span><div><b>Neusic Lab</b><small>Arrange, record, mix, master, and deliver the finished project</small></div></a>
+            <a class="journey-step" href="./studio/" style="--step-accent:#aeb8bf"><span>03</span><div><b>Neusic Lab</b><small>Arrange, record, mix, master, and deliver the finished project</small></div></a>
           </div>
         </section>
 
@@ -117,7 +118,7 @@
             <li>Transfer any recorded voice or loop directly into Neusic Wave.</li>
           </ul>
           <p class="handoff-note"><i></i>Recommended next: send the strongest loop into Wave for refinement.</p>
-          <div class="mode-actions"><a class="mode-button" href="./suite/?suite=live">Open Neusic Live Loop <span>↗</span></a><span class="availability">Or start in Wave or Lab</span></div>
+          <div class="mode-actions"><a class="mode-button" href="./live-loop/">Open Neusic Live Loop <span>↗</span></a><span class="availability">Or start in Wave or Lab</span></div>
         </div>
       </div>
     </section>
@@ -148,7 +149,7 @@
             <li>Transfer a rendered mix or selected sample directly into Neusic Lab.</li>
           </ul>
           <p class="handoff-note"><i></i>Recommended next: send the refined sound into Lab for arrangement and finishing.</p>
-          <div class="mode-actions"><a class="mode-button" href="./suite/?suite=wave">Open Neusic Wave <span>↗</span></a><span class="availability">Or begin here with any sample</span></div>
+          <div class="mode-actions"><a class="mode-button" href="./wave-loom/">Open Neusic Wave <span>↗</span></a><span class="availability">Or begin here with any sample</span></div>
         </div>
       </div>
     </section>
@@ -184,7 +185,7 @@
             <li>Preserve project recovery, MIDI, sampling, effects, automation, and WAV export.</li>
           </ul>
           <p class="handoff-note"><i></i>Lab is the destination for the finished project, but it can also be your starting point.</p>
-          <div class="mode-actions"><a class="mode-button" href="./suite/?suite=studio">Open Neusic Lab <span>↗</span></a><span class="availability">Start here for traditional production</span></div>
+          <div class="mode-actions"><a class="mode-button" href="./studio/">Open Neusic Lab <span>↗</span></a><span class="availability">Start here for traditional production</span></div>
         </div>
       </div>
     </section>
@@ -212,7 +213,7 @@
               <li>Real-time synth triggering &amp; drum machine</li>
               <li>Pedalboard FX: delay, reverb, reverse, half-speed</li>
             </ul>
-            <a class="cta" href="./suite/?suite=live">Launch LiveStudio</a>
+            <a class="cta" href="./live-loop/">Launch LiveStudio</a>
           </article>
           <article class="product-card" data-product="wave">
             <div class="card-cap"><span>WAVEFORM</span></div>
@@ -223,7 +224,7 @@
               <li>Synth design with presets &amp; randomization</li>
               <li>Real-time effects: reverb, delay, comp, EQ</li>
             </ul>
-            <a class="cta" href="./suite/?suite=wave">Launch Waveform</a>
+            <a class="cta" href="./wave-loom/">Launch Waveform</a>
           </article>
           <article class="product-card" data-product="lab">
             <div class="card-cap"><span>NEUSICLAB</span></div>
@@ -234,7 +235,7 @@
               <li>5 drum kits, sampler, console mixing</li>
               <li>Automation, recovery &amp; WAV export</li>
             </ul>
-            <a class="cta" href="./suite/?suite=studio">Launch NeusicLab</a>
+            <a class="cta" href="./studio/">Launch NeusicLab</a>
           </article>
         </div>
 
@@ -255,7 +256,7 @@
 
   <footer class="site-footer">
     <div><b>NEUSIC</b><span>Three products. One connected creative project.</span></div>
-    <nav aria-label="Footer navigation"><a href="./suite/?suite=live">Live Loop</a><a href="./suite/?suite=wave">Wave</a><a href="./suite/?suite=studio">Lab</a></nav>
+    <nav aria-label="Footer navigation"><a href="./live-loop/">Live Loop</a><a href="./wave-loom/">Wave</a><a href="./studio/">Lab</a></nav>
   </footer>
 
   <script src="./site-polish.js?v=7"></script>
