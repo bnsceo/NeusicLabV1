@@ -54,12 +54,7 @@ bool AudioEngine::startRecording()
 
     juce::WavAudioFormat wav;
     auto writer = std::unique_ptr<juce::AudioFormatWriter>(
-        wav.createWriterFor(output.release(),
-                            sampleRate.load(),
-                            2,
-                            24,
-                            {},
-                            0));
+        wav.createWriterFor(output.release(), sampleRate.load(), 2, 24, {}, 0));
 
     if (writer == nullptr)
         return false;
@@ -109,8 +104,10 @@ int AudioEngine::getCurrentBufferSize() const noexcept
 
 void AudioEngine::audioDeviceAboutToStart(juce::AudioIODevice* device)
 {
+    const auto newBufferSize = device != nullptr ? device->getCurrentBufferSizeSamples() : 0;
     sampleRate.store(device != nullptr ? device->getCurrentSampleRate() : 0.0);
-    bufferSize.store(device != nullptr ? device->getCurrentBufferSizeSamples() : 0);
+    bufferSize.store(newBufferSize);
+    recordingBuffer.setSize(2, juce::jmax(2048, newBufferSize), false, true, true);
 }
 
 void AudioEngine::audioDeviceStopped()
@@ -142,5 +139,15 @@ void AudioEngine::audioDeviceIOCallbackWithContext(
     }
 
     if (auto* writer = activeWriter.load())
-        writer->write(inputChannelData, numSamples);
+    {
+        recordingBuffer.clear();
+        for (int channel = 0; channel < 2; ++channel)
+        {
+            const int sourceChannel = numInputChannels > 1 ? channel : 0;
+            if (numInputChannels > 0 && inputChannelData[sourceChannel] != nullptr)
+                recordingBuffer.copyFrom(channel, 0, inputChannelData[sourceChannel], numSamples);
+        }
+
+        writer->write(recordingBuffer.getArrayOfReadPointers(), numSamples);
+    }
 }
