@@ -38,6 +38,7 @@ private:
     std::unique_ptr<juce::AudioFormatWriter::ThreadedWriter> threadedWriter;
     std::atomic<juce::AudioFormatWriter::ThreadedWriter*> activeWriter { nullptr };
     juce::CriticalSection writerLock;
+    juce::AudioBuffer<float> recordingBuffer { 2, 2048 };
 
     juce::File lastRecording;
     std::atomic<bool> monitoringEnabled { true };
