@@ -76,8 +76,25 @@ a{color:inherit}
 .hub-footer a{color:var(--nw-silver)}
 .hub-legacy{opacity:.75}
 
+/* ── Touch ergonomics: 44px+ tap targets ── */
+.product-card .cta{min-height:46px;display:flex;align-items:center;justify-content:center}
+.faq summary{min-height:44px;display:flex;align-items:center}
+.hub-footer a{display:inline-block;padding:6px 2px}
+
 /* ── Mobile: cards stack to a single column ── */
 @media(max-width:820px){
   .product-cards{grid-template-columns:1fr}
   .hub-hero{padding-top:40px}
+}
+
+/* ── Small phones: readable type, safe areas, full-width CTAs ── */
+@media(max-width:480px){
+  body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+  .hub-hero{padding:32px 14px 28px}
+  .hub-sub{font-size:12px}
+  .nw-tri-rule{margin-bottom:26px}
+  .product-card h2{font-size:15px}
+  .product-card>p,.product-card li{font-size:11px}
+  .faq summary,.faq details p,.why-browser p,.hub-footer p{font-size:11px}
+  .product-card .cta{min-height:50px}
 }

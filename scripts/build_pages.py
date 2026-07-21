@@ -139,6 +139,61 @@ def build_wave_card(path: Path) -> None:
     _write_png(path, pixels)
 
 
+def build_hub_card(path: Path) -> None:
+    copper, silver, gold = (201, 125, 90), (176, 179, 178), (212, 165, 116)
+    pixels = _base_card(gold, copper)
+    _rect(pixels, 72, 150, 640, 250, (235, 240, 242), 0.96)
+    _rect(pixels, 72, 282, 860, 304, (124, 137, 145), 0.9)
+    # tri-accent rule: copper → silver → gold
+    third = (WIDTH - 144) // 3
+    for index, color in enumerate((copper, silver, gold)):
+        _rect(pixels, 72 + index * third, 336, 72 + (index + 1) * third, 348, color, 0.95)
+    for index, color in enumerate((gold, silver, copper)):
+        x = 72 + index * 360
+        _rect(pixels, x, 410, x + 310, 560, (18, 24, 28), 0.96)
+        _frame(pixels, x, 410, x + 310, 560, color, 3)
+        _rect(pixels, x, 410, x + 310, 444, color, 0.92)
+        _rect(pixels, x + 24, 470, x + 270, 488, (232, 237, 239), 0.9)
+        _rect(pixels, x + 24, 504, x + 240, 516, (110, 123, 131), 0.9)
+    _write_png(path, pixels)
+
+
+def build_waveform_card(path: Path) -> None:
+    silver, bright = (176, 179, 178), (214, 218, 217)
+    pixels = _base_card(silver, bright)
+    _rect(pixels, 72, 150, 600, 230, (238, 242, 244), 0.96)
+    _rect(pixels, 72, 270, 940, 292, silver, 0.95)
+    mid = 455
+    previous_y = mid
+    for x in range(80, 1120, 4):
+        phase = (x - 80) / 1040
+        y = round(mid + 70 * __import__("math").sin(phase * 30) * __import__("math").sin(phase * 3.14))
+        y1, y2 = sorted((previous_y, y))
+        _rect(pixels, x, y1, x + 4, y2 + 4, bright, 0.95)
+        previous_y = y
+    for index in range(6):
+        x = 140 + index * 180
+        _circle_ring(pixels, x, mid, 13, silver, 5)
+    _write_png(path, pixels)
+
+
+def build_livestudio_card(path: Path) -> None:
+    copper, deep = (201, 125, 90), (166, 91, 45)
+    pixels = _base_card(copper, deep)
+    _rect(pixels, 72, 150, 620, 230, (238, 242, 244), 0.96)
+    _rect(pixels, 72, 270, 900, 292, copper, 0.95)
+    for row in range(2):
+        for col in range(8):
+            x = 72 + col * 132
+            y = 360 + row * 110
+            filled = (row * 8 + col) % 3 == 0
+            _rect(pixels, x, y, x + 112, y + 92, (18, 25, 29), 0.96)
+            _frame(pixels, x, y, x + 112, y + 92, copper if filled else (62, 72, 78), 3)
+            if filled:
+                _rect(pixels, x + 28, y + 26, x + 84, y + 66, deep, 0.9)
+    _write_png(path, pixels)
+
+
 def build_lab_card(path: Path) -> None:
     graphite, gold = (174, 184, 191), (212, 163, 84)
     pixels = _base_card(graphite, gold)
@@ -221,14 +276,29 @@ def build(site: Path) -> None:
     build_live_card(social / "live-loop-card-v3.png")
     build_wave_card(social / "wave-card-v3.png")
     build_lab_card(social / "lab-card-v3.png")
+    build_hub_card(social / "neusicwave-hub-card-v1.png")
+    build_waveform_card(social / "waveform-card-v1.png")
+    build_livestudio_card(social / "livestudio-card-v1.png")
 
     base = "https://bnsceo.github.io/NeusicLabV1"
     previews = {
         site / "index.html": (
-            "Neusic — Live Loop, Wave & Lab",
-            "Three connected music apps: capture synchronized loops, transform sound, and finish the record in one creative workflow.",
+            "NeusicWave — Beats, Loops, and Full Tracks in Your Browser",
+            "Complete production suite in the browser. No installation. No login. Arrange, record, mix, design sounds, and perform live — pick your tool.",
             f"{base}/",
-            f"{base}/social/neusic-suite-card-v3.png",
+            f"{base}/social/neusicwave-hub-card-v1.png",
+        ),
+        site / "waveform/index.html": (
+            "Waveform — NeusicWave Sound Design Studio",
+            "Edit samples, design synths, layer effects — all in real time, in your browser.",
+            f"{base}/waveform/",
+            f"{base}/social/waveform-card-v1.png",
+        ),
+        site / "livestudio/index.html": (
+            "LiveStudio — NeusicWave Loop Station",
+            "Record loops on the fly, layer synths, trigger drums, and perform live — all with one take.",
+            f"{base}/livestudio/",
+            f"{base}/social/livestudio-card-v1.png",
         ),
         site / "live-loop/index.html": (
             "Neusic Live Loop — Five-Lane Performance Instrument",
@@ -250,17 +320,16 @@ def build(site: Path) -> None:
         ),
     }
     for page, (title, description, url, image) in previews.items():
-        set_preview(page, title=title, description=description, url=url, image=image)
+        if page.exists():
+            set_preview(page, title=title, description=description, url=url, image=image)
 
+    # Legacy-landing cleanup; no-ops on the self-contained NeusicWave hub,
+    # which must NOT get the old landing's site-polish assets injected.
     landing = site / "index.html"
     html = landing.read_text()
     html = re.sub(r'\s*<nav\b[^>]*class=["\']desktop-nav["\'][^>]*>.*?</nav>', "", html, flags=re.I | re.S)
     html = re.sub(r'\s*<button\b[^>]*id=["\']menuButton["\'][^>]*>.*?</button>', "", html, flags=re.I | re.S)
     html = re.sub(r'\s*<nav\b[^>]*id=["\']mobileMenu["\'][^>]*>.*?</nav>', "", html, flags=re.I | re.S)
-    if "site-polish.css" not in html:
-        html = html.replace("</head>", '<link rel="stylesheet" href="./site-polish.css?v=10"></head>', 1)
-    if "site-polish.js" not in html:
-        html = html.replace("</body>", '<script src="./site-polish.js?v=10"></script></body>', 1)
     landing.write_text(html)
 
     for page in site.rglob("*.html"):

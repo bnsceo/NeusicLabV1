@@ -50,12 +50,18 @@ test('LiveStudio: hero, entry handoff, 16-slot loop grid, and live agent default
   expect(prefs.performanceMode).toBe('live');
 });
 
-test('mobile product pages collapse panels into slide-overs',async({page})=>{
+test('mobile product pages collapse panels into slide-overs without overflow',async({page})=>{
   await page.setViewportSize({width:390,height:844});
   for(const [url,left] of [['/waveform/','#wf-left'],['/livestudio/','#ls-left']]){
     await page.goto(url,{waitUntil:'domcontentloaded'});
+    await page.evaluate(()=>localStorage.clear());
+    await page.reload({waitUntil:'domcontentloaded'});
+    const cta=await page.locator('#nw-enter').boundingBox();
+    expect(cta.height,`${url} hero CTA is below the 44px touch target`).toBeGreaterThanOrEqual(44);
     await page.click('#nw-enter');
     const box=await page.locator(left).boundingBox();
     if(box)expect(box.x+box.width).toBeLessThanOrEqual(1);
+    const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
+    expect(overflow,`${url} overflows horizontally on a phone`).toBeLessThanOrEqual(1);
   }
 });
