@@ -6,6 +6,9 @@ on:
       - sandbox/landing-mobile-responsiveness
     paths:
       - .github/workflows/sandbox-mobile-browser-test.yml
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read
