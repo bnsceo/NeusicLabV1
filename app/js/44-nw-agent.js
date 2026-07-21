@@ -240,6 +240,30 @@ function openSettings() {
   });
 }
 
+/* ── low-profile trigger dot — agent stays hidden until clicked ── */
+function installTrigger() {
+  if (document.getElementById('nw-agent-dot')) return;
+  const dot = document.createElement('button');
+  dot.id = 'nw-agent-dot';
+  dot.setAttribute('aria-label', 'Open Neusic Agent');
+  dot.title = 'Neusic Agent';
+  dot.style.cssText = [
+    'position:fixed', 'right:14px', 'bottom:14px', 'width:26px', 'height:26px',
+    'border-radius:50%', 'z-index:100', 'cursor:pointer', 'border:1px solid rgba(0,0,0,.6)',
+    'background:radial-gradient(circle at 35% 30%, color-mix(in srgb,var(--nw-accent,#d4a574) 85%,#fff) 0%, var(--nw-accent,#d4a574) 45%, var(--nw-accent-deep,#b58b32) 100%)',
+    'box-shadow:0 0 10px color-mix(in srgb,var(--nw-accent,#d4a574) 55%,transparent),inset 0 1px rgba(255,255,255,.4)',
+    'opacity:.85', 'transition:opacity .16s ease, transform .16s ease', 'padding:0'
+  ].join(';');
+  dot.onmouseenter = () => { dot.style.opacity = '1'; dot.style.transform = 'scale(1.12)'; };
+  dot.onmouseleave = () => { dot.style.opacity = '.85'; dot.style.transform = 'none'; };
+  dot.onclick = () => openPanel();
+  document.body.appendChild(dot);
+  // subtle status pulse on the dot when backend is reachable
+  refreshStatus().then(st => { if (st && st.backend) dot.style.boxShadow += ',0 0 0 2px rgba(7,222,137,.25)'; });
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', installTrigger);
+else installTrigger();
+
 window.NeusicAgent = { identity, prefs: () => prefs, chat, openPanel, openSettings, refreshStatus };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(refreshStatus, 600));
 else setTimeout(refreshStatus, 600);

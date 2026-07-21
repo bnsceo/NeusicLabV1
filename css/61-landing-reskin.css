@@ -1,0 +1,108 @@
+/* 61-landing-reskin.css — Hard-lock the legacy hero to the NeusicWave hardware palette.
+   Loads AFTER site-polish.css + landing-experience.css to override their accents.
+   Copper #c97d5a · Silver #b0b3b2 · Gold #d4a574 */
+
+:root{
+  --nw-copper:#c97d5a; --nw-copper-deep:#a65b2d;
+  --nw-silver:#b0b3b2; --nw-silver-bright:#d6dad9;
+  --nw-gold:#d4a574; --nw-gold-deep:#b58b32;
+  --nw-black:#181817; --nw-charcoal:#252423; --nw-panel:#303432;
+  --nw-steel:#5e6b6a; --nw-light-steel:#7d8685;
+  --nw-font:"Arial Narrow","Roboto Condensed","Inter Tight",system-ui,sans-serif;
+}
+
+/* ── Repaint the legacy background + accents to hardware charcoal ── */
+body{background:var(--nw-black)!important}
+.hero-orbit.orbit-one{background:radial-gradient(circle,color-mix(in srgb,var(--nw-copper) 30%,transparent) 0%,transparent 68%)!important;opacity:.5!important}
+.hero-orbit.orbit-two{background:radial-gradient(circle,color-mix(in srgb,var(--nw-gold) 26%,transparent) 0%,transparent 68%)!important;opacity:.42!important}
+
+/* Any legacy teal/blue/green accent → map to product palette */
+.section-code,.product-journey [class*="code"]{color:var(--nw-light-steel)!important;letter-spacing:.16em}
+a[href*="live-loop"],.journey-live{--seg:var(--nw-copper)}
+a[href*="wave-loom"],.journey-wave{--seg:var(--nw-silver)}
+a[href*="studio"],.journey-lab{--seg:var(--nw-gold)}
+
+/* ── The WAVE subtitle under NEUSIC ── */
+#heroTitle{position:relative;color:#e8eae9!important}
+.nw-wave-sub{display:block;font:700 clamp(16px,3.4vw,26px)/1 var(--nw-font);letter-spacing:.42em;
+  text-transform:uppercase;margin-top:6px;
+  background:linear-gradient(90deg,var(--nw-copper),var(--nw-silver),var(--nw-gold));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+
+/* ── Buttons / CTAs across the legacy hero ── */
+.hero a[class*="open"],.product-journey a,.waitlist button,button[type="submit"]{
+  border-color:color-mix(in srgb,var(--nw-copper) 55%,#1c1e1d)!important}
+
+/* ── Waitlist → "Join the Wave" Pro pipeline capture (glassmorphic) ── */
+.waitlist,[class*="waitlist"]{backdrop-filter:blur(10px)!important;
+  background:rgba(255,255,255,.04)!important;border:1px solid rgba(255,255,255,.12)!important;
+  border-radius:4px!important;box-shadow:inset 0 1px rgba(255,255,255,.08),0 8px 24px rgba(0,0,0,.4)!important}
+.waitlist input,[class*="waitlist"] input{background:rgba(10,12,11,.6)!important;
+  border:1px solid rgba(255,255,255,.14)!important;color:#d7dad9!important;border-radius:3px!important}
+.waitlist button,[class*="waitlist"] button{
+  background:linear-gradient(90deg,var(--nw-copper),var(--nw-gold))!important;
+  color:#141210!important;font-weight:700!important;letter-spacing:.1em!important;
+  text-transform:uppercase!important;border:0!important;border-radius:3px!important;
+  box-shadow:0 0 14px color-mix(in srgb,var(--nw-copper) 40%,transparent)!important}
+
+/* ══════════════════════════════════════════════════════
+   GRAFTED HUB SECTION (product cards + FAQ) — below companion
+   ══════════════════════════════════════════════════════ */
+.nw-hub{background:var(--nw-black);border-top:1px solid rgba(0,0,0,.7);padding:56px 20px 46px}
+.nw-hub .wrap{max-width:1040px;margin:0 auto}
+.nw-hub .nw-tri-rule{height:3px;width:min(320px,70%);margin:0 auto 34px;border-radius:2px;
+  background:linear-gradient(90deg,var(--nw-copper) 0 33%,var(--nw-silver) 33% 66%,var(--nw-gold) 66% 100%);
+  box-shadow:0 0 14px rgba(0,0,0,.5)}
+.nw-hub h2.nw-hub-title{text-align:center;font:700 clamp(20px,4vw,30px)/1.1 var(--nw-font);
+  letter-spacing:.05em;color:#e8eae9;margin:0 0 6px}
+.nw-hub .nw-hub-sub{text-align:center;font:600 13px/1.5 var(--nw-font);color:var(--nw-light-steel);
+  max-width:560px;margin:0 auto 30px}
+
+.product-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.product-card{position:relative;display:flex;flex-direction:column;
+  background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(0,0,0,.12)),var(--nw-charcoal);
+  border:1px solid rgba(0,0,0,.6);border-radius:4px;overflow:hidden;
+  box-shadow:inset 0 1px rgba(255,255,255,.05),0 6px 18px rgba(0,0,0,.35);
+  transition:transform .16s ease,box-shadow .16s ease}
+.product-card:hover{transform:translateY(-3px);
+  box-shadow:inset 0 1px rgba(255,255,255,.07),0 12px 28px rgba(0,0,0,.5)}
+.product-card .card-cap{padding:6px 12px;font:700 9px/1 var(--nw-font);letter-spacing:.16em;
+  text-transform:uppercase;color:#141210}
+.product-card[data-product="lab"] .card-cap{background:var(--nw-gold)}
+.product-card[data-product="wave"] .card-cap{background:var(--nw-silver)}
+.product-card[data-product="live"] .card-cap{background:var(--nw-copper)}
+.product-card h3{margin:12px 14px 4px;font:700 18px/1 var(--nw-font);letter-spacing:.04em;color:#eceeed}
+.product-card >p{margin:0 14px 10px;font:600 12px/1.5 var(--nw-font);color:#b3b8b6}
+.product-card ul{list-style:none;margin:0 14px 14px;padding:0}
+.product-card li{font:600 11px/1.5 var(--nw-font);color:#9aa09d;padding:3px 0 3px 14px;position:relative}
+.product-card li::before{content:"■";position:absolute;left:0;top:5px;font-size:6px}
+.product-card[data-product="lab"] li::before{color:var(--nw-gold)}
+.product-card[data-product="wave"] li::before{color:var(--nw-silver)}
+.product-card[data-product="live"] li::before{color:var(--nw-copper)}
+.product-card .cta{margin:auto 14px 16px;text-align:center;text-decoration:none;
+  font:700 11px/1 var(--nw-font);letter-spacing:.12em;text-transform:uppercase;
+  padding:12px;border-radius:3px;color:#141210;
+  box-shadow:inset 0 1px rgba(255,255,255,.3)}
+.product-card[data-product="lab"] .cta{background:var(--nw-gold)}
+.product-card[data-product="wave"] .cta{background:var(--nw-silver)}
+.product-card[data-product="live"] .cta{background:var(--nw-copper)}
+.product-card .cta:hover{filter:brightness(1.08)}
+
+/* FAQ */
+.nw-faq{max-width:680px;margin:40px auto 0}
+.nw-faq h2{text-align:center;font:700 clamp(18px,3.4vw,24px)/1 var(--nw-font);letter-spacing:.06em;
+  color:#e8eae9;margin:0 0 18px}
+.nw-faq details{background:var(--nw-charcoal);border:1px solid rgba(0,0,0,.55);border-radius:3px;
+  margin:8px 0;padding:0 14px;box-shadow:inset 0 1px rgba(255,255,255,.04)}
+.nw-faq summary{cursor:pointer;padding:13px 0;font:700 12px/1.3 var(--nw-font);letter-spacing:.04em;
+  color:#cfd2d1;list-style:none}
+.nw-faq summary::-webkit-details-marker{display:none}
+.nw-faq summary::after{content:"+";float:right;color:var(--nw-copper);font-weight:700}
+.nw-faq details[open] summary::after{content:"−"}
+.nw-faq details p{margin:0 0 13px;font:600 12px/1.6 var(--nw-font);color:#a9aeac}
+
+.nw-hub-footer{text-align:center;margin:36px auto 0;padding-top:20px;
+  border-top:1px solid rgba(0,0,0,.6);font:600 11px/1.6 var(--nw-font);color:var(--nw-steel)}
+.nw-hub-footer a{color:var(--nw-copper);text-decoration:none}
+
+@media(max-width:760px){.product-cards{grid-template-columns:1fr}}

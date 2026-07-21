@@ -44,31 +44,7 @@
 <link rel="stylesheet" href="css/31-nw-shell.css">
 <link rel="stylesheet" href="css/32-nw-menubar.css">
 </head>
-<body data-product="lab">
-<section id="nw-landing" class="nw-noise">
-  <div class="wrap">
-    <div class="nw-micro" style="margin-bottom:14px">NEUSICWAVE / PRODUCTION</div>
-    <h1>Arrange, record, mix, master.<br>All in your browser.</h1>
-    <p class="sub">NeusicLab is the finishing studio of the NeusicWave suite. No installation, no login — the demo is the full studio.</p>
-    <ul>
-      <li>Multi-track arrangement with waveform clips and full editing</li>
-      <li>5 drum kits, sampler, effects rack, and real-time mixing</li>
-      <li>File operations: Open, Export WAV — Save unlocks with Pro</li>
-    </ul>
-    <button class="cta" id="nw-enter"><i></i>Open NeusicLab</button>
-    <div class="more">
-      <h3>The studio</h3>
-      <p>Record tracks, arrange clips on the timeline, design sounds with the sampler, apply effects, and mix with live level meters. Export your finished project as a WAV file — straight from the browser.</p>
-      <div class="shot">SCREENSHOT — TIMELINE &amp; TRANSPORT</div>
-      <h3>File operations &amp; control</h3>
-      <p>Work like a desktop app. Open projects, export mixes, and tune the Neusic Agent from the File menu — verbosity, approvals, and what it may listen to are all yours to set.</p>
-      <div class="shot">SCREENSHOT — FILE MENU &amp; AGENT SETTINGS</div>
-      <h3>Neusic Agent</h3>
-      <p>Connect your API key to unlock AI mixing advice, auto-arrangement, and sound matching. A local model via Ollama keeps advice working offline — the agent stays quiet while you create and never edits without asking.</p>
-      <div class="shot">SCREENSHOT — AGENT PANEL</div>
-    </div>
-  </div>
-</section>
+<body data-product="lab" class="nw-fullbleed">
 <div id="app">
 
 <!-- TOP BAR -->
@@ -290,14 +266,5 @@
 <script src="js/43-nw-menubar.js"></script>
 <script src="js/44-nw-agent.js"></script>
 <script src="js/45-nw-demo-gate.js"></script>
-<script>
-/* landing → app handoff */
-(function(){
-  var b=document.getElementById('nw-enter');
-  var go=function(){document.body.classList.add('nw-in-app');try{localStorage.setItem('nw-entered','1')}catch(e){}window.scrollTo(0,0)};
-  if(b)b.addEventListener('click',go);
-  try{if(localStorage.getItem('nw-entered')==='1')document.body.classList.add('nw-in-app')}catch(e){}
-})();
-</script>
 </body>
 </html>
