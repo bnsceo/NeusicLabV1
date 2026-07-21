@@ -15,6 +15,11 @@ build/
 venv/
 node_modules/
 
+# Test artifacts
+test-results/
+playwright-report/
+package-lock.json
+
 # Logs and temp files
 *.log
 *.tmp

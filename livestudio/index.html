@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>LiveStudio — NeusicWave Loop Station</title>
+<meta name="description" content="Record loops on the fly, layer synths, trigger drums, and perform live — all with one take.">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../app/css/30-nw-tokens.css">
+<link rel="stylesheet" href="../app/css/32-nw-menubar.css">
+<link rel="stylesheet" href="css/52-livestudio-hero.css">
+<link rel="stylesheet" href="css/53-livestudio-shell.css">
+</head>
+<body data-product="live">
+<section id="nw-landing" class="nw-noise">
+  <div class="wrap">
+    <div class="nw-micro" style="margin-bottom:14px">NEUSICWAVE / LIVE PERFORMANCE</div>
+    <h1>Loop, layer, perform.<br>LiveStudio is real-time beat making.</h1>
+    <p class="sub">Record loops on the fly, layer synths, trigger drums, and perform live — all with one take.</p>
+    <ul>
+      <li>16-track loop station with footswitch control and MIDI learn</li>
+      <li>Real-time synth triggering and drum machine sequencer</li>
+      <li>One-shot recording: press record, play, release — loop set</li>
+    </ul>
+    <button class="cta" id="nw-enter"><i></i>Open LiveStudio</button>
+    <div class="more">
+      <h3>Loop recording &amp; layer management</h3>
+      <p>Every loop snaps to the master length, quantized so layers lock together on the first pass. Set volume per loop, mute and solo rows mid-performance, and keep the groove running while you build.</p>
+      <div class="shot">SCREENSHOT — LOOP GRID &amp; TRANSPORT</div>
+      <h3>Synth triggering &amp; drum machine</h3>
+      <p>Play synth voices from your keyboard or MIDI controller, finger-drum the pads, and let the arpeggiator carry a line while you record the next layer on top.</p>
+      <div class="shot">SCREENSHOT — PADS &amp; SYNTH PANEL</div>
+      <h3>Live control &amp; MIDI mapping</h3>
+      <p>Map any control to a footswitch or CC with MIDI learn, keep tempo synced to the master clock, and overdub onto a playing loop without ever touching the screen.</p>
+      <div class="shot">SCREENSHOT — CONTROL PANEL</div>
+    </div>
+  </div>
+</section>
+<div id="app">
+
+<!-- TRANSPORT STRIP -->
+<div id="ls-topbar">
+  <button class="tb-btn" id="ls-play" onclick="togglePlay()" title="Play/Stop (Space)">▶</button>
+  <button class="tb-btn" id="ls-rec" onclick="toggleRecord()" title="Record arm (R)">⏺</button>
+  <div class="chip" onclick="cycleLoopLen()" title="Loop length (bars)">
+    <div class="chip-main" id="ls-len">4</div>
+    <div class="chip-sub">BARS</div>
+  </div>
+  <div class="chip" onclick="bpmTap(event)" title="Click ± to adjust BPM">
+    <div class="chip-main" id="ls-bpm">120</div>
+    <div class="chip-sub">BPM</div>
+  </div>
+  <div class="tb-spacer"></div>
+  <button class="tb-btn" onclick="LSShell.togglePanel('left')" title="Toggle loop tracks">☰</button>
+  <button class="tb-btn" onclick="LSShell.togglePanel('right')" title="Toggle inspector">⚙</button>
+</div>
+
+<!-- MAIN -->
+<div id="ls-main">
+
+  <!-- LEFT: 16 loop tracks -->
+  <aside id="ls-left">
+    <div class="nw-sect">
+      <div class="nw-label">Loop Tracks</div>
+      <div id="ls-tracks"></div>
+    </div>
+  </aside>
+
+  <!-- CENTER: loop grid + current loop + trigger pads -->
+  <div id="ls-center">
+    <div class="nw-well ls-wave-well"><canvas id="ls-canvas"></canvas></div>
+    <div id="ls-grid"></div>
+    <div id="ls-pads">
+      <div class="nw-label" style="margin-bottom:6px">Synth Trigger</div>
+      <div class="ls-pad-row" id="ls-pad-row"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: inspector -->
+  <aside id="ls-inspector">
+    <div class="nw-sect">
+      <div class="nw-label">Inspector</div>
+      <div id="ls-inspector-body"><div class="nw-micro" style="margin-top:6px">Select a loop slot</div></div>
+    </div>
+    <div class="nw-sect">
+      <div class="nw-label">Neusic Agent</div>
+      <div class="nw-lamp busy" id="nw-agent-lamp"><i></i><span>Checking…</span></div>
+      <button class="nw-btn" style="margin-top:8px" onclick="window.NeusicAgent&&NeusicAgent.openPanel()">Open Assistant</button>
+    </div>
+  </aside>
+
+</div><!-- /ls-main -->
+</div><!-- /app -->
+
+<div id="toast"></div>
+<script src="js/52-livestudio-shell.js"></script>
+<script src="../app/js/44-nw-agent.js"></script>
+<script src="../app/js/45-nw-demo-gate.js"></script>
+<script>
+/* landing → app handoff */
+(function(){
+  var b=document.getElementById('nw-enter');
+  var go=function(){document.body.classList.add('nw-in-app');try{localStorage.setItem('nw-entered-live','1')}catch(e){}window.scrollTo(0,0)};
+  if(b)b.addEventListener('click',go);
+  try{if(localStorage.getItem('nw-entered-live')==='1')document.body.classList.add('nw-in-app')}catch(e){}
+})();
+</script>
+</body>
+</html>

@@ -29,7 +29,17 @@ jobs:
         run: |
           rm -rf _site
           mkdir -p _site/studio _site/wave-loom _site/live-loop _site/social
+          mkdir -p _site/waveform _site/livestudio _site/css _site/app/css _site/app/js
           cp index.html _site/index.html
+          cp css/60-hub-landing.css _site/css/60-hub-landing.css
+          cp -R waveform/. _site/waveform/
+          cp -R livestudio/. _site/livestudio/
+          # shared NW modules referenced as ../app/… by waveform/ and livestudio/
+          # (app/ itself deploys as /studio/, so these need their own copies)
+          cp app/css/30-nw-tokens.css _site/app/css/30-nw-tokens.css
+          cp app/css/32-nw-menubar.css _site/app/css/32-nw-menubar.css
+          cp app/js/44-nw-agent.js _site/app/js/44-nw-agent.js
+          cp app/js/45-nw-demo-gate.js _site/app/js/45-nw-demo-gate.js
           cp site-polish.css _site/site-polish.css
           cp site-polish.js _site/site-polish.js
           cp landing-experience.css _site/landing-experience.css

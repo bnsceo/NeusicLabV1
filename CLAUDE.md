@@ -79,7 +79,13 @@ The suite is being rebranded/expanded as **NeusicWave** — see `docs/NEUSICWAVE
 - Emerald `#07de89` is reserved for meters/signal — never use it as a product accent.
 - Industrial hardware aesthetic: recessed/raised inset borders, uppercase condensed labels, reusable classes `.nw-surface`, `.nw-well`, `.nw-label`, `.nw-micro`, `.nw-btn`.
 
-**Remaining Phase 2B pages** (planned, do not exist yet): `/waveform/` (sound design, silver accent), `/livestudio/` (loop station, copper accent), and a hub landing page with a tri-accent rule (copper → silver → gold) and three product cards. Each new app page reuses the NW shell/menubar/demo-gate/agent modules with minimal adaptation, and per the spec adds its own numbered CSS/JS files (50+ range). Remember: new top-level directories must also be added to the Pages deploy workflow's copy list before they will deploy.
+**Phase 2B pages** (built; real engines land in a later phase):
+
+- `waveform/` — sound design page, silver accent (`data-product="wave"`), entry key `nw-entered-wave`. Page-local `css/50-waveform-hero.css`, `css/51-waveform-shell.css`, `js/50-waveform-shell.js`.
+- `livestudio/` — loop station page, copper accent (`data-product="live"`), entry key `nw-entered-live`, seeds agent `performanceMode: "live"`. Page-local `css/52-livestudio-hero.css`, `css/53-livestudio-shell.css`, `js/52-livestudio-shell.js`.
+- Root `index.html` — the NeusicWave hub landing (tri-accent rule, three product cards, FAQ with the `#pricing` anchor the demo gate targets) styled by `css/60-hub-landing.css`. It keeps footer links to the legacy Wave Loom / Live Loop Lab workspaces, which several restoration tests assert.
+
+Both app pages link the shared modules as `../app/css/30-nw-tokens.css`, `../app/css/32-nw-menubar.css`, `../app/js/44-nw-agent.js`, `../app/js/45-nw-demo-gate.js`, and each page's shell JS provides its own menubar, stub engine functions, and a guarded `NWDialogs` copy. **Deploy caveat**: the Pages workflow deploys `app/` as `/studio/`, so those four shared files are also copied verbatim to `_site/app/…` — keep that list in sync if pages start sharing more NW modules, and remember any new top-level directory must be added to the workflow's copy steps before it will deploy.
 
 ### AI agent integrations (privacy boundary)
 
