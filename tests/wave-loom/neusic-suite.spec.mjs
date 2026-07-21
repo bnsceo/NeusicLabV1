@@ -52,4 +52,9 @@ test('mobile hub stacks the product cards and keeps all three reachable',async({
   const first=await cards.nth(0).boundingBox();
   const second=await cards.nth(1).boundingBox();
   expect(second.y).toBeGreaterThan(first.y+first.height-1);
+
+  const ctaBoxes=await cards.locator('.cta').evaluateAll(links=>links.map(link=>link.getBoundingClientRect().height));
+  for(const height of ctaBoxes)expect(height,'product CTA is below the 44px touch target').toBeGreaterThanOrEqual(44);
+  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
+  expect(overflow,'hub landing overflows horizontally on a phone').toBeLessThanOrEqual(1);
 });

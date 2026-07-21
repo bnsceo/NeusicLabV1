@@ -109,6 +109,8 @@ test('Pages build produces PNG link previews and a menu-free landing',async()=>{
     await cp('index.html',join(site,'index.html'));
     await cp('live-loop',join(site,'live-loop'),{recursive:true});
     await cp('wave-loom',join(site,'wave-loom'),{recursive:true});
+    await cp('waveform',join(site,'waveform'),{recursive:true});
+    await cp('livestudio',join(site,'livestudio'),{recursive:true});
     await cp('app',join(site,'studio'),{recursive:true});
     await rename(join(site,'studio','index.html'),join(site,'studio','core.html'));
     await rename(join(site,'studio','phase-a.html'),join(site,'studio','index.html'));
@@ -122,7 +124,9 @@ test('Pages build produces PNG link previews and a menu-free landing',async()=>{
     assert.doesNotMatch(landing,/id="mobileMenu"/);
 
     const expected=[
-      ['index.html','Neusic — Live Loop, Wave & Lab','neusic-suite-card-v3.png'],
+      ['index.html','NeusicWave — Beats, Loops, and Full Tracks in Your Browser','neusicwave-hub-card-v1.png'],
+      ['waveform/index.html','Waveform — NeusicWave Sound Design Studio','waveform-card-v1.png'],
+      ['livestudio/index.html','LiveStudio — NeusicWave Loop Station','livestudio-card-v1.png'],
       ['live-loop/index.html','Neusic Live Loop — Five-Lane Performance Instrument','live-loop-card-v3.png'],
       ['wave-loom/index.html','Neusic Wave — Sample Performance & Sound Design','wave-card-v3.png'],
       ['studio/index.html','Neusic Lab — Music Production Workspace','lab-card-v3.png']
