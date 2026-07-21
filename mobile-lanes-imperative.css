@@ -1,0 +1,208 @@
+/* Blocking mobile guarantee: five operational loop strips occupy the first phone viewport. */
+@media (max-width:760px){
+  html{
+    height:auto!important;
+    min-height:100%!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+    overscroll-behavior-y:none;
+  }
+  body.stage-performance{
+    height:auto!important;
+    min-height:100vh!important;
+    min-height:100svh!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch;
+    padding:0 0 calc(var(--neusic-credit-safe,0px) + env(safe-area-inset-bottom))!important;
+  }
+  body.stage-performance .neusic-suite-rail{
+    display:none!important;
+  }
+  body.stage-performance .topbar{
+    position:sticky!important;
+    z-index:500!important;
+    top:var(--neusic-credit-safe,0px)!important;
+    width:100%!important;
+    min-height:54px!important;
+    margin:0!important;
+    padding:5px 4px!important;
+    border-radius:0!important;
+  }
+  body.stage-performance .transport{
+    display:grid!important;
+    grid-template-columns:repeat(6,minmax(0,1fr))!important;
+    width:100%!important;
+    gap:3px!important;
+  }
+  body.stage-performance .hardware-button,
+  body.stage-performance .lcd-control,
+  body.stage-performance .switch-control{
+    width:100%!important;
+    min-width:0!important;
+    min-height:44px!important;
+    height:44px!important;
+    padding:2px!important;
+  }
+  body.stage-performance .performance-shell{
+    width:100%!important;
+    max-width:none!important;
+    margin:0!important;
+    padding:0 3px 12px!important;
+  }
+  body.stage-performance .performance-head{
+    display:none!important;
+  }
+  body.stage-performance .loop-deck{
+    display:block!important;
+    width:100%!important;
+    min-height:calc(100vh - 54px - var(--neusic-credit-safe,0px) - env(safe-area-inset-bottom))!important;
+    min-height:calc(100svh - 54px - var(--neusic-credit-safe,0px) - env(safe-area-inset-bottom))!important;
+    margin:0!important;
+    overflow:visible!important;
+    border-radius:0 0 8px 8px!important;
+  }
+  body.stage-performance .loop-deck>.panel-header{
+    display:none!important;
+  }
+  body.stage-performance #trackGrid{
+    display:grid!important;
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    align-items:stretch!important;
+    width:100%!important;
+    height:calc(100vh - 54px - var(--neusic-credit-safe,0px) - env(safe-area-inset-bottom))!important;
+    height:calc(100svh - 54px - var(--neusic-credit-safe,0px) - env(safe-area-inset-bottom))!important;
+    min-height:510px!important;
+    gap:2px!important;
+    padding:3px!important;
+    overflow:visible!important;
+  }
+  body.stage-performance #trackGrid>.loop-track,
+  body.stage-performance #trackGrid>.loop-track.mobile-active{
+    display:flex!important;
+    flex-direction:column!important;
+    width:100%!important;
+    min-width:0!important;
+    height:100%!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:4px 2px!important;
+    overflow:hidden!important;
+    border-radius:5px!important;
+  }
+  body.stage-performance .loop-track header{
+    flex:0 0 28px!important;
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    place-items:center!important;
+    padding:1px 0 3px!important;
+  }
+  body.stage-performance .track-number{
+    width:23px!important;
+    height:23px!important;
+    font-size:8px!important;
+  }
+  body.stage-performance .track-name{
+    display:none!important;
+  }
+  body.stage-performance .track-state{
+    display:block!important;
+    width:100%!important;
+    min-height:7px!important;
+    overflow:hidden!important;
+    color:#b7c1c6!important;
+    font-size:4.5px!important;
+    text-align:center!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+  }
+  body.stage-performance .progress-control{
+    flex:0 0 auto!important;
+    width:min(54px,92%)!important;
+    margin:1px auto 3px!important;
+  }
+  body.stage-performance .progress-center b{
+    font-size:8px!important;
+  }
+  body.stage-performance .track-actions{
+    flex:0 0 auto!important;
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:3px!important;
+    width:100%!important;
+  }
+  body.stage-performance .track-actions button{
+    display:none!important;
+  }
+  body.stage-performance .track-actions button[data-action="record"],
+  body.stage-performance .track-actions button[data-action="mute"]{
+    display:block!important;
+    width:100%!important;
+    min-height:44px!important;
+    padding:0 1px!important;
+    font-size:5.5px!important;
+    touch-action:manipulation!important;
+  }
+  body.stage-performance .track-actions button[data-action="record"]{
+    min-height:50px!important;
+    font-size:7px!important;
+  }
+  body.stage-performance .track-controls{
+    flex:1 1 auto!important;
+    min-height:0!important;
+    display:grid!important;
+    grid-template-rows:minmax(126px,1fr) auto!important;
+    grid-template-columns:1fr!important;
+    gap:3px!important;
+    margin-top:3px!important;
+  }
+  body.stage-performance .track-controls label{
+    display:none!important;
+  }
+  body.stage-performance .track-controls label:has(input[data-control="volume"]),
+  body.stage-performance .track-controls label:has(input[data-control="pan"]){
+    display:grid!important;
+  }
+  body.stage-performance .track-controls label:has(input[data-control="volume"]){
+    min-height:126px!important;
+    grid-template-rows:auto minmax(92px,1fr) auto!important;
+    align-content:stretch!important;
+  }
+  body.stage-performance .track-controls input[data-control="volume"]{
+    width:28px!important;
+    height:100%!important;
+    min-height:92px!important;
+    margin:auto!important;
+    writing-mode:vertical-lr!important;
+    direction:rtl!important;
+    touch-action:none!important;
+  }
+  body.stage-performance .track-controls label:has(input[data-control="pan"]){
+    min-height:45px!important;
+    grid-template-rows:auto 20px auto!important;
+  }
+  body.stage-performance .track-controls input[data-control="pan"]{
+    width:94%!important;
+    height:20px!important;
+    margin:auto!important;
+    touch-action:pan-x!important;
+  }
+  body.stage-performance .track-controls output{
+    font-size:6px!important;
+  }
+  body.stage-performance .stage-macro-deck{
+    margin-top:4px!important;
+  }
+}
+
+@media (max-width:360px){
+  body.stage-performance .hardware-button span,
+  body.stage-performance .hardware-button b,
+  body.stage-performance .switch-control span{
+    font-size:4.5px!important;
+  }
+  body.stage-performance .track-actions button[data-action="record"],
+  body.stage-performance .track-actions button[data-action="mute"]{
+    font-size:5px!important;
+  }
+}

@@ -2,265 +2,106 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
   <meta name="theme-color" content="#07090b">
-  <meta name="description" content="Neusic connects live looping, wave-native sound design, and professional music production in one creative workflow.">
-  <meta property="og:title" content="Neusic — Live Loop, Wave, and Lab">
-  <meta property="og:description" content="Start anywhere. Capture in Live Loop, refine in Wave, and finish in Lab.">
-  <title>NeusicWave — Live Loop, Wave &amp; Lab in Your Browser</title>
-  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
-  <link rel="alternate icon" href="./favicon.png" type="image/png">
-  <link rel="shortcut icon" href="./favicon.ico">
-  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+  <meta name="description" content="Neusic Live Loop is a phone-first five-lane performance instrument for voice, beatbox, samples, tactile effects, synth playing, and direct Neusic Wave transfer.">
+  <link rel="canonical" href="https://bnsceo.github.io/NeusicLabV1/live-loop/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Neusic">
+  <meta property="og:title" content="Neusic Live Loop — Five-Lane Performance Instrument">
+  <meta property="og:description" content="Capture voice, rhythm, bass, harmony, and textures across five synchronized phone-first loop lanes. Touch controls work with or without MIDI.">
+  <meta property="og:url" content="https://bnsceo.github.io/NeusicLabV1/live-loop/">
+  <meta property="og:image" content="https://bnsceo.github.io/NeusicLabV1/social/live-loop-card-v3.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Neusic Live Loop"><meta name="twitter:description" content="A five-lane tactile performance looper built for phones, voice, effects, and improvisation."><meta name="twitter:image" content="https://bnsceo.github.io/NeusicLabV1/social/live-loop-card-v3.png">
+  <title>Neusic Live Loop — Performance Instrument</title>
   <link rel="preconnect" href="https://api.fontshare.com">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="./site-polish.css?v=7">
-  <link rel="stylesheet" href="./landing-experience.css?v=1">
-  <link rel="stylesheet" href="./app/css/30-nw-tokens.css">
-  <link rel="stylesheet" href="./css/61-landing-reskin.css?v=2">
-  <link rel="stylesheet" href="./css/62-mobile-hotfix.css?v=2">
-  <link rel="stylesheet" href="./css/63-mobile-final.css?v=1">
+  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="stylesheet" href="stage-performance.css?v=2">
+  <link rel="stylesheet" href="mobile-lanes-imperative.css?v=2">
+  <link rel="stylesheet" href="mobile-lanes-compact.css?v=2">
+  <link rel="stylesheet" href="loop-undo.css?v=1">
+  <link rel="stylesheet" href="mobile-system.css?v=1">
+  <link rel="stylesheet" href="../neusic-suite.css?v=2">
+  <link rel="stylesheet" href="../neusic-agent.css?v=1">
+<link rel="stylesheet" href="../css/99-mobile-master-fixes.css">
 </head>
-<body>
-  <a class="skip-link" href="#main">Skip to Neusic</a>
-  <div class="page-noise" aria-hidden="true"></div>
-
-  <header class="site-header" id="top">
-    <div class="header-inner">
-      <a class="brand" href="#top" aria-label="Neusic home">
-        <span class="brand-mark">N</span>
-        <span class="brand-copy"><b>NEUSIC</b><small>THREE PRODUCTS · ONE CREATIVE SYSTEM</small></span>
-      </a>
-      <nav class="desktop-nav" aria-label="Primary navigation">
-        <a href="#live-loop">Live Loop</a>
-        <a href="#wave">Wave</a>
-        <a href="#lab">Lab</a>
-      </nav>
-      <div class="build-status" aria-label="Product status"><i></i><span>Status</span><b>Building</b></div>
-      <button class="menu-button" id="menuButton" type="button" aria-label="Open navigation" aria-expanded="false">MENU</button>
+<body class="stage-performance" data-neusic-product="live-loop">
+  <div class="noise" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="../" aria-label="Neusic home"><span class="brand-mark">N</span><span><b>NEUSIC</b><small>LIVE LOOP · PERFORMANCE INSTRUMENT</small></span></a>
+    <div class="transport" aria-label="Live loop transport">
+      <button id="micBtn" class="hardware-button" type="button"><i class="led"></i><span>MIC</span></button>
+      <button id="playBtn" class="hardware-button transport-play" type="button"><span>▶</span><b>START</b></button>
+      <button id="stopBtn" class="hardware-button" type="button"><span>■</span><b>STOP</b></button>
+      <label class="lcd-control"><small>BPM</small><input id="bpmInput" type="number" min="40" max="220" value="112"></label>
+      <label class="switch-control"><input id="quantizeToggle" type="checkbox" checked><span>SYNC</span></label>
+      <button id="midiBtn" class="hardware-button" type="button"><i class="led"></i><span>MIDI</span></button>
     </div>
+    <nav class="top-actions" aria-label="Neusic pages"><a href="../wave-loom/">NEUSIC WAVE</a><a href="../studio/">NEUSIC LAB</a><a href="../">HOME</a></nav>
   </header>
 
-  <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile navigation">
-    <a href="#live-loop"><span>01</span>Neusic Live Loop</a>
-    <a href="#wave"><span>02</span>Neusic Wave</a>
-    <a href="#lab"><span>03</span>Neusic Lab</a>
-    <a href="./live-loop/"><span>↗</span>Open Live Loop</a>
-    <a href="./wave-loom/"><span>↗</span>Open Wave</a>
-    <a href="./studio/"><span>↗</span>Open Lab</a>
-  </nav>
-
-  <main id="main">
-    <section class="hero" aria-labelledby="heroTitle">
-      <div class="hero-orbit orbit-one" aria-hidden="true"></div>
-      <div class="hero-orbit orbit-two" aria-hidden="true"></div>
-      <div class="hero-content">
-        <p class="section-code">NEUSIC / THREE CONNECTED CREATIVE PRODUCTS</p>
-        <h1 id="heroTitle">NEUSIC<span class="nw-wave-sub">WAVE</span></h1>
-        <p class="hero-statement">Start with the moment. Shape the sound. Finish the record.</p>
-        <p class="hero-copy">The recommended path is Live Loop → Wave → Lab, but every product works as its own starting point. Your project can enter wherever the idea begins and move forward when it is ready.</p>
-
-        <section class="product-journey" aria-label="Three connected Neusic products">
-          <div class="journey-heading">
-            <div><span>3 PRODUCTS / 1 CONNECTED PROJECT</span><b>One creative idea can move through the entire system.</b></div>
-            <small>Recommended workflow shown below. Start in any product and transfer forward when useful.</small>
-          </div>
-          <div class="journey-steps">
-            <a class="journey-step" href="./live-loop/" style="--step-accent:#e2a84b"><span>01</span><div><b>Neusic Live Loop</b><small>Capture voice, rhythm, harmony, and performance energy</small></div></a>
-            <i class="journey-transfer"><span>Transfer</span>→</i>
-            <a class="journey-step" href="./wave-loom/" style="--step-accent:#32e7ff"><span>02</span><div><b>Neusic Wave</b><small>Refine, slice, sculpt, resample, and transform the sound</small></div></a>
-            <i class="journey-transfer"><span>Transfer</span>→</i>
-            <a class="journey-step" href="./studio/" style="--step-accent:#aeb8bf"><span>03</span><div><b>Neusic Lab</b><small>Arrange, record, mix, master, and deliver the finished project</small></div></a>
-          </div>
-        </section>
-
-        <form class="waitlist-form" id="waitlistForm" data-endpoint="" novalidate>
-          <label for="waitlistEmail">Enter email for early access</label>
-          <div class="waitlist-row">
-            <input id="waitlistEmail" name="email" type="email" autocomplete="email" inputmode="email" placeholder="creator@example.com" required>
-            <button type="submit">Join Waitlist <span>→</span></button>
-          </div>
-          <p class="form-status" id="waitlistStatus" role="status">Early access is opening in stages.</p>
-        </form>
-        <div class="hero-signals" aria-label="Neusic product principles">
-          <span><i></i>Start anywhere</span>
-          <span><i></i>Transfer forward</span>
-          <span><i></i>Offline-first creation</span>
-          <span><i></i>No API required to create</span>
-        </div>
-      </div>
-      <a class="scroll-cue" href="#live-loop"><span>Explore the three products</span><i>↓</i></a>
+  <main class="performance-shell">
+    <section class="performance-head">
+      <div><span class="eyebrow">NEUSIC PRODUCT 01 · LIVE PERFORMANCE CAPTURE</span><h1>Capture lightning <em>before it disappears.</em></h1><p>Five parallel lanes, immediate overdubbing, tactile effects, and a tiny playable synth. Built for improvisation first—no timeline and no performance menu.</p></div>
+      <div class="master-display"><div><small>MASTER LOOP</small><b id="masterLength">—</b></div><div><small>GLOBAL STATE</small><b id="globalState">READY</b></div><div class="master-meter"><span id="masterMeter"></span></div></div>
     </section>
 
-    <section class="mode-section mode-pulse" id="live-loop" style="--mode-accent:#e2a84b;--mode-rgb:226,168,75">
-      <div class="mode-number" aria-hidden="true">01</div>
-      <div class="mode-inner">
-        <div class="mode-preview pulse-preview" data-preview="live-loop" aria-label="Interactive mock preview of Neusic Live Loop">
-          <div class="preview-top"><span>NEUSIC / LIVE LOOP</span><b>LIVE</b></div>
-          <div class="pulse-rings">
-            <button class="loop-ring active"><span>01</span><i></i><small>VOICE</small></button>
-            <button class="loop-ring"><span>02</span><i></i><small>BEAT</small></button>
-            <button class="loop-ring"><span>03</span><i></i><small>BASS</small></button>
-            <button class="loop-ring"><span>04</span><i></i><small>HARMONY</small></button>
-            <button class="loop-ring"><span>05</span><i></i><small>TEXTURE</small></button>
-          </div>
-          <div class="pulse-meter"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-          <div class="preview-foot"><span>MASTER LOOP 04.00s</span><span>112 BPM</span></div>
-        </div>
-        <div class="mode-copy">
-          <div class="mode-label"><span>Neusic Live Loop</span><b>Performance</b></div>
-          <p class="mode-kicker">The first stage of the recommended workflow</p>
-          <h2>Capture the moment.</h2>
-          <p class="mode-description">Build voice, rhythm, harmony, samples, and effects across five synchronized loop lanes without breaking the energy of the performance.</p>
-          <ul>
-            <li>Record, overdub, mute, reverse, and half-speed in real time.</li>
-            <li>Use every lane on mobile through a focused one-lane performance stage.</li>
-            <li>Transfer any recorded voice or loop directly into Neusic Wave.</li>
-          </ul>
-          <p class="handoff-note"><i></i>Recommended next: send the strongest loop into Wave for refinement.</p>
-          <div class="mode-actions"><a class="mode-button" href="./live-loop/">Open Neusic Live Loop <span>↗</span></a><span class="availability">Or start in Wave or Lab</span></div>
-        </div>
-      </div>
+    <section class="loop-deck panel" aria-labelledby="loopDeckTitle">
+      <header class="panel-header"><div><span class="eyebrow">PRIMARY PERFORMANCE SURFACE</span><h2 id="loopDeckTitle">Five synchronized loop lanes</h2></div><div class="legend"><span><i class="empty"></i>EMPTY</span><span><i class="recording"></i>RECORDING</span><span><i class="playing"></i>PLAYING</span><span><i class="muted"></i>MUTED</span></div></header>
+      <div id="trackGrid" class="track-grid" aria-label="Five synchronized loop lanes"></div>
     </section>
 
-    <section class="mode-section mode-wave" id="wave" style="--mode-accent:#32e7ff;--mode-rgb:50,231,255">
-      <div class="mode-number" aria-hidden="true">02</div>
-      <div class="mode-inner reverse">
-        <div class="mode-preview wave-preview" data-preview="wave" aria-label="Interactive mock preview of Neusic Wave">
-          <div class="preview-top"><span>NEUSIC / WAVE</span><b>SCULPT</b></div>
-          <svg class="wave-visual" viewBox="0 0 900 360" role="img" aria-label="A glowing sculpted waveform with trigger nodes">
-            <defs><linearGradient id="waveGradient" x1="0" x2="1"><stop offset="0" stop-color="#32e7ff"/><stop offset=".48" stop-color="#a76cff"/><stop offset="1" stop-color="#64ffae"/></linearGradient><filter id="waveGlow"><feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-            <g opacity=".16" stroke="#7fdce7"><path d="M0 60H900M0 120H900M0 180H900M0 240H900M0 300H900"/><path d="M90 0V360M180 0V360M270 0V360M360 0V360M450 0V360M540 0V360M630 0V360M720 0V360M810 0V360"/></g>
-            <path class="wave-shadow" d="M0 190 C80 30 120 325 215 168 S360 52 445 194 S575 316 660 148 S808 44 900 180" fill="none" stroke="url(#waveGradient)" stroke-width="28" opacity=".12" filter="url(#waveGlow)"/>
-            <path class="wave-line" d="M0 190 C80 30 120 325 215 168 S360 52 445 194 S575 316 660 148 S808 44 900 180" fill="none" stroke="url(#waveGradient)" stroke-width="5" filter="url(#waveGlow)"/>
-            <g class="wave-nodes" fill="#071014" stroke="#ddfbff" stroke-width="3"><circle cx="82" cy="103" r="10"/><circle cx="214" cy="168" r="10"/><circle cx="348" cy="101" r="10"/><circle cx="445" cy="194" r="10"/><circle cx="575" cy="257" r="10"/><circle cx="660" cy="148" r="10"/><circle cx="799" cy="96" r="10"/></g>
-          </svg>
-          <div class="wave-readouts"><span>HARMONICS <b>68</b></span><span>DENSITY <b>42</b></span><span>MORPH <b>31</b></span><span>SPACE <b>58</b></span></div>
-          <div class="preview-foot"><span>SCULPT / NODES / FORGE</span><span>PATCH AUTOSAVED</span></div>
+    <section class="lower-grid">
+      <article class="pedalboard panel">
+        <header class="panel-header"><div><span class="eyebrow">PEDALBOARD</span><h2>Tape + space processors</h2></div><button id="bypassFxBtn" class="mini-button" type="button">FX ACTIVE</button></header>
+        <div class="pedal-grid">
+          <section class="pedal delay-pedal">
+            <header><span>NEUSIC</span><b>PHRASE DELAY</b><i id="delayLed"></i></header>
+            <div class="knob-row"><label><span>TIME</span><input id="delayTime" type="range" min="40" max="1200" value="360"><output>360ms</output></label><label><span>FEEDBACK</span><input id="delayFeedback" type="range" min="0" max="92" value="42"><output>42%</output></label><label><span>MIX</span><input id="delayMix" type="range" min="0" max="100" value="28"><output>28%</output></label></div>
+            <div class="pedal-actions"><button id="warpDownBtn" type="button">OCTAVE DOWN</button><button id="reverseBtn" type="button">REVERSE SELECTED</button></div>
+          </section>
+          <section class="pedal reverb-pedal">
+            <header><span>NEUSIC</span><b>SPATIAL HALL</b><i id="reverbLed"></i></header>
+            <div class="knob-row"><label><span>SIZE</span><input id="reverbSize" type="range" min="20" max="500" value="180"><output>1.8s</output></label><label><span>TONE</span><input id="reverbTone" type="range" min="1200" max="14000" value="7200"><output>7.2k</output></label><label><span>MIX</span><input id="reverbMix" type="range" min="0" max="100" value="24"><output>24%</output></label></div>
+            <div class="pedal-actions"><button id="freezeBtn" type="button">SPACE FREEZE</button><button id="clearAllBtn" class="danger" type="button">CLEAR ALL</button></div>
+          </section>
         </div>
-        <div class="mode-copy">
-          <div class="mode-label"><span>Neusic Wave</span><b>Sound design</b></div>
-          <p class="mode-kicker">The refinement stage</p>
-          <h2>Shape the sound.</h2>
-          <p class="mode-description">Turn recorded voice, loops, and samples into playable wave geometry, precise slices, granular textures, and hybrid instruments.</p>
-          <ul>
-            <li>Receive a real loop directly from Neusic Live Loop.</li>
-            <li>Trim, slice, normalize, reverse, map, and persist true sample audio.</li>
-            <li>Transfer a rendered mix or selected sample directly into Neusic Lab.</li>
-          </ul>
-          <p class="handoff-note"><i></i>Recommended next: send the refined sound into Lab for arrangement and finishing.</p>
-          <div class="mode-actions"><a class="mode-button" href="./wave-loom/">Open Neusic Wave <span>↗</span></a><span class="availability">Or begin here with any sample</span></div>
-        </div>
-      </div>
+      </article>
+
+      <article class="synth-panel panel">
+        <header class="panel-header"><div><span class="eyebrow">PLAYABLE COLOR SYNTH</span><h2>One-octave performance keys</h2></div><label class="wave-select">VOICE<select id="synthWave"><option value="sawtooth">GRIMY</option><option value="square">BOUNCE</option><option value="triangle">SPACE</option><option value="sine">PURE</option></select></label></header>
+        <div class="synth-controls"><label>CUTOFF<input id="synthCutoff" type="range" min="120" max="12000" value="2400"><output>2.4k</output></label><label>ATTACK<input id="synthAttack" type="range" min="0" max="100" value="2"><output>0.02s</output></label><label>RELEASE<input id="synthRelease" type="range" min="2" max="250" value="45"><output>0.45s</output></label></div>
+        <div id="keyboard" class="keyboard" aria-label="Playable synth keyboard"></div><p class="key-help">Touch keys work directly. Computer keys and MIDI notes are optional.</p>
+      </article>
     </section>
 
-    <section class="mode-section mode-lab" id="lab" style="--mode-accent:#aeb8bf;--mode-rgb:174,184,191">
-      <div class="mode-number" aria-hidden="true">03</div>
-      <div class="mode-inner">
-        <div class="mode-preview lab-preview" data-preview="lab" aria-label="Interactive mock preview of Neusic Lab">
-          <div class="preview-top"><span>NEUSIC / LAB</span><b>STUDIO</b></div>
-          <div class="lab-toolbar"><button type="button">▶</button><span>●</span><b>120 BPM</b><i></i><small>ARRANGE</small><small>MIX</small><small>EXPORT</small></div>
-          <div class="lab-grid">
-            <div class="lab-tracks"><span>VOCALS</span><span>DRUMS</span><span>BASS</span><span>KEYS</span><span>TEXTURE</span></div>
-            <div class="lab-timeline">
-              <div><i style="--x:4%;--w:30%"></i><i style="--x:39%;--w:23%"></i><i style="--x:67%;--w:28%"></i></div>
-              <div><i style="--x:2%;--w:18%"></i><i style="--x:22%;--w:18%"></i><i style="--x:42%;--w:18%"></i><i style="--x:62%;--w:18%"></i><i style="--x:82%;--w:16%"></i></div>
-              <div><i style="--x:9%;--w:42%"></i><i style="--x:57%;--w:38%"></i></div>
-              <div><i style="--x:5%;--w:90%"></i></div>
-              <div><i style="--x:26%;--w:31%"></i><i style="--x:63%;--w:30%"></i></div>
-              <b class="lab-playhead"></b>
-            </div>
-          </div>
-          <div class="lab-console"><span><i></i><b>MASTER</b><small>-6.2 dB</small></span><span><i></i><b>BUS A</b><small>-12.4 dB</small></span><span><i></i><b>SPACE</b><small>28%</small></span><span><i></i><b>EXPORT</b><small>READY</small></span></div>
-          <div class="preview-foot"><span>ARRANGE / CAPTURE / CREATE / MIX</span><span>AUTOSAVED</span></div>
-        </div>
-        <div class="mode-copy">
-          <div class="mode-label"><span>Neusic Lab</span><b>Production</b></div>
-          <p class="mode-kicker">The finishing stage and flagship workspace</p>
-          <h2>Finish the record.</h2>
-          <p class="mode-description">Arrange, record, edit, mix, master, recover, and export the complete project in the professional Neusic production environment.</p>
-          <ul>
-            <li>Receive playable audio directly from Neusic Wave.</li>
-            <li>Work across Arrange, Capture, Create, Edit, Mix, and Deliver stages.</li>
-            <li>Preserve project recovery, MIDI, sampling, effects, automation, and WAV export.</li>
-          </ul>
-          <p class="handoff-note"><i></i>Lab is the destination for the finished project, but it can also be your starting point.</p>
-          <div class="mode-actions"><a class="mode-button" href="./studio/">Open Neusic Lab <span>↗</span></a><span class="availability">Start here for traditional production</span></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="companion-section" aria-labelledby="companionTitle">
-      <div class="companion-glow" aria-hidden="true"></div>
-      <p class="section-code">ONE INTELLIGENCE / EVERY PRODUCT</p>
-      <h2 id="companionTitle">Neusic Companion keeps the creative context alive.</h2>
-      <p>Live Loop understands the performance. Wave understands the sound object. Lab understands the production. The Companion carries intent, decisions, and creative memory across all three.</p>
-      <div class="companion-flow" aria-label="Neusic workflow"><span><b>Live Loop</b><small>Capture instinct</small></span><i>→</i><span><b>Wave</b><small>Transform texture</small></span><i>→</i><span><b>Lab</b><small>Finish the record</small></span></div>
-    </section>
-
-    <section class="nw-hub" id="suite">
-      <div class="wrap">
-        <div class="nw-tri-rule" aria-hidden="true"></div>
-        <h2 class="nw-hub-title">Launch the suite</h2>
-        <p class="nw-hub-sub">Three tools, one connected project. The demo is free and runs entirely in your browser — save unlocks with Pro.</p>
-        <div class="product-cards">
-          <article class="product-card" data-product="live">
-            <div class="card-cap"><span>LIVESTUDIO</span></div>
-            <h3>LiveStudio</h3>
-            <p>Loop, layer, perform. Real-time beat making on the fly.</p>
-            <ul>
-              <li>16-track loop matrix with quantize &amp; sync</li>
-              <li>Real-time synth triggering &amp; drum machine</li>
-              <li>Pedalboard FX: delay, reverb, reverse, half-speed</li>
-            </ul>
-            <a class="cta" href="./live-loop/">Launch LiveStudio</a>
-          </article>
-          <article class="product-card" data-product="wave">
-            <div class="card-cap"><span>WAVEFORM</span></div>
-            <h3>Waveform</h3>
-            <p>Shape, sculpt, and layer sounds. The sound design studio.</p>
-            <ul>
-              <li>Transient slicer &amp; chop-pad matrix</li>
-              <li>Synth design with presets &amp; randomization</li>
-              <li>Real-time effects: reverb, delay, comp, EQ</li>
-            </ul>
-            <a class="cta" href="./wave-loom/">Launch Waveform</a>
-          </article>
-          <article class="product-card" data-product="lab">
-            <div class="card-cap"><span>NEUSICLAB</span></div>
-            <h3>NeusicLab</h3>
-            <p>Arrange, record, mix, and master. The finishing studio.</p>
-            <ul>
-              <li>Multi-track arrangement &amp; waveform editing</li>
-              <li>5 drum kits, sampler, console mixing</li>
-              <li>Automation, recovery &amp; WAV export</li>
-            </ul>
-            <a class="cta" href="./studio/">Launch NeusicLab</a>
-          </article>
-        </div>
-
-        <div class="nw-faq">
-          <h2>FAQ</h2>
-          <details><summary>Is NeusicWave free?</summary><p>Yes. The demo is entirely free and includes the full suite. Save and cloud archiving unlock when you upgrade to Neusic Suite Pro.</p></details>
-          <details><summary>Do I need to be online?</summary><p>No. All audio engines run locally in your browser. The internet is only needed to load the page and, if you choose, to sync.</p></details>
-          <details><summary>Can I use it on my phone?</summary><p>Yes. Every tool is mobile-optimized — panels collapse and stack on smaller screens.</p></details>
-          <details><summary>Do I need an API key?</summary><p>No API key is required to create. A key only unlocks the optional Neusic Agent for AI mixing and arrangement help.</p></details>
-        </div>
-
-        <div class="nw-hub-footer">
-          Made by Anderson Paulino · <a href="https://tiktok.com/@neusicwave" target="_blank" rel="noopener">@neusicwave</a> on TikTok
-        </div>
-      </div>
+    <section class="session-tools panel">
+      <div><span class="eyebrow">SAMPLE INPUT + NEUSIC WAVE BRIDGE</span><h2>Capture here. Refine in Wave.</h2><p>Upload audio into the selected lane or send a recorded and overdubbed loop directly into the persistent Neusic Wave Forge.</p></div>
+      <div class="tool-actions"><button id="uploadBtn" class="primary-action" type="button">UPLOAD TO SELECTED TRACK</button><input id="fileInput" type="file" accept="audio/*,.wav,.wave,.mp3,.m4a,.aac,.flac,.ogg,.oga,.opus,.webm,.mp4" multiple hidden><button id="sendSelectedBtn" type="button">SEND SELECTED TO NEUSIC WAVE</button><button id="downloadSelectedBtn" type="button">DOWNLOAD SELECTED WAV</button></div>
+      <div id="statusMessage" class="status-message" role="status">Five loop lanes are visible. Tap REC on any lane; MIDI is optional.</div>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div><b>NEUSIC</b><span>Three products. One connected creative project.</span></div>
-    <nav aria-label="Footer navigation"><a href="./live-loop/">Live Loop</a><a href="./wave-loom/">Wave</a><a href="./studio/">Lab</a></nav>
-  </footer>
+  <template id="trackTemplate">
+    <article class="loop-track" data-state="Empty">
+      <header><div><span class="track-number"></span><b class="track-name"></b></div><span class="track-state">READY</span></header>
+      <button class="progress-control" data-action="select" type="button" aria-label="Select track"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="progress-bg" cx="50" cy="50" r="43"></circle><circle class="progress-ring" cx="50" cy="50" r="43"></circle></svg><span class="progress-center"><b class="progress-time">00.0</b><small>SECONDS</small></span></button>
+      <div class="track-actions"><button data-action="record" class="record-action" type="button">REC</button><button data-action="mute" type="button">MUTE</button><button data-action="upload" type="button">LOAD</button><button data-action="forge" type="button">WAVE</button><button data-action="clear" class="danger" type="button">CLEAR</button></div>
+      <div class="track-controls"><label>LEVEL<input data-control="volume" type="range" min="0" max="125" value="90"><output>90</output></label><label>PAN<input data-control="pan" type="range" min="-100" max="100" value="0"><output>C</output></label><label>DELAY<input data-control="delay" type="range" min="0" max="100" value="22"><output>22</output></label><label>SPACE<input data-control="reverb" type="range" min="0" max="100" value="18"><output>18</output></label></div>
+    </article>
+  </template>
 
-  <script src="./site-polish.js?v=7"></script>
-  <script src="./landing-experience.js?v=1"></script>
+  <footer class="legal-note">Performance workflow inspired by modern improvisational loop artists and hardware loop stations. Neusic is not affiliated with Reggie Watts, Boss, Line 6, Nord, or their manufacturers.</footer>
+  <script src="mobile-mic-primer.js?v=8"></script>
+  <script type="module" src="app.js?v=12"></script>
+  <script src="loop-undo.js?v=1"></script>
+  <script src="stage-performance.js?v=2"></script>
+  <script src="mobile-recording-feedback.js?v=1"></script>
+  <script src="../neusic-suite.js?v=2"></script>
+  <script src="../neusic-agent.js?v=1"></script>
+<script src="../js/99-mobile-interactions.js"></script>
 </body>
 </html>

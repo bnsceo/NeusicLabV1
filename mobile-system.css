@@ -1,0 +1,46 @@
+/* Final phone layout layer. Loaded last so mobile controls remain visible and touchable. */
+@media (max-width:760px){
+  :root{--live-mobile-bar:54px}
+  html,body{width:100%!important;max-width:100%!important;overflow-x:hidden!important}
+  body.stage-performance{min-width:0!important;max-width:100vw!important;padding-bottom:calc(12px + env(safe-area-inset-bottom) + var(--neusic-credit-safe,0px))!important}
+  body.stage-performance .topbar{position:sticky!important;top:var(--neusic-credit-safe,0px)!important;z-index:1000!important;width:100%!important;max-width:100vw!important;min-height:var(--live-mobile-bar)!important;padding:4px!important;overflow:hidden!important}
+  body.stage-performance .transport{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:3px!important;width:100%!important;min-width:0!important}
+  body.stage-performance .transport>*{min-width:0!important;width:100%!important;min-height:44px!important;touch-action:manipulation!important}
+  body.stage-performance .performance-shell{width:100%!important;max-width:100vw!important;margin:0!important;padding:0 3px 12px!important;overflow-x:hidden!important}
+  body.stage-performance .loop-deck{width:100%!important;max-width:100vw!important;min-height:0!important;height:auto!important;margin:0!important;overflow:hidden!important}
+  body.stage-performance #trackGrid{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;width:100%!important;max-width:100%!important;height:clamp(390px,62svh,520px)!important;min-height:390px!important;max-height:520px!important;gap:2px!important;padding:3px!important;overflow:hidden!important}
+  body.stage-performance #trackGrid>.loop-track{display:flex!important;flex-direction:column!important;width:100%!important;min-width:0!important;height:100%!important;min-height:0!important;padding:3px 2px!important;overflow:hidden!important}
+  body.stage-performance .loop-track header{flex:0 0 22px!important;min-height:22px!important}
+  body.stage-performance .progress-control{flex:0 0 auto!important;width:min(40px,84%)!important;margin:1px auto 2px!important}
+  body.stage-performance .track-actions{display:grid!important;grid-template-columns:1fr!important;gap:2px!important;width:100%!important}
+  body.stage-performance .track-actions button[data-action="record"]{display:block!important;min-height:44px!important;font-size:7px!important;touch-action:manipulation!important}
+  body.stage-performance .track-actions button[data-action="mute"],body.stage-performance .track-actions button[data-action="undo"]{display:block!important;min-height:34px!important;font-size:5.5px!important;touch-action:manipulation!important}
+  body.stage-performance .track-controls{flex:1 1 auto!important;display:grid!important;grid-template-columns:1fr!important;grid-template-rows:minmax(70px,1fr) 34px!important;gap:2px!important;min-height:0!important;margin-top:2px!important}
+  body.stage-performance .track-controls label:has(input[data-control="volume"]){display:grid!important;min-height:70px!important;grid-template-rows:auto minmax(46px,1fr) auto!important;padding:2px 0!important}
+  body.stage-performance .track-controls input[data-control="volume"]{width:26px!important;height:100%!important;min-height:46px!important;margin:auto!important}
+  body.stage-performance .track-controls label:has(input[data-control="pan"]){display:grid!important;min-height:34px!important;grid-template-rows:auto 14px auto!important;padding:2px 0!important}
+  body.stage-performance .track-controls input[data-control="pan"]{width:94%!important;height:14px!important;margin:auto!important}
+  body.stage-performance .stage-macro-deck{width:100%!important;max-width:100%!important;grid-template-columns:1fr 1fr!important;gap:4px!important;margin-top:4px!important;padding:4px!important;overflow:hidden!important}
+  body.stage-performance .stage-macro-actions{grid-column:1/-1!important;grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  body.stage-performance .stage-macro-button{min-width:0!important;min-height:44px!important;touch-action:manipulation!important}
+  body.stage-performance .stage-xy{min-width:0!important;min-height:96px!important}
+  body.stage-performance .lower-grid,body.stage-performance .synth-panel,body.stage-performance .session-tools{width:100%!important;max-width:100%!important;overflow:hidden!important}
+  body.stage-performance .keyboard{width:100%!important;max-width:100%!important;overflow:hidden!important}
+  .mobile-recording-toast{top:calc(var(--neusic-credit-safe,0px) + var(--live-mobile-bar) + 6px)!important;width:min(94vw,520px)!important}
+}
+
+@media (max-width:390px){
+  body.stage-performance #trackGrid{height:380px!important;min-height:380px!important}
+  body.stage-performance .track-actions button[data-action="record"]{min-height:40px!important}
+  body.stage-performance .track-actions button[data-action="mute"],body.stage-performance .track-actions button[data-action="undo"]{min-height:31px!important}
+  body.stage-performance .stage-macro-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+
+@media (orientation:landscape) and (max-height:560px){
+  :root{--live-mobile-bar:48px}
+  body.stage-performance #trackGrid{height:330px!important;min-height:330px!important;max-height:330px!important}
+  body.stage-performance .lower-grid{display:none!important}
+  body.stage-performance .stage-macro-deck{grid-template-columns:.9fr 1fr 1fr!important}
+  body.stage-performance .stage-macro-actions{grid-column:auto!important;grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  body.stage-performance .stage-xy{min-height:90px!important}
+}
