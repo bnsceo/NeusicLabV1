@@ -67,6 +67,20 @@ Per `docs/NEUSIC_PRODUCT_BLUEPRINT.md`, the product promise is one journey (capt
 
 `docs/` holds the phase blueprints/roadmaps that drove each numbered module — check there before redesigning a workspace.
 
+### Current phase: NeusicWave (Phase 2B)
+
+The suite is being rebranded/expanded as **NeusicWave** — see `docs/NEUSICWAVE_PHASE2B_HANDOFF.md` for the full spec. The `nw-` prefixed modules are this phase's shell: `app/css/30-nw-tokens.css` (design tokens), `31-nw-shell.css`, `32-nw-menubar.css`, and `app/js/42-nw-shell.js`, `43-nw-menubar.js`, `44-nw-agent.js` (agent client), `45-nw-demo-gate.js` (Save gated behind Pro; Export stays free).
+
+**Design system (locked)** — defined in `30-nw-tokens.css`, selected via `body[data-product]`:
+
+- Lab / NeusicLab (Studio): gold `#d4a574` — `data-product="lab"`
+- Wave / Waveform: silver `#b0b3b2` — `data-product="wave"`
+- Live / LiveStudio: copper `#c97d5a` — `data-product="live"`
+- Emerald `#07de89` is reserved for meters/signal — never use it as a product accent.
+- Industrial hardware aesthetic: recessed/raised inset borders, uppercase condensed labels, reusable classes `.nw-surface`, `.nw-well`, `.nw-label`, `.nw-micro`, `.nw-btn`.
+
+**Remaining Phase 2B pages** (planned, do not exist yet): `/waveform/` (sound design, silver accent), `/livestudio/` (loop station, copper accent), and a hub landing page with a tri-accent rule (copper → silver → gold) and three product cards. Each new app page reuses the NW shell/menubar/demo-gate/agent modules with minimal adaptation, and per the spec adds its own numbered CSS/JS files (50+ range). Remember: new top-level directories must also be added to the Pages deploy workflow's copy list before they will deploy.
+
 ### AI agent integrations (privacy boundary)
 
 Three separate Python entry points exist; all are local-first and never receive raw audio:
