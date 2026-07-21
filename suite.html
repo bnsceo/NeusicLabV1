@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#181817">
+<title>NeusicWave Suite</title>
+<link rel="stylesheet" href="./app/css/30-nw-tokens.css">
+<style>
+  :root{--rail-h:40px}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100dvh;overflow:hidden;background:var(--nw-black,#181817);
+    font-family:var(--nw-font,"Arial Narrow","Roboto Condensed",system-ui,sans-serif)}
+  /* ── Top rail: suite switcher ── */
+  #suite-rail{height:var(--rail-h);display:flex;align-items:center;gap:2px;padding:0 8px;
+    background:linear-gradient(#211f1e,#1a1918);border-bottom:1px solid rgba(0,0,0,.7);
+    box-shadow:inset 0 1px rgba(255,255,255,.04);position:relative;z-index:10}
+  #suite-rail .brand{display:flex;align-items:center;gap:7px;margin-right:12px;
+    font:700 11px/1 var(--nw-font);letter-spacing:.18em;color:#c9cdcb}
+  #suite-rail .brand i{width:8px;height:8px;border-radius:50%;
+    background:linear-gradient(90deg,#c97d5a,#b0b3b2,#d4a574)}
+  .suite-tab{font:700 10px/1 var(--nw-font);letter-spacing:.1em;text-transform:uppercase;
+    padding:8px 12px;background:none;border:0;border-radius:2px;color:#8b918f;cursor:pointer;
+    border-bottom:2px solid transparent}
+  .suite-tab:hover{background:#2f3331;color:#c5c9c7}
+  .suite-tab.on{color:#eceeed;background:#2a2d2b}
+  .suite-tab[data-suite="live"].on{border-bottom-color:#c97d5a}
+  .suite-tab[data-suite="wave"].on{border-bottom-color:#b0b3b2}
+  .suite-tab[data-suite="studio"].on{border-bottom-color:#d4a574}
+  #suite-rail .home{margin-left:auto;font:700 9px/1 var(--nw-font);letter-spacing:.1em;
+    text-transform:uppercase;color:#8b918f;text-decoration:none;padding:8px 10px;border-radius:2px}
+  #suite-rail .home:hover{background:#2f3331;color:#c5c9c7}
+  /* ── Frame stack: persistent iframes, only active is shown ── */
+  #frames{position:absolute;inset:var(--rail-h) 0 0 0}
+  .suite-frame{position:absolute;inset:0;width:100%;height:100%;border:0;
+    opacity:0;pointer-events:none;transition:opacity .18s ease}
+  .suite-frame.on{opacity:1;pointer-events:auto}
+  .suite-frame.loading{display:block}
+  /* ── Loading veil ── */
+  #veil{position:absolute;inset:var(--rail-h) 0 0 0;display:flex;align-items:center;justify-content:center;
+    background:var(--nw-black,#181817);z-index:5;transition:opacity .3s ease}
+  #veil.gone{opacity:0;pointer-events:none}
+  #veil .load{font:700 11px/1.6 var(--nw-font);letter-spacing:.14em;text-transform:uppercase;
+    color:#7d8685;text-align:center}
+  #veil .bar{width:180px;height:2px;margin:12px auto 0;background:#2a2d2b;overflow:hidden;border-radius:2px}
+  #veil .bar i{display:block;height:100%;width:40%;background:linear-gradient(90deg,#c97d5a,#d4a574);
+    animation:slide 1s ease-in-out infinite}
+  @keyframes slide{0%{transform:translateX(-100%)}100%{transform:translateX(350%)}}
+</style>
+</head>
+<body>
+  <nav id="suite-rail">
+    <span class="brand"><i></i>NEUSICWAVE</span>
+    <button class="suite-tab" data-suite="live">LiveStudio</button>
+    <button class="suite-tab" data-suite="wave">Waveform</button>
+    <button class="suite-tab" data-suite="studio">NeusicLab</button>
+    <a class="home" href="./">‹ Hub</a>
+  </nav>
+  <div id="frames"></div>
+  <div id="veil"><div class="load">Loading suite<div class="bar"><i></i></div></div></div>
+
+<script>
+(function(){
+  'use strict';
+  var APPS = {
+    live:   { src: './live-loop/',  label: 'LiveStudio' },
+    wave:   { src: './wave-loom/',  label: 'Waveform'   },
+    studio: { src: './studio/',     label: 'NeusicLab'  }
+  };
+  var order = ['live','wave','studio'];
+  var frames = {}, loaded = {}, current = null;
+  var host = document.getElementById('frames');
+  var veil = document.getElementById('veil');
+
+  function param(){
+    var q = new URLSearchParams(location.search).get('suite');
+    return APPS[q] ? q : 'live';
+  }
+
+  function ensureFrame(key){
+    if (frames[key]) return frames[key];
+    var f = document.createElement('iframe');
+    f.className = 'suite-frame';
+    f.setAttribute('allow','microphone; autoplay; clipboard-write');
+    f.setAttribute('title', APPS[key].label);
+    f.dataset.suite = key;
+    // lazy src: only set when first activated, so audio contexts start on demand
+    frames[key] = f;
+    host.appendChild(f);
+    return f;
+  }
+
+  function activate(key, push){
+    if (!APPS[key]) key = 'live';
+    var f = ensureFrame(key);
+    if (!loaded[key]){ f.src = APPS[key].src; loaded[key] = true; }
+    order.forEach(function(k){
+      if (frames[k]) frames[k].classList.toggle('on', k === key);
+    });
+    document.querySelectorAll('.suite-tab').forEach(function(t){
+      t.classList.toggle('on', t.dataset.suite === key);
+    });
+    current = key;
+    document.title = 'NeusicWave — ' + APPS[key].label;
+    if (push){
+      var u = new URL(location.href); u.searchParams.set('suite', key);
+      history.pushState({suite:key}, '', u);
+    }
+    // drop the veil once the active frame paints
+    f.addEventListener('load', function(){ veil.classList.add('gone'); }, {once:true});
+    // safety: hide veil after 2.5s regardless
+    setTimeout(function(){ veil.classList.add('gone'); }, 2500);
+  }
+
+  document.querySelectorAll('.suite-tab').forEach(function(t){
+    t.addEventListener('click', function(){ activate(t.dataset.suite, true); });
+  });
+  window.addEventListener('popstate', function(){ activate(param(), false); });
+
+  activate(param(), false);
+})();
+</script>
+</body>
+</html>

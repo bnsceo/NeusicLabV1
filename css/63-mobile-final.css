@@ -1,0 +1,20 @@
+/* Final phone containment for the NeusicWave landing. Loaded last. */
+@media (max-width:760px){
+  html,body{width:100%!important;max-width:100%!important;overflow-x:hidden!important}
+  body>*{max-width:100vw!important}
+  .site-header,.header-inner,main,.hero,.hero-content,.product-journey,.waitlist-form,.mode-section,.mode-inner,.companion-section,.nw-hub,.nw-hub .wrap,.site-footer{width:100%!important;max-width:100%!important;min-width:0!important}
+  .hero{padding-left:14px!important;padding-right:14px!important}
+  #heroTitle{display:block!important;width:100%!important;max-width:100%!important;margin-inline:0!important;font-size:clamp(42px,15.5vw,64px)!important;line-height:.88!important;letter-spacing:-.055em!important;white-space:normal!important;overflow:hidden!important;overflow-wrap:normal!important;word-break:normal!important}
+  #heroTitle .nw-wave-sub{display:block!important;width:100%!important;max-width:100%!important;margin:8px 0 0!important;font-size:clamp(13px,4.4vw,18px)!important;line-height:1!important;letter-spacing:.22em!important;white-space:normal!important;overflow:hidden!important}
+  .hero-statement,.hero-copy,.journey-heading,.journey-step,.mode-copy,.mode-copy h2,.companion-section h2,.nw-hub-title,.nw-hub-sub{max-width:100%!important;min-width:0!important;white-space:normal!important;overflow-wrap:anywhere!important}
+  .journey-step{display:grid!important;grid-template-columns:52px minmax(0,1fr)!important}
+  .journey-step>span{width:48px!important;height:48px!important}
+  .journey-step>div{min-width:0!important}
+  .journey-step b,.journey-step small{display:block!important;max-width:100%!important;white-space:normal!important;overflow-wrap:anywhere!important}
+  .mode-preview,.pulse-preview,.wave-preview,.lab-preview{max-width:100%!important;min-width:0!important}
+  .site-footer>div,.site-footer nav{width:100%!important;max-width:100%!important}
+}
+@media (max-width:390px){
+  #heroTitle{font-size:clamp(38px,14.5vw,54px)!important}
+  .hero-statement{font-size:clamp(19px,6.3vw,25px)!important}
+}
