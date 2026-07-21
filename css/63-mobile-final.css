@@ -3,8 +3,16 @@
   html,body{width:100%!important;max-width:100%!important;overflow-x:hidden!important}
   body{position:relative!important}
   body>*{width:auto!important;max-width:100%!important;min-width:0!important}
-  main,.hero,.hero-content,.product-journey,.journey-heading,.journey-steps,.waitlist-form,.mode-section,.mode-inner,.mode-preview,.mode-copy,.companion-section,.nw-hub,.nw-hub .wrap,.product-cards,.product-card,.site-footer{width:100%!important;max-width:100%!important;min-width:0!important}
-  .header-inner{width:100%!important;max-width:100%!important;padding-inline:14px!important}
+  main,.hero,.hero-content,.product-journey,.journey-heading,.journey-steps,.waitlist-form,.mode-section,.mode-inner,.mode-preview,.mode-copy,.companion-section,.nw-hub,.nw-hub .wrap,.product-cards,.product-card{width:100%!important;max-width:100%!important;min-width:0!important}
+
+  /* One shared mobile frame: header and footer now have identical outer edges. */
+  .site-header,.site-footer{left:14px!important;right:14px!important;width:calc(100% - 28px)!important;max-width:calc(100% - 28px)!important;margin-left:0!important;margin-right:0!important}
+  .site-header{inset-inline:14px!important}
+  .header-inner,.site-footer{box-sizing:border-box!important;padding-left:14px!important;padding-right:14px!important}
+  .header-inner{width:100%!important;max-width:100%!important;margin:0!important}
+  .site-footer{display:grid!important;gap:14px!important;text-align:center!important}
+  .site-footer>div,.site-footer nav{width:100%!important;max-width:100%!important;min-width:0!important;margin:0!important}
+
   .hero{padding:34px 14px 30px!important;min-height:auto!important;overflow:hidden!important}
   .hero-content{margin:0!important;padding:0!important}
   #heroTitle,.hero h1{display:block!important;width:100%!important;max-width:100%!important;margin:12px 0 18px!important;font-size:clamp(42px,15vw,62px)!important;line-height:.9!important;letter-spacing:-.055em!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:break-word!important;overflow:hidden!important}
@@ -32,7 +40,6 @@
   .product-cards{gap:14px!important}
   .product-card{overflow:hidden!important}
   .product-card h3,.product-card p,.product-card li{white-space:normal!important;overflow-wrap:anywhere!important}
-  .site-footer{padding:24px 14px!important;text-align:center!important}
   .site-footer nav{display:flex!important;flex-wrap:wrap!important;justify-content:center!important}
   #nw-agent-dot,#nw-agent-panel{display:none!important}
 }
