@@ -1,0 +1,37 @@
+name: Sandbox mobile suite patch
+on:
+  push:
+    branches: [sandbox/mobile-suite-release-pages]
+    paths: [.github/workflows/sandbox-mobile-suite-patch.yml]
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: sandbox/mobile-suite-release-pages
+      - name: Link final mobile styles
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          jobs = [
+            ('studio/index.html', '<link rel="stylesheet" href="css/33-mobile-usable.css?v=1">', '</head>'),
+            ('live-loop/index.html', '<link rel="stylesheet" href="mobile-release.css?v=1">', '</head>'),
+            ('wave-loom/index.html', '<link rel="stylesheet" href="mobile-release.css?v=1">', '</head>'),
+          ]
+          for name, link, marker in jobs:
+            p=Path(name); text=p.read_text(encoding='utf-8')
+            if link not in text:
+              text=text.replace(marker, '  '+link+'\n'+marker, 1)
+            p.write_text(text, encoding='utf-8')
+          PY
+          rm .github/workflows/sandbox-mobile-suite-patch.yml
+      - name: Commit sandbox patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add studio/index.html live-loop/index.html wave-loom/index.html .github/workflows/sandbox-mobile-suite-patch.yml
+          git commit -m "Wire mobile usability layers into all three apps"
+          git push origin HEAD:sandbox/mobile-suite-release-pages
