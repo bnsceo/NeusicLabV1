@@ -1,0 +1,72 @@
+/* 51-waveform-shell.css — Waveform four-zone shell.
+   Zones: menubar / transport strip / left browser / center canvas / right inspector.
+   Adapted from ../app/css/31-nw-shell.css with waveform-specific regions. */
+
+html,body{margin:0;padding:0}
+body{background:var(--nw-black);font-family:var(--nw-font);color:#c9cdcb}
+body.nw-in-app #app{height:100dvh}
+#app{display:flex;flex-direction:column;background:var(--nw-black);min-height:60dvh}
+
+/* ── Transport strip: recessed, minimal visual weight ── */
+#wf-topbar{display:flex;align-items:center;gap:6px;padding:0 8px;min-height:38px;
+  background:linear-gradient(#211f1e,#1a1918);border-bottom:1px solid rgba(0,0,0,.7);
+  box-shadow:inset 0 -1px rgba(255,255,255,.03)}
+#wf-topbar .tb-btn{font:700 var(--nw-ctl)/1 var(--nw-font);letter-spacing:.06em;
+  background:linear-gradient(#454a48,#2e3230);border:1px solid #1c1e1d;border-radius:2px;
+  color:#9ba09e;cursor:pointer;padding:6px 10px;
+  box-shadow:inset 0 1px rgba(255,255,255,.07),0 1px rgba(0,0,0,.5)}
+#wf-topbar .tb-spacer{flex:1}
+#wf-topbar .chip{background:#141614;border:1px solid #0e100f;border-radius:2px;
+  box-shadow:var(--nw-recess);color:var(--nw-silver);padding:4px 10px;text-align:center;cursor:default}
+#wf-topbar .chip-main{font:700 var(--nw-display)/1.1 var(--nw-font);letter-spacing:.06em;
+  color:color-mix(in srgb,var(--nw-accent) 60%,#e8eae9)}
+#wf-topbar .chip-sub{font:600 var(--nw-micro)/1 var(--nw-font);color:var(--nw-steel)}
+/* play = the accent element */
+#wf-topbar #wf-play{background:var(--nw-accent);color:#141210;border-radius:50%;width:30px;height:30px;padding:0;
+  box-shadow:inset 0 1px rgba(255,255,255,.35),0 0 6px color-mix(in srgb,var(--nw-accent) 45%,transparent)}
+#wf-topbar #wf-rec{border-radius:50%;width:30px;height:30px;padding:0;
+  background:radial-gradient(circle,#b34b37 0 35%,#4a302b 38% 65%,#202322 68%);color:transparent}
+#wf-topbar #wf-rec.armed{box-shadow:0 0 8px var(--nw-rec-ring)}
+
+/* ── Zone grid ── */
+#wf-main{display:grid;grid-template-columns:var(--wf-left-w,216px) 1fr var(--wf-right-w,224px);
+  grid-template-areas:"left center right";flex:1;min-height:320px;background:var(--nw-black)}
+body.wf-left-closed #wf-main{--wf-left-w:0px}
+body.wf-right-closed #wf-main{--wf-right-w:0px}
+#wf-left{grid-area:left;overflow:hidden auto;
+  background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.1)),var(--nw-charcoal);
+  border-right:1px solid rgba(0,0,0,.65);box-shadow:inset -1px 0 rgba(255,255,255,.03)}
+#wf-center{grid-area:center;min-width:0;background:var(--nw-panel);display:flex;flex-direction:column}
+#wf-inspector{grid-area:right;overflow:hidden auto;
+  background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.1)),var(--nw-charcoal);
+  border-left:1px solid rgba(0,0,0,.65);box-shadow:inset 1px 0 rgba(255,255,255,.03)}
+body.wf-left-closed #wf-left,body.wf-right-closed #wf-inspector{display:none}
+.nw-sect{padding:10px 10px 8px;border-bottom:1px solid rgba(0,0,0,.5);
+  box-shadow:inset 0 1px rgba(255,255,255,.025)}
+
+/* ── Left panel lists ── */
+.wf-list{margin-top:6px;display:flex;flex-direction:column;gap:3px}
+.wf-list button{font:600 var(--nw-label)/1.2 var(--nw-font);letter-spacing:.03em;text-align:left;
+  background:none;border:0;border-radius:2px;color:#b9bdbb;padding:6px 7px;cursor:pointer}
+.wf-list button:hover{background:#333735;color:#e6e9e8}
+.wf-list button.on{background:color-mix(in srgb,var(--nw-accent) 24%,#2c2f2d);color:#eef1f0}
+
+/* ── Center views ── */
+.wf-view{display:none;flex:1;flex-direction:column;padding:12px;gap:10px;min-height:0}
+.wf-view.on{display:flex}
+.wf-canvas-well{flex:1;min-height:180px;position:relative;overflow:hidden}
+#wf-canvas{position:absolute;inset:0;width:100%;height:100%}
+.wf-tools{display:flex;flex-wrap:wrap;gap:6px}
+.wf-synth-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;align-content:start;flex:1}
+.wf-mod{padding:12px;border-radius:2px}
+.wf-mod .nw-micro{margin-top:6px}
+
+/* ── Responsive: panels become slide-overs ── */
+@media(max-width:768px){
+  #wf-main{grid-template-columns:1fr;grid-template-areas:"center"}
+  #wf-left,#wf-inspector{position:fixed;top:64px;bottom:0;z-index:70;width:min(78vw,300px)}
+  #wf-left{left:0;transform:translateX(-100%);transition:transform .18s ease}
+  #wf-inspector{right:0;transform:translateX(100%);transition:transform .18s ease}
+  body.wf-left-open #wf-left{transform:none;display:block}
+  body.wf-right-open #wf-inspector{transform:none;display:block}
+}

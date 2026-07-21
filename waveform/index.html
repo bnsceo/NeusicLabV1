@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Waveform — NeusicWave Sound Design Studio</title>
+<meta name="description" content="Edit samples, design synths, layer effects — all in real time, in your browser.">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../app/css/30-nw-tokens.css">
+<link rel="stylesheet" href="../app/css/32-nw-menubar.css">
+<link rel="stylesheet" href="css/50-waveform-hero.css">
+<link rel="stylesheet" href="css/51-waveform-shell.css">
+</head>
+<body data-product="wave">
+<section id="nw-landing" class="nw-noise">
+  <div class="wrap">
+    <div class="nw-micro" style="margin-bottom:14px">NEUSICWAVE / SOUND DESIGN</div>
+    <h1>Shape, sculpt, and layer sounds.<br>Waveform is the sound design studio.</h1>
+    <p class="sub">Edit samples, design synths, layer effects — all in real time, in your browser.</p>
+    <ul>
+      <li>Load or record audio; edit waveforms with surgical precision</li>
+      <li>Design synths with an oscillator stack + real-time preview</li>
+      <li>Layer effects: reverb, delay, compression, EQ — print to sample</li>
+    </ul>
+    <button class="cta" id="nw-enter"><i></i>Open Waveform</button>
+    <div class="more">
+      <h3>Waveform editing &amp; sample management</h3>
+      <p>Zoom into the sample, trim with surgical precision, drag regions to rearrange, and keep every edit non-destructive. Your source audio stays intact while you shape the take that ships.</p>
+      <div class="shot">SCREENSHOT — WAVEFORM EDITOR &amp; TIMELINE</div>
+      <h3>Synth design with presets &amp; randomization</h3>
+      <p>Stack oscillators, sweep filters, and shape envelopes with instant audible feedback. Start from the preset library or roll the randomizer until the sound surprises you — then save it as your own.</p>
+      <div class="shot">SCREENSHOT — SYNTH INTERFACE</div>
+      <h3>Real-time effects processing</h3>
+      <p>Chain reverb, delay, compression, and EQ in the effect rack. Balance wet and dry per send, audition the chain live, and print the processed result straight back to a sample.</p>
+      <div class="shot">SCREENSHOT — EFFECTS RACK</div>
+    </div>
+  </div>
+</section>
+<div id="app">
+
+<!-- TRANSPORT STRIP -->
+<div id="wf-topbar">
+  <button class="tb-btn" id="wf-play" onclick="playAudio()" title="Play/Pause (Space)">▶</button>
+  <button class="tb-btn wf-rec" id="wf-rec" onclick="toggleRecord()" title="Record (R)">⏺</button>
+  <div class="chip">
+    <div class="chip-main" id="wf-time">00:00.000</div>
+    <div class="chip-sub">POSITION</div>
+  </div>
+  <div class="chip" onclick="bpmTap(event)" title="Click ± to adjust BPM">
+    <div class="chip-main" id="wf-bpm">120</div>
+    <div class="chip-sub">BPM</div>
+  </div>
+  <div class="tb-spacer"></div>
+  <button class="tb-btn" onclick="WFShell.togglePanel('left')" title="Toggle browser">☰</button>
+  <button class="tb-btn" onclick="WFShell.togglePanel('right')" title="Toggle inspector">⚙</button>
+</div>
+
+<!-- MAIN -->
+<div id="wf-main">
+
+  <!-- LEFT: browser / presets / history -->
+  <aside id="wf-left">
+    <div class="nw-sect">
+      <div class="nw-label">Samples</div>
+      <div id="wf-samples" class="wf-list"></div>
+    </div>
+    <div class="nw-sect">
+      <div class="nw-label">Synth Presets</div>
+      <div id="wf-presets" class="wf-list"></div>
+    </div>
+    <div class="nw-sect">
+      <div class="nw-label">History</div>
+      <div id="wf-history" class="wf-list"><div class="nw-micro">No edits yet</div></div>
+    </div>
+  </aside>
+
+  <!-- CENTER: waveform canvas / synth editor -->
+  <div id="wf-center">
+    <div id="wf-wave-view" class="wf-view on">
+      <div class="nw-well wf-canvas-well"><canvas id="wf-canvas"></canvas></div>
+      <div class="wf-tools">
+        <button class="nw-btn" onclick="wfTool('trim')">Trim</button>
+        <button class="nw-btn" onclick="wfTool('fade')">Fade</button>
+        <button class="nw-btn" onclick="wfTool('normalize')">Normalize</button>
+        <button class="nw-btn" onclick="wfTool('reverse')">Reverse</button>
+        <button class="nw-btn" onclick="wfTool('print')">Print FX</button>
+      </div>
+    </div>
+    <div id="wf-synth-view" class="wf-view">
+      <div class="wf-synth-grid">
+        <div class="nw-surface wf-mod"><div class="nw-label">OSC 1</div><div class="nw-micro">SAW · −12st · 64%</div></div>
+        <div class="nw-surface wf-mod"><div class="nw-label">OSC 2</div><div class="nw-micro">SQUARE · 0st · 40%</div></div>
+        <div class="nw-surface wf-mod"><div class="nw-label">FILTER</div><div class="nw-micro">LP 24dB · 880Hz · RES 22%</div></div>
+        <div class="nw-surface wf-mod"><div class="nw-label">ENVELOPE</div><div class="nw-micro">A 4ms · D 180ms · S 55% · R 320ms</div></div>
+        <div class="nw-surface wf-mod"><div class="nw-label">LFO</div><div class="nw-micro">SINE · 2.4Hz → CUTOFF</div></div>
+        <div class="nw-surface wf-mod"><div class="nw-label">FX RACK</div><div class="nw-micro">REVERB · DELAY · COMP · EQ</div></div>
+      </div>
+      <div class="wf-tools">
+        <button class="nw-btn" onclick="wfTool('preview')">Preview</button>
+        <button class="nw-btn" onclick="wfTool('randomize')">Randomize</button>
+        <button class="nw-btn" onclick="wfTool('save-preset')">Save Preset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: inspector -->
+  <aside id="wf-inspector">
+    <div class="nw-sect">
+      <div class="nw-label">Inspector</div>
+      <div id="wf-inspector-body"><div class="nw-micro" style="margin-top:6px">Select a sample or preset</div></div>
+    </div>
+    <div class="nw-sect">
+      <div class="nw-label">Neusic Agent</div>
+      <div class="nw-lamp busy" id="nw-agent-lamp"><i></i><span>Checking…</span></div>
+      <button class="nw-btn" style="margin-top:8px" onclick="window.NeusicAgent&&NeusicAgent.openPanel()">Open Assistant</button>
+    </div>
+  </aside>
+
+</div><!-- /wf-main -->
+</div><!-- /app -->
+
+<div id="toast"></div>
+<script src="js/50-waveform-shell.js"></script>
+<script src="../app/js/44-nw-agent.js"></script>
+<script src="../app/js/45-nw-demo-gate.js"></script>
+<script>
+/* landing → app handoff */
+(function(){
+  var b=document.getElementById('nw-enter');
+  var go=function(){document.body.classList.add('nw-in-app');try{localStorage.setItem('nw-entered-wave','1')}catch(e){}window.scrollTo(0,0)};
+  if(b)b.addEventListener('click',go);
+  try{if(localStorage.getItem('nw-entered-wave')==='1')document.body.classList.add('nw-in-app')}catch(e){}
+})();
+</script>
+</body>
+</html>

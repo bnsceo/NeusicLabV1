@@ -1,30 +1,18 @@
 import {test,expect} from '@playwright/test';
 
-test('landing explains the three-product journey and mock previews respond',async({page})=>{
+test('hub landing presents the NeusicWave trio and FAQ responds',async({page})=>{
   await page.goto('/',{waitUntil:'domcontentloaded'});
-  await expect(page.getByText('3 PRODUCTS / 1 CONNECTED PROJECT')).toBeVisible();
-  await expect(page.locator('.journey-step')).toHaveCount(3);
-  const destinations=await page.locator('.journey-step').evaluateAll(items=>items.map(item=>item.getAttribute('href')));
-  expect(destinations).toEqual(['./live-loop/','./wave-loom/','./studio/']);
+  await expect(page.locator('.hub-hero h1')).toContainText('entirely in your browser');
+  await expect(page.locator('.nw-tri-rule')).toBeVisible();
+  const cards=page.locator('.product-card');
+  await expect(cards).toHaveCount(3);
+  const destinations=await cards.locator('.cta').evaluateAll(links=>links.map(link=>link.getAttribute('href')));
+  expect(destinations).toEqual(['./studio/','./waveform/','./livestudio/']);
 
-  const live=page.locator('[data-preview="live-loop"]');
-  await live.locator('[data-demo-action="record"]').click();
-  await expect(live).toHaveClass(/demo-recording/);
-  await live.locator('.loop-ring').nth(2).click();
-  await expect(live.locator('.preview-demo-status')).toContainText('LANE 03');
-
-  const wave=page.locator('[data-preview="wave"]');
-  await wave.locator('[data-demo-action="morph"]').click();
-  await expect(wave).toHaveClass(/demo-morph/);
-  const waveNode=wave.locator('.wave-nodes circle').nth(3);
-  await waveNode.evaluate(node=>node.dispatchEvent(new MouseEvent('click',{bubbles:true})));
-  await expect(waveNode).toHaveClass(/mock-selected/);
-
-  const lab=page.locator('[data-preview="lab"]');
-  await lab.locator('[data-demo-action="mix"]').click();
-  await expect(lab).toHaveAttribute('data-lab-view','mix');
-  await lab.locator('[data-demo-action="play"]').click();
-  await expect(lab).toHaveClass(/demo-playing/);
+  const faq=page.locator('.faq details').first();
+  await expect(faq.locator('p')).not.toBeVisible();
+  await faq.locator('summary').click();
+  await expect(faq.locator('p')).toBeVisible();
 });
 
 test('Live Loop and Wave share the suite rail while remaining distinct',async({page})=>{
@@ -52,13 +40,16 @@ test('Neusic Lab exposes the same journey inside the Studio frame',async({page})
   await expect(frame.locator('#topbar')).toBeVisible();
 });
 
-test('mobile landing keeps all three starting points reachable',async({page})=>{
+test('mobile hub stacks the product cards and keeps all three reachable',async({page})=>{
   await page.setViewportSize({width:390,height:844});
   await page.goto('/',{waitUntil:'domcontentloaded'});
-  const steps=page.locator('.journey-step');
-  await expect(steps).toHaveCount(3);
-  for(let index=0;index<3;index++)await expect(steps.nth(index)).toBeVisible();
-  await expect(page.locator('[data-preview="live-loop"] .preview-demo-panel')).toBeVisible();
-  await expect(page.locator('[data-preview="wave"] .preview-demo-panel')).toBeVisible();
-  await expect(page.locator('[data-preview="lab"] .preview-demo-panel')).toBeVisible();
+  const cards=page.locator('.product-card');
+  await expect(cards).toHaveCount(3);
+  for(let index=0;index<3;index++){
+    await cards.nth(index).scrollIntoViewIfNeeded();
+    await expect(cards.nth(index)).toBeVisible();
+  }
+  const first=await cards.nth(0).boundingBox();
+  const second=await cards.nth(1).boundingBox();
+  expect(second.y).toBeGreaterThan(first.y+first.height-1);
 });
