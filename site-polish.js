@@ -13,6 +13,16 @@
   document.getElementById('mobileMenu')?.remove();
   header?.classList.add('menu-free');
 
+  // Use the proven direct app routes instead of the broken suite wrapper links.
+  const routeMap={live:'./live-loop/',wave:'./wave-loom/',studio:'./studio/'};
+  document.querySelectorAll('a[href*="suite/?suite="]').forEach(link=>{
+    try{
+      const value=new URL(link.getAttribute('href'),location.href).searchParams.get('suite');
+      if(routeMap[value]) link.setAttribute('href',routeMap[value]);
+    }catch(_){}
+  });
+
+  if(!document.querySelector('link[href*="62-mobile-hotfix.css"]')){const link=document.createElement('link');link.rel='stylesheet';link.href='./css/62-mobile-hotfix.css?v=1';document.head.appendChild(link)}
   if(!document.querySelector('link[href*="neusic-agent.css"]')){const link=document.createElement('link');link.rel='stylesheet';link.href='./neusic-agent.css?v=1';document.head.appendChild(link)}
   if(!document.querySelector('script[src*="neusic-agent.js"]')){const script=document.createElement('script');script.src='./neusic-agent.js?v=1';script.defer=true;document.body.appendChild(script)}
 
