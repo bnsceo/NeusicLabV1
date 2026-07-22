@@ -1,0 +1,144 @@
+name: Organize repository root
+
+on:
+  push:
+    branches:
+      - chore/organize-repository-root
+    paths:
+      - scripts/maintenance/organize-root.mjs
+      - .github/workflows/organize-root.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - scripts/maintenance/organize-root.mjs
+      - .github/workflows/organize-root.yml
+      - index.html
+      - css/**
+      - scripts/**
+      - assets/**
+      - archive/**
+      - docs/**
+      - tests/**
+      - live-loop/**
+      - wave-loom/**
+      - waveform/**
+      - livestudio/**
+      - app/**
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: organize-root-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  organize-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Restore canonical hub landing
+        shell: bash
+        run: |
+          if ! grep -q 'NEUSICWAVE' index.html; then
+            git fetch --depth=1 origin ce2524165723e96f1ca4b0d1956ad1e1d8275f52
+            git show ce2524165723e96f1ca4b0d1956ad1e1d8275f52:index.html > index.html
+          fi
+          python3 - <<'PY'
+          from pathlib import Path
+
+          page = Path('index.html')
+          source = page.read_text()
+          replacements = {
+              './favicon.svg': './assets/icons/favicon.svg',
+              './favicon.png': './assets/icons/favicon.png',
+              './site-polish.css': './css/landing/site-polish.css',
+              './landing-experience.css': './css/landing/landing-experience.css',
+              './site-polish.js': './scripts/landing/site-polish.js',
+              './landing-experience.js': './scripts/landing/landing-experience.js',
+              '<a class="cta" href="./live-loop/">Launch LiveStudio</a>': '<a class="cta" href="./livestudio/">Launch LiveStudio</a>',
+              '<a class="cta" href="./wave-loom/">Launch Waveform</a>': '<a class="cta" href="./waveform/">Launch Waveform</a>',
+          }
+          for old, new in replacements.items():
+              source = source.replace(old, new)
+          if './css/60-hub-landing.css' not in source:
+              source = source.replace(
+                  '<link rel="stylesheet" href="./css/61-landing-reskin.css?v=2">',
+                  '<link rel="stylesheet" href="./css/60-hub-landing.css">\n  <link rel="stylesheet" href="./css/61-landing-reskin.css?v=2">',
+              )
+          page.write_text(source)
+          PY
+
+      - name: Apply deterministic root organization
+        shell: bash
+        run: |
+          set +e
+          node scripts/maintenance/organize-root.mjs > /tmp/organize-root.log 2>&1
+          status=$?
+          cat /tmp/organize-root.log
+          exit "$status"
+
+      - name: Upload organizer diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: organize-root-log
+          path: /tmp/organize-root.log
+          retention-days: 3
+          if-no-files-found: error
+
+      - name: Validate JavaScript syntax
+        shell: bash
+        run: |
+          node --check live-loop/app.js
+          find scripts live-loop/src app wave-loom waveform livestudio -type f \( -name '*.js' -o -name '*.mjs' \) -print0 \
+            | xargs -0 -n1 node --check
+
+      - name: Run source-integrity tests
+        shell: bash
+        run: |
+          set +e
+          npm run test:wave > /tmp/test-wave.log 2>&1
+          status=$?
+          cat /tmp/test-wave.log
+          exit "$status"
+
+      - name: Upload source test diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: organize-root-test-log
+          path: /tmp/test-wave.log
+          retention-days: 3
+          if-no-files-found: warn
+
+      - name: Validate patch formatting
+        run: git diff --check
+
+      - name: Commit organized repository to branch
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          if git diff --quiet && git diff --cached --quiet; then
+            echo 'Repository is already organized.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'chore: organize repository root [organized]'
+          git push origin HEAD:chore/organize-repository-root
