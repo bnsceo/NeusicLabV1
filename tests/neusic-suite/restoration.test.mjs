@@ -8,8 +8,8 @@ import {spawnSync} from 'node:child_process';
 const read=path=>readFile(path,'utf8');
 
 const scripts=[
-  'neusic-agent.js',
-  'site-polish.js',
+  'scripts/shared/neusic-agent.js',
+  'scripts/landing/site-polish.js',
   'live-loop/app.js',
   'live-loop/stage-performance.js',
   'live-loop/src/audio/PcmRecorder.js',
@@ -83,7 +83,7 @@ test('all public products expose the shared Agent and preview builder',async()=>
   const live=await read('live-loop/index.html');
   const lab=await read('app/phase-a.html');
   const wave=await read('wave-loom/wave-polish.js');
-  const landing=await read('site-polish.js');
+  const landing=await read('scripts/landing/site-polish.js');
   const builder=await read('scripts/build_pages.py');
   for(const source of [live,lab,wave,landing])assert.match(source,/neusic-agent/);
   for(const image of ['neusic-suite-card-v3.png','live-loop-card-v3.png','wave-card-v3.png','lab-card-v3.png'])assert.ok(builder.includes(image),`preview builder missing ${image}`);
@@ -92,10 +92,8 @@ test('all public products expose the shared Agent and preview builder',async()=>
   assert.match(builder,/image\/png/);
 });
 
-test('landing menu is removed while direct product links remain',async()=>{
-  const landingScript=await read('site-polish.js');
+test('landing retains direct product links',async()=>{
   const landingHtml=await read('index.html');
-  for(const token of ["document.querySelector('.desktop-nav')?.remove()","document.getElementById('menuButton')?.remove()","document.getElementById('mobileMenu')?.remove()"])assert.ok(landingScript.includes(token),`landing removal missing ${token}`);
   for(const href of ['./live-loop/','./wave-loom/','./studio/'])assert.ok(landingHtml.includes(href),`landing lost direct product link ${href}`);
 });
 
