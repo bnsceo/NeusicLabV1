@@ -48,8 +48,6 @@ async function startRecordFromGesture(index,button){
   selectTrack(index);
   status(`Preparing LOOP ${index+1}… Keep this page open.`);
 
-  // Both operations begin immediately in the original trusted finger gesture.
-  // Do not await one before launching the other on iPhone Safari.
   const microphonePromise=primeMicrophoneFromGesture();
   const audioEnginePromise=ensureEngine();
 
@@ -78,11 +76,25 @@ function buildTracks(){
     card.querySelector('.track-name').textContent=`LOOP ${index+1}`;
     card.querySelectorAll('[data-action]').forEach(button=>button.addEventListener('click',async event=>{
       event.stopPropagation();
-      await handleTrackAction(index,button.dataset.action);
+      await handleTrackAction(index,button.data
+
+ta.action);
     }));
     const recordButton=card.querySelector('[data-action="record"]');
+    // iOS Safari: touchstart + click fallback
+    // Android: pointerdown
+    recordButton.addEventListener('touchstart',event=>{
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      startRecordFromGesture(index,recordButton);
+    },{passive:false});
     recordButton.addEventListener('pointerdown',event=>{
       if(event.pointerType==='mouse')return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      startRecordFromGesture(index,recordButton);
+    },{passive:false});
+    recordButton.addEventListener('click',event=>{
       event.preventDefault();
       event.stopImmediatePropagation();
       startRecordFromGesture(index,recordButton);
@@ -144,62 +156,46 @@ async function sendTrack(index){
 function renderTrack(index){
   const card=trackGrid.querySelector(`[data-index="${index}"]`);
   if(!card)return;
-  if(!looper){
-    card.dataset.state=STATES.EMPTY;
-    card.querySelector('.track-state').textContent='READY';
-    return;
-  }
   const track=looper.tracks[index];
-  card.dataset.state=track.state;
-  card.querySelector('.track-name').textContent=track.name;
-  card.querySelector('.track-state').textContent=track.state.toUpperCase();
-  const record=card.querySelector('[data-action="record"]');
-  record.textContent=track.state===STATES.QUEUED?'CANCEL':track.state===STATES.RECORDING||track.state===STATES.OVERDUBBING?'STOP':track.buffer?'OVERDUB':'REC';
-  card.querySelector('[data-action="mute"]').textContent=track.muted?'UNMUTE':'MUTE';
-  card.querySelector('[data-action="forge"]').disabled=!track.buffer;
-  card.querySelector('[data-action="clear"]').disabled=!track.buffer;
-  window.dispatchEvent(new CustomEvent('neusic:live-loop-track',{detail:{index,state:track.state,muted:track.muted,hasAudio:Boolean(track.buffer),rate:track.rate,reverse:track.reverse}}));
+  card.classList.toggle('empty',!track.buffer);
+  card.classList.toggle('recording',track.state===STATES.RECORDING);
+  card.classList.toggle('playing',track.state===STATES.PLAYING);
+  card.classList.toggle('muted',track.muted);
+  card.querySelector('.track-duration').textContent=format(track.duration);
+  card.querySelector('[data-control="volume"]').value=track.volume*100;
+  card.querySelector('[data-control="volume"]').nextElementSibling.textContent=outputFor('volume',track.volume);
+  card.querySelector('[data-control="pan"]').value=track.panValue*100;
+  card.querySelector('[data-control="pan"]').nextElementSibling.textContent=outputFor('pan',track.panValue);
 }
 
 function renderAll(){
-  for(let index=0;index<5;index++)renderTrack(index);
-  if(!looper)return;
-  $('masterLength').textContent=format(looper.masterLength);
-  $('globalState').textContent=looper.activeRecording?'CAPTURING':looper.playing?'PLAYING':'READY';
-  $('playBtn').classList.toggle('active',looper.playing);
-  $('playBtn').querySelector('b').textContent=looper.playing?'RUNNING':'START';
+  for(let i=0;i<5;i++)renderTrack(i);
+  const master=$('masterDuration');
+  if(master)master.textContent=format(looper.masterLength);
+  const bpmDisplay=$('bpmValue');
+  if(bpmDisplay)bpmDisplay.textContent=String(looper.bpm).padStart(3,'0');
+  $('playBtn').textContent=looper.playing?'⏸ PAUSE':'▶ START';
+  $('syncToggle').checked=looper.quantizeEnabled;
 }
 
 function updateProgress(){
-  if(looper){
-    const progress=looper.progress();
-    const circumference=270.2;
-    document.querySelectorAll('.loop-track').forEach((card,index)=>{
-      const track=looper.tracks[index];
-      const ring=card.querySelector('.progress-ring');
-      const time=card.querySelector('.progress-time');
-      ring.style.strokeDashoffset=String(circumference*(1-(track.buffer?progress:0)));
-      time.textContent=track.buffer?(progress*looper.masterLength).toFixed(1):'00.0';
-    });
-    const level=workspace.meterLevel();
-    $('masterMeter').style.width=`${level*100}%`;
-    window.dispatchEvent(new CustomEvent('neusic:live-loop-progress',{detail:{progress,level}}));
-  }
+  if(!looper)return;
+  const progress=looper.masterLength>0?looper.position/looper.masterLength*100:0;
+  $('progressBar').style.width=progress+'%';
+  $('positionTime').textContent=format(looper.position);
   requestAnimationFrame(updateProgress);
 }
 
 function bindGlobal(){
   $('micBtn').addEventListener('click',async()=>{
     try{
-      const microphonePromise=primeMicrophoneFromGesture();
-      await ensureEngine();
-      const stream=await microphonePromise;
-      if(stream?.getAudioTracks?.().length)workspace.micStream=stream;
-      await workspace.initMic();
-      workspace.setMonitor(!$('micBtn').classList.contains('active'));
-      $('micBtn').classList.toggle('active');
-      status($('micBtn').classList.contains('active')?'Microphone enabled. Use headphones when monitoring.':'Microphone remains available; direct monitoring is muted.');
-    }catch(error){status(error.message||'Microphone access failed. Check browser permission and tap MIC again.');}
+      primeMicrophoneFromGesture().then(stream=>{
+        if(stream?.getAudioTracks?.().length){workspace.micStream=stream;workspace.initMic().catch(e=>status(e.message));}
+        status('Microphone active. Tap REC on any lane to begin.');
+      }).catch(error=>{
+        status('Microphone access denied. Touch recording is disabled.');
+      });
+    }catch(error){status(error.message);}
   });
   $('playBtn').addEventListener('click',async()=>{try{await ensureEngine();looper.playing?looper.stop():looper.start();}catch(error){status(error.message);}});
   $('stopBtn').addEventListener('click',async()=>{try{await ensureEngine();if(looper.activeRecording)await looper.stopRecording();looper.stop();}catch(error){status(error.message);}});
