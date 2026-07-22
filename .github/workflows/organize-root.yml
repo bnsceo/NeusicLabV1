@@ -130,7 +130,7 @@ jobs:
         run: git diff --check
 
       - name: Commit organized repository to branch
-        if: github.event_name == 'push'
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
         shell: bash
         run: |
           if git diff --quiet && git diff --cached --quiet; then
