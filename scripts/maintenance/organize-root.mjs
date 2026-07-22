@@ -22,7 +22,7 @@ const moves=new Map(Object.entries({
   'Synth.js':'archive/legacy-root/audio/Synth.js',
   'TapeDelay.js':'archive/legacy-root/audio/TapeDelay.js',
 
-  // Historical root Live Loop copies. The active product owns its files in live-loop/.
+  // Historical root Live Loop copies. Active files remain in live-loop/.
   'app.js':'archive/legacy-root/live-loop/app.js',
   'iphone-record-bridge.js':'archive/legacy-root/live-loop/iphone-record-bridge.js',
   'loop-undo.js':'archive/legacy-root/live-loop/loop-undo.js',
@@ -40,24 +40,24 @@ const moves=new Map(Object.entries({
   'mobile-performance.css':'archive/legacy-root/live-loop/mobile-performance.css',
 
   // Active landing and shared assets.
-  'css/landing/landing-experience.css':'css/landing/landing-experience.css',
-  'css/landing/landing-loop.css':'css/landing/landing-loop.css',
-  'css/landing/product-home.css':'css/landing/product-home.css',
-  'css/landing/site-polish.css':'css/landing/site-polish.css',
-  'scripts/landing/landing-experience.js':'scripts/landing/landing-experience.js',
-  'scripts/landing/site-polish.js':'scripts/landing/site-polish.js',
-  'css/shared/neusic-agent.css':'css/shared/neusic-agent.css',
-  'css/shared/neusic-suite.css':'css/shared/neusic-suite.css',
-  'scripts/shared/neusic-agent.js':'scripts/shared/neusic-agent.js',
-  'scripts/shared/neusic-suite.js':'scripts/shared/neusic-suite.js',
+  'landing-experience.css':'css/landing/landing-experience.css',
+  'landing-loop.css':'css/landing/landing-loop.css',
+  'product-home.css':'css/landing/product-home.css',
+  'site-polish.css':'css/landing/site-polish.css',
+  'landing-experience.js':'scripts/landing/landing-experience.js',
+  'site-polish.js':'scripts/landing/site-polish.js',
+  'neusic-agent.css':'css/shared/neusic-agent.css',
+  'neusic-suite.css':'css/shared/neusic-suite.css',
+  'neusic-agent.js':'scripts/shared/neusic-agent.js',
+  'neusic-suite.js':'scripts/shared/neusic-suite.js',
 
   // Tooling, documentation, and icons.
-  'scripts/workers/scheduler-worker.js':'scripts/workers/scheduler-worker.js',
+  'scheduler-worker.js':'scripts/workers/scheduler-worker.js',
   'start_music.py':'scripts/tools/start_music.py',
   'start_neusic.py':'scripts/tools/start_neusic.py',
   'CLAUDE.md':'docs/development/CLAUDE.md',
-  'assets/icons/favicon.png':'assets/icons/favicon.png',
-  'assets/icons/favicon.svg':'assets/icons/favicon.svg'
+  'favicon.png':'assets/icons/favicon.png',
+  'favicon.svg':'assets/icons/favicon.svg'
 }));
 
 const keepAtRoot=new Set([
@@ -84,6 +84,7 @@ for(const entry of fs.readdirSync(root,{withFileTypes:true})){
 }
 
 function moveFile(source,destination){
+  if(source===destination)return;
   const sourcePath=fromRoot(source);
   if(!fs.existsSync(sourcePath))return;
   const destinationPath=fromRoot(destination);
@@ -101,23 +102,27 @@ function moveFile(source,destination){
 for(const [source,destination] of moves)moveFile(source,destination);
 
 const replacements=new Map([
-  ['assets/icons/favicon.svg','assets/icons/favicon.svg'],
-  ['assets/icons/favicon.png','assets/icons/favicon.png'],
-  ['css/landing/landing-experience.css','css/landing/landing-experience.css'],
-  ['css/landing/landing-loop.css','css/landing/landing-loop.css'],
-  ['css/landing/product-home.css','css/landing/product-home.css'],
-  ['css/landing/site-polish.css','css/landing/site-polish.css'],
-  ['scripts/landing/landing-experience.js','scripts/landing/landing-experience.js'],
-  ['scripts/landing/site-polish.js','scripts/landing/site-polish.js'],
-  ['css/shared/neusic-agent.css','css/shared/neusic-agent.css'],
-  ['css/shared/neusic-suite.css','css/shared/neusic-suite.css'],
-  ['scripts/shared/neusic-agent.js','scripts/shared/neusic-agent.js'],
-  ['scripts/shared/neusic-suite.js','scripts/shared/neusic-suite.js'],
-  ['scripts/workers/scheduler-worker.js','scripts/workers/scheduler-worker.js']
+  ['favicon.svg','assets/icons/favicon.svg'],
+  ['favicon.png','assets/icons/favicon.png'],
+  ['landing-experience.css','css/landing/landing-experience.css'],
+  ['landing-loop.css','css/landing/landing-loop.css'],
+  ['product-home.css','css/landing/product-home.css'],
+  ['site-polish.css','css/landing/site-polish.css'],
+  ['landing-experience.js','scripts/landing/landing-experience.js'],
+  ['site-polish.js','scripts/landing/site-polish.js'],
+  ['neusic-agent.css','css/shared/neusic-agent.css'],
+  ['neusic-suite.css','css/shared/neusic-suite.css'],
+  ['neusic-agent.js','scripts/shared/neusic-agent.js'],
+  ['neusic-suite.js','scripts/shared/neusic-suite.js'],
+  ['scheduler-worker.js','scripts/workers/scheduler-worker.js']
 ]);
 
 const textExtensions=new Set(['.html','.htm','.css','.js','.mjs','.cjs','.json','.md','.py','.svg','.txt','.yml','.yaml']);
 const ignoredDirectories=new Set(['.git','node_modules','archive']);
+const ignoredFiles=new Set([
+  'scripts/maintenance/organize-root.mjs',
+  '.github/workflows/organize-root.yml'
+]);
 
 function walk(directory){
   const output=[];
@@ -143,7 +148,7 @@ function replaceKnownReference(content,oldName,newPath){
 
 for(const absolute of walk(root)){
   const relative=posix(path.relative(root,absolute));
-  if(!textExtensions.has(path.extname(relative).toLowerCase()))continue;
+  if(ignoredFiles.has(relative)||!textExtensions.has(path.extname(relative).toLowerCase()))continue;
   let content=fs.readFileSync(absolute,'utf8');
   const original=content;
   for(const [oldName,newPath] of replacements)content=replaceKnownReference(content,oldName,newPath);
@@ -158,8 +163,8 @@ if(fs.existsSync(fromRoot('suite/index.html'))){
     fs.mkdirSync(path.dirname(archivePath),{recursive:true});
     if(!fs.existsSync(archivePath))fs.copyFileSync(suitePath,archivePath);
   }
-  fs.writeFileSync(suitePath,`<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=./suite/"><link rel="canonical" href="./suite/"><title>Opening Neusic Suite</title></head><body><p><a href="./suite/">Open Neusic Suite</a></p></body></html>\n`);
+  const redirect='<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=./suite/"><link rel="canonical" href="./suite/"><title>Opening Neusic Suite</title></head><body><p><a href="./suite/">Open Neusic Suite</a></p></body></html>\n';
+  fs.writeFileSync(suitePath,redirect);
 }
 
 fs.mkdirSync(fromRoot('docs'),{recursive:true});
@@ -210,4 +215,4 @@ for(const required of [
   if(!fs.existsSync(fromRoot(required)))throw new Error(`Required maintained file is missing: ${required}`);
 }
 
-console.log(`Repository root organized. ${moves.size} root files moved; ${remaining.length} intentional root files remain.`);
+console.log(`Repository root organized. ${moves.size} root files mapped; ${remaining.length} intentional root files remain.`);
