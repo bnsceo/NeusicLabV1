@@ -2,14 +2,14 @@ import {test,expect} from '@playwright/test';
 
 test('hub landing presents the NeusicWave trio and FAQ responds',async({page})=>{
   await page.goto('/',{waitUntil:'domcontentloaded'});
-  await expect(page.locator('.hub-hero h1')).toContainText('entirely in your browser');
+  await expect(page.locator('#heroTitle')).toContainText('NEUSICWAVE');
   await expect(page.locator('.nw-tri-rule')).toBeVisible();
   const cards=page.locator('.product-card');
   await expect(cards).toHaveCount(3);
   const destinations=await cards.locator('.cta').evaluateAll(links=>links.map(link=>link.getAttribute('href')));
-  expect(destinations).toEqual(['./studio/','./waveform/','./livestudio/']);
+  expect(destinations).toEqual(['./livestudio/','./waveform/','./studio/']);
 
-  const faq=page.locator('.faq details').first();
+  const faq=page.locator('.nw-faq details').first();
   await expect(faq.locator('p')).not.toBeVisible();
   await faq.locator('summary').click();
   await expect(faq.locator('p')).toBeVisible();
