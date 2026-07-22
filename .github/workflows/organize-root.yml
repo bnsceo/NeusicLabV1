@@ -133,12 +133,39 @@ jobs:
         if: github.event_name == 'pull_request' || github.event_name == 'push'
         shell: bash
         run: |
+          set +e
           if git diff --quiet && git diff --cached --quiet; then
-            echo 'Repository is already organized.'
+            echo 'Repository is already organized.' | tee /tmp/organize-commit.log
+            echo 0 > /tmp/organize-commit-status
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
-          git commit -m 'chore: organize repository root [organized]'
-          git push origin HEAD:chore/organize-repository-root
+          git commit -m 'chore: organize repository root [organized]' > /tmp/organize-commit.log 2>&1
+          status=$?
+          if [ "$status" -eq 0 ]; then
+            git push origin HEAD:chore/organize-repository-root >> /tmp/organize-commit.log 2>&1
+            status=$?
+          fi
+          cat /tmp/organize-commit.log
+          echo "$status" > /tmp/organize-commit-status
+          exit 0
+
+      - name: Upload commit diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: organize-root-commit-log
+          path: |
+            /tmp/organize-commit.log
+            /tmp/organize-commit-status
+          retention-days: 3
+          if-no-files-found: warn
+
+      - name: Verify organized branch update
+        if: always()
+        shell: bash
+        run: |
+          test -f /tmp/organize-commit-status
+          test "$(cat /tmp/organize-commit-status)" -eq 0
