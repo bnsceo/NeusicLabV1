@@ -1,5 +1,5 @@
 /* 61-landing-reskin.css — Hard-lock the legacy hero to the NeusicWave hardware palette.
-   Loads AFTER site-polish.css + landing-experience.css to override their accents.
+   Loads AFTER css/landing/site-polish.css + css/landing/landing-experience.css to override their accents.
    Copper #c97d5a · Silver #b0b3b2 · Gold #d4a574 */
 
 :root{

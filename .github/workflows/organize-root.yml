@@ -64,12 +64,12 @@ jobs:
           page = Path('index.html')
           source = page.read_text()
           replacements = {
-              './favicon.svg': './assets/icons/favicon.svg',
-              './favicon.png': './assets/icons/favicon.png',
-              './site-polish.css': './css/landing/site-polish.css',
-              './landing-experience.css': './css/landing/landing-experience.css',
-              './site-polish.js': './scripts/landing/site-polish.js',
-              './landing-experience.js': './scripts/landing/landing-experience.js',
+              './assets/icons/favicon.svg': './assets/icons/favicon.svg',
+              './assets/icons/favicon.png': './assets/icons/favicon.png',
+              './css/landing/site-polish.css': './css/landing/site-polish.css',
+              './css/landing/landing-experience.css': './css/landing/landing-experience.css',
+              './scripts/landing/site-polish.js': './scripts/landing/site-polish.js',
+              './scripts/landing/landing-experience.js': './scripts/landing/landing-experience.js',
               '<a class="cta" href="./live-loop/">Launch LiveStudio</a>': '<a class="cta" href="./livestudio/">Launch LiveStudio</a>',
               '<a class="cta" href="./wave-loom/">Launch Waveform</a>': '<a class="cta" href="./waveform/">Launch Waveform</a>',
           }

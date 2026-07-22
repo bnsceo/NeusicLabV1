@@ -40,24 +40,24 @@ const moves=new Map(Object.entries({
   'mobile-performance.css':'archive/legacy-root/live-loop/mobile-performance.css',
 
   // Active landing and shared assets.
-  'landing-experience.css':'css/landing/landing-experience.css',
-  'landing-loop.css':'css/landing/landing-loop.css',
-  'product-home.css':'css/landing/product-home.css',
-  'site-polish.css':'css/landing/site-polish.css',
-  'landing-experience.js':'scripts/landing/landing-experience.js',
-  'site-polish.js':'scripts/landing/site-polish.js',
-  'neusic-agent.css':'css/shared/neusic-agent.css',
-  'neusic-suite.css':'css/shared/neusic-suite.css',
-  'neusic-agent.js':'scripts/shared/neusic-agent.js',
-  'neusic-suite.js':'scripts/shared/neusic-suite.js',
+  'css/landing/landing-experience.css':'css/landing/landing-experience.css',
+  'css/landing/landing-loop.css':'css/landing/landing-loop.css',
+  'css/landing/product-home.css':'css/landing/product-home.css',
+  'css/landing/site-polish.css':'css/landing/site-polish.css',
+  'scripts/landing/landing-experience.js':'scripts/landing/landing-experience.js',
+  'scripts/landing/site-polish.js':'scripts/landing/site-polish.js',
+  'css/shared/neusic-agent.css':'css/shared/neusic-agent.css',
+  'css/shared/neusic-suite.css':'css/shared/neusic-suite.css',
+  'scripts/shared/neusic-agent.js':'scripts/shared/neusic-agent.js',
+  'scripts/shared/neusic-suite.js':'scripts/shared/neusic-suite.js',
 
   // Tooling, documentation, and icons.
-  'scheduler-worker.js':'scripts/workers/scheduler-worker.js',
+  'scripts/workers/scheduler-worker.js':'scripts/workers/scheduler-worker.js',
   'start_music.py':'scripts/tools/start_music.py',
   'start_neusic.py':'scripts/tools/start_neusic.py',
   'CLAUDE.md':'docs/development/CLAUDE.md',
-  'favicon.png':'assets/icons/favicon.png',
-  'favicon.svg':'assets/icons/favicon.svg'
+  'assets/icons/favicon.png':'assets/icons/favicon.png',
+  'assets/icons/favicon.svg':'assets/icons/favicon.svg'
 }));
 
 const keepAtRoot=new Set([
@@ -101,19 +101,19 @@ function moveFile(source,destination){
 for(const [source,destination] of moves)moveFile(source,destination);
 
 const replacements=new Map([
-  ['favicon.svg','assets/icons/favicon.svg'],
-  ['favicon.png','assets/icons/favicon.png'],
-  ['landing-experience.css','css/landing/landing-experience.css'],
-  ['landing-loop.css','css/landing/landing-loop.css'],
-  ['product-home.css','css/landing/product-home.css'],
-  ['site-polish.css','css/landing/site-polish.css'],
-  ['landing-experience.js','scripts/landing/landing-experience.js'],
-  ['site-polish.js','scripts/landing/site-polish.js'],
-  ['neusic-agent.css','css/shared/neusic-agent.css'],
-  ['neusic-suite.css','css/shared/neusic-suite.css'],
-  ['neusic-agent.js','scripts/shared/neusic-agent.js'],
-  ['neusic-suite.js','scripts/shared/neusic-suite.js'],
-  ['scheduler-worker.js','scripts/workers/scheduler-worker.js']
+  ['assets/icons/favicon.svg','assets/icons/favicon.svg'],
+  ['assets/icons/favicon.png','assets/icons/favicon.png'],
+  ['css/landing/landing-experience.css','css/landing/landing-experience.css'],
+  ['css/landing/landing-loop.css','css/landing/landing-loop.css'],
+  ['css/landing/product-home.css','css/landing/product-home.css'],
+  ['css/landing/site-polish.css','css/landing/site-polish.css'],
+  ['scripts/landing/landing-experience.js','scripts/landing/landing-experience.js'],
+  ['scripts/landing/site-polish.js','scripts/landing/site-polish.js'],
+  ['css/shared/neusic-agent.css','css/shared/neusic-agent.css'],
+  ['css/shared/neusic-suite.css','css/shared/neusic-suite.css'],
+  ['scripts/shared/neusic-agent.js','scripts/shared/neusic-agent.js'],
+  ['scripts/shared/neusic-suite.js','scripts/shared/neusic-suite.js'],
+  ['scripts/workers/scheduler-worker.js','scripts/workers/scheduler-worker.js']
 ]);
 
 const textExtensions=new Set(['.html','.htm','.css','.js','.mjs','.cjs','.json','.md','.py','.svg','.txt','.yml','.yaml']);

@@ -35,8 +35,8 @@
     }catch(_){}
   });
 
-  if(!document.querySelector('link[href*="neusic-agent.css"]')){const link=document.createElement('link');link.rel='stylesheet';link.href='./neusic-agent.css?v=1';document.head.appendChild(link)}
-  if(!document.querySelector('script[src*="neusic-agent.js"]')){const script=document.createElement('script');script.src='./neusic-agent.js?v=1';script.defer=true;document.body.appendChild(script)}
+  if(!document.querySelector('link[href*="css/shared/neusic-agent.css"]')){const link=document.createElement('link');link.rel='stylesheet';link.href='./css/shared/neusic-agent.css?v=1';document.head.appendChild(link)}
+  if(!document.querySelector('script[src*="scripts/shared/neusic-agent.js"]')){const script=document.createElement('script');script.src='./scripts/shared/neusic-agent.js?v=1';script.defer=true;document.body.appendChild(script)}
 
   const updateHeader=()=>header?.classList.toggle('scrolled',scrollY>18);
   updateHeader();addEventListener('scroll',updateHeader,{passive:true});

@@ -12,7 +12,7 @@ export class LookAheadScheduler {
     if (this.running) return;
     this.running = true;
     try {
-      this.worker = new Worker(new URL('./scheduler-worker.js', import.meta.url));
+      this.worker = new Worker(new URL('./scripts/workers/scheduler-worker.js', import.meta.url));
       this.worker.onmessage = () => this.tick();
       this.worker.postMessage({type:'start', interval:this.interval});
     } catch (_) {
