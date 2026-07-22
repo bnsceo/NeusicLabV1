@@ -18,7 +18,8 @@ test('Waveform: hero, entry handoff, four-zone shell, and save gate',async({page
 
   await page.locator('.nw-menu>button',{hasText:'File'}).click();
   await page.locator('.nw-menu-list button',{hasText:'Save'}).click();
-  await expect(page.locator('#nw-gate')).toBeVisible();
+  await expect(page.locator('#nw-gate-scrim')).toBeVisible();
+  await expect(page.locator('#nw-gate-card h2')).toHaveText('Save is a premium feature');
 });
 
 test('Waveform: VIEW menu switches between waveform editor and synth designer',async({page})=>{
