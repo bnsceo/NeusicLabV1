@@ -1,0 +1,92 @@
+name: Organize repository root
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - scripts/maintenance/organize-root.mjs
+      - .github/workflows/organize-root.yml
+      - index.html
+      - css/**
+      - scripts/**
+      - assets/**
+      - archive/**
+      - docs/**
+      - tests/**
+      - live-loop/**
+      - wave-loom/**
+      - waveform/**
+      - livestudio/**
+      - app/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: organize-root-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  organize-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Verify deterministic root organization
+        shell: bash
+        run: |
+          set +e
+          node scripts/maintenance/organize-root.mjs > /tmp/organize-root.log 2>&1
+          status=$?
+          cat /tmp/organize-root.log
+          exit "$status"
+
+      - name: Upload organizer diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: organize-root-log
+          path: /tmp/organize-root.log
+          retention-days: 3
+          if-no-files-found: error
+
+      - name: Confirm organizer is idempotent
+        run: git diff --exit-code
+
+      - name: Validate JavaScript syntax
+        shell: bash
+        run: |
+          node --check live-loop/app.js
+          find scripts live-loop/src app wave-loom waveform livestudio -type f \( -name '*.js' -o -name '*.mjs' \) -print0 \
+            | xargs -0 -n1 node --check
+
+      - name: Run source-integrity tests
+        shell: bash
+        run: |
+          set +e
+          npm run test:wave > /tmp/test-wave.log 2>&1
+          status=$?
+          cat /tmp/test-wave.log
+          exit "$status"
+
+      - name: Upload source test diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: organize-root-test-log
+          path: /tmp/test-wave.log
+          retention-days: 3
+          if-no-files-found: warn
+
+      - name: Validate patch formatting
+        run: git diff --check

@@ -28,37 +28,45 @@ jobs:
       - name: Prepare production site
         run: |
           rm -rf _site
-          mkdir -p _site/studio _site/wave-loom _site/live-loop _site/social
+          mkdir -p _site/studio _site/wave-loom _site/live-loop _site/social _site/suite
           mkdir -p _site/waveform _site/livestudio _site/css _site/app/css _site/app/js
+          mkdir -p _site/scripts/landing _site/scripts/shared _site/assets/icons
+
           cp index.html _site/index.html
-          cp css/60-hub-landing.css _site/css/60-hub-landing.css
+          cp suite.html _site/suite.html
+          cp favicon.ico _site/favicon.ico
+          cp apple-touch-icon.png _site/apple-touch-icon.png
+
+          cp -R css/. _site/css/
+          cp -R scripts/landing/. _site/scripts/landing/
+          cp -R scripts/shared/. _site/scripts/shared/
+          cp -R assets/icons/. _site/assets/icons/
+
           cp -R waveform/. _site/waveform/
           cp -R livestudio/. _site/livestudio/
-          # shared NW modules referenced as ../app/… by waveform/ and livestudio/
-          # (app/ itself deploys as /studio/, so these need their own copies)
+          cp -R suite/. _site/suite/
+
+          # Shared NW modules referenced as ../app/… by waveform/ and livestudio/.
+          # app/ itself deploys as /studio/, so these receive dedicated copies.
           cp app/css/30-nw-tokens.css _site/app/css/30-nw-tokens.css
           cp app/css/32-nw-menubar.css _site/app/css/32-nw-menubar.css
           cp app/js/44-nw-agent.js _site/app/js/44-nw-agent.js
           cp app/js/45-nw-demo-gate.js _site/app/js/45-nw-demo-gate.js
-          cp site-polish.css _site/site-polish.css
-          cp site-polish.js _site/site-polish.js
-          cp landing-experience.css _site/landing-experience.css
-          cp landing-experience.js _site/landing-experience.js
-          cp neusic-suite.css _site/neusic-suite.css
-          cp neusic-suite.js _site/neusic-suite.js
-          cp neusic-agent.css _site/neusic-agent.css
-          cp neusic-agent.js _site/neusic-agent.js
+
           cp -R social/. _site/social/
           cp -R app/. _site/studio/
           cp -R wave-loom/. _site/wave-loom/
           cp -R live-loop/. _site/live-loop/
+
           mv _site/studio/index.html _site/studio/core.html
           mv _site/studio/phase-a.html _site/studio/index.html
           python3 scripts/build_pages.py _site
+
           touch _site/.nojekyll
           touch _site/studio/.nojekyll
           touch _site/wave-loom/.nojekyll
           touch _site/live-loop/.nojekyll
+          touch _site/suite/.nojekyll
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

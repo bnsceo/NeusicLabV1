@@ -5,7 +5,7 @@ import {spawnSync} from 'node:child_process';
 
 const read=path=>readFile(path,'utf8');
 
-const scripts=['landing-experience.js','neusic-suite.js','app/js/35-neusic-suite-identity.js'];
+const scripts=['scripts/landing/landing-experience.js','scripts/shared/neusic-suite.js','app/js/35-neusic-suite-identity.js'];
 
 test('shared suite JavaScript parses',()=>{
   for(const file of scripts){
@@ -16,7 +16,8 @@ test('shared suite JavaScript parses',()=>{
 
 test('hub landing presents the NeusicWave trio with the tri-accent rule',async()=>{
   const html=await read('index.html');
-  for(const token of ['NEUSICWAVE','NeusicLab','Waveform','LiveStudio','nw-tri-rule','data-product="lab"','data-product="wave"','data-product="live"'])assert.ok(html.includes(token),`hub landing missing ${token}`);
+  assert.match(html,/NEUSIC<span class="nw-wave-sub">WAVE<\/span>/,'hub landing missing styled NEUSICWAVE wordmark');
+  for(const token of ['NeusicLab','Waveform','LiveStudio','nw-tri-rule','data-product="lab"','data-product="wave"','data-product="live"'])assert.ok(html.includes(token),`hub landing missing ${token}`);
   for(const href of ['./studio/','./waveform/','./livestudio/'])assert.ok(html.includes(`href="${href}"`),`hub landing missing product link ${href}`);
   for(const href of ['./wave-loom/','./live-loop/'])assert.ok(html.includes(`href="${href}"`),`hub landing lost legacy workspace link ${href}`);
   assert.match(html,/app\/css\/30-nw-tokens\.css/);
@@ -42,7 +43,7 @@ test('NeusicWave product pages share the NW modules and per-page entry keys',asy
 });
 
 test('landing thumbnail interactions remain mock-only',async()=>{
-  const source=await read('landing-experience.js');
+  const source=await read('scripts/landing/landing-experience.js');
   for(const forbidden of ['getUserMedia','MediaRecorder','AudioContext','webkitAudioContext','indexedDB'])assert.equal(source.includes(forbidden),false,`landing mock unexpectedly uses ${forbidden}`);
   for(const token of ['demo-recording','demo-sculpting','dataset.labView','MOCK READY'])assert.ok(source.includes(token),`mock interaction missing ${token}`);
 });
@@ -51,14 +52,19 @@ test('all product pages load the shared suite identity',async()=>{
   const live=await read('live-loop/index.html');
   const wave=await read('wave-loom/index.html');
   const lab=await read('app/phase-a.html');
-  for(const html of [live,wave]){assert.match(html,/\.\.\/neusic-suite\.css/);assert.match(html,/\.\.\/neusic-suite\.js/);}
+  for(const html of [live,wave]){assert.match(html,/\.\.\/css\/shared\/neusic-suite\.css/);assert.match(html,/\.\.\/scripts\/shared\/neusic-suite\.js/);}
   assert.match(lab,/css\/22-neusic-suite-identity\.css/);
   assert.match(lab,/js\/35-neusic-suite-identity\.js/);
 });
 
-test('Pages deployment copies every root suite asset',async()=>{
+test('Pages deployment copies organized suite assets',async()=>{
   const workflow=await read('.github/workflows/deploy-neusic-pages.yml');
-  for(const file of ['landing-experience.css','landing-experience.js','neusic-suite.css','neusic-suite.js','css/60-hub-landing.css'])assert.ok(workflow.includes(`cp ${file} _site/${file}`),`deployment does not copy ${file}`);
+  for(const command of [
+    'cp -R css/. _site/css/',
+    'cp -R scripts/landing/. _site/scripts/landing/',
+    'cp -R scripts/shared/. _site/scripts/shared/',
+    'cp -R assets/icons/. _site/assets/icons/'
+  ])assert.ok(workflow.includes(command),`deployment missing organized asset command: ${command}`);
   for(const dir of ['waveform','livestudio'])assert.ok(workflow.includes(`cp -R ${dir}/. _site/${dir}/`),`deployment does not copy ${dir}/`);
   for(const shared of ['app/css/30-nw-tokens.css','app/css/32-nw-menubar.css','app/js/44-nw-agent.js','app/js/45-nw-demo-gate.js'])assert.ok(workflow.includes(`cp ${shared} _site/${shared}`),`deployment does not copy shared NW module ${shared}`);
 });
