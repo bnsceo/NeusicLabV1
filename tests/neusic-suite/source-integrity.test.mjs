@@ -27,7 +27,7 @@ test('root landing is a teaser-only NeusicWave waitlist',async()=>{
   ])assert.ok(html.includes(token),`teaser landing missing ${token}`);
   assert.match(html,/css\/landing\/neusicwave-teaser\.css/);
   assert.match(html,/scripts\/landing\/neusicwave-teaser\.js/);
-  assert.match(html,/assets\/icons\/neusicwave-logo\.svg/);
+  assert.match(html,/assets\/icons\/neusicwave-campaign-logo\.jpg/);
   for(const href of ['./studio/','./waveform/','./livestudio/','./wave-loom/','./live-loop/'])assert.equal(html.includes(`href="${href}"`),false,`teaser unexpectedly reveals ${href}`);
 });
 
