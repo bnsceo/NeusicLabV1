@@ -62,6 +62,10 @@ jobs:
           mv _site/studio/phase-a.html _site/studio/index.html
           python3 scripts/build_pages.py _site
 
+          # Keep the public root as the exact teaser-only launch page. The
+          # metadata builder still prepares cards and product-page metadata.
+          cp index.html _site/index.html
+
           touch _site/.nojekyll
           touch _site/studio/.nojekyll
           touch _site/wave-loom/.nojekyll
