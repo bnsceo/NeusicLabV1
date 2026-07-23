@@ -92,9 +92,11 @@ test('all public products expose the shared Agent and preview builder',async()=>
   assert.match(builder,/image\/png/);
 });
 
-test('landing retains direct product links',async()=>{
+test('teaser root hides direct product links and retains the waitlist',async()=>{
   const landingHtml=await read('index.html');
-  for(const href of ['./live-loop/','./wave-loom/','./studio/'])assert.ok(landingHtml.includes(href),`landing lost direct product link ${href}`);
+  for(const href of ['./live-loop/','./wave-loom/','./studio/','./waveform/','./livestudio/'])assert.equal(landingHtml.includes(`href="${href}"`),false,`teaser unexpectedly reveals product link ${href}`);
+  assert.match(landingHtml,/id="waitlistForm"/);
+  assert.match(landingHtml,/entry\.1064572385/);
 });
 
 test('Pages build produces PNG link previews and a menu-free landing',async()=>{

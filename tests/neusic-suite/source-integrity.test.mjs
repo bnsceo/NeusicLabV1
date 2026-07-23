@@ -5,7 +5,7 @@ import {spawnSync} from 'node:child_process';
 
 const read=path=>readFile(path,'utf8');
 
-const scripts=['scripts/landing/landing-experience.js','scripts/shared/neusic-suite.js','app/js/35-neusic-suite-identity.js'];
+const scripts=['scripts/landing/landing-experience.js','scripts/landing/neusicwave-teaser.js','scripts/shared/neusic-suite.js','app/js/35-neusic-suite-identity.js'];
 
 test('shared suite JavaScript parses',()=>{
   for(const file of scripts){
@@ -14,15 +14,21 @@ test('shared suite JavaScript parses',()=>{
   }
 });
 
-test('hub landing presents the NeusicWave trio with the tri-accent rule',async()=>{
+test('root landing is a teaser-only NeusicWave waitlist',async()=>{
   const html=await read('index.html');
-  assert.match(html,/NEUSIC<span class="nw-wave-sub">WAVE<\/span>/,'hub landing missing styled NEUSICWAVE wordmark');
-  for(const token of ['NeusicLab','Waveform','LiveStudio','nw-tri-rule','data-product="lab"','data-product="wave"','data-product="live"'])assert.ok(html.includes(token),`hub landing missing ${token}`);
-  for(const href of ['./studio/','./waveform/','./livestudio/'])assert.ok(html.includes(`href="${href}"`),`hub landing missing product link ${href}`);
-  for(const href of ['./wave-loom/','./live-loop/'])assert.ok(html.includes(`href="${href}"`),`hub landing lost legacy workspace link ${href}`);
-  assert.match(html,/app\/css\/30-nw-tokens\.css/);
-  assert.match(html,/css\/60-hub-landing\.css/);
-  assert.match(html,/<details>/);
+  for(const token of [
+    'Something New',
+    'waitlistForm',
+    'The signal is getting stronger',
+    '1FAIpQLSeld6WZQXpL0rRkWHFazCvSHs6FrlXYmvyQo8uyZKx3kOWhQw/formResponse',
+    'entry.1064572385',
+    'https://www.tiktok.com/@neusicwave',
+    'https://www.instagram.com/neusicwave/'
+  ])assert.ok(html.includes(token),`teaser landing missing ${token}`);
+  assert.match(html,/css\/landing\/neusicwave-teaser\.css/);
+  assert.match(html,/scripts\/landing\/neusicwave-teaser\.js/);
+  assert.match(html,/assets\/icons\/neusicwave-logo\.svg/);
+  for(const href of ['./studio/','./waveform/','./livestudio/','./wave-loom/','./live-loop/'])assert.equal(html.includes(`href="${href}"`),false,`teaser unexpectedly reveals ${href}`);
 });
 
 test('NeusicWave product pages share the NW modules and per-page entry keys',async()=>{
@@ -57,7 +63,7 @@ test('all product pages load the shared suite identity',async()=>{
   assert.match(lab,/js\/35-neusic-suite-identity\.js/);
 });
 
-test('Pages deployment copies organized suite assets',async()=>{
+test('Pages deployment copies organized suite assets and restores the teaser root',async()=>{
   const workflow=await read('.github/workflows/deploy-neusic-pages.yml');
   for(const command of [
     'cp -R css/. _site/css/',
@@ -67,4 +73,7 @@ test('Pages deployment copies organized suite assets',async()=>{
   ])assert.ok(workflow.includes(command),`deployment missing organized asset command: ${command}`);
   for(const dir of ['waveform','livestudio'])assert.ok(workflow.includes(`cp -R ${dir}/. _site/${dir}/`),`deployment does not copy ${dir}/`);
   for(const shared of ['app/css/30-nw-tokens.css','app/css/32-nw-menubar.css','app/js/44-nw-agent.js','app/js/45-nw-demo-gate.js'])assert.ok(workflow.includes(`cp ${shared} _site/${shared}`),`deployment does not copy shared NW module ${shared}`);
+  const builderAt=workflow.indexOf('python3 scripts/build_pages.py _site');
+  const restoreAt=workflow.lastIndexOf('cp index.html _site/index.html');
+  assert.ok(builderAt>=0&&restoreAt>builderAt,'deployment does not restore the exact teaser after metadata generation');
 });
