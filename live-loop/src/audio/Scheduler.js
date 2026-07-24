@@ -8,15 +8,25 @@ export class LookAheadScheduler {
     this.worker = null;
     this.fallback = 0;
   }
+  startFallback() {
+    if (!this.running || this.fallback) return;
+    this.fallback = setInterval(() => this.tick(), this.interval);
+  }
   start() {
     if (this.running) return;
     this.running = true;
     try {
-      this.worker = new Worker(new URL('./scripts/workers/scheduler-worker.js', import.meta.url));
+      this.worker = new Worker(new URL('./scheduler-worker.js', import.meta.url));
       this.worker.onmessage = () => this.tick();
+      this.worker.onerror = () => {
+        this.worker?.terminate();
+        this.worker = null;
+        this.startFallback();
+      };
       this.worker.postMessage({type:'start', interval:this.interval});
     } catch (_) {
-      this.fallback = setInterval(() => this.tick(), this.interval);
+      this.worker = null;
+      this.startFallback();
     }
   }
   tick() {
