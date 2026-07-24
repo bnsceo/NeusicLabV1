@@ -1,18 +1,21 @@
 import {workspace} from './src/audio/AudioWorkspace.js';
-import {LookAheadScheduler} from './src/audio/Scheduler.js';
-import {TapeDelay} from './src/audio/effects/TapeDelay.js';
-import {SpatialReverb} from './src/audio/effects/SpatialReverb.js';
+import {LookAheadScheduler} from './src/audio/Scheduler.js?v=2';
+import {TapeDelay} from './src/audio/effects/TapeDelay.js?v=2';
+import {SpatialReverb} from './src/audio/effects/SpatialReverb.js?v=2';
 import {PerformanceFx} from './src/audio/effects/PerformanceFx.js';
 import {PolySynth} from './src/audio/instruments/Synth.js';
 import {MidiRouter} from './src/midi/MidiRouter.js';
-import {FiveTrackLooper,STATES} from './src/audio/Looper.js';
-import {sendToForge,downloadBuffer} from './src/storage/ForgeBridge.js';
+import {FiveTrackLooper,STATES} from './src/audio/Looper.js?v=2';
+import {sendToForge,downloadBuffer} from './src/storage/ForgeBridge.js?v=2';
+import {clearSession,hasRecoverableAudio,loadSession,restoreSession,saveSession} from './src/storage/LiveLoopSessionStore.js?v=2';
+import {planImportTargets} from './src/ui/importPlan.js?v=2';
 
 const $=id=>document.getElementById(id);
 const trackGrid=$('trackGrid');
 const template=$('trackTemplate');
 const keyMap={a:60,w:61,s:62,e:63,d:64,f:65,t:66,g:67,y:68,h:69,u:70,j:71};
 const heldKeys=new Set();
+const sendingTracks=new Set();
 
 let looper=null;
 let synth=null;
@@ -24,6 +27,8 @@ let enginePromise=null;
 let selected=0;
 let fxBypassed=false;
 let spaceFrozen=false;
+let pendingRecovery=null;
+let saveTimer=0;
 
 function status(message){
   const output=$('statusMessage');
@@ -34,6 +39,39 @@ function format(seconds){return seconds?`${seconds.toFixed(2)}s`:'—';}
 function outputFor(control,value){
   if(control==='pan')return Math.abs(value)<.03?'C':value<0?`L${Math.round(Math.abs(value)*100)}`:`R${Math.round(value*100)}`;
   return Math.round(value*100);
+}
+
+function hideRecovery(){
+  const panel=$('sessionRecovery');
+  if(panel)panel.hidden=true;
+}
+
+function showRecovery(record){
+  pendingRecovery=record;
+  const panel=$('sessionRecovery');
+  const summary=$('sessionRecoverySummary');
+  if(!panel||!summary)return;
+  const lanes=record.tracks.filter(track=>track?.buffer?.length).length;
+  summary.textContent=`${lanes} saved lane${lanes===1?'':'s'} · ${format(record.masterLength)} master loop`;
+  panel.hidden=false;
+}
+
+async function checkRecovery(){
+  try{
+    const record=await loadSession();
+    if(hasRecoverableAudio(record))showRecovery(record);
+  }catch(error){
+    console.warn('Live Loop recovery is unavailable.',error);
+  }
+}
+
+function scheduleSessionSave(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(async()=>{
+    if(!looper||looper.activeRecording||looper.arming)return;
+    try{await saveSession(looper);}
+    catch(error){console.warn('Live Loop recovery save failed.',error);}
+  },500);
 }
 
 function primeMicrophoneFromGesture(){
@@ -134,13 +172,36 @@ async function handleTrackAction(index,action){
   }
 }
 
-async function sendTrack(index){
+async function downloadTrack(index=selected){
   await ensureEngine();
   const track=looper.tracks[index];
-  if(!track.buffer){status('Record or load audio into this track before sending it to Wave.');return;}
-  status(`Preparing ${track.name} for Neusic Wave…`);
-  await sendToForge(track.buffer,`${track.name} · Live Loop`);
-  status(`${track.name} was sent to Neusic Wave.`);
+  if(!track.buffer){status('The selected track is empty. Record or load audio before downloading.');return false;}
+  downloadBuffer(track.buffer,`${track.name.toLowerCase().replace(/\s+/g,'-')}.wav`);
+  status(`${track.name} downloaded as WAV.`);
+  return true;
+}
+
+async function sendTrack(index){
+  if(sendingTracks.has(index)){status(`LOOP ${index+1} is already being sent to Neusic Wave.`);return;}
+  sendingTracks.add(index);
+  const globalButton=$('sendSelectedBtn');
+  if(selected===index&&globalButton)globalButton.disabled=true;
+  try{
+    await ensureEngine();
+    const track=looper.tracks[index];
+    if(!track.buffer){status('Record or load audio into this track before sending it to Wave.');return;}
+    renderTrack(index);
+    status(`Preparing ${track.name} for Neusic Wave…`);
+    const mobileHandoff=matchMedia('(pointer: coarse)').matches||navigator.maxTouchPoints>0;
+    await sendToForge(track.buffer,`${track.name} · Live Loop`,{beforeNavigate:async()=>{
+      if(mobileHandoff&&workspace.context?.state==='running')await workspace.context.suspend();
+    }});
+    status(`${track.name} was sent to Neusic Wave.`);
+  }finally{
+    sendingTracks.delete(index);
+    if(selected===index&&globalButton)globalButton.disabled=false;
+    if(looper)renderTrack(index);
+  }
 }
 
 function renderTrack(index){
@@ -154,11 +215,17 @@ function renderTrack(index){
   const track=looper.tracks[index];
   card.dataset.state=track.state;
   card.querySelector('.track-name').textContent=track.name;
-  card.querySelector('.track-state').textContent=track.state.toUpperCase();
+  card.querySelector('.track-state').textContent=`${track.state.toUpperCase()}${track.rate===.5?' · 2× CYCLE':''}`;
   const record=card.querySelector('[data-action="record"]');
   record.textContent=track.state===STATES.QUEUED?'CANCEL':track.state===STATES.RECORDING||track.state===STATES.OVERDUBBING?'STOP':track.buffer?'OVERDUB':'REC';
-  card.querySelector('[data-action="mute"]').textContent=track.muted?'UNMUTE':'MUTE';
-  card.querySelector('[data-action="forge"]').disabled=!track.buffer;
+  record.setAttribute('aria-pressed',String([STATES.QUEUED,STATES.RECORDING,STATES.OVERDUBBING].includes(track.state)));
+  const mute=card.querySelector('[data-action="mute"]');
+  mute.textContent=track.muted?'UNMUTE':'MUTE';
+  mute.setAttribute('aria-pressed',String(track.muted));
+  const forge=card.querySelector('[data-action="forge"]');
+  const sending=sendingTracks.has(index);
+  forge.textContent=sending?'SENDING…':'WAVE';
+  forge.disabled=!track.buffer||sending;
   card.querySelector('[data-action="clear"]').disabled=!track.buffer;
   window.dispatchEvent(new CustomEvent('neusic:live-loop-track',{detail:{index,state:track.state,muted:track.muted,hasAudio:Boolean(track.buffer),rate:track.rate,reverse:track.reverse}}));
 }
@@ -169,6 +236,7 @@ function renderAll(){
   $('masterLength').textContent=format(looper.masterLength);
   $('globalState').textContent=looper.activeRecording?'CAPTURING':looper.playing?'PLAYING':'READY';
   $('playBtn').classList.toggle('active',looper.playing);
+  $('playBtn').setAttribute('aria-pressed',String(looper.playing));
   $('playBtn').querySelector('b').textContent=looper.playing?'RUNNING':'START';
 }
 
@@ -180,8 +248,9 @@ function updateProgress(){
       const track=looper.tracks[index];
       const ring=card.querySelector('.progress-ring');
       const time=card.querySelector('.progress-time');
-      if(ring)ring.style.strokeDashoffset=String(circumference*(1-(track.buffer?progress:0)));
-      if(time)time.textContent=track.buffer?(progress*looper.masterLength).toFixed(1):'00.0';
+      const laneProgress=looper.trackProgress(index),laneCycle=looper.masterLength/(track.rate||1);
+      if(ring)ring.style.strokeDashoffset=String(circumference*(1-(track.buffer?laneProgress:0)));
+      if(time)time.textContent=track.buffer?(laneProgress*laneCycle).toFixed(1):'00.0';
     });
     const level=workspace.meterLevel();
     const masterMeter=$('masterMeter');
@@ -192,6 +261,28 @@ function updateProgress(){
 }
 
 function bindGlobal(){
+  $('recoverSessionBtn').addEventListener('click',async()=>{
+    if(!pendingRecovery)return;
+    try{
+      await ensureEngine();
+      const restored=restoreSession(looper,pendingRecovery);
+      $('bpmInput').value=String(looper.bpm);
+      $('quantizeToggle').checked=looper.quantize;
+      pendingRecovery=null;
+      hideRecovery();
+      renderAll();
+      window.dispatchEvent(new CustomEvent('neusic:live-loop-session-restored'));
+      status(`Recovered ${restored} saved lane${restored===1?'':'s'}. Press START when you are ready.`);
+    }catch(error){status(error.message||'The saved Live Loop session could not be recovered.');}
+  });
+  $('discardSessionBtn').addEventListener('click',async()=>{
+    try{
+      await clearSession();
+      pendingRecovery=null;
+      hideRecovery();
+      status('Saved recovery session discarded.');
+    }catch(error){status(error.message||'The saved session could not be discarded.');}
+  });
   $('micBtn').addEventListener('click',async()=>{
     try{
       const microphonePromise=primeMicrophoneFromGesture();
@@ -201,6 +292,7 @@ function bindGlobal(){
       await workspace.initMic();
       workspace.setMonitor(!$('micBtn').classList.contains('active'));
       $('micBtn').classList.toggle('active');
+      $('micBtn').setAttribute('aria-pressed',String($('micBtn').classList.contains('active')));
       status($('micBtn').classList.contains('active')?'Microphone enabled. Use headphones when monitoring.':'Microphone remains available; direct monitoring is muted.');
     }catch(error){status(error.message||'Microphone access failed. Check browser permission and tap MIC again.');}
   });
@@ -211,21 +303,28 @@ function bindGlobal(){
   $('uploadBtn').addEventListener('click',()=>$('fileInput').click());
   $('fileInput').addEventListener('change',async event=>{
     try{await ensureEngine();}catch(error){status(error.message);return;}
-    for(const file of [...event.target.files]){
-      try{status(`Decoding ${file.name}…`);await looper.importFile(selected,file);status(`${file.name} loaded into track ${selected+1}.`);}
-      catch(error){console.error(error);status(`${file.name} could not be decoded by this browser.`);}
+    const files=[...event.target.files];
+    const targets=planImportTargets(selected,files.length,looper.tracks.length);
+    let loaded=0;
+    let lastTarget=selected;
+    for(let item=0;item<targets.length;item++){
+      const file=files[item],target=targets[item];
+      try{status(`Decoding ${file.name}…`);await looper.importFile(target,file);loaded++;lastTarget=target;}
+      catch(error){console.error(error);status(`${file.name} could not be loaded: ${error.message||'unsupported audio file'}.`);}
+    }
+    if(loaded){
+      selectTrack(lastTarget,{announce:false});
+      status(`${loaded} audio file${loaded===1?'':'s'} loaded into distinct loop lanes.${files.length>targets.length?' Only the first five files were accepted.':''}`);
     }
     event.target.value='';
   });
   $('sendSelectedBtn').addEventListener('click',()=>sendTrack(selected).catch(error=>status(error.message)));
-  $('downloadSelectedBtn').addEventListener('click',async()=>{
-    try{await ensureEngine();const track=looper.tracks[selected];if(!track.buffer){status('The selected track is empty.');return;}downloadBuffer(track.buffer,`${track.name.toLowerCase().replace(/\s+/g,'-')}.wav`);status(`${track.name} downloaded as WAV.`);}catch(error){status(error.message);}
-  });
+  $('downloadSelectedBtn').addEventListener('click',()=>downloadTrack(selected).catch(error=>status(error.message)));
   $('clearAllBtn').addEventListener('click',async()=>{try{await ensureEngine();if(confirm('Clear all five loop tracks?'))looper.clearAll();}catch(error){status(error.message);}});
   $('bypassFxBtn').addEventListener('click',async()=>{try{await ensureEngine();fxBypassed=!fxBypassed;looper.setFxBypass(fxBypassed);$('bypassFxBtn').textContent=fxBypassed?'FX BYPASSED':'FX ACTIVE';}catch(error){status(error.message);}});
   $('reverseBtn').addEventListener('click',async()=>{try{await ensureEngine();looper.reverse(selected);status(`Reverse toggled on track ${selected+1}.`);}catch(error){status(error.message);}});
-  $('warpDownBtn').addEventListener('click',async()=>{try{await ensureEngine();looper.halfSpeed(selected);status(`Octave-down tape speed toggled on track ${selected+1}.`);}catch(error){status(error.message);}});
-  $('freezeBtn').addEventListener('click',async()=>{try{await ensureEngine();spaceFrozen=!spaceFrozen;reverb.freeze(spaceFrozen);$('freezeBtn').classList.toggle('active',spaceFrozen);$('freezeBtn').textContent=spaceFrozen?'RELEASE SPACE':'SPACE FREEZE';}catch(error){status(error.message);}});
+  $('warpDownBtn').addEventListener('click',async()=>{try{await ensureEngine();looper.halfSpeed(selected);status(`Half-speed tape toggled on track ${selected+1}. Half speed uses an explicit 2× lane cycle.`);}catch(error){status(error.message);}});
+  $('freezeBtn').addEventListener('click',async()=>{try{await ensureEngine();spaceFrozen=!spaceFrozen;reverb.freeze(spaceFrozen);$('freezeBtn').classList.toggle('active',spaceFrozen);$('freezeBtn').textContent=spaceFrozen?'RELEASE BOOST':'TAIL BOOST';}catch(error){status(error.message);}});
   const bindRange=(id,handler,formatValue)=>$(id).addEventListener('input',async event=>{
     const value=Number(event.target.value);
     event.target.nextElementSibling.textContent=formatValue(value);
@@ -251,21 +350,36 @@ function buildKeyboard(){
   const notes=[60,61,62,63,64,65,66,67,68,69,70,71,72];
   const black=new Set([1,3,6,8,10]);
   const labels=['A','W','S','E','D','F','T','G','Y','H','U','J',''];
+  const names=['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'];
   notes.forEach((note,index)=>{
     const button=document.createElement('button');
     button.type='button';
     button.className=black.has(note%12)?'key-black':'key-white';
     button.dataset.note=String(note);
-    button.innerHTML=`<small>${labels[index]}</small>`;
-    button.addEventListener('pointerdown',async event=>{
+    const noteName=`${names[note%12]}${Math.floor(note/12)-1}`;
+    button.setAttribute('aria-label',`Play ${noteName}${labels[index]?` · computer key ${labels[index]}`:''}`);
+    button.setAttribute('aria-pressed','false');
+    button.innerHTML=`<small>${labels[index]||noteName}</small>`;
+    let keyboardHeld=false;
+    const on=async velocity=>{
+      try{await ensureEngine();synth.noteOn(note,velocity);button.classList.add('active');button.setAttribute('aria-pressed','true');}catch(error){status(error.message);}
+    };
+    button.addEventListener('pointerdown',event=>{
       event.preventDefault();
       button.setPointerCapture?.(event.pointerId);
-      try{await ensureEngine();synth.noteOn(note,105);button.classList.add('active');}catch(error){status(error.message);}
+      on(105);
     });
-    const off=()=>{if(synth)synth.noteOff(note);button.classList.remove('active');};
+    const off=()=>{if(synth)synth.noteOff(note);button.classList.remove('active');button.setAttribute('aria-pressed','false');};
     button.addEventListener('pointerup',off);
     button.addEventListener('pointercancel',off);
     button.addEventListener('pointerleave',event=>{if(event.buttons)off();});
+    button.addEventListener('keydown',event=>{
+      if((event.key==='Enter'||event.key===' ')&&!keyboardHeld){event.preventDefault();keyboardHeld=true;on(105);}
+    });
+    button.addEventListener('keyup',event=>{
+      if(event.key==='Enter'||event.key===' '){event.preventDefault();keyboardHeld=false;off();}
+    });
+    button.addEventListener('blur',()=>{keyboardHeld=false;off();});
     $('keyboard').appendChild(button);
   });
 }
@@ -309,8 +423,8 @@ async function setupEngine(){
     noteOn:(note,velocity)=>synth.noteOn(note,velocity),
     noteOff:note=>synth.noteOff(note)
   });
-  looper.addEventListener('track',event=>renderTrack(event.detail.index));
-  looper.addEventListener('change',renderAll);
+  looper.addEventListener('track',event=>{renderTrack(event.detail.index);scheduleSessionSave();});
+  looper.addEventListener('change',()=>{renderAll();scheduleSessionSave();});
   looper.addEventListener('transport',renderAll);
   looper.addEventListener('status',event=>status(event.detail.message));
   renderAll();
@@ -320,10 +434,11 @@ async function setupEngine(){
     selectTrack,
     record:index=>looper.toggleRecord(index),
     toggleLoFi:()=>{const enabled=performanceFx.toggleLoFi();status(enabled?'Global lo-fi crusher engaged.':'Global lo-fi crusher released.');return enabled;},
-    toggleOctave:()=>{looper.halfSpeed(selected);status(`Octave-down tape speed toggled on track ${selected+1}.`);},
+    toggleOctave:()=>{looper.halfSpeed(selected);status(`Half-speed tape toggled on track ${selected+1}. Half speed uses an explicit 2× lane cycle.`);},
     toggleReverse:()=>{looper.reverse(selected);status(`Reverse toggled on track ${selected+1}.`);},
     toggleFreeze:()=>{$('freezeBtn').click();},
     loadSelected:()=>$('fileInput').click(),
+    downloadSelected:()=>downloadTrack(selected),
     sendSelected:()=>sendTrack(selected),
     clearSelected:()=>looper.clear(selected),
     state:()=>({ready:true,selected,bpm:looper.bpm,masterLength:looper.masterLength,playing:looper.playing,lofi:performanceFx.lofi,lanes:looper.tracks.map(track=>({name:track.name,state:track.state,hasAudio:Boolean(track.buffer),muted:track.muted,volume:track.volume,pan:track.panValue,rate:track.rate,reverse:track.reverse}))})
@@ -333,8 +448,11 @@ async function setupEngine(){
   return looper;
 }
 
-function ensureEngine(){
-  if(looper)return Promise.resolve(looper);
+async function ensureEngine(){
+  if(looper){
+    if(workspace.context?.state==='suspended')await workspace.resume({required:true});
+    return looper;
+  }
   if(!enginePromise){
     enginePromise=setupEngine().catch(error=>{
       enginePromise=null;
@@ -355,6 +473,7 @@ function boot(){
   renderAll();
   updateProgress();
   status('Five loop lanes are visible. Tap REC on any lane; MIDI is optional.');
+  checkRecovery();
   window.dispatchEvent(new CustomEvent('neusic:live-loop-ui-ready',{detail:{lanes:5}}));
 }
 

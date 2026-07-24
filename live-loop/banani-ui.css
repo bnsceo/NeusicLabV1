@@ -1,0 +1,211 @@
+/* NEUSIC Live Loop — functional Banani-inspired performance console.
+   This file is intentionally loaded last. It changes presentation only and preserves
+   every existing engine ID, data-action contract, recovery path, and transfer control. */
+:root{
+  --banani-bg:#07090c;
+  --banani-surface:#0d1117;
+  --banani-surface-2:#131922;
+  --banani-line:#27303c;
+  --banani-line-bright:#3d4a59;
+  --banani-copy:#f5f7fb;
+  --banani-muted:#8994a3;
+  --banani-blue:#25b9ff;
+  --banani-cyan:#37f0de;
+  --banani-red:#ff355f;
+  --banani-orange:#ff9d35;
+  --banani-yellow:#f6dc46;
+  --banani-green:#4ee089;
+  --banani-purple:#a86cff;
+}
+html{background:var(--banani-bg)}
+body.stage-performance{
+  color:var(--banani-copy);
+  background:#07090c;
+  font-family:"Satoshi","Manrope",system-ui,sans-serif;
+}
+body.stage-performance .noise{opacity:.025}
+body.stage-performance button:focus-visible,
+body.stage-performance a:focus-visible,
+body.stage-performance input:focus-visible,
+body.stage-performance select:focus-visible{outline:2px solid var(--banani-cyan);outline-offset:2px}
+
+/* Hardware header */
+body.stage-performance .topbar{
+  position:sticky;top:0;z-index:70;
+  grid-template-columns:minmax(190px,.7fr) minmax(520px,1.7fr) minmax(240px,.8fr);
+  min-height:68px;padding:8px 14px;gap:14px;
+  border:0;border-bottom:1px solid var(--banani-line-bright);
+  background:rgba(8,11,15,.96);backdrop-filter:blur(18px);
+  box-shadow:0 12px 32px rgba(0,0,0,.45);
+}
+body.stage-performance .brand-mark{
+  width:44px;height:44px;border-radius:50%;font-size:0;
+  background:url('../assets/icons/neusicwave-campaign-logo.jpg?v=20260723') center/cover no-repeat;
+  border:1px solid rgba(55,240,222,.38);box-shadow:0 0 20px rgba(37,185,255,.18);
+}
+body.stage-performance .brand b{font-size:15px;letter-spacing:.16em}
+body.stage-performance .brand small{font-size:7px;color:var(--banani-muted);letter-spacing:.13em}
+body.stage-performance .transport{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;width:100%}
+body.stage-performance .hardware-button,
+body.stage-performance .lcd-control,
+body.stage-performance .switch-control{
+  min-width:0;min-height:46px;border:1px solid var(--banani-line);border-radius:7px;
+  background:#111720;color:#c9d2dc;box-shadow:inset 0 1px rgba(255,255,255,.05);
+}
+body.stage-performance .hardware-button:hover{border-color:#526172;background:#17202b}
+body.stage-performance .transport-play{border-color:rgba(78,224,137,.52);color:#b9ffd3}
+body.stage-performance .hardware-button[aria-pressed="true"]{border-color:var(--banani-cyan);color:#d9fffb;background:#102623}
+body.stage-performance .lcd-control{background:#070b10;color:var(--banani-cyan)}
+body.stage-performance .lcd-control input{color:var(--banani-cyan)}
+body.stage-performance .top-actions{display:flex;justify-content:flex-end;gap:6px}
+body.stage-performance .top-actions a{min-height:42px;border-color:var(--banani-line);background:#10161e;font-size:7px}
+body.stage-performance .top-actions a:first-child{border-color:rgba(168,108,255,.45);color:#dfc9ff}
+
+/* Main three-column console */
+body.stage-performance .performance-shell{width:min(1880px,calc(100% - 20px));padding:10px 0 30px}
+.banani-workspace{
+  display:grid;
+  grid-template-columns:220px minmax(680px,1fr) 278px;
+  grid-template-areas:
+    "identity head fx"
+    "identity deck fx"
+    "identity macros fx"
+    "identity synth fx"
+    "identity session fx";
+  align-items:start;gap:8px;
+}
+.banani-identity-rail{
+  grid-area:identity;position:sticky;top:78px;min-height:calc(100dvh - 96px);
+  display:flex;flex-direction:column;gap:12px;padding:14px;
+  border:1px solid var(--banani-line);border-radius:10px;background:var(--banani-surface);
+  box-shadow:0 18px 40px rgba(0,0,0,.32);
+}
+.banani-logo-lockup{display:grid;grid-template-columns:64px 1fr;align-items:center;gap:10px;padding-bottom:14px;border-bottom:1px solid var(--banani-line)}
+.banani-logo-lockup img{width:64px;height:64px;border-radius:50%;object-fit:cover;box-shadow:0 0 26px rgba(37,185,255,.2)}
+.banani-logo-lockup span,.banani-logo-lockup strong,.banani-logo-lockup small{display:block}
+.banani-logo-lockup span{color:var(--banani-cyan);font:800 8px/1 var(--mono);letter-spacing:.2em}
+.banani-logo-lockup strong{margin-top:5px;font:700 19px/1 var(--display);letter-spacing:.04em}
+.banani-logo-lockup small{margin-top:6px;color:var(--banani-muted);font:700 6px/1.4 var(--mono);letter-spacing:.09em}
+.banani-section-label{display:block;margin-bottom:10px;color:#6f7a88;font:800 7px/1 var(--mono);letter-spacing:.16em}
+.banani-input-card,.banani-lane-map,.banani-route-card{padding:12px;border:1px solid var(--banani-line);border-radius:8px;background:#0a0f15}
+.banani-input-card{text-align:center}
+.banani-input-card strong,.banani-input-card small{display:block}
+.banani-input-card strong{margin-top:10px;font:800 9px/1 var(--mono);letter-spacing:.08em}
+.banani-input-card small{margin-top:6px;color:var(--banani-muted);font:700 6px/1 var(--mono)}
+.banani-signal-orb{position:relative;width:86px;height:86px;margin:auto;border:1px solid rgba(55,240,222,.35);border-radius:50%;background:#0b1519;box-shadow:inset 0 0 25px rgba(37,185,255,.15),0 0 22px rgba(37,185,255,.08)}
+.banani-signal-orb:after{content:"";position:absolute;inset:30%;border-radius:50%;background:var(--banani-cyan);box-shadow:0 0 18px var(--banani-cyan)}
+.banani-signal-orb i{position:absolute;inset:12%;border:1px solid rgba(37,185,255,.22);border-radius:50%}
+.banani-signal-orb i:nth-child(2){inset:23%}.banani-signal-orb i:nth-child(3){inset:36%}
+.banani-lane-map ol{list-style:none;margin:0;padding:0;display:grid;gap:6px;counter-reset:banani-lane}
+.banani-lane-map li{counter-increment:banani-lane;display:grid;grid-template-columns:5px 22px 1fr;align-items:center;min-height:29px;padding:0 8px;border:1px solid #202a35;border-radius:5px;background:#0d131a;color:#b8c2ce;font:800 7px/1 var(--mono);letter-spacing:.08em}
+.banani-lane-map li:before{content:counter(banani-lane,decimal-leading-zero);color:#64707e}
+.banani-lane-map li i{width:8px;height:8px;border-radius:50%;background:var(--banani-red);box-shadow:0 0 10px currentColor}
+.banani-lane-map li:nth-child(2) i{background:var(--banani-orange)}.banani-lane-map li:nth-child(3) i{background:var(--banani-yellow)}.banani-lane-map li:nth-child(4) i{background:var(--banani-green)}.banani-lane-map li:nth-child(5) i{background:var(--banani-purple)}
+.banani-route-card{margin-top:auto;display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:5px;text-align:center}
+.banani-route-card .banani-section-label{grid-column:1/-1;text-align:left}
+.banani-route-card b{padding:8px 3px;border:1px solid #2b3542;border-radius:4px;background:#111821;font:800 6px/1 var(--mono);letter-spacing:.05em}.banani-route-card i{color:var(--banani-cyan);font-style:normal}
+
+body.stage-performance .performance-head{grid-area:head;display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:8px;margin:0}
+body.stage-performance .performance-head>div:first-child{display:block;padding:10px 14px;border:1px solid var(--banani-line);border-radius:9px;background:var(--banani-surface)}
+body.stage-performance .performance-head h1{margin:3px 0 0;font-size:clamp(20px,2vw,30px);line-height:1}.performance-head h1 em{color:var(--banani-cyan)}
+body.stage-performance .performance-head p{display:none}
+body.stage-performance .master-display{grid-template-columns:1fr 1fr;gap:5px;padding:7px;border:1px solid var(--banani-line);border-radius:9px;background:var(--banani-surface)}
+body.stage-performance .master-display>div:not(.master-meter){min-height:44px;padding:7px 9px;border-color:#28323e;background:#080d13}
+body.stage-performance .master-display small{color:#768290}body.stage-performance .master-display b{color:#eaf1f7}
+body.stage-performance .master-meter{grid-column:1/-1;height:8px;background:#05080b}
+body.stage-performance .master-meter span{background:var(--banani-cyan);box-shadow:0 0 12px rgba(55,240,222,.5)}
+
+/* Five real lanes */
+body.stage-performance .loop-deck{grid-area:deck;overflow:hidden;border:1px solid var(--banani-line-bright);border-radius:10px;background:var(--banani-surface);box-shadow:0 18px 44px rgba(0,0,0,.32)}
+body.stage-performance .loop-deck>.panel-header{min-height:52px;padding:10px 14px;border-bottom-color:var(--banani-line)}
+body.stage-performance .loop-deck>.panel-header h2{font-size:18px}.loop-deck .legend{font-size:6px}
+body.stage-performance .track-grid{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:6px!important;padding:7px!important;overflow:visible!important}
+body.stage-performance .loop-track,
+body.stage-performance .loop-track.mobile-active{
+  position:relative;display:block!important;width:auto!important;min-width:0!important;min-height:470px!important;padding:0 7px 8px!important;margin:0!important;
+  border:1px solid #252f3a!important;border-radius:7px!important;background:#0b1016!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.04)!important;overflow:hidden;
+}
+body.stage-performance .loop-track:before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:var(--track)}
+body.stage-performance .loop-track.selected{outline:1px solid var(--track)!important;outline-offset:-2px!important;box-shadow:0 0 22px color-mix(in srgb,var(--track) 20%,transparent)!important}
+body.stage-performance .loop-track header{min-height:52px;padding:12px 2px 7px!important;display:grid!important;grid-template-columns:1fr!important;gap:5px!important;text-align:center!important;border-bottom:1px solid #202934}
+body.stage-performance .loop-track header div{justify-content:center}.track-number{background:color-mix(in srgb,var(--track) 17%,#0c1117);border-color:var(--track);color:#fff}.track-name{max-width:none!important;font-size:8px!important;letter-spacing:.11em}.track-state{font-size:6px!important;color:var(--track)!important}
+body.stage-performance .progress-control{width:min(118px,88%)!important;margin:12px auto 10px!important}.progress-bg,.progress-ring{stroke-width:6}.progress-ring{filter:drop-shadow(0 0 5px var(--track))}.progress-center b{font-size:14px!important}.progress-center small{font-size:5px!important}
+body.stage-performance .track-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:5px!important}
+body.stage-performance .track-actions button{display:block!important;min-width:0!important;min-height:36px!important;padding:4px 2px!important;border:1px solid #2a3541!important;border-radius:5px!important;background:#131a23!important;color:#aeb9c5!important;font:800 6px/1 var(--mono)!important;letter-spacing:.06em!important}
+body.stage-performance .track-actions .record-action{grid-column:1/-1;min-height:49px!important;border-color:color-mix(in srgb,var(--track) 62%,#27303a)!important;background:color-mix(in srgb,var(--track) 17%,#10151c)!important;color:#fff!important;font-size:9px!important;box-shadow:inset 0 1px rgba(255,255,255,.05)!important}
+body.stage-performance .loop-track[data-state="Recording"] .record-action,body.stage-performance .loop-track[data-state="Overdubbing"] .record-action{background:var(--banani-red)!important;border-color:#ff86a0!important;box-shadow:0 0 20px rgba(255,53,95,.42)!important}
+body.stage-performance .track-actions .danger{color:#ff8099!important}
+body.stage-performance .track-controls{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:5px!important;margin-top:7px!important}
+body.stage-performance .track-controls label{display:grid!important;grid-template-columns:1fr!important;justify-items:stretch!important;min-height:52px!important;padding:6px!important;border:1px solid #202a35!important;border-radius:5px!important;background:#080d12!important;color:#73808e!important;font:800 5px/1 var(--mono)!important;letter-spacing:.08em!important}
+body.stage-performance .track-controls input{width:100%!important;height:18px!important;margin:2px 0!important;writing-mode:horizontal-tb!important;direction:ltr!important;appearance:auto!important;accent-color:var(--track)!important}
+body.stage-performance .track-controls output{font-size:6px!important;color:#d6dee7!important}
+
+/* Real selected-lane macros */
+.stage-macro-deck{grid-area:macros;grid-template-columns:minmax(360px,1.2fr) repeat(2,minmax(180px,.7fr));gap:6px;margin:0;padding:7px;border:1px solid var(--banani-line-bright);border-radius:10px;background:var(--banani-surface);box-shadow:0 14px 36px rgba(0,0,0,.28)}
+.stage-macro-actions{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.stage-selected{grid-column:1/-1;min-height:31px;border-color:#2a3440;background:#080c11}.stage-selected b{color:var(--banani-cyan)}
+.stage-macro-button{min-height:48px;border-color:#29333f;background:#131a23;color:#98a5b3;font-size:6px}.stage-macro-button strong{font-size:8px}.stage-macro-button:hover{border-color:#526172;background:#18222d}.stage-macro-button.active{border-color:var(--banani-cyan);background:#102925;color:#d8fffa;box-shadow:0 0 16px rgba(55,240,222,.16)}
+.stage-xy{min-height:147px;border-color:#28333e;background-color:#080d12}.stage-delay{--xy:var(--banani-orange)}.stage-space{--xy:var(--banani-cyan)}
+
+/* Right-side real FX and lower functional sections */
+body.stage-performance .lower-grid{display:contents!important}
+body.stage-performance .pedalboard{grid-area:fx;position:sticky;top:78px;display:block!important;min-width:0;border:1px solid var(--banani-line);border-radius:10px;background:var(--banani-surface);overflow:hidden}
+body.stage-performance .pedalboard>.panel-header{display:grid;grid-template-columns:1fr;gap:8px;padding:12px;border-bottom:1px solid var(--banani-line)}
+body.stage-performance .pedalboard .panel-header h2{font-size:17px}.pedalboard .mini-button{width:100%;min-height:36px;border-color:rgba(78,224,137,.4);color:#bfffd6;background:#102018}
+body.stage-performance .pedal-grid{display:grid!important;grid-template-columns:1fr!important;gap:7px!important;padding:7px!important}
+body.stage-performance .pedal{padding:10px!important;border:1px solid #29333f!important;border-radius:7px!important;background:#0a1016!important;box-shadow:none!important}
+body.stage-performance .pedal header{border-bottom-color:#28323d}.pedal header b{font-size:10px}.pedal header span{font-size:6px}
+body.stage-performance .knob-row{grid-template-columns:1fr!important;gap:7px!important;margin-top:9px!important}
+body.stage-performance .knob-row label{display:grid!important;grid-template-columns:58px 1fr 44px!important;align-items:center!important;gap:5px!important;min-height:42px!important;padding:6px!important;border:1px solid #202a34!important;border-radius:5px!important;background:#080d12!important}
+body.stage-performance .knob-row label:before{display:none!important}.knob-row label span{position:static!important;transform:none!important;font-size:5px!important}.knob-row input{width:100%!important;accent-color:var(--banani-cyan)}.knob-row output{font-size:6px!important;text-align:right}
+body.stage-performance .pedal-actions{grid-template-columns:1fr!important;gap:5px!important;margin-top:8px!important}.pedal-actions button{min-height:40px!important;border-color:#293440!important;background:#121a23!important;font-size:6px!important}
+body.stage-performance .synth-panel{grid-area:synth;border:1px solid rgba(168,108,255,.42);border-radius:10px;background:var(--banani-surface)}
+body.stage-performance .synth-panel .panel-header{min-height:46px;padding:8px 12px}.synth-panel .panel-header h2{font-size:15px!important}.stage-performance .synth-controls{grid-template-columns:repeat(3,1fr);padding:7px}.stage-performance .keyboard{height:108px;padding:0 7px 7px}
+body.stage-performance .session-tools{grid-area:session;margin:0;padding:8px;border:1px solid var(--banani-line);border-radius:9px;background:var(--banani-surface);grid-template-columns:1fr!important}
+body.stage-performance .session-tools>div:first-child,body.stage-performance .tool-actions{display:none!important}.stage-performance .status-message{min-height:34px;margin:0;border-color:#27323e;background:#080d12;color:#aab5c1;font-size:7px}
+.session-recovery{margin-bottom:8px;border-color:rgba(55,240,222,.5);background:#0c1718}
+body.stage-performance .legal-note{padding:16px 10px;color:#596470}
+
+/* Medium consoles */
+@media(max-width:1240px){
+  .banani-workspace{grid-template-columns:180px minmax(600px,1fr);grid-template-areas:"identity head" "identity deck" "identity macros" "identity fx" "identity synth" "identity session"}
+  body.stage-performance .pedalboard{position:relative;top:auto}.banani-logo-lockup{grid-template-columns:48px 1fr}.banani-logo-lockup img{width:48px;height:48px}.banani-logo-lockup strong{font-size:15px}
+  body.stage-performance .pedal-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.stage-macro-deck{grid-template-columns:1fr 1fr}.stage-macro-actions{grid-column:1/-1}
+}
+
+/* Touch console: all five lanes remain simultaneously visible. */
+@media(max-width:900px){
+  html{overflow:auto!important}
+  body.stage-performance{height:auto!important;min-height:100dvh!important;overflow:auto!important;padding-bottom:calc(18px + env(safe-area-inset-bottom))!important}
+  body.stage-performance .topbar{position:relative!important;display:grid!important;grid-template-columns:1fr!important;gap:7px!important;padding:7px!important}
+  body.stage-performance .brand{display:flex!important}.stage-performance .brand small{display:block!important}
+  body.stage-performance .transport{grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:3px!important}.stage-performance .transport>*{min-height:44px!important}.stage-performance .hardware-button span,.stage-performance .hardware-button b{font-size:5px!important}
+  body.stage-performance .top-actions{display:flex!important;justify-content:flex-start!important;overflow-x:auto!important}.stage-performance .top-actions a{min-height:40px!important}
+  body.stage-performance .performance-shell{width:100%!important;padding:5px!important}
+  .banani-workspace{display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-template-areas:"identity" "head" "deck" "macros" "fx" "synth" "session"!important;gap:5px!important}
+  .banani-identity-rail{position:relative;top:auto;min-height:0;display:block;padding:7px}.banani-logo-lockup{grid-template-columns:46px 1fr;padding:0;border:0}.banani-logo-lockup img{width:46px;height:46px}.banani-logo-lockup strong{font-size:14px}.banani-input-card,.banani-lane-map,.banani-route-card{display:none}
+  body.stage-performance .performance-head{display:grid!important;grid-template-columns:1fr 1.2fr!important;gap:4px!important}body.stage-performance .performance-head>div:first-child{display:block!important;padding:7px!important}.stage-performance .performance-head .eyebrow{font-size:5px!important}.stage-performance .performance-head h1{font-size:14px!important;margin-top:4px!important}.stage-performance .master-display{display:grid!important;padding:4px!important}.stage-performance .master-display>div:not(.master-meter){min-height:34px!important;padding:4px!important}.stage-performance .master-display small{font-size:4px!important}.stage-performance .master-display b{font-size:8px!important}
+  body.stage-performance .loop-deck>.panel-header{min-height:35px!important;padding:5px 7px!important}.stage-performance .loop-deck .eyebrow,.stage-performance .loop-deck .legend{display:none!important}.stage-performance .loop-deck h2{font-size:11px!important;margin:0!important}
+  body.stage-performance #trackGrid{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:2px!important;height:auto!important;min-height:0!important;max-height:none!important;padding:3px!important;overflow:visible!important;scroll-snap-type:none!important}
+  body.stage-performance #trackGrid>.loop-track,body.stage-performance #trackGrid>.loop-track.mobile-active{display:block!important;flex:none!important;width:auto!important;min-width:0!important;height:342px!important;min-height:342px!important;max-height:342px!important;padding:0 2px 4px!important;scroll-snap-align:none!important}
+  .stage-performance .loop-track header{min-height:44px!important;padding:8px 1px 4px!important}.stage-performance .track-name{display:none!important}.stage-performance .track-number{width:20px!important;height:20px!important}.stage-performance .track-state{font-size:4px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .stage-performance .progress-control{width:min(52px,92%)!important;margin:6px auto!important}.stage-performance .progress-center b{font-size:7px!important}.stage-performance .progress-center small{display:none!important}
+  .stage-performance .track-actions{grid-template-columns:1fr!important;gap:3px!important}body.stage-performance .track-actions button{display:none!important}body.stage-performance .track-actions button[data-action="record"],body.stage-performance .track-actions button[data-action="mute"]{display:block!important;grid-column:auto!important;min-height:43px!important;padding:2px!important;font-size:5px!important}
+  .stage-performance .track-controls{grid-template-columns:1fr!important;gap:3px!important;margin-top:4px!important}body.stage-performance .loop-track .track-controls label:not(:first-child){display:none!important}body.stage-performance .loop-track .track-controls label:first-child{display:grid!important;min-height:58px!important;padding:3px!important;font-size:4px!important}.stage-performance .track-controls input{height:24px!important}.stage-performance .track-controls output{font-size:5px!important}
+  .stage-macro-deck{display:grid!important;grid-template-columns:1fr 1fr!important;gap:3px!important;padding:3px!important;margin:0!important}.stage-macro-actions{grid-column:1/-1;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:2px!important}.stage-selected{min-height:25px}.stage-macro-button{min-height:44px!important;padding:2px!important;font-size:4px!important}.stage-macro-button strong{font-size:5.5px!important}.stage-xy{min-height:96px!important}
+  body.stage-performance .pedalboard{position:relative!important;top:auto!important}.stage-performance .pedalboard>.panel-header{grid-template-columns:1fr auto!important;padding:7px!important}.stage-performance .pedalboard .panel-header h2{font-size:12px!important}.stage-performance .pedalboard .mini-button{width:auto!important}.stage-performance .pedal-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;padding:4px!important;gap:4px!important}.stage-performance .pedal{padding:6px!important}.stage-performance .knob-row label{grid-template-columns:39px 1fr 30px!important;min-height:34px!important;padding:3px!important}.stage-performance .pedal-actions button{min-height:40px!important}
+  .stage-performance .synth-panel .panel-header{min-height:38px!important}.stage-performance .synth-panel .panel-header .eyebrow{display:none!important}.stage-performance .synth-panel .panel-header h2{font-size:11px!important}.stage-performance .synth-controls{display:none!important}.stage-performance .keyboard{height:90px!important;padding:0 4px 4px!important}
+  .stage-performance .session-tools{padding:4px!important}.stage-performance .status-message{min-height:28px!important;font-size:5.5px!important;padding:4px!important}.stage-performance .legal-note{display:none!important}.mobile-lane-nav,.mobile-performance-controls{display:none!important}
+}
+@media(max-width:430px){
+  body.stage-performance .transport{grid-template-columns:repeat(3,minmax(0,1fr))!important}.stage-performance .transport>*{min-height:46px!important}
+  body.stage-performance .performance-head{grid-template-columns:1fr!important}body.stage-performance .performance-head>div:first-child{display:none!important}
+  body.stage-performance #trackGrid>.loop-track{height:350px!important;min-height:350px!important;max-height:350px!important}.stage-performance .track-actions button[data-action="record"],.stage-performance .track-actions button[data-action="mute"]{font-size:4.5px!important}
+  .stage-performance .pedal-grid{grid-template-columns:1fr!important}.stage-xy{min-height:88px!important}
+}
+@media(orientation:landscape) and (max-height:560px){
+  .banani-identity-rail,.stage-performance .performance-head,.stage-performance .synth-panel{display:none!important}
+  .banani-workspace{grid-template-areas:"deck" "macros" "fx" "session"!important}
+  body.stage-performance #trackGrid>.loop-track{min-height:300px!important}
+}
+@media(prefers-reduced-motion:reduce){.banani-signal-orb:after{box-shadow:none}.loop-track,.stage-macro-button{transition:none!important}}

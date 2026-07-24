@@ -2,31 +2,35 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <link rel="icon" href="../favicon.ico?v=20260723" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png?v=20260723">
+  <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png?v=20260723">
+  <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png?v=20260723">
   <meta name="theme-color" content="#07090b">
   <meta name="description" content="Neusic Live Loop is a phone-first five-lane performance instrument for voice, beatbox, samples, tactile effects, synth playing, and direct Neusic Wave transfer.">
-  <link rel="canonical" href="https://bnsceo.github.io/NeusicLabV1/live-loop/">
+  <link rel="canonical" href="https://neusicwave.com/live-loop/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Neusic">
   <meta property="og:title" content="Neusic Live Loop — Five-Lane Performance Instrument">
-  <meta property="og:description" content="Capture voice, rhythm, bass, harmony, and textures across five synchronized phone-first loop lanes. Touch controls work with or without MIDI.">
-  <meta property="og:url" content="https://bnsceo.github.io/NeusicLabV1/live-loop/">
-  <meta property="og:image" content="https://bnsceo.github.io/NeusicLabV1/social/live-loop-card-v3.png">
+  <meta property="og:description" content="Capture voice, rhythm, bass, harmony, and textures across five phase-aligned phone-first loop lanes, with an explicit 2× tape cycle option. Touch controls work with or without MIDI.">
+  <meta property="og:url" content="https://neusicwave.com/live-loop/">
+  <meta property="og:image" content="https://neusicwave.com/social/live-loop-card-v3.png">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
-  <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Neusic Live Loop"><meta name="twitter:description" content="A five-lane tactile performance looper built for phones, voice, effects, and improvisation."><meta name="twitter:image" content="https://bnsceo.github.io/NeusicLabV1/social/live-loop-card-v3.png">
+  <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Neusic Live Loop"><meta name="twitter:description" content="A five-lane tactile performance looper built for phones, voice, effects, and improvisation."><meta name="twitter:image" content="https://neusicwave.com/social/live-loop-card-v3.png">
   <title>Neusic Live Loop — Performance Instrument</title>
   <link rel="preconnect" href="https://api.fontshare.com">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="styles.css?v=3">
-  <link rel="stylesheet" href="stage-performance.css?v=2">
+  <link rel="stylesheet" href="stage-performance.css?v=3">
   <link rel="stylesheet" href="mobile-lanes-imperative.css?v=2">
   <link rel="stylesheet" href="mobile-lanes-compact.css?v=2">
-  <link rel="stylesheet" href="loop-undo.css?v=1">
+  <link rel="stylesheet" href="loop-undo.css?v=2">
   <link rel="stylesheet" href="mobile-system.css?v=1">
   <link rel="stylesheet" href="../css/shared/neusic-suite.css?v=2">
-  <link rel="stylesheet" href="../css/shared/neusic-agent.css?v=1">
-  <link rel="stylesheet" href="mobile-release.css?v=1">
+  <link rel="stylesheet" href="mobile-release.css?v=2">
+  <link rel="stylesheet" href="banani-ui.css?v=1">
 </head>
 <body class="stage-performance" data-neusic-product="live-loop">
   <div class="noise" aria-hidden="true"></div>
@@ -44,14 +48,39 @@
   </header>
 
   <main class="performance-shell">
+    <section id="sessionRecovery" class="session-recovery" aria-live="polite" hidden>
+      <div><span class="eyebrow">RECOVERY AVAILABLE</span><b id="sessionRecoverySummary">A previous Live Loop performance is ready.</b></div>
+      <div class="session-recovery-actions"><button id="recoverSessionBtn" type="button">RECOVER SESSION</button><button id="discardSessionBtn" type="button">DISCARD</button></div>
+    </section>
+    <div class="banani-workspace">
+      <aside class="banani-identity-rail" aria-label="Neusic Live Loop signal path">
+        <div class="banani-logo-lockup">
+          <img src="../assets/icons/neusicwave-campaign-logo.jpg?v=20260723" alt="NeusicWave neon ring logo">
+          <div><span>NEUSIC</span><strong>LIVE LOOP</strong><small>PERFORMANCE CONSOLE · 01</small></div>
+        </div>
+        <div class="banani-input-card">
+          <span class="banani-section-label">INPUT SIGNAL</span>
+          <div class="banani-signal-orb" aria-hidden="true"><i></i><i></i><i></i></div>
+          <strong>VOICE / INSTRUMENT</strong>
+          <small>MICROPHONE · SAMPLE · MIDI</small>
+        </div>
+        <div class="banani-lane-map" aria-label="Five lane color map">
+          <span class="banani-section-label">FIVE-LANE MAP</span>
+          <ol><li><i></i><span>VOICE</span></li><li><i></i><span>RHYTHM</span></li><li><i></i><span>BASS</span></li><li><i></i><span>HARMONY</span></li><li><i></i><span>TEXTURE</span></li></ol>
+        </div>
+        <div class="banani-route-card">
+          <span class="banani-section-label">CONNECTED WORKFLOW</span>
+          <b>LIVE LOOP</b><i>→</i><b>WAVE</b><i>→</i><b>LAB</b>
+        </div>
+      </aside>
     <section class="performance-head">
       <div><span class="eyebrow">NEUSIC PRODUCT 01 · LIVE PERFORMANCE CAPTURE</span><h1>Capture lightning <em>before it disappears.</em></h1><p>Five parallel lanes, immediate overdubbing, tactile effects, and a tiny playable synth. Built for improvisation first—no timeline and no performance menu.</p></div>
       <div class="master-display"><div><small>MASTER LOOP</small><b id="masterLength">—</b></div><div><small>GLOBAL STATE</small><b id="globalState">READY</b></div><div class="master-meter"><span id="masterMeter"></span></div></div>
     </section>
 
     <section class="loop-deck panel" aria-labelledby="loopDeckTitle">
-      <header class="panel-header"><div><span class="eyebrow">PRIMARY PERFORMANCE SURFACE</span><h2 id="loopDeckTitle">Five synchronized loop lanes</h2></div><div class="legend"><span><i class="empty"></i>EMPTY</span><span><i class="recording"></i>RECORDING</span><span><i class="playing"></i>PLAYING</span><span><i class="muted"></i>MUTED</span></div></header>
-      <div id="trackGrid" class="track-grid" aria-label="Five synchronized loop lanes"></div>
+      <header class="panel-header"><div><span class="eyebrow">PRIMARY PERFORMANCE SURFACE</span><h2 id="loopDeckTitle">Five phase-aligned loop lanes</h2></div><div class="legend"><span><i class="empty"></i>EMPTY</span><span><i class="recording"></i>RECORDING</span><span><i class="playing"></i>PLAYING</span><span><i class="muted"></i>MUTED</span></div></header>
+      <div id="trackGrid" class="track-grid" aria-label="Five phase-aligned loop lanes"></div>
     </section>
 
     <section class="lower-grid">
@@ -61,12 +90,12 @@
           <section class="pedal delay-pedal">
             <header><span>NEUSIC</span><b>PHRASE DELAY</b><i id="delayLed"></i></header>
             <div class="knob-row"><label><span>TIME</span><input id="delayTime" type="range" min="40" max="1200" value="360"><output>360ms</output></label><label><span>FEEDBACK</span><input id="delayFeedback" type="range" min="0" max="92" value="42"><output>42%</output></label><label><span>MIX</span><input id="delayMix" type="range" min="0" max="100" value="28"><output>28%</output></label></div>
-            <div class="pedal-actions"><button id="warpDownBtn" type="button">OCTAVE DOWN</button><button id="reverseBtn" type="button">REVERSE SELECTED</button></div>
+            <div class="pedal-actions"><button id="warpDownBtn" type="button">HALF SPEED · 2× CYCLE</button><button id="reverseBtn" type="button">REVERSE SELECTED</button></div>
           </section>
           <section class="pedal reverb-pedal">
             <header><span>NEUSIC</span><b>SPATIAL HALL</b><i id="reverbLed"></i></header>
             <div class="knob-row"><label><span>SIZE</span><input id="reverbSize" type="range" min="20" max="500" value="180"><output>1.8s</output></label><label><span>TONE</span><input id="reverbTone" type="range" min="1200" max="14000" value="7200"><output>7.2k</output></label><label><span>MIX</span><input id="reverbMix" type="range" min="0" max="100" value="24"><output>24%</output></label></div>
-            <div class="pedal-actions"><button id="freezeBtn" type="button">SPACE FREEZE</button><button id="clearAllBtn" class="danger" type="button">CLEAR ALL</button></div>
+            <div class="pedal-actions"><button id="freezeBtn" type="button">TAIL BOOST</button><button id="clearAllBtn" class="danger" type="button">CLEAR ALL</button></div>
           </section>
         </div>
       </article>
@@ -79,10 +108,11 @@
     </section>
 
     <section class="session-tools panel">
-      <div><span class="eyebrow">SAMPLE INPUT + NEUSIC WAVE BRIDGE</span><h2>Capture here. Refine in Wave.</h2><p>Upload audio into the selected lane or send a recorded and overdubbed loop directly into the persistent Neusic Wave Forge.</p></div>
-      <div class="tool-actions"><button id="uploadBtn" class="primary-action" type="button">UPLOAD TO SELECTED TRACK</button><input id="fileInput" type="file" accept="audio/*,.wav,.wave,.mp3,.m4a,.aac,.flac,.ogg,.oga,.opus,.webm,.mp4" multiple hidden><button id="sendSelectedBtn" type="button">SEND SELECTED TO NEUSIC WAVE</button><button id="downloadSelectedBtn" type="button">DOWNLOAD SELECTED WAV</button></div>
+      <div><span class="eyebrow">SAMPLE INPUT + NEUSIC WAVE BRIDGE</span><h2>Capture here. Refine in Wave.</h2><p>Upload audio into loop lanes or send a raw loop source to Wave. Live Loop gain, pan, tape speed, and effects remain non-destructive here.</p></div>
+      <div class="tool-actions"><button id="uploadBtn" class="primary-action" type="button">UPLOAD TO SELECTED TRACK</button><input id="fileInput" type="file" accept="audio/*,.wav,.wave,.mp3,.m4a,.aac,.flac,.ogg,.oga,.opus,.webm,.mp4" multiple hidden><button id="sendSelectedBtn" type="button">SEND RAW LOOP TO NEUSIC WAVE</button><button id="downloadSelectedBtn" type="button">DOWNLOAD RAW LOOP WAV</button></div>
       <div id="statusMessage" class="status-message" role="status">Five loop lanes are visible. Tap REC on any lane; MIDI is optional.</div>
     </section>
+    </div>
   </main>
 
   <template id="trackTemplate">
@@ -96,11 +126,10 @@
 
   <footer class="legal-note">Performance workflow inspired by modern improvisational loop artists and hardware loop stations. Neusic is not affiliated with Reggie Watts, Boss, Line 6, Nord, or their manufacturers.</footer>
   <script src="mobile-mic-primer.js?v=8"></script>
-  <script type="module" src="app.js?v=12"></script>
-  <script src="loop-undo.js?v=1"></script>
-  <script src="stage-performance.js?v=2"></script>
-  <script src="mobile-recording-feedback.js?v=1"></script>
+  <script type="module" src="app.js?v=13"></script>
+  <script src="loop-undo.js?v=2"></script>
+  <script src="stage-performance.js?v=3"></script>
+  <script src="mobile-recording-feedback.js?v=2"></script>
   <script src="../scripts/shared/neusic-suite.js?v=2"></script>
-  <script src="../scripts/shared/neusic-agent.js?v=1"></script>
 </body>
 </html>

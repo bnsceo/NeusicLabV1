@@ -29,6 +29,7 @@
   };
 
   const updateAllButtons = () => histories.forEach((_, index) => updateButton(index));
+  const clearHistories = () => {histories.forEach(history => history.splice(0));updateAllButtons();};
 
   const pushSnapshot = index => {
     const snapshot = cloneSnapshot(index);
@@ -44,23 +45,32 @@
       return false;
     }
 
-    const snapshot = histories[index].pop();
+    const snapshot = histories[index].at(-1);
     if (!snapshot) {
       window.dispatchEvent(new CustomEvent('neusic:live-loop-status', {detail:{message:`Track ${index + 1} has nothing to undo.`}}));
       updateButton(index);
       return false;
     }
 
+    const otherHasAudio = looper.tracks.some((item, itemIndex) => itemIndex !== index && item.buffer);
+    if (snapshot.buffer && otherHasAudio && Math.abs((snapshot.masterLength || 0) - looper.masterLength) > .001) {
+      histories[index].splice(0);
+      window.dispatchEvent(new CustomEvent('neusic:live-loop-status', {detail:{message:'Undo history was cleared because the master loop cycle changed.'}}));
+      updateButton(index);
+      return false;
+    }
+    histories[index].pop();
+
     const track = looper.tracks[index];
     looper.stopSource(track);
     track.buffer = snapshot.buffer;
+    track.revision = (track.revision || 0) + 1;
     track.name = snapshot.name;
     track.muted = snapshot.muted;
     track.rate = snapshot.rate;
     track.reverse = snapshot.reverse;
     track.recording = null;
 
-    const otherHasAudio = looper.tracks.some((item, itemIndex) => itemIndex !== index && item.buffer);
     if (snapshot.buffer) looper.masterLength = snapshot.masterLength;
     else if (!otherHasAudio) looper.masterLength = 0;
 
@@ -126,6 +136,8 @@
     wrapMutation('clear', index => index, track => Boolean(track.buffer));
     wrapMutation('reverse', index => index, track => Boolean(track.buffer));
     wrapMutation('halfSpeed', index => index, track => Boolean(track.buffer));
+    const originalClearAll = looper.clearAll.bind(looper);
+    looper.clearAll = (...args) => {clearHistories();return originalClearAll(...args);};
 
     looper.undo = restoreSnapshot;
     looper.canUndo = index => histories[index]?.length > 0;
@@ -134,6 +146,7 @@
 
     addUndoButtons();
     addEventListener('neusic:live-loop-track', event => updateButton(event.detail?.index));
+    addEventListener('neusic:live-loop-session-restored', clearHistories);
     document.addEventListener('keydown', event => {
       if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== 'z') return;
       if (event.target.matches('input,textarea,select')) return;

@@ -36,11 +36,13 @@
     actions.innerHTML='<div class="stage-selected"><span>SELECTED LANE</span><b id="stageSelectedLane">01</b></div>';
     actions.append(
       makeButton('lofi','LO-FI','CRUSH'),
-      makeButton('octave','OCT −1','BASS'),
+      makeButton('octave','HALF SPEED','2× CYCLE'),
       makeButton('reverse','REVERSE','FLIP'),
-      makeButton('freeze','FREEZE','SPACE'),
+      makeButton('freeze','TAIL','BOOST'),
       makeButton('load','LOAD','SAMPLE'),
-      makeButton('wave','SEND','WAVE')
+      makeButton('download','RAW WAV','DOWNLOAD'),
+      makeButton('wave','RAW LOOP','TO WAVE'),
+      makeButton('clear','CLEAR','LANE','danger')
     );
     const delay=document.createElement('div');delay.className='stage-xy stage-delay';delay.style.setProperty('--x','28%');delay.style.setProperty('--y','72%');delay.innerHTML='<header><span>TAPE DELAY</span><b>XY</b></header><div class="stage-xy-dot"></div><footer><span>TIME →</span><span>↑ MIX</span></footer>';
     const space=document.createElement('div');space.className='stage-xy stage-space';space.style.setProperty('--x','36%');space.style.setProperty('--y','76%');space.innerHTML='<header><span>SPACE REVERB</span><b>XY</b></header><div class="stage-xy-dot"></div><footer><span>SIZE →</span><span>↑ MIX</span></footer>';
@@ -50,18 +52,28 @@
     bindXY(space,{xId:'reverbSize',xMin:20,xMax:500,yId:'reverbMix',yMin:0,yMax:100});
     actions.addEventListener('click',event=>{
       const button=event.target.closest('[data-stage-action]');if(!button)return;
-      if(!ready()){
-        document.querySelector('.loop-track.selected [data-action="record"]')?.focus();
-        document.getElementById('statusMessage').textContent='Tap REC or MIC once to activate audio, then use this effect.';
+      const action=button.dataset.stageAction;
+      if(action==='load'){
+        document.getElementById('fileInput')?.click();
         return;
       }
-      const api=window.NeusicLiveLoop,action=button.dataset.stageAction;
-      if(action==='lofi')button.classList.toggle('active',api.toggleLoFi());
+      if(!ready()){
+        document.querySelector('.loop-track.selected [data-action="record"]')?.focus();
+        document.getElementById('statusMessage').textContent='Record or load audio first, then use this control.';
+        return;
+      }
+      const api=window.NeusicLiveLoop;
+      if(action==='lofi'){const active=api.toggleLoFi();button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active));}
       if(action==='octave'){api.toggleOctave();button.classList.toggle('active',api.state().lanes[api.selectedTrack].rate===.5);}
       if(action==='reverse'){api.toggleReverse();button.classList.toggle('active',api.state().lanes[api.selectedTrack].reverse);}
-      if(action==='freeze'){api.toggleFreeze();button.classList.toggle('active');}
-      if(action==='load')api.loadSelected();
+      if(action==='freeze'){api.toggleFreeze();button.classList.toggle('active');button.setAttribute('aria-pressed',String(button.classList.contains('active')));}
+      if(action==='download')api.downloadSelected();
       if(action==='wave')api.sendSelected();
+      if(action==='clear'){
+        const lane=api.state().lanes[api.selectedTrack];
+        if(!lane?.hasAudio){document.getElementById('statusMessage').textContent='The selected lane is already empty.';return;}
+        if(confirm(`Clear ${lane.name}?`))api.clearSelected();
+      }
     });
     syncSelection();
   }
@@ -70,9 +82,9 @@
     const state=ready()?window.NeusicLiveLoop.state():null;
     const lane=state?.lanes?.[selected];
     const output=document.getElementById('stageSelectedLane');if(output)output.textContent=String(selected+1).padStart(2,'0');
-    const octave=document.querySelector('[data-stage-action="octave"]');if(octave)octave.classList.toggle('active',lane?.rate===.5);
-    const reverse=document.querySelector('[data-stage-action="reverse"]');if(reverse)reverse.classList.toggle('active',Boolean(lane?.reverse));
-    const lofi=document.querySelector('[data-stage-action="lofi"]');if(lofi)lofi.classList.toggle('active',Boolean(state?.lofi));
+    const octave=document.querySelector('[data-stage-action="octave"]');if(octave){octave.classList.toggle('active',lane?.rate===.5);octave.setAttribute('aria-pressed',String(lane?.rate===.5));}
+    const reverse=document.querySelector('[data-stage-action="reverse"]');if(reverse){reverse.classList.toggle('active',Boolean(lane?.reverse));reverse.setAttribute('aria-pressed',String(Boolean(lane?.reverse)));}
+    const lofi=document.querySelector('[data-stage-action="lofi"]');if(lofi){lofi.classList.toggle('active',Boolean(state?.lofi));lofi.setAttribute('aria-pressed',String(Boolean(state?.lofi)));}
   }
   addEventListener('neusic:live-loop-ui-ready',build);
   addEventListener('neusic:live-loop-ready',()=>{build();syncSelection();});

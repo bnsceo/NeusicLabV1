@@ -24,7 +24,8 @@
 
   addEventListener('neusic:live-loop-status', event => {
     const message = String(event.detail?.message || '');
-    const isError = /blocked|failed|cannot|could not|no microphone|no audio|locked|permission/i.test(message);
-    show(message, isError, isError ? 7500 : 4200);
+    const isError = /blocked|failed|cannot|could not|no microphone|no audio|locked|permission|unavailable/i.test(message);
+    const isRecordingFeedback = /microphone|record|overdub|captur|preparing loop|allow access/i.test(message);
+    if (isError || isRecordingFeedback) show(message, isError, isError ? 7500 : 4200);
   });
 })();
