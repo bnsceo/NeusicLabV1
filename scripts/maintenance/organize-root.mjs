@@ -62,9 +62,10 @@ const moves=new Map(Object.entries({
 
 const keepAtRoot=new Set([
   '.gitignore','.nojekyll','CNAME','LICENSE','LICENSE.md','README.md',
-  'apple-touch-icon.png','favicon.ico','index.html','manifest.json',
+  'apple-touch-icon.png','favicon.ico','favicon-16x16.png','favicon-32x32.png',
+  'favicon-48x48.png','favicon-192x192.png','favicon-512x512.png','index.html','manifest.json',
   'manifest.webmanifest','package-lock.json','package.json','robots.txt',
-  'sitemap.xml','suite.html'
+  'site.webmanifest','sitemap.xml','suite.html'
 ]);
 
 const fallbackDestination=filename=>{
@@ -113,8 +114,7 @@ const replacements=new Map([
   ['neusic-agent.css','css/shared/neusic-agent.css'],
   ['neusic-suite.css','css/shared/neusic-suite.css'],
   ['neusic-agent.js','scripts/shared/neusic-agent.js'],
-  ['neusic-suite.js','scripts/shared/neusic-suite.js'],
-  ['scheduler-worker.js','scripts/workers/scheduler-worker.js']
+  ['neusic-suite.js','scripts/shared/neusic-suite.js']
 ]);
 
 const textExtensions=new Set(['.html','.htm','.css','.js','.mjs','.cjs','.json','.md','.py','.svg','.txt','.yml','.yaml']);
@@ -163,7 +163,7 @@ if(fs.existsSync(fromRoot('suite/index.html'))){
     fs.mkdirSync(path.dirname(archivePath),{recursive:true});
     if(!fs.existsSync(archivePath))fs.copyFileSync(suitePath,archivePath);
   }
-  const redirect='<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=./suite/"><link rel="canonical" href="./suite/"><title>Opening Neusic Suite</title></head><body><p><a href="./suite/">Open Neusic Suite</a></p></body></html>\n';
+  const redirect='<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="./favicon.ico?v=20260723" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=20260723"><link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=20260723"><meta http-equiv="refresh" content="0;url=./suite/"><link rel="canonical" href="./suite/"><title>Opening Neusic Suite</title></head><body><p><a href="./suite/">Open Neusic Suite</a></p></body></html>\n';
   fs.writeFileSync(suitePath,redirect);
 }
 

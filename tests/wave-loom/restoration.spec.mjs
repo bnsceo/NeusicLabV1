@@ -76,16 +76,11 @@ test('phone stage exposes tactile faders, pan, macro effects, and synth',async({
   expect(await page.evaluate(()=>window.NeusicLiveLoop.state().lofi)).toBe(true);
 });
 
-test('shared Neusic Agent works offline and explains touch recording',async({page})=>{
+test('Live Loop stays focused without a decorative shared Agent',async({page})=>{
   await openLiveLoop(page);
-  await page.locator('.neusic-agent-launcher').click();
-  await expect(page.locator('.neusic-agent-panel')).toHaveClass(/open/);
-  await page.locator('.neusic-agent-compose textarea').fill('How do I record without MIDI on my phone?');
-  await page.locator('.neusic-agent-send').click();
-  await expect(page.locator('.neusic-agent-message').last()).toContainText('MIDI is optional');
-  const context=await page.evaluate(()=>window.NeusicAgent.context());
-  expect(context.product).toBe('live-loop');
-  expect(context.lanes).toHaveLength(5);
+  await expect(page.locator('.neusic-agent-launcher')).toHaveCount(0);
+  await expect(page.locator('.neusic-agent-panel')).toHaveCount(0);
+  await expect(page.locator('.loop-track')).toHaveCount(5);
 });
 
 test('Neusic Lab restores one track sidebar and one dedicated center workspace',async({page})=>{

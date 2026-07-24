@@ -79,13 +79,14 @@ test('Lab V4 keeps one sidebar and one dedicated center workspace',async()=>{
   assert.match(wrapper,/js\/40-studio-v4-hardening\.js/);
 });
 
-test('all public products expose the shared Agent and preview builder',async()=>{
+test('supported public surfaces expose the shared Agent while Live Loop stays focused',async()=>{
   const live=await read('live-loop/index.html');
   const lab=await read('app/phase-a.html');
   const wave=await read('wave-loom/wave-polish.js');
   const landing=await read('scripts/landing/site-polish.js');
   const builder=await read('scripts/build_pages.py');
-  for(const source of [live,lab,wave,landing])assert.match(source,/neusic-agent/);
+  assert.doesNotMatch(live,/neusic-agent\.js|neusic-agent\.css/);
+  for(const source of [lab,wave,landing])assert.match(source,/neusic-agent/);
   for(const image of ['neusic-suite-card-v3.png','live-loop-card-v3.png','wave-card-v3.png','lab-card-v3.png'])assert.ok(builder.includes(image),`preview builder missing ${image}`);
   assert.match(builder,/og:image:secure_url/);
   assert.match(builder,/twitter:image:src/);

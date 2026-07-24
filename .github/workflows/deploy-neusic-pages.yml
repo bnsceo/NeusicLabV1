@@ -35,7 +35,14 @@ jobs:
           cp index.html _site/index.html
           cp suite.html _site/suite.html
           cp favicon.ico _site/favicon.ico
+          cp favicon-16x16.png _site/favicon-16x16.png
+          cp favicon-32x32.png _site/favicon-32x32.png
+          cp favicon-48x48.png _site/favicon-48x48.png
+          cp favicon-180x180.png _site/favicon-180x180.png
+          cp favicon-192x192.png _site/favicon-192x192.png
+          cp favicon-512x512.png _site/favicon-512x512.png
           cp apple-touch-icon.png _site/apple-touch-icon.png
+          cp site.webmanifest _site/site.webmanifest
 
           cp -R css/. _site/css/
           cp -R scripts/landing/. _site/scripts/landing/
