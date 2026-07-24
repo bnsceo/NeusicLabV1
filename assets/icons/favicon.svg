@@ -1,45 +1,29 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+
   <defs>
-    <!-- Neon ring gradient (Cyan to Purple/Pink matching the campaign logo) -->
-    <linearGradient id="neonGlow" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00f0ff"/>
-      <stop offset="50%" stop-color="#a855f7"/>
-      <stop offset="100%" stop-color="#ff007f"/>
-    </linearGradient>
-    
-    <!-- Dark textured vinyl record background -->
-    <radialGradient id="vinylCenter" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#1a1d24"/>
-      <stop offset="70%" stop-color="#0b0e14"/>
-      <stop offset="100%" stop-color="#05070a"/>
-    </radialGradient>
-    
-    <!-- Metallic silver text gradient -->
-    <linearGradient id="silverText" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#ffffff"/>
-      <stop offset="50%" stop-color="#cbd5e1"/>
-      <stop offset="100%" stop-color="#64748b"/>
+
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+
+      <stop offset="0%" stop-color="#353e42"/>
+
+      <stop offset="72%" stop-color="#090c0d"/>
+
     </linearGradient>
 
-    <!-- Waveform gradient matching the neon transition -->
-    <linearGradient id="waveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#00f0ff"/>
-      <stop offset="50%" stop-color="#a855f7"/>
-      <stop offset="100%" stop-color="#ff007f"/>
+    <linearGradient id="shine" x1="0" y1="0" x2="0" y2="1">
+
+      <stop offset="0%" stop-color="rgba(255,255,255,.22)"/>
+
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+
     </linearGradient>
+
   </defs>
 
-  <!-- Base Vinyl Record Circle with Neon Ring Stroke -->
-  <circle cx="32" cy="32" r="30" fill="url(#vinylCenter)" stroke="url(#neonGlow)" stroke-width="3.5"/>
+  <rect x="6" y="6" width="52" height="52" rx="8" fill="url(#bg)" stroke="#586168" stroke-width="2"/>
 
-  <!-- Subtle Vinyl Grooves -->
-  <circle cx="32" cy="32" r="23" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
-  <circle cx="32" cy="32" r="18" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-  <circle cx="32" cy="32" r="13" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+  <path d="M10 10h44v12c-14 2-24 3-44 0z" fill="rgba(255,255,255,.08)"/>
 
-  <!-- Central 'N' styled with the metallic silver lettering -->
-  <text x="32" y="31" text-anchor="middle" font-size="22" font-weight="800" font-family="'Space Grotesk', 'Arial Black', sans-serif" fill="url(#silverText)" letter-spacing="-1">N</text>
+  <text x="32" y="39" text-anchor="middle" font-size="28" font-weight="700" font-family="Clash Display, Manrope, Arial, sans-serif" letter-spacing="-2" fill="#f0c77d">N</text>
 
-  <!-- Signature Audio Waveform at the bottom -->
-  <path d="M20 44h2v4h-2zm3-3h2v7h-2zm3-4h2v11h-2zm3 2h2v7h-2zm3-5h2v17h-2zm3 3h2v11h-2zm3-2h2v7h-2zm3 4h2v3h-2zm3-2h2v5h-2z" fill="url(#waveGrad)" opacity="0.9"/>
 </svg>
