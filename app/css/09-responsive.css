@@ -1,6 +1,6 @@
-/* ═══════════════════════════════════════════════
+/* ══════════════════════════════════════════════
    Responsive breakpoints + touch scrollbar hiding
-═══════════════════════════════════════════════ */
+══════════════════════════════════════════════ */
 /* ─ Responsive grid for panels ─ */
 @media(min-width:768px){
   #drawer{--drawer-h:340px;}
@@ -25,6 +25,95 @@
 }
 @media(min-width:1024px){
   :root{--hdr-w:168px;}
+}
+
+/* ─ Mobile responsive: contain horizontal overflow, fix tracks, topbar ─ */
+@media(max-width:860px){
+  /* Constrain topbar horizontal scroll */
+  #topbar{
+    max-width:100vw!important;
+    overflow-x:auto!important;
+    scrollbar-width:none!important;
+  }
+  #topbar::-webkit-scrollbar{display:none!important}
+  
+  /* Ensure tracks area fits viewport */
+  #tracks-area,
+  #tracks-scroll,
+  #tracks-inner,
+  #center,
+  #main{
+    max-width:100vw!important;
+    min-width:0!important;
+  }
+  
+  /* Track inner should only be as wide as scroll container allows horizontal scroll */
+  #tracks-inner{
+    min-width:max-content!important;
+  }
+  
+  /* Ruler pad should not force huge width */
+  .ruler-pad{
+    min-width:var(--hdr-w)!important;
+    width:var(--hdr-w)!important;
+  }
+  
+  /* Sequencer area */
+  .phase-a-seq-area,
+  .seq-area{
+    overflow-x:auto!important;
+    overscroll-behavior-x:contain!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+  .seq-row{
+    min-width:max-content!important;
+  }
+}
+
+/* Stronger mobile containment at 480px and below */
+@media(max-width:480px){
+  :root{--hdr-w:112px;--track-h:64px;}
+  
+  #topbar{
+    overflow-x:auto!important;
+    max-width:100vw!important;
+  }
+  
+  #tracks-area,
+  #tracks-scroll,
+  #tracks-inner,
+  #center,
+  #main,
+  #app{
+    max-width:100vw!important;
+    min-width:0!important;
+    width:100vw!important;
+    overflow-x:hidden!important;
+  }
+  
+  #tracks-scroll{
+    overflow-x:auto!important;
+    width:100vw!important;
+  }
+  
+  #tracks-inner{
+    min-width:max-content!important;
+    width:auto!important;
+  }
+  
+  /* Ensure timeline/canvas areas don't overflow */
+  .arranger-viewport,
+  .timeline-wrap,
+  .timeline-scroll,
+  .mixer-wrap,
+  .mixer-scroll,
+  [class*="timeline-scroll"],
+  [class*="mixer-scroll"]{
+    max-width:100vw!important;
+    overflow-x:auto!important;
+    overscroll-behavior-x:contain!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
 }
 
 /* ─ Scrollbar hide on touch ─ */

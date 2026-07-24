@@ -259,6 +259,9 @@ body.mobile-sidebar-open .mobile-sidebar-scrim{
 
 /* ── Persistent bottom navigation. ── */
 #mobile-nav{display:none!important;}
+@media(max-width:860px){
+  #mobile-nav{display:flex!important;}
+}
 .neusic-system-footer{
   display:flex!important;
   height:var(--mobile-footer-h)!important;
