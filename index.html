@@ -25,12 +25,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./css/landing/neusicwave-teaser.css?v=12" />
+  <link rel="stylesheet" href="./css/landing/neusicwave-teaser.css?v=14" />
   <style>
-    .logo-stage{isolation:isolate}
-    .logo-stage::before{inset:7%;filter:blur(58px);opacity:.24}
-    .campaign-logo{width:94%;border-radius:0;object-fit:contain;box-shadow:none;filter:drop-shadow(0 24px 55px rgba(0,0,0,.58));animation:neusicLogoBreathe 6s ease-in-out infinite}
-    @keyframes neusicLogoBreathe{0%,100%{transform:translateY(0) scale(.985);filter:drop-shadow(0 24px 55px rgba(0,0,0,.58))}50%{transform:translateY(-5px) scale(1);filter:drop-shadow(-5px 0 24px rgba(70,216,255,.2)) drop-shadow(5px 0 24px rgba(255,79,216,.2))}}
+    .logo-stage{isolation:isolate;overflow:visible}
+    .logo-stage::before{inset:8%;filter:blur(54px);opacity:.2}
+    .campaign-logo{display:block;width:94%;height:auto;aspect-ratio:1;object-fit:contain;border-radius:50%;box-shadow:none;image-rendering:auto;filter:drop-shadow(0 24px 55px rgba(0,0,0,.58));animation:neusicLogoBreathe 6s ease-in-out infinite}
+    @keyframes neusicLogoBreathe{0%,100%{transform:translateY(0) scale(.992)}50%{transform:translateY(-4px) scale(1)}}
     @media(prefers-reduced-motion:reduce){.campaign-logo{animation:none}}
   </style>
 </head>
@@ -54,12 +54,12 @@
     <section class="hero" id="top">
       <div class="logo-stage">
         <img
-          src="./assets/icons/neusicwave-campaign-logo.jpg?v=12"
+          src="./assets/icons/neusicwave-circle-hd-v14.webp?v=14"
           alt="NeusicWave circular neon vinyl logo"
           class="campaign-logo"
-          width="900"
-          height="900"
-          decoding="sync"
+          width="512"
+          height="512"
+          decoding="async"
           fetchpriority="high"
         />
       </div>
@@ -120,6 +120,6 @@
     </div>
   </div>
 
-  <script src="./scripts/landing/neusicwave-teaser.js?v=12"></script>
+  <script src="./scripts/landing/neusicwave-teaser.js?v=14"></script>
 </body>
 </html>
