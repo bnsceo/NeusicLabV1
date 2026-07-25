@@ -24,8 +24,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Prepare production site
         run: |
@@ -41,12 +39,7 @@ jobs:
           cp -R css/shared/. _site/css/shared/
           cp -R scripts/landing/. _site/scripts/landing/
           cp -R scripts/shared/. _site/scripts/shared/
-
-          # Fetch and publish the exact approved circular logo from the last
-          # working teaser commit. The landing no longer depends on autoplay,
-          # a poster frame, or a Studio-relative image path.
-          git fetch --no-tags --depth=1 origin 11c5c82d895984db7c1bbfd4760125e2641bdfd6
-          git show FETCH_HEAD:assets/icons/neusicwave-campaign-logo.jpg > _site/assets/icons/neusicwave-campaign-logo.jpg
+          cp -R assets/icons/. _site/assets/icons/
           test -s _site/assets/icons/neusicwave-campaign-logo.jpg
 
           cp -R app/. _site/studio/
