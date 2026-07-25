@@ -24,6 +24,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Prepare production site
         run: |
@@ -32,12 +34,19 @@ jobs:
           mkdir -p _site/studio _site/wave-loom _site/live-loop
           mkdir -p _site/css/landing _site/css/shared
           mkdir -p _site/scripts/landing _site/scripts/shared
+          mkdir -p _site/assets/icons
 
           cp index.html _site/index.html
           cp -R css/landing/. _site/css/landing/
           cp -R css/shared/. _site/css/shared/
           cp -R scripts/landing/. _site/scripts/landing/
           cp -R scripts/shared/. _site/scripts/shared/
+
+          # Restore the exact approved circular campaign logo from the preserved
+          # working teaser commit. This avoids relying on video autoplay or a
+          # Studio-relative fallback path.
+          git show 11c5c82d895984db7c1bbfd4760125e2641bdfd6:assets/icons/neusicwave-campaign-logo.jpg > _site/assets/icons/neusicwave-campaign-logo.jpg
+          test -s _site/assets/icons/neusicwave-campaign-logo.jpg
 
           cp -R app/. _site/studio/
           cp -R wave-loom/. _site/wave-loom/
