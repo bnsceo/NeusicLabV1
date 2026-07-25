@@ -1,0 +1,22 @@
+/* Final mobile release layer for Neusic Wave. */
+html,body{max-width:100%;overflow-x:hidden}
+@media(max-width:900px){
+  body{padding-bottom:calc(76px + env(safe-area-inset-bottom))!important}
+  .topbar{display:grid!important;grid-template-columns:1fr!important;gap:8px!important;padding:8px!important;position:sticky!important;top:0!important;z-index:70!important}
+  .transport{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}.transport>*{min-width:0!important;min-height:46px!important}.lcd.wide{grid-column:1/-1!important}
+  .top-actions{display:flex!important;gap:6px!important;overflow-x:auto!important;scrollbar-width:none!important}.top-actions::-webkit-scrollbar{display:none}.top-actions>*{flex:0 0 auto!important;min-height:44px!important}
+  main.workspace{display:block!important;width:100%!important;padding:0!important;overflow-x:hidden!important}
+  .capture-rail,.loom-stage,.inspector,.forge{width:100%!important;max-width:100%!important;min-width:0!important;border-inline:0!important;border-radius:0!important}
+  .capture-rail,.inspector,.forge{padding:12px!important;overflow-y:auto!important}
+  .loom-titlebar{display:grid!important;grid-template-columns:1fr!important;gap:10px!important;padding:12px!important}.loom-command-cluster{display:grid!important;grid-template-columns:1fr!important;gap:8px!important}.loom-command-cluster>*{min-width:0!important;width:100%!important}
+  .mode-switch{display:grid!important;grid-template-columns:repeat(3,1fr)!important}.mode-switch button{min-height:44px!important}
+  .loom-frame{height:52dvh!important;min-height:360px!important}.canvas-hud{font-size:7px!important}.gesture-card{display:none!important}
+  .loom-footer{display:grid!important;grid-template-columns:1fr!important;gap:8px!important}.macro-strip{grid-template-columns:1fr 1fr!important}.macro-strip label{min-height:54px!important}
+  .forge-head{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}.forge-tools{display:grid!important;grid-template-columns:1fr!important}.forge-tools>*{min-height:46px!important}
+  .sample-shelf,.uploaded-sample-shelf,.persistent-sample-shelf{display:grid!important;grid-template-columns:1fr!important;overflow:visible!important}.persistent-sample-card{width:100%!important;min-width:0!important;max-width:none!important}.persistent-sample-actions{grid-template-columns:1fr 1fr!important}.persistent-sample-actions button{min-height:46px!important}
+  dialog{width:100vw!important;max-width:none!important;height:100dvh!important;max-height:none!important;margin:0!important;border:0!important;border-radius:0!important}.help-grid,.forge-editor-controls,.export-grid,.transient-controls{grid-template-columns:1fr!important}
+  #nw-agent-dot{right:12px!important;bottom:calc(76px + env(safe-area-inset-bottom))!important;width:34px!important;height:34px!important;z-index:95!important}
+  #nw-agent-panel{left:8px!important;right:8px!important;bottom:calc(76px + env(safe-area-inset-bottom))!important;width:auto!important;max-width:none!important;height:min(60dvh,520px)!important;z-index:100!important;border-radius:12px!important}
+}
+@media(max-width:430px){.loom-frame{height:46dvh!important;min-height:320px!important}.macro-strip{grid-template-columns:1fr!important}.canvas-hud.top-right{display:none!important}.capture-orb{width:min(70vw,250px)!important;height:min(70vw,250px)!important}}
+@media(orientation:landscape) and (max-height:560px){.topbar{position:relative!important}.loom-frame{height:calc(100dvh - 120px)!important;min-height:260px!important}.capture-rail,.inspector,.forge{max-height:none!important}}

@@ -1,0 +1,99 @@
+/* 31-nw-shell.css — Four-zone decluttered layout over the existing DOM.
+   Zones: menubar / transport strip / left panel / center timeline / right inspector.
+   No bottom drawer: legacy drawer becomes a VIEW-menu workspace mode. */
+
+body.nw-shell{background:var(--nw-black);font-family:var(--nw-font)}
+
+/* ── Zone grid ── */
+body.nw-shell #app{display:flex;flex-direction:column;height:100dvh;background:var(--nw-black)}
+body.nw-shell #main{display:grid;grid-template-columns:var(--nw-left-w,216px) 1fr var(--nw-right-w,224px);
+  grid-template-areas:"left center right";flex:1;min-height:0;gap:0;background:var(--nw-black)}
+body.nw-shell.nw-left-closed #main{--nw-left-w:28px}
+body.nw-shell.nw-right-closed #main{--nw-right-w:28px}
+body.nw-shell #sidebar{grid-area:left;overflow:hidden auto}
+body.nw-shell #center{grid-area:center;min-width:0}
+body.nw-shell #nw-inspector{grid-area:right;overflow:hidden auto}
+
+/* ── Transport strip: recessed, minimal visual weight ── */
+body.nw-shell #topbar{
+  background:linear-gradient(#211f1e,#1a1918);
+  border-bottom:1px solid rgba(0,0,0,.7);
+  box-shadow:inset 0 -1px rgba(255,255,255,.03);
+  min-height:38px;gap:6px;padding:0 8px}
+body.nw-shell #topbar .tb-btn,body.nw-shell #topbar button{
+  font:700 var(--nw-ctl)/1 var(--nw-font);letter-spacing:.06em;
+  background:linear-gradient(#454a48,#2e3230);border:1px solid #1c1e1d;border-radius:2px;
+  color:#9ba09e;box-shadow:inset 0 1px rgba(255,255,255,.07),0 1px rgba(0,0,0,.5)}
+body.nw-shell #topbar .chip{background:#141614;border:1px solid #0e100f;border-radius:2px;
+  box-shadow:var(--nw-recess);color:var(--nw-silver)}
+body.nw-shell #topbar .chip-main{font:700 var(--nw-display)/1.1 var(--nw-font);letter-spacing:.06em;
+  color:color-mix(in srgb,var(--nw-accent) 60%,#e8eae9)}
+body.nw-shell #topbar .chip-sub{font:600 var(--nw-micro)/1 var(--nw-font);color:var(--nw-steel)}
+/* play = the accent element */
+body.nw-shell #topbar [id*="play"],body.nw-shell #topbar .tb-play{
+  background:var(--nw-accent)!important;color:#141210!important;border-radius:50%!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.35),0 0 6px color-mix(in srgb,var(--nw-accent) 45%,transparent)!important}
+body.nw-shell #topbar [id*="rec"]:not([id*="record-arm"]){border-radius:50%!important;
+  background:radial-gradient(circle,#b34b37 0 35%,#4a302b 38% 65%,#202322 68%)!important}
+
+/* ── Left panel (kits / browser) ── */
+body.nw-shell #sidebar{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.1)),var(--nw-charcoal);
+  border-right:1px solid rgba(0,0,0,.65);box-shadow:inset -1px 0 rgba(255,255,255,.03)}
+body.nw-shell.nw-left-closed #sidebar>*:not(.nw-panel-toggle){display:none}
+
+/* ── Right inspector (new region) ── */
+#nw-inspector{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.1)),var(--nw-charcoal);
+  border-left:1px solid rgba(0,0,0,.65);box-shadow:inset 1px 0 rgba(255,255,255,.03);
+  display:flex;flex-direction:column;gap:0}
+#nw-inspector .nw-sect{padding:10px 10px 8px;border-bottom:1px solid rgba(0,0,0,.5);
+  box-shadow:inset 0 1px rgba(255,255,255,.025)}
+body.nw-shell.nw-right-closed #nw-inspector>*:not(.nw-panel-toggle){display:none}
+.nw-panel-toggle{align-self:flex-end;margin:4px;width:20px;height:20px;padding:0;line-height:18px;text-align:center}
+
+/* ── Center: the hero workspace ── */
+body.nw-shell #center{background:var(--nw-panel)}
+body.nw-shell #ruler{background:linear-gradient(#2b2e2c,#242726);border-bottom:1px solid rgba(0,0,0,.6);
+  color:var(--nw-light-steel);font:600 var(--nw-small)/1 var(--nw-font);letter-spacing:.08em}
+body.nw-shell .track-row,body.nw-shell [class*="track-lane"]{border-bottom:1px solid rgba(0,0,0,.5);
+  box-shadow:inset 0 1px rgba(255,255,255,.025)}
+body.nw-shell .track-row:nth-child(odd){background:#303332}
+body.nw-shell .track-row:nth-child(even){background:#353837}
+body.nw-shell .clip,body.nw-shell [class*="clip"]{border-radius:1px;border:1px solid rgba(0,0,0,.5);
+  box-shadow:inset 0 1px rgba(255,255,255,.12),inset 0 -1px rgba(0,0,0,.15);opacity:.9}
+body.nw-shell .clip.sel,body.nw-shell .clip.is-selected,body.nw-shell [class*="clip"].sel{
+  background:#c8cccb!important;border-color:rgba(235,240,239,.7)!important;opacity:1;
+  box-shadow:0 0 0 1px rgba(0,0,0,.55),inset 0 1px rgba(255,255,255,.5)}
+/* playhead = accent */
+body.nw-shell #playhead,body.nw-shell [id*="playhead"],body.nw-shell .playhead{
+  background:var(--nw-accent)!important;width:1px;box-shadow:0 0 4px color-mix(in srgb,var(--nw-accent) 60%,transparent)}
+
+/* ── Meters: emerald, the audio truth ── */
+body.nw-shell .meter,body.nw-shell [class*="meter"]{background:#121614;border:1px solid rgba(0,0,0,.75)}
+body.nw-shell .meter-fill,body.nw-shell [class*="meter"] .fill,body.nw-shell [class*="meter-fill"]{
+  background:linear-gradient(to top,#00d879 0%,#08ee95 65%,#59ffb6 100%)!important;
+  box-shadow:0 0 4px rgba(0,238,143,.35),inset 1px 0 rgba(255,255,255,.25)}
+
+/* ── Retire the competing shells: drawer becomes a workspace mode ── */
+body.nw-shell #drawer{display:none}
+body.nw-shell.nw-mode-mix #drawer,body.nw-shell.nw-mode-pads #drawer,body.nw-shell.nw-mode-keys #drawer{
+  display:block;position:fixed;inset:auto 0 0 0;max-height:46dvh;overflow:auto;z-index:60;
+  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(0,0,0,.12)),var(--nw-charcoal);
+  border-top:1px solid rgba(0,0,0,.7);box-shadow:0 -6px 18px rgba(0,0,0,.5)}
+/* legacy floating layers that competed for attention */
+body.nw-shell [class*="hyperreal-float"],body.nw-shell [class*="copilot-fab"],
+body.nw-shell [id*="floating"],body.nw-shell .legacy-shell{display:none!important}
+
+/* ── Kit picker inherits accent ── */
+body.nw-shell .kit-btn.kit-active{background:var(--nw-accent);border-color:var(--nw-accent);color:#141210;
+  box-shadow:0 0 8px color-mix(in srgb,var(--nw-accent) 40%,transparent)}
+
+/* ── Responsive ── */
+@media(max-width:1024px){body.nw-shell #main{--nw-left-w:28px;--nw-right-w:28px}}
+@media(max-width:768px){
+  body.nw-shell #main{grid-template-columns:1fr;grid-template-areas:"center"}
+  body.nw-shell #sidebar,body.nw-shell #nw-inspector{position:fixed;top:38px;bottom:0;z-index:70;width:min(78vw,300px)}
+  body.nw-shell #sidebar{left:0;transform:translateX(-100%);transition:transform .18s ease}
+  body.nw-shell #nw-inspector{right:0;transform:translateX(100%);transition:transform .18s ease}
+  body.nw-shell.nw-left-open #sidebar{transform:none}
+  body.nw-shell.nw-right-open #nw-inspector{transform:none}
+}
