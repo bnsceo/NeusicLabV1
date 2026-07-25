@@ -25,7 +25,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./css/landing/neusicwave-teaser.css?v=9" />
+  <link rel="stylesheet" href="./css/landing/neusicwave-teaser.css?v=10" />
+  <style>
+    .logo-stage{overflow:hidden}
+    .campaign-logo-fallback,.campaign-logo-video{position:absolute;z-index:2;width:86%;height:86%;aspect-ratio:1;border-radius:50%;box-shadow:0 26px 90px rgba(0,0,0,.64),0 0 50px rgba(90,113,255,.14)}
+    .campaign-logo-fallback{object-fit:cover}
+    .campaign-logo-video{object-fit:contain;background:#020309;opacity:0;transition:opacity .35s ease}
+    .campaign-logo-video.is-ready{opacity:1}
+  </style>
 </head>
 <body data-neusic-creator="source-managed">
   <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -48,16 +55,19 @@
       <div class="logo-stage" aria-hidden="true">
         <div class="orbit orbit-one"></div>
         <div class="orbit orbit-two"></div>
+        <img class="campaign-logo-fallback" src="./studio/neusicwave-share-v4.jpg?v=10" alt="" />
         <video
-          class="campaign-logo"
+          class="campaign-logo-video"
           autoplay
           muted
           loop
           playsinline
           preload="auto"
-          poster="./studio/neusicwave-share-v4.jpg?v=9"
+          poster="./studio/neusicwave-share-v4.jpg?v=10"
+          oncanplay="this.classList.add('is-ready');this.play().catch(()=>{});"
+          onerror="this.style.display='none'"
         >
-          <source src="./studio/neusicwave-logo-animated.mp4?v=9" type="video/mp4" />
+          <source src="./studio/neusicwave-logo-animated.mp4?v=10" type="video/mp4" />
         </video>
       </div>
 
@@ -117,6 +127,6 @@
     </div>
   </div>
 
-  <script src="./scripts/landing/neusicwave-teaser.js?v=9"></script>
+  <script src="./scripts/landing/neusicwave-teaser.js?v=10"></script>
 </body>
 </html>
