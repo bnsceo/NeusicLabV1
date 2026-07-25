@@ -1,0 +1,71 @@
+name: Apply NeusicWave Share Preview
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Update share metadata
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          page = Path('index.html')
+          html = page.read_text()
+
+          removable = [
+              r'\n?<link\s+rel=["\']canonical["\'][^>]*>',
+              r'\n?<meta\s+property=["\']og:type["\'][^>]*>',
+              r'\n?<meta\s+property=["\']og:site_name["\'][^>]*>',
+              r'\n?<meta\s+property=["\']og:url["\'][^>]*>',
+              r'\n?<meta\s+property=["\']og:image[^"\']*["\'][^>]*>',
+              r'\n?<meta\s+name=["\']twitter:[^"\']+["\'][^>]*>',
+          ]
+          for pattern in removable:
+              html = re.sub(pattern, '', html, flags=re.I)
+
+          social_meta = '''
+          <link rel="canonical" href="https://neusicwave.com/">
+          <meta property="og:type" content="website">
+          <meta property="og:site_name" content="NeusicWave">
+          <meta property="og:url" content="https://neusicwave.com/">
+          <meta property="og:image" content="https://neusicwave.com/studio/neusicwave-share-v4.jpg">
+          <meta property="og:image:secure_url" content="https://neusicwave.com/studio/neusicwave-share-v4.jpg">
+          <meta property="og:image:type" content="image/jpeg">
+          <meta property="og:image:width" content="1200">
+          <meta property="og:image:height" content="630">
+          <meta property="og:image:alt" content="NeusicWave neon vinyl logo and waveform">
+          <meta name="twitter:card" content="summary_large_image">
+          <meta name="twitter:title" content="Neusic — One Creative System, Three Energies">
+          <meta name="twitter:description" content="Perform the spark, reshape the sound, and finish the record inside one Neusic flow.">
+          <meta name="twitter:image" content="https://neusicwave.com/studio/neusicwave-share-v4.jpg">
+          '''.strip()
+
+          html = html.replace('</head>', social_meta + '\n</head>', 1)
+          page.write_text(html)
+
+          Path('.github/workflows/apply-neusicwave-share-preview.yml').unlink()
+          PY
+
+      - name: Commit metadata
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html .github/workflows/apply-neusicwave-share-preview.yml
+          git commit -m "Apply NeusicWave share preview metadata"
+          git push origin main
