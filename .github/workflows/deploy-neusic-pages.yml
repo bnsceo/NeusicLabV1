@@ -29,14 +29,22 @@ jobs:
         run: |
           rm -rf _site
           mkdir -p _site/studio _site/wave-loom _site/live-loop
+          mkdir -p _site/css/landing _site/scripts/landing
+
           cp index.html _site/index.html
           cp site-polish.css _site/site-polish.css
           cp site-polish.js _site/site-polish.js
+          cp -R css/landing/. _site/css/landing/
+          cp -R scripts/landing/. _site/scripts/landing/
+
           cp -R app/. _site/studio/
           cp -R wave-loom/. _site/wave-loom/
           cp -R live-loop/. _site/live-loop/
+          if [ -f CNAME ]; then cp CNAME _site/CNAME; fi
+
           mv _site/studio/index.html _site/studio/core.html
           mv _site/studio/phase-a.html _site/studio/index.html
+
           python - <<'PY'
           from pathlib import Path
 
@@ -66,14 +74,6 @@ jobs:
           const apply=()=>{const colors=pick(),key=colors.join("|");if(key===last)return;last=key;root.style.setProperty("--neusic-credit-primary",colors[0]);root.style.setProperty("--neusic-credit-secondary",colors[1]);root.style.setProperty("--neusic-credit-tertiary",colors[2])};apply();addEventListener("storage",apply);setInterval(apply,1000)})();
           </script>'''
 
-          landing = Path('_site/index.html')
-          html = landing.read_text()
-          if 'site-polish.css' not in html:
-              html = html.replace('</head>', '<link rel="stylesheet" href="./site-polish.css?v=5"></head>', 1)
-          if 'site-polish.js' not in html:
-              html = html.replace('</body>', '<script src="./site-polish.js?v=5"></script></body>', 1)
-          landing.write_text(html)
-
           for page in Path('_site').rglob('*.html'):
               html = page.read_text()
               if 'data-neusic-creator' not in html:
@@ -87,6 +87,7 @@ jobs:
                   html = html.replace('</body>', creator_script + '</body>', 1)
               page.write_text(html)
           PY
+
           touch _site/.nojekyll
           touch _site/studio/.nojekyll
           touch _site/wave-loom/.nojekyll
