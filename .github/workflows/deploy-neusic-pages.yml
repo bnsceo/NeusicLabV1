@@ -42,10 +42,11 @@ jobs:
           cp -R scripts/landing/. _site/scripts/landing/
           cp -R scripts/shared/. _site/scripts/shared/
 
-          # Restore the exact approved circular campaign logo from the preserved
-          # working teaser commit. This avoids relying on video autoplay or a
-          # Studio-relative fallback path.
-          git show 11c5c82d895984db7c1bbfd4760125e2641bdfd6:assets/icons/neusicwave-campaign-logo.jpg > _site/assets/icons/neusicwave-campaign-logo.jpg
+          # Fetch and publish the exact approved circular logo from the last
+          # working teaser commit. The landing no longer depends on autoplay,
+          # a poster frame, or a Studio-relative image path.
+          git fetch --no-tags --depth=1 origin 11c5c82d895984db7c1bbfd4760125e2641bdfd6
+          git show FETCH_HEAD:assets/icons/neusicwave-campaign-logo.jpg > _site/assets/icons/neusicwave-campaign-logo.jpg
           test -s _site/assets/icons/neusicwave-campaign-logo.jpg
 
           cp -R app/. _site/studio/
