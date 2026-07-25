@@ -18,4 +18,38 @@
   const updateNav=()=>nav.classList.toggle('scrolled',scrollY>24);updateNav();addEventListener('scroll',updateNav,{passive:true});
   const targets=[...document.querySelectorAll('section .section-head,.feature,.flow-card,.road,.theme-picker,.brain,.cta-box')];
   if('IntersectionObserver' in window&&!matchMedia('(prefers-reduced-motion: reduce)').matches){targets.forEach(el=>el.classList.add('reveal-ready'));const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('revealed');observer.unobserve(entry.target)}}),{threshold:.08});targets.forEach(el=>observer.observe(el));}else targets.forEach(el=>el.classList.add('revealed'));
+
+  // Waitlist form handling
+  const form=document.querySelector('.waitlist-form');
+  const statusEl=form?.querySelector('#formStatus');
+  if(form){
+    form.addEventListener('submit',async(e)=>{
+      e.preventDefault();
+      const btn=form.querySelector('button[type="submit"]');
+      const emailInput=form.querySelector('input[name="email"]');
+      if(!emailInput.value.trim())return;
+      
+      btn.disabled=true;
+      btn.textContent='Joining...';
+      statusEl.textContent='';
+      statusEl.classList.remove('error');
+      
+      try{
+        const formData=new FormData(form);
+        const resp=await fetch(form.action,{method:'POST',body:formData,headers:{'Accept':'application/json'}});
+        if(resp.ok||resp.type==='opaque'){
+          emailInput.value='';
+          statusEl.textContent='You\'re in. Welcome to the signal chain.';
+        }else{
+          throw new Error('Submission failed');
+        }
+      }catch(err){
+        statusEl.textContent='Something went wrong. Try again or email us directly.';
+        statusEl.classList.add('error');
+      }finally{
+        btn.disabled=false;
+        btn.innerHTML='Join the waitlist <span aria-hidden="true">→</span>';
+      }
+    });
+  }
 })();

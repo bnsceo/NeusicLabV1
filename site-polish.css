@@ -16,3 +16,19 @@ nav.scrolled{background:rgba(7,10,11,.97);box-shadow:0 12px 34px #000b,inset 0 -
 @media(max-width:600px){.brand-copy b{font-size:16px}.hero-actions .btn,.portfolio-nav a{width:100%}.proof{gap:10px 14px}.portfolio-kicker,.portfolio-meta span,.portfolio-highlights li,.portfolio-nav a{letter-spacing:.12em}.portfolio-highlights li{font-size:13px;line-height:1.7}.portfolio-note{font-size:7px;line-height:1.45}.brain-head,.metric small,.metric b{word-break:break-word}}
 @media(max-width:420px){.hero{padding-top:98px}.portfolio-hero{padding:16px!important}.portfolio-copy h3{font-size:clamp(28px,11vw,40px)!important}.portfolio-meta{display:grid}.portfolio-meta span,.portfolio-nav a{width:100%}.portfolio-badge{left:10px;top:10px}.portfolio-note{margin-top:10px;padding:8px 10px}.neusic-mobile-launch{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.reveal-ready{opacity:1;transform:none}.btn,.feature,.flow-card,.road,.theme-picker,.brain,.console{transition:none}}
+
+.waitlist-section{padding:104px 0;background:radial-gradient(circle at 50% 0%,rgba(212,163,84,.08),transparent 40%)}
+.waitlist-card{display:grid;grid-template-columns:1fr 1.2fr;gap:32px;align-items:center;padding:36px;border:1px solid rgba(255,255,255,.08);border-radius:28px;background:linear-gradient(180deg,rgba(19,24,27,.92),rgba(9,12,13,.98));box-shadow:0 22px 60px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.06)}
+.waitlist-copy h2{margin:18px 0 12px;font:620 clamp(36px,4.5vw,56px)/.95 var(--display);letter-spacing:-.055em}
+.waitlist-copy p{margin:0;color:#aab3b8;font-size:16px;line-height:1.78}
+.waitlist-form{display:grid;gap:16px}
+.waitlist-form .form-row{display:flex;gap:12px;flex-wrap:wrap}
+.waitlist-form input[type="email"]{flex:1;min-width:260px;min-height:48px;padding:0 18px;border:1px solid #3f494e;border-radius:999px;background:linear-gradient(#2b3236,#101315);color:#edf1f2;font:700 13px/1 var(--ui);outline:none}
+.waitlist-form input[type="email"]:focus{border-color:color-mix(in srgb,var(--accent) 64%,#465055);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 24%,transparent)}
+.waitlist-form .btn{white-space:nowrap}
+.waitlist-form .form-note{margin:0;color:var(--muted);font-size:12px}
+.waitlist-form .form-status{margin:0;min-height:20px;font:700 12px/1 var(--mono);color:var(--positive)}
+.waitlist-form .form-status.error{color:#ff6b7a}
+
+@media(max-width:1020px){.waitlist-card{grid-template-columns:1fr;gap:24px}}
+@media(max-width:600px){.waitlist-form .form-row{display:grid}.waitlist-form .btn{width:100%}}
