@@ -1,0 +1,23 @@
+/* Final mobile release layer for Live Loop. */
+html,body{max-width:100%;overflow-x:hidden}
+@media(max-width:900px){
+  body.stage-performance{padding-bottom:calc(20px + env(safe-area-inset-bottom))!important}
+  .topbar{display:grid!important;grid-template-columns:1fr!important;gap:8px!important;padding:8px!important;overflow:visible!important}
+  .topbar .brand{min-width:0!important}.topbar .brand small{white-space:normal!important}
+  .topbar .transport{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;width:100%!important;gap:6px!important}
+  .topbar .transport>*{min-width:0!important;min-height:48px!important}
+  .top-actions{display:flex!important;gap:6px!important;overflow-x:auto!important;padding-bottom:2px!important;scrollbar-width:none!important}
+  .top-actions::-webkit-scrollbar{display:none}.top-actions a{flex:0 0 auto!important;min-height:44px!important;display:flex!important;align-items:center!important}
+  .performance-shell{padding:10px!important}.performance-head{grid-template-columns:1fr!important;gap:14px!important}.performance-head h1{font-size:clamp(32px,11vw,58px)!important}
+  .panel-header{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}.legend{overflow-x:auto!important;white-space:nowrap!important}
+  #trackGrid{display:flex!important;overflow-x:auto!important;scroll-snap-type:x mandatory!important;gap:10px!important;height:auto!important;min-height:0!important;padding:4px!important}
+  #trackGrid>.loop-track{flex:0 0 min(88vw,360px)!important;width:min(88vw,360px)!important;height:auto!important;min-height:520px!important;scroll-snap-align:center!important;padding:10px!important}
+  .progress-control{width:min(180px,58vw)!important;margin:8px auto!important}.track-actions{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:5px!important}.track-actions button{min-height:46px!important;font-size:8px!important}
+  .track-controls{grid-template-columns:1fr 1fr!important;grid-template-rows:auto!important;gap:8px!important}.track-controls label{min-height:76px!important}
+  .lower-grid,.pedal-grid{grid-template-columns:1fr!important}.knob-row,.synth-controls{grid-template-columns:1fr!important}.pedal-actions,.tool-actions{grid-template-columns:1fr!important}.pedal-actions button,.tool-actions button{min-height:48px!important}
+  .keyboard{overflow-x:auto!important;min-height:150px!important}.session-tools{grid-template-columns:1fr!important}
+  #nw-agent-dot{right:12px!important;bottom:12px!important;width:34px!important;height:34px!important;z-index:80!important}
+  #nw-agent-panel{left:8px!important;right:8px!important;bottom:8px!important;width:auto!important;max-width:none!important;height:min(62dvh,520px)!important;z-index:100!important;border-radius:12px!important}
+}
+@media(max-width:430px){.performance-shell{padding-inline:6px!important}#trackGrid>.loop-track{flex-basis:92vw!important;width:92vw!important}.track-actions{grid-template-columns:repeat(2,1fr)!important}.track-actions button[data-action="clear"]{grid-column:1/-1}.track-controls{grid-template-columns:1fr!important}.performance-head p{font-size:14px!important;line-height:1.55!important}}
+@media(orientation:landscape) and (max-height:560px){.topbar{position:relative!important}.performance-head{display:none!important}#trackGrid>.loop-track{flex-basis:52vw!important;min-height:390px!important}.lower-grid{display:grid!important}}

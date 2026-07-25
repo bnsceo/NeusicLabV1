@@ -23,8 +23,6 @@ function ctxSplit(){
     start:splitAtBeat,
     len:secondLen,
     label:clip.label+'b',
-    // The second half starts further into the same source buffer — carry that
-    // forward so it keeps playing the right audio instead of restarting from 0.
     trimStart:(clip.trimStart||0)+(clip.reverse?0:beatToSec(firstLen)),
   };
   clip.len=firstLen;
@@ -42,9 +40,6 @@ function ctxDuplicate(){
   if(S.playing){ stopAllScheduled(); scheduleClipPlayback(); }
   toast('Duplicated');
 }
-
-// Reverse just flips a flag — actual reversed-buffer generation happens lazily
-// (and is cached) inside reversedBuffer(), same engine used by the Sampler panel.
 function ctxReverse(){
   if(!S.selectedClip){ctxMenu.style.display='none';return;}
   const {ti,ci}=S.selectedClip;const clip=S.tracks[ti].clips[ci];
@@ -56,10 +51,6 @@ function ctxReverse(){
   toast(clip.reverse?'Reversed':'Un-reversed');
   ctxMenu.style.display='none';
 }
-
-// Normalize analyzes the clip's actual audio region for its true peak sample value,
-// then stores a per-clip gain multiplier so playback boosts/attenuates it to ~0dB
-// (peak = 1.0) without touching the shared source buffer (other clips may reuse it).
 function ctxNormalize(){
   if(!S.selectedClip){ctxMenu.style.display='none';return;}
   const {ti,ci}=S.selectedClip;const clip=S.tracks[ti].clips[ci];
@@ -71,13 +62,13 @@ function ctxNormalize(){
   let peak=0;
   for(let c=0;c<entry.buffer.numberOfChannels;c++){
     const data=entry.buffer.getChannelData(c);
-    for(let i=startSample;i<endSample;i+=4){ // sample every 4th frame — plenty for a peak estimate
+    for(let i=startSample;i<endSample;i+=4){
       const v=Math.abs(data[i]);if(v>peak)peak=v;
     }
   }
   if(peak<0.001){toast('Clip region is silent, nothing to normalize');ctxMenu.style.display='none';return;}
   snapshot();
-  clip.gain=Math.min(8,0.98/peak); // cap the boost so a near-silent region can't scream
+  clip.gain=Math.min(8,0.98/peak);
   renderTracks();
   if(S.playing){ stopAllScheduled(); scheduleClipPlayback(); }
   toast(`Normalized (×${clip.gain.toFixed(2)})`);
@@ -166,7 +157,7 @@ function buildDrums(el){
   const padHTML=PADS.map(p=>`
     <button class="pad-btn" id="pad-${p.id}" style="color:${p.col};background:${p.bg};"
       onmousedown="hitPad(${p.id},'${p.n}')" ontouchstart="hitPad(${p.id},'${p.n}')">${p.n}</button>`).join('');
-  const seqHTML=PADS.slice(0,4).map(p=>{
+  const seqHTML=PADS.map(p=>{
     const steps=S.seqSteps[p.id]||Array(16).fill(0);
     let stHTML='';
     steps.forEach((on,i)=>{
