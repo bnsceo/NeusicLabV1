@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#03040a" />
+  <meta name="description" content="Something new is arriving from NeusicWave. Join the private waitlist." />
+  <meta property="og:title" content="NeusicWave — Something New Is Arriving" />
+  <meta property="og:description" content="The next wave is almost here. Join the private waitlist." />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="NeusicWave" />
+  <link rel="canonical" href="https://neusicwave.com/" />
+  <meta property="og:url" content="https://neusicwave.com/" />
+  <meta property="og:image" content="https://neusicwave.com/studio/neusicwave-share-v4.jpg" />
+  <meta property="og:image:secure_url" content="https://neusicwave.com/studio/neusicwave-share-v4.jpg" />
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="NeusicWave neon vinyl logo and waveform" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="NeusicWave — Something New Is Arriving" />
+  <meta name="twitter:description" content="The next wave is almost here. Join the private waitlist." />
+  <meta name="twitter:image" content="https://neusicwave.com/studio/neusicwave-share-v4.jpg" />
+  <title>NeusicWave — Coming Soon</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/landing/neusicwave-teaser.css?v=15" />
+  <style>
+    .logo-stage{isolation:isolate;overflow:visible;position:relative}
+    .logo-stage::before{inset:8%;filter:blur(54px);opacity:.24}
+    .logo-stage::after{content:"";position:absolute;z-index:1;inset:3%;border-radius:50%;background:url("https://raw.githubusercontent.com/bnsceo/NeusicLabV1/main/assets/icons/neusicwave-campaign-logo.jpg?v=15") center/cover no-repeat;clip-path:circle(50% at 50% 50%);filter:drop-shadow(0 24px 55px rgba(0,0,0,.58))}
+    .campaign-logo{position:relative!important;z-index:3!important;display:block!important;width:94%!important;height:auto!important;aspect-ratio:1!important;object-fit:contain!important;opacity:1!important;visibility:visible!important;border-radius:50%!important;box-shadow:none!important;image-rendering:auto;filter:drop-shadow(0 24px 55px rgba(0,0,0,.58));animation:neusicLogoBreathe 6s ease-in-out infinite}
+    @keyframes neusicLogoBreathe{0%,100%{transform:translateY(0) scale(.992)}50%{transform:translateY(-4px) scale(1)}}
+    @media(prefers-reduced-motion:reduce){.campaign-logo{animation:none}}
+  </style>
+</head>
+<body data-neusic-creator="source-managed">
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <main class="page-shell">
+    <nav class="topbar" aria-label="Primary navigation">
+      <a class="brand" href="#top" aria-label="NeusicWave home">
+        <span class="brand-mark"></span>
+        <span>NEUSICWAVE</span>
+      </a>
+      <div class="social-links" aria-label="Social channels">
+        <a href="https://www.tiktok.com/@neusicwave" target="_blank" rel="noreferrer">TikTok</a>
+        <a href="https://www.instagram.com/neusicwave/" target="_blank" rel="noreferrer">Instagram</a>
+      </div>
+    </nav>
+
+    <section class="hero" id="top">
+      <div class="logo-stage">
+        <img
+          src="https://raw.githubusercontent.com/bnsceo/NeusicLabV1/main/assets/icons/neusicwave-circle-hd-v14.webp?v=15"
+          alt="NeusicWave circular neon vinyl logo"
+          class="campaign-logo"
+          width="1024"
+          height="1024"
+          decoding="sync"
+          fetchpriority="high"
+          onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/bnsceo/NeusicLabV1/main/assets/icons/neusicwave-campaign-logo.jpg?v=15';"
+        />
+      </div>
+
+      <div class="hero-copy">
+        <p class="eyebrow"><span></span> The signal is getting stronger</p>
+        <h1>Something New<br />Is Arriving.</h1>
+        <p class="intro">
+          A new creative frequency is forming behind the scenes. Built for people who hear possibilities before everyone else does.
+        </p>
+
+        <form
+          class="waitlist-form"
+          id="waitlistForm"
+          action="https://formsubmit.co/ajax/neusicwave@gmail.com"
+          method="POST"
+          novalidate
+        >
+          <input type="hidden" name="_subject" value="New NeusicWave Waitlist Signup" />
+          <input type="hidden" name="_captcha" value="false" />
+          <input type="hidden" name="_template" value="table" />
+          <label class="sr-only" for="email">Email address</label>
+          <div class="form-row">
+            <input
+              id="email"
+              name="email"
+              type="email"
+              inputmode="email"
+              autocomplete="email"
+              placeholder="Enter your email"
+              required
+            />
+            <button type="submit">
+              <span>Join the waitlist</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            </button>
+          </div>
+          <p class="form-note">Early access. Quiet updates. No noise.</p>
+          <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+
+    <footer>
+      <p>© <span id="year"></span> NeusicWave</p>
+      <p class="footer-signal"><span></span> Transmission pending</p>
+    </footer>
+  </main>
+
+  <div class="success-modal" id="successModal" role="dialog" aria-modal="true" aria-labelledby="successTitle" hidden>
+    <div class="success-card">
+      <button class="close-button" id="closeSuccess" aria-label="Close success message">×</button>
+      <div class="success-icon" aria-hidden="true">✓</div>
+      <p class="success-kicker">You’re on the frequency</p>
+      <h2 id="successTitle">Welcome to the waitlist.</h2>
+      <p>We’ll reach out when the next signal drops.</p>
+      <button class="success-dismiss" id="dismissSuccess">Got it</button>
+    </div>
+  </div>
+
+  <script src="./scripts/landing/neusicwave-teaser.js?v=15"></script>
+</body>
+</html>
