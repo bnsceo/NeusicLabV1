@@ -29,7 +29,7 @@
   <style>
     .logo-stage{isolation:isolate;overflow:visible;position:relative}
     .logo-stage::before{inset:8%;filter:blur(54px);opacity:.24}
-    .logo-stage::after{content:"";position:absolute;z-index:1;inset:3%;border-radius:50%;background:url("https://raw.githubusercontent.com/bnsceo/NeusicLabV1/main/assets/icons/neusicwave-campaign-logo.jpg?v=15") center/cover no-repeat;clip-path:circle(50% at 50% 50%);filter:drop-shadow(0 24px 55px rgba(0,0,0,.58))}
+    .logo-stage::after{content:"";position:absolute;z-index:1;inset:3%;border-radius:50%;background:url("/assets/icons/neusicwave-logo-hd.png") center/cover no-repeat;clip-path:circle(50% at 50% 50%);filter:drop-shadow(0 24px 55px rgba(0,0,0,.58))}
     .campaign-logo{position:relative!important;z-index:3!important;display:block!important;width:94%!important;height:auto!important;aspect-ratio:1!important;object-fit:contain!important;opacity:1!important;visibility:visible!important;border-radius:50%!important;box-shadow:none!important;image-rendering:auto;filter:drop-shadow(0 24px 55px rgba(0,0,0,.58));animation:neusicLogoBreathe 6s ease-in-out infinite}
     @keyframes neusicLogoBreathe{0%,100%{transform:translateY(0) scale(.992)}50%{transform:translateY(-4px) scale(1)}}
     @media(prefers-reduced-motion:reduce){.campaign-logo{animation:none}}
@@ -56,14 +56,13 @@
     <section class="hero" id="top">
       <div class="logo-stage">
         <img
-          src="https://raw.githubusercontent.com/bnsceo/NeusicLabV1/main/assets/icons/neusicwave-circle-hd-v14.webp?v=15"
+          src="/assets/icons/neusicwave-logo-hd.png"
           alt="NeusicWave circular neon vinyl logo"
           class="campaign-logo"
           width="1024"
           height="1024"
           decoding="sync"
           fetchpriority="high"
-          onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/bnsceo/NeusicLabV1/main/assets/icons/neusicwave-campaign-logo.jpg?v=15';"
         />
       </div>
 
