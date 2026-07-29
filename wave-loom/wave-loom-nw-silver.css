@@ -1,0 +1,66 @@
+/* ═══════════════════════════════════════════════════════════════
+   wave-loom-nw-silver.css
+   Additive override. Loads AFTER styles.css, loom-pro.css, and the
+   shared neusic-suite.css. Nothing in those files is edited.
+
+   Wave-loom's real, shipped identity uses --cyan as its primary
+   brand accent (transport highlight, main glow, accent buttons) —
+   confirmed by usage audit: 22 of 24 accent-color references are
+   `var(--cyan)`, not hardcoded, so retargeting the token's VALUE
+   (not its name — same convention already established in Studio's
+   01-tokens.css) cascades correctly with almost no direct edits.
+
+   Per direct confirmation: the original spec's Wave=Silver stands.
+   This brings Wave-loom's real accent in line with it, and with the
+   exact --nw-wave-silver value Studio already uses, so the whole
+   product agrees on one silver, not two close-but-different ones.
+
+   Left deliberately UNCHANGED — these are not brand-accent, they're
+   distinct semantic/legend colors and recoloring them would hurt
+   the feature, not help it:
+     --green  — a genuine "live/active" status LED color (same role
+                as Studio's signal-green), should stay green regardless
+                of suite, exactly like --nw-sig does in Studio.
+     --violet, --pink — used only in the canvas waveform legend
+                (up/down/cross indicators) as differentiator colors
+                for telling channels apart. Collapsing a legend's
+                distinct colors toward one silver would make that
+                legend harder to read, not more on-brand.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --cyan: #b0b3b2;        /* was #29f3ff — now --nw-wave-silver */
+}
+
+/* The one hardcoded (non-token) brand-cyan literal in the file: a
+   decorative drop-shadow on the atmospheric ".nebula" background
+   texture. Everything else cyan-colored in that same rule (the
+   starfield dots) is a genuine multi-color decoration alongside
+   violet/green, not a brand-accent statement on its own — left as
+   the multi-color decoration it is. */
+.nebula {
+  filter: drop-shadow(0 0 4px #b0b3b2);
+}
+
+/* Wave-loom-scoped only — does NOT touch the shared neusic-suite.css
+   file, so Live-loop and Studio's own suite-rail accents are
+   completely unaffected. */
+body[data-neusic-product="wave"] {
+  --suite-accent: #b0b3b2;
+  --suite-rgb: 176, 179, 178;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   KNOWN REMAINING SCOPE — not covered by this file, flagged not
+   silently skipped:
+   1. reliability-phase.css (14KB, 104 distinct hex values) has NOT
+      been audited yet — unknown how much of it is brand-cyan vs.
+      structural. Same rigor this file got is needed before touching it.
+   2. forge-receiver.css, sample-import.css, wave-polish.css,
+      mobile-release.css — not yet read at all.
+   3. The ".nebula" cosmic-starfield decoration itself (not just its
+      color) may not fit the "physical studio hardware" identity —
+      that's a design call, not a token swap, and deliberately left
+      for a real decision rather than silently removed or silently
+      kept.
+   ───────────────────────────────────────────────────────────── */

@@ -1,0 +1,45 @@
+/* 30b-nw-tokens-ext.css — small ADDITIVE extension to 30-nw-tokens.css.
+   Nothing in the original file is renamed, removed, or changed —
+   these are the few things it doesn't have yet, needed to reskin the
+   mixer without inventing a parallel token system. Load this right
+   after 30-nw-tokens.css. */
+:root{
+  /* Explicit text-role tokens — the base file has surface/steel tones
+     but nothing named for "this is text," so borrowing the existing
+     greyscale steps and giving them a text-facing name. */
+  --nw-text:       #f2f4f3;       /* bright — live/active values (dB, LUFS) */
+  --nw-text-dim:   var(--nw-light-steel); /* passive labels */
+  --nw-text-faint: var(--nw-steel);       /* micro labels, disabled */
+
+  /* Solo needs its own color distinct from any suite's accent — Studio's
+     accent IS gold, so reusing gold for "soloed" would be ambiguous
+     there specifically. A warm amber reads as "solo" everywhere without
+     colliding with lab-gold, wave-silver, or live-copper. */
+  --nw-solo: #d9a441;
+  --nw-solo-ring: #f0c46a;
+
+  /* Meter "getting loud" state shares the solo amber — both mean
+     "pay attention," and they never appear in the same element, so
+     one color for both is clean rather than redundant. */
+  --nw-hot: #d9503a;  /* meter clip / mute — distinct from --nw-rec,
+                          which is the record button's own semantic color */
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Global semantic retarget — 01-tokens.css's own header comment
+   explicitly permits this: "variable NAMES are contract... only
+   change values here, never rename." --red/--yel/--grn are used
+   throughout the mixer's JS (meter fill colors, mute/solo active
+   states, LUFS readout) purely as semantic names — danger/warn/
+   good — never as hardcoded hex. Repointing their VALUES here
+   means every one of those JS-driven color assignments picks up
+   the new palette automatically, with not one line of JS touched.
+   Blast radius note: this is app-wide, not mixer-only, since these
+   three tokens may be used elsewhere too — flagging clearly rather
+   than doing it silently.
+   ───────────────────────────────────────────────────────────── */
+:root{
+  --red: var(--nw-hot);
+  --yel: var(--nw-solo);
+  --grn: var(--nw-sig);
+}

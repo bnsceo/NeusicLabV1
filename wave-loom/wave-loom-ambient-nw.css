@@ -1,0 +1,41 @@
+/* ═══════════════════════════════════════════════════════════════
+   wave-loom-ambient-nw.css
+   Replaces the ".nebula" cosmic-starfield background — additive,
+   loads after styles.css, wins by load order, nothing else edited.
+
+   Why the starfield had to go: three unrelated colors (cyan/violet/
+   green) scattered as glowing dots is a sci-fi motif, not a hardware
+   one — it doesn't read as "you're looking at a physical sampler,"
+   it reads as "you're looking at a screensaver." It also fights the
+   single-accent-per-suite rule the rest of this reskin established.
+
+   What replaces it: the SAME recessed-well language already used for
+   every knob, meter, and fader track elsewhere in this reskin — the
+   whole page background now reads as one large recessed bay, using
+   Wave's own silver at very low opacity for the one soft glow instead
+   of three competing hues. The fine noise/grain texture is kept
+   completely unchanged — it was already good, already period-correct
+   for a hardware surface, and already matches the nw- system's own
+   ".nw-noise" convention.
+   ═══════════════════════════════════════════════════════════════ */
+
+.nebula {
+  /* single soft silver glow, top-anchored, plus a vignette darkening
+     toward the edges — reads as a recessed chassis bay, not a sky */
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%,
+      rgba(176,179,178,.06) 0%, transparent 60%),
+    radial-gradient(ellipse 120% 90% at 50% 50%,
+      transparent 40%, rgba(0,0,0,.35) 100%);
+  filter: none; /* drop the old cyan drop-shadow — no single-object glow needed */
+}
+
+/* the noise/grain texture itself — completely unchanged from the
+   original file, kept deliberately identical */
+.nebula:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: .07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.75' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}

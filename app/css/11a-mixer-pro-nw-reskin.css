@@ -1,0 +1,125 @@
+/* ═══════════════════════════════════════════════════════════════
+   11a-mixer-pro-nw-reskin.css
+   Additive override for 11-mixer-pro.css. Loads AFTER both that
+   file and 30-nw-tokens.css + 30b-nw-tokens-ext.css. Nothing in
+   the original files is edited, renamed, or removed — every rule
+   below targets the exact same selectors the real, working mixer
+   already uses, so zero JS changes are needed.
+
+   Discipline carried over from the original DAW-frontend design
+   spec (Ableton-anchored): the FRAME stays flat and dense — only
+   the actual touch controls (fader thumb, mute/solo buttons, pan
+   thumb) get real tactile depth. No chrome, no screws, no faux
+   textures. Density is correct, not a bug — nothing here makes
+   things bigger, only better-ordered.
+   ═══════════════════════════════════════════════════════════════ */
+
+.pmx-wrap { font-family: var(--nw-font); }
+
+/* ── channel strip frame: flat, just properly toned — NOT raised.
+   A hardware channel housing sits flush with its neighbors; only
+   the controls on it protrude. ── */
+.pmx-ch {
+  background: var(--nw-panel);
+  border: 1px solid rgba(0,0,0,.4);
+}
+.pmx-master {
+  border-color: color-mix(in srgb, var(--nw-sig) 35%, transparent);
+}
+.pmx-ch-icon, .pmx-ch-name { color: var(--nw-text); }
+
+.pmx-strips { scrollbar-color: var(--nw-steel) transparent; }
+.pmx-strips::-webkit-scrollbar-thumb { background: var(--nw-steel); }
+
+/* ── labels / readouts — passive text, no depth needed ── */
+.pmx-send-lbl, .pmx-pan-lbl { color: var(--nw-text-dim); }
+.pmx-send-val, .pmx-db, .pmx-ret-name { color: var(--nw-text-dim); }
+.pmx-lufs-lbl, .pmx-lufs-target { color: var(--nw-text-faint); }
+.pmx-lufs-val { color: var(--nw-text); }
+.pmx-ret-title { color: var(--nw-text-faint); }
+
+/* ── pan slider — a touch control, gets real depth: recessed
+   track, a raised grippable thumb ── */
+.pmx-pan {
+  background: var(--nw-black);
+  box-shadow: var(--nw-recess);
+}
+.pmx-pan::-webkit-slider-thumb {
+  background: var(--nw-accent);
+  box-shadow: var(--nw-raise), 0 1px 2px rgba(0,0,0,.5);
+}
+
+/* ── meter housings — recessed wells (readouts, not controls;
+   matches the same "recessed track" language as the pan slider
+   and fader below, just without a thumb to grip) ── */
+.pmx-meter-bar, .pmx-ret-meter {
+  background: var(--nw-black);
+  box-shadow: var(--nw-recess);
+}
+
+/* ── fader — the mixer's primary touch control. Track recessed,
+   thumb genuinely raised with a top-lit gradient instead of a
+   flat pill, so it reads as something with a real grip. ── */
+.pmx-fader-track {
+  background: var(--nw-black);
+  box-shadow: var(--nw-recess);
+}
+.pmx-thumb {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--nw-text) 90%, transparent) 0%,
+    color-mix(in srgb, var(--nw-panel-raised) 88%, black) 100%);
+  box-shadow: var(--nw-raise), 0 2px 5px rgba(0,0,0,.5);
+}
+
+/* ── mute / solo / limiter / return-on buttons — real touch
+   controls, get the same raised-button recipe as .nw-btn.
+   Class names (.pmx-ms-btn / .active.red / .active.yel / .active.grn)
+   are untouched — this only changes what those classes render as. ── */
+.pmx-ms-btn {
+  background: linear-gradient(var(--nw-panel-raised), var(--nw-panel));
+  border: var(--nw-edge);
+  color: var(--nw-text-dim);
+  box-shadow: var(--nw-raise);
+}
+.pmx-ms-btn:hover { background: linear-gradient(color-mix(in srgb, var(--nw-panel-raised) 115%, white), var(--nw-panel)); }
+
+.pmx-ms-btn.active.red {
+  background: linear-gradient(color-mix(in srgb, var(--nw-hot) 60%, #353937), color-mix(in srgb, var(--nw-hot) 45%, #252827));
+  border-color: var(--nw-hot);
+  color: #fff;
+  box-shadow: inset 0 1px rgba(255,255,255,.15), 0 0 4px color-mix(in srgb, var(--nw-hot) 40%, transparent);
+}
+.pmx-ms-btn.active.yel {
+  background: linear-gradient(color-mix(in srgb, var(--nw-solo) 60%, #353937), color-mix(in srgb, var(--nw-solo) 45%, #252827));
+  border-color: var(--nw-solo);
+  color: #14161a;
+  box-shadow: inset 0 1px rgba(255,255,255,.15), 0 0 4px color-mix(in srgb, var(--nw-solo-ring) 45%, transparent);
+}
+.pmx-ms-btn.active.grn {
+  background: linear-gradient(color-mix(in srgb, var(--nw-sig) 55%, #353937), color-mix(in srgb, var(--nw-sig) 40%, #252827));
+  border-color: var(--nw-sig);
+  color: #08150f;
+  box-shadow: inset 0 1px rgba(255,255,255,.15), 0 0 4px color-mix(in srgb, var(--nw-sig) 40%, transparent);
+}
+
+/* ── return buses — same flat-frame-not-raised treatment as
+   channel strips, since these are housings, not controls ── */
+.pmx-ret-bus { background: var(--nw-panel); border: 1px solid rgba(0,0,0,.4); }
+.pmx-ret-off { opacity: .45; }
+
+.pmx-lufs-row { border-top-color: rgba(0,0,0,.4); }
+
+/* ─────────────────────────────────────────────────────────────
+   KNOWN LIMITATION — read before assuming full coverage.
+   Two visual elements are drawn via <canvas> in JS, not styled by
+   CSS at all, so this file cannot reach them without a JS edit:
+     1. Send-knob arcs (drawSendKnobs()) — stroke colors come from
+        each return bus's own `.color` field in JS state, not a
+        CSS token.
+     2. The LUFS meter's green→amber→red gradient (startProMeterAnim())
+        — three literal hex stops baked into the canvas draw call.
+   Both are left untouched deliberately, per "zero JS changes" for
+   this pass. If full palette consistency there matters, that's a
+   small, separate, clearly-scoped follow-up — not bundled in here
+   silently.
+   ───────────────────────────────────────────────────────────── */
