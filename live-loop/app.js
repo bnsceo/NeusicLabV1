@@ -13,6 +13,9 @@ const trackGrid=$('trackGrid');
 const template=$('trackTemplate');
 const keyMap={a:60,w:61,s:62,e:63,d:64,f:65,t:66,g:67,y:68,h:69,u:70,j:71};
 const heldKeys=new Set();
+const sceneSnapshots=[null,null,null];
+let activeScene=0,currentKey=0,currentScale='major';
+const scaleIntervals={major:[0,2,4,5,7,9,11],minor:[0,2,3,5,7,8,10],pentatonic:[0,2,4,7,9]};
 
 let looper=null;
 let synth=null;
@@ -35,6 +38,10 @@ function outputFor(control,value){
   if(control==='pan')return Math.abs(value)<.03?'C':value<0?`L${Math.round(Math.abs(value)*100)}`:`R${Math.round(value*100)}`;
   return Math.round(value*100);
 }
+function scaleContains(note){return scaleIntervals[currentScale].includes((note-currentKey+120)%12);}
+function refreshKeyHighlight(){document.querySelectorAll('#keyboard [data-note]').forEach(button=>button.classList.toggle('in-scale',scaleContains(Number(button.dataset.note))));}
+function saveScene(index){if(!looper)return;sceneSnapshots[index]=looper.tracks.map(track=>({buffer:track.buffer,name:track.name,muted:track.muted}));activeScene=index;document.querySelectorAll('.scene-button').forEach(button=>button.classList.toggle('active',Number(button.dataset.scene)===index));status(`Scene ${String.fromCharCode(65+index)} saved.`);}
+function launchScene(index){if(!looper)return;const snapshot=sceneSnapshots[index];if(!snapshot){saveScene(index);return;}snapshot.forEach((saved,i)=>{const track=looper.tracks[i];track.buffer=saved.buffer;track.name=saved.name;track.muted=saved.muted;track.state=track.muted?STATES.MUTED:track.buffer?(looper.playing?STATES.PLAYING:STATES.STOPPED):STATES.EMPTY;if(looper.playing)looper.restartTrack(track);});activeScene=index;document.querySelectorAll('.scene-button').forEach(button=>button.classList.toggle('active',Number(button.dataset.scene)===index));looper.emit('change');status(`Scene ${String.fromCharCode(65+index)} launched.`);}
 
 function primeMicrophoneFromGesture(){
   if(window.NeusicMobileMicPrimer?.prime)return window.NeusicMobileMicPrimer.prime();
@@ -89,11 +96,11 @@ function buildTracks(){
       event.stopImmediatePropagation();
       startRecordFromGesture(index,recordButton);
     },{passive:false});
-    card.querySelectorAll('[data-control]').forEach(input=>input.addEventListener('input',async()=>{
+    card.querySelectorAll('[data-control]').forEach(input=>input.addEventListener(input.tagName==='SELECT'?'change':'input',async()=>{
       const key=input.dataset.control;
-      const raw=Number(input.value);
-      const value=raw/100;
-      input.nextElementSibling.textContent=outputFor(key,value);
+      const raw=input.tagName==='SELECT'?input.value:Number(input.value);
+      const value=input.tagName==='SELECT'?raw:raw/100;
+      if(input.nextElementSibling?.tagName==='OUTPUT')input.nextElementSibling.textContent=outputFor(key,value);
       try{await ensureEngine();looper.setTrackValue(index,key,value);}catch(error){status(error.message||'Audio could not start. Tap again.');}
     }));
     card.addEventListener('click',()=>selectTrack(index));
@@ -160,6 +167,8 @@ function renderTrack(index){
   card.querySelector('[data-action="mute"]').textContent=track.muted?'UNMUTE':'MUTE';
   card.querySelector('[data-action="forge"]').disabled=!track.buffer;
   card.querySelector('[data-action="clear"]').disabled=!track.buffer;
+  const tune=card.querySelector('[data-control="autotune"]');
+  if(tune)tune.value=track.autotune||'off';
   window.dispatchEvent(new CustomEvent('neusic:live-loop-track',{detail:{index,state:track.state,muted:track.muted,hasAudio:Boolean(track.buffer),rate:track.rate,reverse:track.reverse}}));
 }
 
@@ -192,6 +201,12 @@ function updateProgress(){
 }
 
 function bindGlobal(){
+  $('captureBtn').addEventListener('click',async()=>{try{await ensureEngine();await workspace.initMic();await workspace.resume({required:true});await looper.toggleRecord(selected);}catch(error){status(error.message||'Capture could not start.');}});
+  $('saveSceneBtn').addEventListener('click',()=>saveScene(activeScene));
+  document.querySelectorAll('.scene-button').forEach(button=>button.addEventListener('click',()=>launchScene(Number(button.dataset.scene))));
+  $('keySelect').addEventListener('change',event=>{currentKey=Number(event.target.value);refreshKeyHighlight();});
+  $('scaleSelect').addEventListener('change',event=>{currentScale=event.target.value;refreshKeyHighlight();});
+  $('exportMixBtn').addEventListener('click',async()=>{try{await ensureEngine();const mix=looper.mixBuffer();if(!mix){status('Record or load a loop before exporting the mix.');return;}downloadBuffer(mix,'neusic-live-mix.wav');status('Full five-lane mix exported as WAV.');}catch(error){status(error.message||'Mix export failed.');}});
   $('micBtn').addEventListener('click',async()=>{
     try{
       const microphonePromise=primeMicrophoneFromGesture();
@@ -268,6 +283,7 @@ function buildKeyboard(){
     button.addEventListener('pointerleave',event=>{if(event.buttons)off();});
     $('keyboard').appendChild(button);
   });
+  refreshKeyHighlight();
 }
 
 function bindKeyboard(){

@@ -28,13 +28,16 @@
   <link rel="stylesheet" href="../css/shared/neusic-suite.css?v=2">
   <link rel="stylesheet" href="../css/shared/neusic-agent.css?v=1">
   <link rel="stylesheet" href="mobile-release.css?v=1">
+  <link rel="stylesheet" href="neusic-v3.css?v=1">
 </head>
 <body class="stage-performance" data-neusic-product="live-loop">
   <div class="noise" aria-hidden="true"></div>
   <header class="topbar">
     <a class="brand" href="../" aria-label="Neusic home"><span class="brand-mark">N</span><span><b>NEUSIC</b><small>LIVE LOOP · PERFORMANCE INSTRUMENT</small></span></a>
+    <div class="master-display header-master-display"><div><small>MASTER LOOP</small><b id="masterLength">—</b></div><div><small>GLOBAL STATE</small><b id="globalState">READY</b></div><div class="master-meter"><span id="masterMeter"></span></div></div>
     <div class="transport" aria-label="Live loop transport">
       <button id="micBtn" class="hardware-button" type="button"><i class="led"></i><span>MIC</span></button>
+      <button id="captureBtn" class="hardware-button capture-button" type="button"><span>●</span><b>CAPTURE</b></button>
       <button id="playBtn" class="hardware-button transport-play" type="button"><span>▶</span><b>START</b></button>
       <button id="stopBtn" class="hardware-button" type="button"><span>■</span><b>STOP</b></button>
       <label class="lcd-control"><small>BPM</small><input id="bpmInput" type="number" min="40" max="220" value="112"></label>
@@ -46,12 +49,12 @@
 
   <main class="performance-shell">
     <section class="performance-head">
-      <div><span class="eyebrow">NEUSIC PRODUCT 01 · LIVE PERFORMANCE CAPTURE</span><h1>Capture lightning <em>before it disappears.</em></h1><p>Five parallel lanes, immediate overdubbing, tactile effects, and a tiny playable synth. Built for improvisation first—no timeline and no performance menu.</p></div>
-      <div class="master-display"><div><small>MASTER LOOP</small><b id="masterLength">—</b></div><div><small>GLOBAL STATE</small><b id="globalState">READY</b></div><div class="master-meter"><span id="masterMeter"></span></div></div>
+      <div aria-hidden="true"></div>
     </section>
 
     <section class="loop-deck panel" aria-labelledby="loopDeckTitle">
       <header class="panel-header"><div><span class="eyebrow">PRIMARY PERFORMANCE SURFACE</span><h2 id="loopDeckTitle">Five synchronized loop lanes</h2></div><div class="legend"><span><i class="empty"></i>EMPTY</span><span><i class="recording"></i>RECORDING</span><span><i class="playing"></i>PLAYING</span><span><i class="muted"></i>MUTED</span></div></header>
+      <div class="scene-strip" aria-label="Loop scenes"><button class="scene-button active" data-scene="0" type="button">A</button><button class="scene-button" data-scene="1" type="button">B</button><button class="scene-button" data-scene="2" type="button">C</button><button id="saveSceneBtn" class="scene-save" type="button">SAVE SCENE</button><button id="exportMixBtn" class="scene-save" type="button">EXPORT MIX</button></div>
       <div id="trackGrid" class="track-grid" aria-label="Five synchronized loop lanes"></div>
     </section>
 
@@ -73,7 +76,7 @@
       </article>
 
       <article class="synth-panel panel">
-        <header class="panel-header"><div><span class="eyebrow">PLAYABLE COLOR SYNTH</span><h2>One-octave performance keys</h2></div><label class="wave-select">VOICE<select id="synthWave"><option value="sawtooth">GRIMY</option><option value="square">BOUNCE</option><option value="triangle">SPACE</option><option value="sine">PURE</option></select></label></header>
+        <header class="panel-header"><div><span class="eyebrow">PLAYABLE COLOR SYNTH</span><h2>One-octave performance keys</h2></div><div class="synth-choices"><label class="wave-select">VOICE<select id="synthWave"><option value="sawtooth">GRIMY</option><option value="square">BOUNCE</option><option value="triangle">SPACE</option><option value="sine">PURE</option></select></label><label class="wave-select">KEY<select id="keySelect"><option value="0">C</option><option value="1">C♯</option><option value="2">D</option><option value="3">D♯</option><option value="4">E</option><option value="5">F</option><option value="6">F♯</option><option value="7">G</option><option value="8">G♯</option><option value="9">A</option><option value="10">A♯</option><option value="11">B</option></select></label><label class="wave-select">SCALE<select id="scaleSelect"><option value="major">MAJOR</option><option value="minor">MINOR</option><option value="pentatonic">PENTA</option></select></label></div></header>
         <div class="synth-controls"><label>CUTOFF<input id="synthCutoff" type="range" min="120" max="12000" value="2400"><output>2.4k</output></label><label>ATTACK<input id="synthAttack" type="range" min="0" max="100" value="2"><output>0.02s</output></label><label>RELEASE<input id="synthRelease" type="range" min="2" max="250" value="45"><output>0.45s</output></label></div>
         <div id="keyboard" class="keyboard" aria-label="Playable synth keyboard"></div><p class="key-help">Touch keys work directly. Computer keys and MIDI notes are optional.</p>
       </article>
@@ -91,7 +94,7 @@
       <header><div><span class="track-number"></span><b class="track-name"></b></div><span class="track-state">READY</span></header>
       <button class="progress-control" data-action="select" type="button" aria-label="Select track"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="progress-bg" cx="50" cy="50" r="43"></circle><circle class="progress-ring" cx="50" cy="50" r="43"></circle></svg><span class="progress-center"><b class="progress-time">00.0</b><small>SECONDS</small></span></button>
       <div class="track-actions"><button data-action="record" class="record-action" type="button">REC</button><button data-action="mute" type="button">MUTE</button><button data-action="upload" type="button">LOAD</button><button data-action="forge" type="button">WAVE</button><button data-action="clear" class="danger" type="button">CLEAR</button></div>
-      <div class="track-controls"><label>LEVEL<input data-control="volume" type="range" min="0" max="125" value="90"><output>90</output></label><label>PAN<input data-control="pan" type="range" min="-100" max="100" value="0"><output>C</output></label><label>DELAY<input data-control="delay" type="range" min="0" max="100" value="22"><output>22</output></label><label>SPACE<input data-control="reverb" type="range" min="0" max="100" value="18"><output>18</output></label></div>
+      <div class="track-controls"><label>LEVEL<input data-control="volume" type="range" min="0" max="125" value="90"><output>90</output></label><label>PAN<input data-control="pan" type="range" min="-100" max="100" value="0"><output>C</output></label><label>DELAY<input data-control="delay" type="range" min="0" max="100" value="22"><output>22</output></label><label>SPACE<input data-control="reverb" type="range" min="0" max="100" value="18"><output>18</output></label><label class="autotune-control">TUNE<select data-control="autotune"><option value="off">OFF</option><option value="chromatic">CHROMATIC</option></select></label></div>
     </article>
   </template>
 

@@ -28,7 +28,7 @@ export class FiveTrackLooper extends EventTarget {
     const gain=this.context.createGain(),pan=this.context.createStereoPanner(),delaySend=this.context.createGain(),reverbSend=this.context.createGain();
     gain.gain.value=.9;pan.pan.value=0;delaySend.gain.value=.22;reverbSend.gain.value=.18;
     gain.connect(pan);pan.connect(this.workspace.master);pan.connect(delaySend);pan.connect(reverbSend);delaySend.connect(this.delay.input);reverbSend.connect(this.reverb.input);
-    return{index,name:`LOOP ${index+1}`,state:STATES.EMPTY,buffer:null,source:null,gain,pan,delaySend,reverbSend,volume:.9,panValue:0,delay:.22,reverb:.18,muted:false,rate:1,reverse:false,recording:null};
+    return{index,name:`LOOP ${index+1}`,state:STATES.EMPTY,buffer:null,source:null,gain,pan,delaySend,reverbSend,volume:.9,panValue:0,delay:.22,reverb:.18,autotune:'off',muted:false,rate:1,reverse:false,recording:null};
   }
 
   emit(type,detail={}){this.dispatchEvent(new CustomEvent(type,{detail}));}
@@ -63,6 +63,18 @@ export class FiveTrackLooper extends EventTarget {
     track.name=file.name.replace(/\.[^.]+$/,'').slice(0,22)||track.name;
     track.state=this.playing?STATES.PLAYING:STATES.STOPPED;
     this.restartTrack(track);this.emit('track',{index});this.emit('change');
+  }
+
+  mixBuffer(){
+    if(!this.masterLength)return null;
+    const frames=Math.max(1,Math.round(this.masterLength*this.context.sampleRate)),out=this.context.createBuffer(2,frames,this.context.sampleRate);
+    for(const track of this.tracks){
+      if(!track.buffer||track.muted)continue;
+      const left=track.buffer.getChannelData(0),right=track.buffer.getChannelData(Math.min(1,track.buffer.numberOfChannels-1)),pan=track.panValue||0,leftGain=Math.cos((pan+1)*Math.PI/4)*(track.volume??.9),rightGain=Math.sin((pan+1)*Math.PI/4)*(track.volume??.9),dstL=out.getChannelData(0),dstR=out.getChannelData(1);
+      for(let i=0;i<frames;i++){dstL[i]+=(left[i%left.length]||0)*leftGain;dstR[i]+=(right[i%right.length]||0)*rightGain;}
+    }
+    for(let channel=0;channel<2;channel++){const data=out.getChannelData(channel);for(let i=0;i<data.length;i++)data[i]=Math.tanh(data[i]*.82);}
+    return out;
   }
 
   nextBoundary(){
@@ -178,7 +190,7 @@ export class FiveTrackLooper extends EventTarget {
   clearAll(){this.capture.cancel();if(this.arming)this.arming.cancelled=true;this.arming=null;this.activeRecording=null;this.stop();this.tracks.forEach((_,index)=>this.clear(index));this.masterLength=0;this.emit('change');}
   reverse(index){const track=this.tracks[index];if(!track.buffer)return;const clone=this.context.createBuffer(track.buffer.numberOfChannels,track.buffer.length,track.buffer.sampleRate);for(let channel=0;channel<clone.numberOfChannels;channel++)clone.copyToChannel(Float32Array.from(track.buffer.getChannelData(channel)).reverse(),channel);track.buffer=clone;track.reverse=!track.reverse;this.restartTrack(track);this.emit('track',{index});}
   halfSpeed(index){const track=this.tracks[index];if(!track.buffer)return;track.rate=track.rate===.5?1:.5;this.restartTrack(track);this.emit('track',{index});}
-  setTrackValue(index,key,value){const track=this.tracks[index];if(key==='volume'){track.volume=value;track.gain.gain.setTargetAtTime(track.muted?0:value,this.context.currentTime,.02);}if(key==='pan'){track.panValue=value;track.pan.pan.setTargetAtTime(value,this.context.currentTime,.02);}if(key==='delay'){track.delay=value;track.delaySend.gain.setTargetAtTime(value,this.context.currentTime,.02);}if(key==='reverb'){track.reverb=value;track.reverbSend.gain.setTargetAtTime(value,this.context.currentTime,.02);}this.emit('track',{index});}
+  setTrackValue(index,key,value){const track=this.tracks[index];if(key==='volume'){track.volume=value;track.gain.gain.setTargetAtTime(track.muted?0:value,this.context.currentTime,.02);}if(key==='pan'){track.panValue=value;track.pan.pan.setTargetAtTime(value,this.context.currentTime,.02);}if(key==='delay'){track.delay=value;track.delaySend.gain.setTargetAtTime(value,this.context.currentTime,.02);}if(key==='reverb'){track.reverb=value;track.reverbSend.gain.setTargetAtTime(value,this.context.currentTime,.02);}if(key==='autotune'){track.autotune=value;}this.emit('track',{index});}
   progress(){if(!this.playing||!this.masterLength)return 0;return ((this.context.currentTime-this.transportStart)%this.masterLength+this.masterLength)%this.masterLength/this.masterLength;}
   setFxBypass(value){this.fxBypassed=value;this.delay.setBypass(value);this.reverb.setBypass(value);}
 }
