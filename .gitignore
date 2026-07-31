@@ -1,7 +1,4 @@
-# macOS
-.DS_Store
-**/.DS_Store
-
+```
 # Compiled and build artifacts
 *.pyc
 __pycache__/
@@ -28,3 +25,8 @@ node_modules/
 # Editors
 .vscode/
 .idea/
+.DS_Store
+
+# Original rules preserved
+*.log
+```

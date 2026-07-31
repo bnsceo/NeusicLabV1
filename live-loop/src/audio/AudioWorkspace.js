@@ -7,6 +7,9 @@ class AudioWorkspace {
     this.micStream = null;
     this.micSource = null;
     this.monitor = null;
+    this.pitchNode = null;
+    this.pitchFrequency = 0;
+    this.pitchConfidence = 0;
     this.unlocked = false;
   }
 
@@ -23,6 +26,7 @@ class AudioWorkspace {
       this.meterData = new Uint8Array(this.analyser.fftSize);
       this.master.connect(this.analyser);
       this.analyser.connect(this.context.destination);
+      if(this.context.audioWorklet){try{await this.context.audioWorklet.addModule(new URL('./worklets/pitch-detector.js',import.meta.url));}catch(_){}}
     }
     await this.resume();
     return this;
@@ -58,8 +62,11 @@ class AudioWorkspace {
   releaseMicGraph() {
     try { this.micSource?.disconnect(); } catch (_) {}
     try { this.monitor?.disconnect(); } catch (_) {}
+    try { this.pitchNode?.disconnect(); } catch (_) {}
+    if(this.pitchNode?.port)this.pitchNode.port.onmessage=null;
     this.micSource = null;
     this.monitor = null;
+    this.pitchNode = null;
   }
 
   microphoneError(error) {
@@ -142,9 +149,10 @@ class AudioWorkspace {
     if (this.micSource) return stream;
     this.releaseMicGraph();
     this.micSource = this.context.createMediaStreamSource(stream);
+    if(this.context.audioWorklet){try{this.pitchNode=new AudioWorkletNode(this.context,'neusic-pitch-detector');this.pitchNode.port.onmessage=event=>{this.pitchFrequency=event.data?.frequency||0;this.pitchConfidence=event.data?.confidence||0;};}catch(_){this.pitchNode=null;}}
     this.monitor = this.context.createGain();
     this.monitor.gain.value = 0;
-    this.micSource.connect(this.monitor);
+    if(this.pitchNode){this.micSource.connect(this.pitchNode);this.pitchNode.connect(this.monitor);}else this.micSource.connect(this.monitor);
     this.monitor.connect(this.master);
     return stream;
   }
