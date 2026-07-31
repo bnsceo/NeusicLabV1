@@ -40,7 +40,8 @@ jobs:
           cp -R scripts/landing/. _site/scripts/landing/
           cp -R scripts/shared/. _site/scripts/shared/
           cp -R assets/icons/. _site/assets/icons/
-          test -s _site/assets/icons/neusicwave-campaign-logo.jpg
+          # The landing-page campaign image is optional; do not block app deployments when it is absent.
+          if [ -f _site/assets/icons/neusicwave-campaign-logo.jpg ]; then test -s _site/assets/icons/neusicwave-campaign-logo.jpg; fi
 
           cp -R app/. _site/studio/
           cp -R wave-loom/. _site/wave-loom/
