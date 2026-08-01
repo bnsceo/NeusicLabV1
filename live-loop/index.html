@@ -1,115 +1,219 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-  <meta name="theme-color" content="#07090b">
-  <meta name="description" content="Neusic Live Loop is a phone-first five-lane performance instrument for voice, beatbox, samples, tactile effects, synth playing, and direct Neusic Wave transfer.">
-  <link rel="canonical" href="https://bnsceo.github.io/NeusicLabV1/live-loop/">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Neusic">
-  <meta property="og:title" content="Neusic Live Loop — Five-Lane Performance Instrument">
-  <meta property="og:description" content="Capture voice, rhythm, bass, harmony, and textures across five synchronized phone-first loop lanes. Touch controls work with or without MIDI.">
-  <meta property="og:url" content="https://bnsceo.github.io/NeusicLabV1/live-loop/">
-  <meta property="og:image" content="https://bnsceo.github.io/NeusicLabV1/social/live-loop-card-v3.png">
-  <meta property="og:image:type" content="image/png">
-  <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
-  <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Neusic Live Loop"><meta name="twitter:description" content="A five-lane tactile performance looper built for phones, voice, effects, and improvisation."><meta name="twitter:image" content="https://bnsceo.github.io/NeusicLabV1/social/live-loop-card-v3.png">
-  <title>Neusic Live Loop — Performance Instrument</title>
-  <link rel="preconnect" href="https://api.fontshare.com">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="styles.css?v=3">
-  <link rel="stylesheet" href="live-loop-nw-copper.css">
-  <link rel="stylesheet" href="stage-performance.css?v=3">
-  <link rel="stylesheet" href="loop-undo.css?v=1">
-  <link rel="stylesheet" href="../css/shared/neusic-suite.css?v=2">
-  <link rel="stylesheet" href="../css/shared/neusic-agent.css?v=1">
-  <link rel="stylesheet" href="mobile-release.css?v=2">
-  <link rel="stylesheet" href="neusic-v3.css?v=18">
-  <link rel="stylesheet" href="mobile-performance.css?v=1">
-  <link rel="stylesheet" href="mobile-performance-v2.css?v=1">
-  <link rel="stylesheet" href="live-loop-header-final.css?v=1">
-</head>
-<body class="stage-performance" data-neusic-product="live-loop">
-  <div class="noise" aria-hidden="true"></div>
-  <header class="topbar">
-    <div class="master-display header-master-display"><div><small>MASTER LOOP</small><b id="masterLength">—</b></div><div><small>GLOBAL STATE</small><b id="globalState">READY</b></div><div class="master-meter"><span id="masterMeter"></span></div></div>
-    <div class="transport" aria-label="Live loop transport">
-      <button id="micBtn" class="hardware-button" type="button"><i class="led"></i><span>MIC</span></button>
-      <button id="captureBtn" class="hardware-button capture-button" type="button"><span>●</span><b>CAPTURE</b></button>
-      <button id="playBtn" class="hardware-button transport-play" type="button"><span>▶</span><b>START</b></button>
-      <button id="stopBtn" class="hardware-button" type="button"><span>■</span><b>STOP</b></button>
-      <label class="lcd-control"><small>BPM</small><input id="bpmInput" type="number" min="40" max="220" value="112"></label>
-      <label class="switch-control"><input id="quantizeToggle" type="checkbox" checked><span>SYNC</span></label>
-      <button id="midiBtn" class="hardware-button" type="button"><i class="led"></i><span>MIDI</span></button>
-    </div>
-    <nav class="top-actions" aria-label="Neusic pages"><a href="../wave-loom/">NEUSIC WAVE</a><a href="../studio/">NEUSIC LAB</a><a href="../">HOME</a></nav>
-  </header>
+/* Neusic Live: capture-first tactile instrument */
+:root {
+  --neo-bg: #dfe5e8;
+  --neo-light: #fbfdff;
+  --neo-shadow: #b9c3ca;
+  --neo-ink: #26343c;
+  --neo-muted: #63747d;
+  --neo-mint: #159d7e;
+  --neo-coral: #c95770;
+  color-scheme: light;
+}
 
-  <main class="performance-shell">
-    <section class="performance-head">
-      <div aria-hidden="true"></div>
-    </section>
+body { color: var(--neo-ink)!important; background: radial-gradient(circle at 15% -10%, #fff 0 10%, transparent 34%), var(--neo-bg)!important; }
+.noise { display:none!important; }
+.topbar { position:sticky; min-height:68px!important; grid-template-columns:minmax(150px,1fr) auto auto minmax(120px,1fr)!important; padding:10px 20px!important; background:rgba(223,229,232,.9)!important; border:0!important; box-shadow:6px 6px 16px #b9c3caaa,-6px -6px 16px #fbfdffcc!important; }
+.brand,.brand b { color:var(--neo-ink)!important; }.brand small,.top-actions a { color:var(--neo-muted)!important; }
+.brand-mark { border:0!important; background:var(--neo-bg)!important; color:var(--neo-mint)!important; box-shadow:inset 3px 3px 7px var(--neo-shadow),inset -3px -3px 7px var(--neo-light)!important; }
+.hardware-button,.top-actions a,.mini-button,.tool-actions button,.pedal-actions button { border:0!important; border-radius:14px!important; background:var(--neo-bg)!important; color:var(--neo-ink)!important; box-shadow:5px 5px 11px var(--neo-shadow),-5px -5px 11px var(--neo-light)!important; }
+.hardware-button:hover,.top-actions a:hover,.mini-button:hover,.tool-actions button:hover,.pedal-actions button:hover { filter:none!important; color:var(--neo-mint)!important; transform:translateY(-1px); }
+.capture-button { color:var(--neo-coral)!important; }
+.performance-shell { width:min(1420px,calc(100% - 40px))!important; padding:30px 0 44px!important; }
+.performance-head { display:none!important; }
+.header-master-display { position:relative; display:grid!important; grid-template-columns:1fr 1fr!important; grid-template-rows:1fr!important; min-width:190px; height:42px; align-self:center; margin:0 12px; padding:5px 8px!important; border:0!important; border-radius:14px!important; background:var(--neo-bg)!important; box-shadow:inset 3px 3px 7px var(--neo-shadow),inset -3px -3px 7px var(--neo-light)!important; overflow:hidden; }
+.header-master-display>div:not(.master-meter) { border:0!important; background:transparent!important; padding:2px 6px!important; }
+.header-master-display .master-meter { position:absolute; left:14px; right:14px; bottom:5px; height:3px; margin:0; padding:0; border:0!important; border-radius:999px; background:#c7d0d5!important; box-shadow:inset 2px 2px 4px #aebac1,inset -2px -2px 4px #f8fbfc!important; overflow:hidden; }
+.header-master-display .master-meter span { height:100%; border-radius:999px; background:var(--neo-mint)!important; box-shadow:0 0 7px #159d7e66; }
+.header-master-display b { color:var(--neo-ink)!important; }.header-master-display small { color:var(--neo-muted)!important; }
+.performance-head h1 { max-width:none!important; margin:8px 0 6px!important; color:var(--neo-ink)!important; font-size:clamp(34px,5vw,60px)!important; letter-spacing:-.07em!important; }
+.performance-head h1 em { color:var(--neo-mint)!important; }.performance-head p { color:var(--neo-muted)!important; font-size:13px!important; }
+.eyebrow { color:var(--neo-mint)!important; }.master-display { min-width:230px; border:0!important; border-radius:18px!important; background:var(--neo-bg)!important; box-shadow:inset 3px 3px 8px var(--neo-shadow),inset -3px -3px 8px var(--neo-light)!important; }
+.master-display>div:not(.master-meter) { border:0!important; background:transparent!important; }.master-display b { color:var(--neo-ink)!important; }.master-display small { color:var(--neo-muted)!important; }
+.panel { border:0!important; border-radius:24px!important; background:var(--neo-bg)!important; box-shadow:10px 10px 23px var(--neo-shadow),-10px -10px 23px var(--neo-light)!important; }
+.panel-header { min-height:60px!important; padding:14px 18px!important; background:transparent!important; border-bottom:1px solid #63747d2b!important; }.panel-header h2 { color:var(--neo-ink)!important; font-size:20px!important; }
+.scene-strip { display:flex; align-items:center; gap:8px; padding:12px 18px 0; }
+.scene-button,.scene-save { min-width:36px; height:32px; padding:0 10px; border:0; border-radius:10px; background:var(--neo-bg); color:var(--neo-muted); font:800 10px/1 var(--mono); box-shadow:4px 4px 8px var(--neo-shadow),-4px -4px 8px var(--neo-light); }
+.scene-button.active,.scene-button:hover,.scene-save:hover { color:var(--neo-mint); }
+.scene-button.active { box-shadow:inset 3px 3px 6px var(--neo-shadow),inset -3px -3px 6px var(--neo-light); }
+.scene-save { margin-left:auto; font-size:8px; }
+.track-grid { grid-template-columns:repeat(5,minmax(0,1fr))!important; gap:18px!important; padding:18px!important; background:transparent!important; }
+.loop-track { min-width:0!important; padding:15px!important; border:0!important; border-radius:19px!important; background:var(--neo-bg)!important; box-shadow:7px 7px 15px var(--neo-shadow),-7px -7px 15px var(--neo-light)!important; }
+.loop-track.selected { outline:2px solid #159d7e99!important; box-shadow:inset 3px 3px 8px var(--neo-shadow),inset -3px -3px 8px var(--neo-light)!important; }.track-state,.track-controls label { color:var(--neo-muted)!important; }
+.progress-center { border:0!important; background:var(--neo-bg)!important; color:var(--neo-ink)!important; box-shadow:inset 5px 5px 10px var(--neo-shadow),inset -5px -5px 10px var(--neo-light)!important; }.progress-ring { stroke:var(--neo-mint)!important; filter:none!important; }
+.track-actions { gap:7px!important; }.track-actions button,.track-controls input,.track-controls select { min-height:34px; border:0!important; border-radius:10px!important; background:var(--neo-bg)!important; color:var(--neo-ink)!important; box-shadow:inset 3px 3px 7px var(--neo-shadow),inset -3px -3px 7px var(--neo-light)!important; }.track-actions .record-action { color:var(--neo-coral)!important; }
+.track-controls { gap:8px!important; }.autotune-control { grid-column:1/-1; grid-template-columns:38px 1fr!important; }.autotune-control select { width:100%; padding:0 6px; font-size:9px; }
+.utility-drawer { margin-top:24px; }.utility-drawer>summary { display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-radius:18px; list-style:none; cursor:pointer; color:var(--neo-ink); font:700 13px/1 var(--ui); box-shadow:5px 5px 12px var(--neo-shadow),-5px -5px 12px var(--neo-light); }.utility-drawer>summary::-webkit-details-marker{display:none}.utility-drawer>summary span{color:var(--neo-muted);font-size:11px;font-weight:500}.utility-drawer[open]>summary{box-shadow:inset 3px 3px 7px var(--neo-shadow),inset -3px -3px 7px var(--neo-light)}
+.synth-choices { display:flex; gap:8px; align-items:end; }.synth-choices .wave-select { min-width:62px; }.key-white.in-scale { background:linear-gradient(#e9fbf7,#a7d9ce); }.key-black.in-scale { background:linear-gradient(#35aa92,#176653); color:#fff; }
+.lower-grid { gap:18px!important; margin-top:18px!important; }.session-tools { margin-top:18px!important; }.session-tools h2 { color:var(--neo-ink)!important; font-size:20px!important; }.session-tools p,.status-message { color:var(--neo-muted)!important; }.status-message { border:0!important; border-radius:12px!important; background:var(--neo-bg)!important; box-shadow:inset 3px 3px 7px var(--neo-shadow),inset -3px -3px 7px var(--neo-light)!important; }
+.legal-note { color:var(--neo-muted)!important; }
+@media(max-width:1200px){.track-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(max-width:760px){.topbar{position:relative!important;grid-template-columns:1fr!important;padding:14px!important}.brand{justify-self:center}.header-master-display{order:2;margin:2px auto 8px}.transport{order:3;justify-content:flex-start!important;overflow-x:auto}.top-actions{order:4}.performance-shell{width:calc(100% - 24px)!important;padding-top:22px!important}.utility-drawer>summary{padding:15px}.utility-drawer>summary span{display:none}.synth-choices{width:100%;overflow-x:auto}.synth-choices .wave-select{flex:1;min-width:58px}}
+@media(max-width:500px){.performance-head h1{font-size:40px!important}.master-display{max-width:none}}
 
-    <section class="loop-deck panel" aria-labelledby="loopDeckTitle">
-      <header class="panel-header loop-control-header"><h2 id="loopDeckTitle">Loop Control</h2><div class="system-status"><span class="status-dot"></span><span>System Status: <b>Active</b></span></div></header>
-      <div class="legend legend-caption"><span><i class="empty"></i>EMPTY</span><span><i class="recording"></i>RECORDING</span><span><i class="playing"></i>PLAYING</span><span><i class="muted"></i>MUTED</span></div>
-      <div class="scene-strip" aria-label="Loop scenes"><button class="scene-button active" data-scene="0" type="button">A</button><button class="scene-button" data-scene="1" type="button">B</button><button class="scene-button" data-scene="2" type="button">C</button><button id="saveSceneBtn" class="scene-save" type="button">SAVE SCENE</button><button id="exportMixBtn" class="scene-save" type="button">EXPORT MIX</button></div>
-      <div id="trackGrid" class="track-grid" aria-label="Five synchronized loop lanes"></div>
-    </section>
+/* Compact header hierarchy: controls first, product links beside them, no fake logo. */
+body.stage-performance .topbar{grid-template-columns:minmax(0,1fr) auto!important;min-height:76px!important;gap:12px!important}
+body.stage-performance .transport{display:grid!important;grid-template-columns:repeat(8,minmax(0,1fr))!important;gap:8px!important;min-width:0!important}
+body.stage-performance .neusic-suite-next{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;padding:8px 12px;text-decoration:none;font:800 7px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+body.stage-performance .neusic-suite-next span{color:var(--neo-muted)}
+body.stage-performance .neusic-suite-next b{color:var(--neo-coral);font-size:8px}
+body.stage-performance .top-actions{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-items:center}
+body.stage-performance .top-actions a{min-height:48px;display:grid;place-items:center;padding:0 12px;text-decoration:none;font-size:7px}
+body.stage-performance .neusic-suite-rail{display:none!important}
+/* If an older cached suite script still paints the rail, keep it in the same
+   light neumorphic language instead of exposing the legacy black strip. */
+body.stage-performance .neusic-suite-rail{
+  display:grid!important;
+  min-height:64px;
+  padding:8px 20px;
+  border:0;
+  border-top:1px solid #c7d0d5;
+  border-bottom:1px solid #c7d0d5;
+  background:var(--neo-bg);
+  box-shadow:6px 6px 16px #b9c3caaa,-6px -6px 16px #fbfdffcc;
+  color:var(--neo-ink);
+}
+body.stage-performance .neusic-suite-intro,
+body.stage-performance .neusic-suite-path>a,
+body.stage-performance .neusic-suite-next{color:var(--neo-muted)}
+body.stage-performance .neusic-suite-path>a[aria-current="page"]{
+  border-color:#c95770;
+  background:var(--neo-bg);
+  color:var(--neo-coral);
+  box-shadow:inset 3px 3px 7px var(--neo-shadow),inset -3px -3px 7px var(--neo-light);
+}
+body.stage-performance .neusic-suite-next{
+  border:0;
+  background:var(--neo-bg);
+  box-shadow:5px 5px 11px var(--neo-shadow),-5px -5px 11px var(--neo-light);
+}
+body.stage-performance .neusic-suite-next b{color:var(--neo-coral)}
+@media(max-width:760px){
+  body.stage-performance .topbar{grid-template-columns:1fr!important;gap:8px!important;padding:10px!important}
+  body.stage-performance .transport{grid-template-columns:repeat(8,minmax(0,1fr))!important;gap:4px!important;overflow:visible!important}
+  body.stage-performance .hardware-button,body.stage-performance .lcd-control,body.stage-performance .switch-control,body.stage-performance .neusic-suite-next{min-height:46px!important;border-radius:13px!important;padding:4px 2px!important;font-size:5px!important}
+  body.stage-performance .neusic-suite-next{align-items:center;text-align:center}
+  body.stage-performance .neusic-suite-next span{display:none}
+  body.stage-performance .neusic-suite-next b{font-size:6px}
+  body.stage-performance .top-actions{grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+  body.stage-performance .top-actions a{min-height:42px;border-radius:13px;padding:4px 2px;font-size:5px}
+body.stage-performance .neusic-suite-rail{grid-template-columns:1fr auto;padding:7px 10px}
+}
 
-    <details class="utility-drawer">
-      <summary>Sound tools <span>Effects · synth · transfer</span></summary>
-    <section class="lower-grid">
-      <article class="pedalboard panel">
-        <header class="panel-header"><div><span class="eyebrow">PEDALBOARD</span><h2>Tape + space processors</h2></div><button id="bypassFxBtn" class="mini-button" type="button">FX ACTIVE</button></header>
-        <div class="pedal-grid">
-          <section class="pedal delay-pedal">
-            <header><span>NEUSIC</span><b>PHRASE DELAY</b><i id="delayLed"></i></header>
-            <div class="knob-row"><label><span>TIME</span><input id="delayTime" type="range" min="40" max="1200" value="360"><output>360ms</output></label><label><span>FEEDBACK</span><input id="delayFeedback" type="range" min="0" max="92" value="42"><output>42%</output></label><label><span>MIX</span><input id="delayMix" type="range" min="0" max="100" value="28"><output>28%</output></label></div>
-            <div class="pedal-actions"><button id="warpDownBtn" type="button">OCTAVE DOWN</button><button id="reverseBtn" type="button">REVERSE SELECTED</button></div>
-          </section>
-          <section class="pedal reverb-pedal">
-            <header><span>NEUSIC</span><b>SPATIAL HALL</b><i id="reverbLed"></i></header>
-            <div class="knob-row"><label><span>SIZE</span><input id="reverbSize" type="range" min="20" max="500" value="180"><output>1.8s</output></label><label><span>TONE</span><input id="reverbTone" type="range" min="1200" max="14000" value="7200"><output>7.2k</output></label><label><span>MIX</span><input id="reverbMix" type="range" min="0" max="100" value="24"><output>24%</output></label></div>
-            <div class="pedal-actions"><button id="freezeBtn" type="button">SPACE FREEZE</button><button id="clearAllBtn" class="danger" type="button">CLEAR ALL</button></div>
-          </section>
-        </div>
-      </article>
+/* Some iOS/embedded browsers expose a tablet-width CSS viewport while still
+   rendering on a phone. Keep the touch layout usable in that mode as well. */
+@media (min-width:761px) and (max-width:1100px){
+  body.stage-performance .topbar{grid-template-columns:1fr!important}
+  body.stage-performance .transport{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+  body.stage-performance .stage-macro-deck{grid-template-columns:1fr!important}
+  body.stage-performance .stage-macro-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  body.stage-performance .stage-xy{min-height:190px!important}
+}
 
-      <article class="synth-panel panel">
-        <header class="panel-header"><div><span class="eyebrow">PLAYABLE COLOR SYNTH</span><h2>One-octave performance keys</h2></div><div class="synth-choices"><label class="wave-select">VOICE<select id="synthWave"><option value="sawtooth">GRIMY</option><option value="square">BOUNCE</option><option value="triangle">SPACE</option><option value="sine">PURE</option></select></label><label class="wave-select">KEY<select id="keySelect"><option value="0">C</option><option value="1">C♯</option><option value="2">D</option><option value="3">D♯</option><option value="4">E</option><option value="5">F</option><option value="6">F♯</option><option value="7">G</option><option value="8">G♯</option><option value="9">A</option><option value="10">A♯</option><option value="11">B</option></select></label><label class="wave-select">SCALE<select id="scaleSelect"><option value="major">MAJOR</option><option value="minor">MINOR</option><option value="pentatonic">PENTA</option></select></label></div></header>
-        <div class="synth-controls"><label>CUTOFF<input id="synthCutoff" type="range" min="120" max="12000" value="2400"><output>2.4k</output></label><label>ATTACK<input id="synthAttack" type="range" min="0" max="100" value="2"><output>0.02s</output></label><label>RELEASE<input id="synthRelease" type="range" min="2" max="250" value="45"><output>0.45s</output></label></div>
-        <div id="keyboard" class="keyboard" aria-label="Playable synth keyboard"></div><p class="key-help">Touch keys work directly. Computer keys and MIDI notes are optional.</p>
-      </article>
-    </section>
+/* The product journey was removed from Live Loop; never let an old cached
+   script recreate its legacy dark strip. */
+body.stage-performance .neusic-suite-rail{display:none!important}
 
-    <section class="session-tools panel">
-      <div><span class="eyebrow">SAMPLE INPUT + NEUSIC WAVE BRIDGE</span><h2>Capture here. Refine in Wave.</h2><p>Upload audio into the selected lane or send a recorded and overdubbed loop directly into the persistent Neusic Wave Forge.</p></div>
-      <div class="tool-actions"><button id="uploadBtn" class="primary-action" type="button">UPLOAD TO SELECTED TRACK</button><input id="fileInput" type="file" accept="audio/*,.wav,.wave,.mp3,.m4a,.aac,.flac,.ogg,.oga,.opus,.webm,.mp4" multiple hidden><button id="sendSelectedBtn" type="button">SEND SELECTED TO NEUSIC WAVE</button><button id="downloadSelectedBtn" type="button">DOWNLOAD SELECTED WAV</button></div>
-      <div id="statusMessage" class="status-message" role="status">Five loop lanes are visible. Tap REC on any lane; MIDI is optional.</div>
-    </section>
-    </details>
-  </main>
+/* Final Live Loop surface: this layer intentionally wins over the older stage/mobile skins. */
+body.stage-performance .topbar{background:rgba(223,229,232,.9)!important;color:var(--neo-ink)!important;grid-template-columns:minmax(150px,1fr) auto auto minmax(120px,1fr)!important;min-height:68px!important;padding:10px 20px!important;border:0!important;box-shadow:6px 6px 16px #b9c3caaa,-6px -6px 16px #fbfdffcc!important}
+body.stage-performance .brand,body.stage-performance .brand b{color:var(--neo-ink)!important}body.stage-performance .brand small{color:var(--neo-muted)!important}
+body.stage-performance .performance-head{display:none!important}
+body.stage-performance .loop-deck>.panel-header{min-height:60px!important;padding:14px 18px!important;background:transparent!important}
+body.stage-performance .lower-grid{display:grid!important;grid-template-columns:1.15fr .85fr!important;gap:18px!important;margin-top:18px!important}body.stage-performance .pedalboard{display:block!important}
+body.stage-performance .pedal,body.stage-performance .synth-panel{background:var(--neo-bg)!important;color:var(--neo-ink)!important;border:0!important;box-shadow:7px 7px 15px var(--neo-shadow),-7px -7px 15px var(--neo-light)!important}
+body.stage-performance .keyboard{height:150px!important;padding:0 12px 12px!important;overflow-x:auto!important}.stage-performance .key-white{background:linear-gradient(#e9fbf7,#a7d9ce)!important}.stage-performance .key-black{background:linear-gradient(#30383c,#080a0c)!important}
+body.stage-performance .utility-drawer{display:block!important;margin-top:24px!important}body.stage-performance .utility-drawer>summary{display:flex!important}
+@media(max-width:760px){body.stage-performance .topbar{grid-template-columns:1fr!important;padding:14px!important}.stage-performance .lower-grid{grid-template-columns:1fr!important}}
 
-  <template id="trackTemplate">
-    <article class="loop-track" data-state="Empty">
-      <header><div><span class="track-number"></span><b class="track-name"></b></div><span class="track-state">READY</span></header>
-      <button class="progress-control" data-action="select" type="button" aria-label="Select track"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="progress-bg" cx="50" cy="50" r="43"></circle><circle class="progress-ring" cx="50" cy="50" r="43"></circle></svg><span class="progress-center"><b class="progress-time">00.0</b><small>SECONDS</small></span></button>
-      <div class="track-actions"><button data-action="record" class="record-action" type="button">REC</button><button data-action="mute" type="button">MUTE</button><button data-action="upload" type="button">LOAD</button><button data-action="forge" type="button">WAVE</button><button data-action="edit" type="button">EDIT</button><button data-action="clear" class="danger" type="button">CLEAR</button></div>
-      <div class="track-controls"><label>LEVEL<input data-control="volume" type="range" min="0" max="125" value="90"><output>90</output></label><label>PAN<input data-control="pan" type="range" min="-100" max="100" value="0"><output>C</output></label><label>DELAY<input data-control="delay" type="range" min="0" max="100" value="22"><output>22</output></label><label>SPACE<input data-control="reverb" type="range" min="0" max="100" value="18"><output>18</output></label><label class="autotune-control">TUNE<select data-control="autotune"><option value="off">OFF</option><option value="chromatic">CHROMATIC</option></select></label></div>
-    </article>
-  </template>
+/* Mobile-first performance layout: every lane gets a usable touch target. */
+@media(max-width:760px){
+  body.stage-performance .transport{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:7px!important;overflow:visible!important}
+  body.stage-performance .transport>*{min-width:0!important;min-height:52px!important}
+  body.stage-performance .neusic-suite-next{grid-column:span 2!important}
+  body.stage-performance .stage-macro-deck{grid-template-columns:1fr!important;gap:10px!important;padding:10px!important}
+  body.stage-performance .stage-macro-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+  body.stage-performance .stage-selected{grid-column:1/-1!important;min-height:42px!important;font-size:8px!important}
+  body.stage-performance .stage-macro-button{min-height:58px!important;font-size:7px!important}
+  body.stage-performance .stage-macro-button strong{font-size:9px!important}
+  body.stage-performance .stage-xy{min-height:190px!important;width:100%!important}
+  body.stage-performance .stage-xy header{font-size:9px!important;inset:12px 14px auto!important}
+  body.stage-performance .stage-xy footer{font-size:7px!important;inset:auto 14px 12px!important}
+  body.stage-performance .stage-xy-dot{width:30px!important;height:30px!important}
+}
 
-  <footer class="legal-note">Performance workflow inspired by modern improvisational loop artists and hardware loop stations. Neusic is not affiliated with Reggie Watts, Boss, Line 6, Nord, or their manufacturers.</footer>
-  <script src="mobile-mic-primer.js?v=8"></script>
-  <script src="iphone-record-bridge.js?v=1"></script>
-  <script type="module" src="app.js?v=14"></script>
-  <script src="loop-undo.js?v=1"></script>
-  <script src="stage-performance.js?v=2"></script>
-  <script src="mobile-performance.js?v=1"></script>
-  <script src="mobile-recording-feedback.js?v=1"></script>
-  <script src="../scripts/shared/neusic-suite.js?v=3"></script>
-  <script src="../scripts/shared/neusic-agent.js?v=1"></script>
-</body>
-</html>
+/* Unified palette: every legacy component uses the same light neumorphic surface. */
+body.stage-performance,body.stage-performance .topbar,body.stage-performance .panel,body.stage-performance .loop-track,body.stage-performance .utility-drawer>summary,body.stage-performance .session-tools{color:var(--neo-ink)!important;background:var(--neo-bg)!important}
+body.stage-performance .pedal,body.stage-performance .synth-panel,body.stage-performance .progress-center,body.stage-performance .status-message,body.stage-performance .track-controls label,body.stage-performance .track-actions button,body.stage-performance .hardware-button,body.stage-performance .lcd-control,body.stage-performance .switch-control,body.stage-performance .top-actions a{color:var(--neo-ink)!important;background:var(--neo-bg)!important;border:0!important;box-shadow:5px 5px 11px var(--neo-shadow),-5px -5px 11px var(--neo-light)!important}
+body.stage-performance .pedal header,body.stage-performance .panel-header{border-color:#63747d2b!important;background:transparent!important;color:var(--neo-ink)!important}
+body.stage-performance .pedal b,body.stage-performance .synth-panel h2,body.stage-performance .session-tools h2,body.stage-performance .track-name,body.stage-performance .progress-center b{color:var(--neo-ink)!important}
+body.stage-performance .track-controls input,body.stage-performance .synth-controls input,body.stage-performance .knob-row input{accent-color:var(--neo-mint)!important;filter:none!important}
+body.stage-performance .track-controls input::-webkit-slider-runnable-track,body.stage-performance .synth-controls input::-webkit-slider-runnable-track,body.stage-performance .knob-row input::-webkit-slider-runnable-track{height:8px!important;border:0!important;border-radius:999px!important;background:#c4cdd2!important;box-shadow:inset 2px 2px 4px #aeb9bf,inset -2px -2px 4px #f8fbfc!important}
+body.stage-performance .track-controls input::-webkit-slider-thumb,body.stage-performance .synth-controls input::-webkit-slider-thumb,body.stage-performance .knob-row input::-webkit-slider-thumb{margin-top:-3px!important;background:var(--neo-mint)!important;border:0!important;box-shadow:2px 2px 5px #aeb9bf,-2px -2px 5px #f8fbfc!important}
+body.stage-performance .key-white{background:linear-gradient(#e9fbf7,#a7d9ce)!important;color:var(--neo-ink)!important;border-color:#a9c9c4!important;box-shadow:4px 5px 8px var(--neo-shadow),-3px -3px 7px var(--neo-light)!important}
+body.stage-performance .key-black{background:linear-gradient(#465158,#1f292e)!important;color:#f5fbfb!important;border-color:#1c2529!important}
+body.stage-performance .master-display{background:var(--neo-bg)!important;color:var(--neo-ink)!important;box-shadow:inset 3px 3px 7px var(--neo-shadow),inset -3px -3px 7px var(--neo-light)!important}
+body.stage-performance .neusic-agent-launcher{background:var(--neo-bg)!important;color:var(--neo-mint)!important;border:0!important;box-shadow:5px 5px 11px var(--neo-shadow),-5px -5px 11px var(--neo-light)!important}
+body.stage-performance .track-actions [data-action="edit"]{display:none!important}
+
+/* Reference-width mobile/tablet carousel. The 828px reference is still a
+   mobile composition: one lane per slide, never five lanes squeezed together. */
+@media (pointer:coarse) and (max-width:1100px){
+  body.stage-performance .scene-strip{display:none!important}
+}
+
+/* Final touch-device override. This intentionally wins over every legacy
+   desktop/stage rule, including browsers that expose a wide CSS viewport. */
+@media (pointer:coarse){
+  body.stage-performance .topbar{grid-template-columns:1fr!important;padding:10px!important}
+  body.stage-performance .transport{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:7px!important;overflow:visible!important}
+  body.stage-performance .transport>*{min-width:0!important;min-height:52px!important}
+  body.stage-performance .stage-macro-deck{grid-template-columns:1fr!important;gap:10px!important;padding:10px!important}
+  body.stage-performance .stage-macro-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+  body.stage-performance .stage-macro-button{min-height:58px!important;font-size:7px!important}
+  body.stage-performance .stage-macro-button strong{font-size:9px!important}
+  body.stage-performance .stage-xy{min-height:190px!important;width:100%!important;border:0!important;background:linear-gradient(90deg,transparent 49.35%,#7f909966 49.7%,#7f909966 50.3%,transparent 50.65%),linear-gradient(0deg,transparent 49.35%,#7f909966 49.7%,#7f909966 50.3%,transparent 50.65%),#f3f6f5!important;box-shadow:inset 4px 4px 9px #c4cdd0,inset -4px -4px 9px #fff!important}
+  body.stage-performance .stage-xy header{color:var(--neo-ink)!important}
+  body.stage-performance .stage-xy footer{color:var(--neo-muted)!important}
+  body.stage-performance .mobile-recording-toast{display:none!important}
+  body.stage-performance .utility-drawer{display:block!important}
+  body.stage-performance .utility-drawer>summary{margin-bottom:12px!important}
+  body.stage-performance .lower-grid{display:flex!important;gap:14px!important;width:100%!important;overflow-x:auto!important;overflow-y:visible!important;padding:0 8px 18px!important;scroll-snap-type:x mandatory!important;scroll-padding-inline:8px!important;-webkit-overflow-scrolling:touch!important}
+  body.stage-performance .lower-grid>.pedalboard,
+  body.stage-performance .lower-grid>.synth-panel{flex:0 0 calc(100vw - 32px)!important;width:calc(100vw - 32px)!important;min-width:calc(100vw - 32px)!important;scroll-snap-align:start!important}
+  body.stage-performance .lower-grid .pedalboard{display:block!important}
+  body.stage-performance .lower-grid .synth-panel{display:block!important}
+  body.stage-performance .transport{display:flex!important;justify-content:flex-start!important;gap:10px!important;width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;padding:4px 4px 12px!important;scroll-snap-type:x proximity!important;touch-action:pan-x!important;-webkit-overflow-scrolling:touch!important}
+  body.stage-performance .transport>*{flex:0 0 92px!important;width:92px!important;scroll-snap-align:start!important}
+  body.stage-performance .transport .lcd-control{flex-basis:104px!important;width:104px!important}
+  body.stage-performance .transport .neusic-suite-next{flex-basis:118px!important;width:118px!important}
+  body.stage-performance .top-actions{display:flex!important;justify-content:flex-start!important;gap:10px!important;width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;padding:4px 8px 10px!important;scroll-snap-type:x proximity!important;touch-action:pan-x!important;-webkit-overflow-scrolling:touch!important}
+  body.stage-performance .top-actions a{flex:0 0 112px!important;width:112px!important;scroll-snap-align:start!important}
+}
+
+/* Match the generated performance deck to the light neumorphic UI. */
+body.stage-performance .stage-macro-deck{
+  border:0!important;background:var(--neo-bg)!important;
+  box-shadow:10px 10px 23px var(--neo-shadow),-10px -10px 23px var(--neo-light)!important;
+}
+body.stage-performance .stage-selected,
+body.stage-performance .stage-macro-button{
+  border:0!important;background:var(--neo-bg)!important;color:var(--neo-ink)!important;
+  box-shadow:5px 5px 11px var(--neo-shadow),-5px -5px 11px var(--neo-light)!important;
+}
+body.stage-performance .stage-selected b{color:var(--neo-coral)!important}
+body.stage-performance .stage-macro-button strong{color:var(--neo-ink)!important}
+body.stage-performance .stage-macro-button[data-stage-action="lofi"] strong{color:#d34c9b!important}
+body.stage-performance .stage-macro-button[data-stage-action="octave"] strong{color:#159db5!important}
+body.stage-performance .stage-macro-button[data-stage-action="download"] strong{color:var(--neo-mint)!important}
+body.stage-performance .stage-macro-button.danger{color:var(--neo-coral)!important}
+body.stage-performance .stage-macro-button.active{background:var(--neo-bg)!important;color:var(--neo-mint)!important;box-shadow:inset 3px 3px 7px var(--neo-shadow),inset -3px -3px 7px var(--neo-light)!important}
+body.stage-performance .stage-xy{
+  border:0!important;
+  background:linear-gradient(90deg,transparent 49.35%,#7f909966 49.7%,#7f909966 50.3%,transparent 50.65%),linear-gradient(0deg,transparent 49.35%,#7f909966 49.7%,#7f909966 50.3%,transparent 50.65%),var(--xy-surface,var(--neo-bg))!important;
+  box-shadow:inset 4px 4px 9px #c4cdd0,inset -4px -4px 9px #ffffff!important;
+}
+body.stage-performance .stage-delay{--xy-surface:#f7f1e7!important}
+body.stage-performance .stage-space{--xy-surface:#edf7f8!important}
+body.stage-performance .stage-delay:before,body.stage-performance .stage-delay:after{background:#e4ad4f99!important}
+body.stage-performance .stage-space:before,body.stage-performance .stage-space:after{background:#41cfe099!important}
+body.stage-performance .stage-xy header{color:var(--neo-ink)!important}
+body.stage-performance .stage-xy footer{color:var(--neo-muted)!important}
