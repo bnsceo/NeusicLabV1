@@ -8,6 +8,16 @@
     if (text === 'Five loop lanes are visible. Tap REC on any lane; MIDI is optional.') output.textContent = '';
   };
 
+  function hideDeferredBridge() {
+    const tools = document.querySelector('.session-tools');
+    if (!tools) return;
+    tools.classList.add('bridge-deferred');
+    [...tools.children].forEach(child => {
+      if (!child.classList.contains('status-message')) child.hidden = true;
+    });
+    tools.setAttribute('aria-label', 'Live Loop status');
+  }
+
   function normalizeLayout() {
     document.getElementById('stageMacroDeck')?.remove();
     document.querySelectorAll('.mobile-lane-nav,.mobile-performance-controls').forEach(element => element.remove());
@@ -15,6 +25,7 @@
     const piano = document.querySelector('.synth-panel');
     const effects = document.querySelector('.pedalboard');
     if (lowerGrid && piano && effects && piano.nextElementSibling !== effects) lowerGrid.insertBefore(piano, effects);
+    hideDeferredBridge();
     clearObsoleteStatus();
   }
 
@@ -45,6 +56,6 @@
   }
 
   addEventListener('neusic:live-loop-ui-ready', normalizeLayout);
-  addEventListener('neusic:live-loop-ready', clearObsoleteStatus);
+  addEventListener('neusic:live-loop-ready', normalizeLayout);
   addEventListener('pageshow', normalizeLayout);
 })();
