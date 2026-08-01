@@ -24,23 +24,28 @@
     clearObsoleteStatus();
   }
 
-  function loadPerformancePolish() {
-    if (document.querySelector('script[data-live-loop-polish]')) return;
+  function loadScript(src, marker) {
+    if (document.querySelector(`script[${marker}]`)) return;
     const script = document.createElement('script');
-    script.src = 'mobile-performance-polish.js?v=ce76418';
-    script.dataset.liveLoopPolish = 'true';
+    script.src = src;
+    script.setAttribute(marker, 'true');
     script.defer = true;
     document.head.appendChild(script);
+  }
+
+  function loadEnhancements() {
+    loadScript('mobile-performance-polish.js?v=ce76418', 'data-live-loop-polish');
+    loadScript('vocal-pitch-correction.js?v=653d420', 'data-live-loop-pitch');
   }
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       normalizeLayout();
-      loadPerformancePolish();
+      loadEnhancements();
     }, {once:true});
   } else {
     normalizeLayout();
-    loadPerformancePolish();
+    loadEnhancements();
   }
 
   addEventListener('neusic:live-loop-ui-ready', normalizeLayout);
