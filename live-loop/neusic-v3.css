@@ -177,8 +177,8 @@ body.stage-performance .neusic-agent-launcher{background:var(--neo-bg)!important
   body.stage-performance .topbar{grid-template-columns:1fr!important;padding:10px!important}
   body.stage-performance .transport{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:7px!important;overflow:visible!important}
   body.stage-performance .transport>*{min-width:0!important;min-height:52px!important}
-  body.stage-performance #trackGrid{grid-template-columns:1fr!important;gap:14px!important;overflow:visible!important;padding:12px 8px 18px!important}
-  body.stage-performance .loop-track{width:100%!important;min-height:430px!important;padding:14px!important}
+  body.stage-performance #trackGrid{display:flex!important;grid-template-columns:none!important;gap:12px!important;height:auto!important;min-height:0!important;max-height:none!important;overflow-x:auto!important;overflow-y:hidden!important;padding:12px 8px 22px!important;scroll-snap-type:x mandatory!important;scroll-padding-inline:8px!important;-webkit-overflow-scrolling:touch!important}
+  body.stage-performance .loop-track{flex:0 0 calc(100vw - 32px)!important;width:calc(100vw - 32px)!important;height:auto!important;min-height:560px!important;padding:14px!important;scroll-snap-align:start!important}
   body.stage-performance .track-actions{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:6px!important}
   body.stage-performance .track-actions button{min-height:46px!important;font-size:7px!important}
   body.stage-performance .track-actions .record-action{grid-column:1/-1!important;min-height:52px!important}
