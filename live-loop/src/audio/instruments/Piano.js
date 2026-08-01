@@ -18,6 +18,7 @@ const VOICE_PRESETS = {
   space:{wave:'triangle',cutoff:5200,attack:.08,release:1.15},
   pure:{wave:'sine',cutoff:10000,attack:.012,release:.55}
 };
+const PRESET_ALIASES={sawtooth:'grimy',square:'bounce',triangle:'space',sine:'pure'};
 
 export class SamplePiano {
   constructor(context, output, basePath='assets/piano/'){
@@ -102,7 +103,8 @@ export class HybridInstrument {
   }
 
   applyPreset(name){
-    const preset=VOICE_PRESETS[name];
+    const resolved=PRESET_ALIASES[name]||name;
+    const preset=VOICE_PRESETS[resolved];
     if(!preset)return;
     this.synth.setWave(preset.wave);
     this.synth.setCutoff(preset.cutoff);
