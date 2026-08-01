@@ -154,8 +154,12 @@ body.stage-performance .stage-macro-button.danger{color:var(--neo-coral)!importa
 body.stage-performance .stage-macro-button.active{background:var(--neo-bg)!important;color:var(--neo-mint)!important;box-shadow:inset 3px 3px 7px var(--neo-shadow),inset -3px -3px 7px var(--neo-light)!important}
 body.stage-performance .stage-xy{
   border:0!important;
-  background:linear-gradient(90deg,transparent 49.5%,#8d9ba333 50%,transparent 50.5%),linear-gradient(0deg,transparent 49.5%,#8d9ba333 50%,transparent 50.5%),var(--neo-bg)!important;
-  box-shadow:inset 4px 4px 9px var(--neo-shadow),inset -4px -4px 9px var(--neo-light)!important;
+  background:linear-gradient(90deg,transparent 49.35%,#7f909966 49.7%,#7f909966 50.3%,transparent 50.65%),linear-gradient(0deg,transparent 49.35%,#7f909966 49.7%,#7f909966 50.3%,transparent 50.65%),var(--xy-surface,var(--neo-bg))!important;
+  box-shadow:inset 4px 4px 9px #c4cdd0,inset -4px -4px 9px #ffffff!important;
 }
+body.stage-performance .stage-delay{--xy-surface:#f7f1e7!important}
+body.stage-performance .stage-space{--xy-surface:#edf7f8!important}
+body.stage-performance .stage-delay:before,body.stage-performance .stage-delay:after{background:#e4ad4f99!important}
+body.stage-performance .stage-space:before,body.stage-performance .stage-space:after{background:#41cfe099!important}
 body.stage-performance .stage-xy header{color:var(--neo-ink)!important}
 body.stage-performance .stage-xy footer{color:var(--neo-muted)!important}
