@@ -39,14 +39,26 @@
     controls.querySelector('[data-mobile-status]').textContent=state==='Empty'?'Touch REC to capture. No MIDI required.':state==='Queued'?'Waiting for the synchronized boundary…':state==='Recording'?'Recording. Touch STOP when the first loop is complete.':state==='Overdubbing'?'Overdubbing one synchronized cycle…':`${state.toUpperCase()} · TOUCH CONTROLS ACTIVE`;
   }
 
+  function triggerRecordFromPointer(event){
+    if(event.pointerType==='mouse')return;
+    event.preventDefault();
+    event.stopPropagation();
+    const recordButton=cards()[currentIndex()]?.querySelector('[data-action="record"]');
+    if(!recordButton)return;
+    recordButton.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,cancelable:true,pointerType:event.pointerType||'touch',isPrimary:true}));
+    setTimeout(sync,40);
+  }
+
   function buildControls(nav){
     const controls=document.createElement('section');controls.id='mobilePerformanceControls';controls.className='mobile-performance-controls';controls.setAttribute('aria-label','Touch performance controls');
     controls.innerHTML=`<div class="mobile-performance-primary"><button type="button" data-mobile-action="mic">ENABLE MIC</button><button class="mobile-record" type="button" data-mobile-action="record">REC</button><button type="button" data-mobile-action="transport">PLAY</button><button type="button" data-mobile-action="next">NEXT LANE</button></div><div class="mobile-performance-secondary"><label>BPM<input data-mobile-bpm type="number" min="40" max="220" value="112"></label><label class="mobile-sync"><input data-mobile-quantize type="checkbox" checked><span>SYNC</span></label><button type="button" data-mobile-action="midi">MIDI OPTIONAL</button></div><p data-mobile-status>Touch REC to capture. No MIDI required.</p>`;
     nav.after(controls);
+    const mobileRecord=controls.querySelector('[data-mobile-action="record"]');
+    mobileRecord.addEventListener('pointerdown',triggerRecordFromPointer,{passive:false});
     controls.addEventListener('click',event=>{
       const action=event.target.closest('[data-mobile-action]')?.dataset.mobileAction;if(!action)return;
+      if(action==='record')return;
       if(action==='mic')document.getElementById('micBtn')?.click();
-      if(action==='record')cards()[currentIndex()]?.querySelector('[data-action="record"]')?.click();
       if(action==='transport')document.getElementById('playBtn')?.click();
       if(action==='next')activateLane((currentIndex()+1)%Math.max(1,cards().length));
       if(action==='midi')document.getElementById('midiBtn')?.click();
