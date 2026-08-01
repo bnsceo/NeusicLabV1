@@ -198,6 +198,12 @@ body.stage-performance .neusic-agent-launcher{background:var(--neo-bg)!important
   body.stage-performance .lower-grid>.synth-panel{flex:0 0 calc(100vw - 32px)!important;width:calc(100vw - 32px)!important;min-width:calc(100vw - 32px)!important;scroll-snap-align:start!important}
   body.stage-performance .lower-grid .pedalboard{display:block!important}
   body.stage-performance .lower-grid .synth-panel{display:block!important}
+  body.stage-performance .transport{display:flex!important;justify-content:flex-start!important;gap:10px!important;width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;padding:4px 4px 12px!important;scroll-snap-type:x proximity!important;touch-action:pan-x!important;-webkit-overflow-scrolling:touch!important}
+  body.stage-performance .transport>*{flex:0 0 92px!important;width:92px!important;scroll-snap-align:start!important}
+  body.stage-performance .transport .lcd-control{flex-basis:104px!important;width:104px!important}
+  body.stage-performance .transport .neusic-suite-next{flex-basis:118px!important;width:118px!important}
+  body.stage-performance .top-actions{display:flex!important;justify-content:flex-start!important;gap:10px!important;width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;padding:4px 8px 10px!important;scroll-snap-type:x proximity!important;touch-action:pan-x!important;-webkit-overflow-scrolling:touch!important}
+  body.stage-performance .top-actions a{flex:0 0 112px!important;width:112px!important;scroll-snap-align:start!important}
 }
 
 /* Match the generated performance deck to the light neumorphic UI. */
