@@ -47,8 +47,8 @@ body { color: var(--neo-ink)!important; background: radial-gradient(circle at 15
 .lower-grid { gap:18px!important; margin-top:18px!important; }.session-tools { margin-top:18px!important; }.session-tools h2 { color:var(--neo-ink)!important; font-size:20px!important; }.session-tools p,.status-message { color:var(--neo-muted)!important; }.status-message { border:0!important; border-radius:12px!important; background:var(--neo-bg)!important; box-shadow:inset 3px 3px 7px var(--neo-shadow),inset -3px -3px 7px var(--neo-light)!important; }
 .legal-note { color:var(--neo-muted)!important; }
 @media(max-width:1200px){.track-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
-@media(max-width:760px){.topbar{position:relative!important;grid-template-columns:1fr!important;padding:14px!important}.brand{justify-self:center}.header-master-display{order:2;margin:2px auto 8px}.transport{order:3;justify-content:flex-start!important;overflow-x:auto}.top-actions{order:4}.performance-shell{width:calc(100% - 24px)!important;padding-top:22px!important}.track-grid{grid-template-columns:repeat(5,minmax(240px,1fr))!important;overflow-x:auto!important;scroll-snap-type:x mandatory!important;padding:18px 10px 20px!important}.loop-track{scroll-snap-align:start}.loop-deck{overflow:hidden!important}.utility-drawer>summary{padding:15px}.utility-drawer>summary span{display:none}.synth-choices{width:100%;overflow-x:auto}.synth-choices .wave-select{flex:1;min-width:58px}}
-@media(max-width:500px){.track-grid{grid-template-columns:repeat(5,minmax(82vw,1fr))!important}.performance-head h1{font-size:40px!important}.master-display{max-width:none}.track-actions button{font-size:8px!important}}
+@media(max-width:760px){.topbar{position:relative!important;grid-template-columns:1fr!important;padding:14px!important}.brand{justify-self:center}.header-master-display{order:2;margin:2px auto 8px}.transport{order:3;justify-content:flex-start!important;overflow-x:auto}.top-actions{order:4}.performance-shell{width:calc(100% - 24px)!important;padding-top:22px!important}.utility-drawer>summary{padding:15px}.utility-drawer>summary span{display:none}.synth-choices{width:100%;overflow-x:auto}.synth-choices .wave-select{flex:1;min-width:58px}}
+@media(max-width:500px){.performance-head h1{font-size:40px!important}.master-display{max-width:none}}
 
 /* Compact header hierarchy: controls first, product links beside them, no fake logo. */
 body.stage-performance .topbar{grid-template-columns:minmax(0,1fr) auto!important;min-height:76px!important;gap:12px!important}
@@ -104,8 +104,6 @@ body.stage-performance .neusic-suite-rail{grid-template-columns:1fr auto;padding
 @media (min-width:761px) and (max-width:1100px){
   body.stage-performance .topbar{grid-template-columns:1fr!important}
   body.stage-performance .transport{grid-template-columns:repeat(4,minmax(0,1fr))!important}
-  body.stage-performance #trackGrid{grid-template-columns:1fr!important;overflow:visible!important}
-  body.stage-performance .loop-track{min-height:430px!important}
   body.stage-performance .stage-macro-deck{grid-template-columns:1fr!important}
   body.stage-performance .stage-macro-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important}
   body.stage-performance .stage-xy{min-height:190px!important}
@@ -120,33 +118,17 @@ body.stage-performance .topbar{background:rgba(223,229,232,.9)!important;color:v
 body.stage-performance .brand,body.stage-performance .brand b{color:var(--neo-ink)!important}body.stage-performance .brand small{color:var(--neo-muted)!important}
 body.stage-performance .performance-head{display:none!important}
 body.stage-performance .loop-deck>.panel-header{min-height:60px!important;padding:14px 18px!important;background:transparent!important}
-body.stage-performance #trackGrid{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:18px!important;overflow:visible!important;padding:18px!important}
-body.stage-performance .loop-track{display:block!important;min-width:0!important;min-height:0!important;padding:15px!important;border:0!important;border-radius:19px!important;background:var(--neo-bg)!important;box-shadow:7px 7px 15px var(--neo-shadow),-7px -7px 15px var(--neo-light)!important}
-body.stage-performance .loop-track header{display:flex!important;grid-template-columns:none!important;padding:3px 3px 8px!important;text-align:left!important}
-body.stage-performance .track-name{display:block!important;max-width:105px!important}.stage-performance .track-number{width:24px!important;height:24px!important;border-radius:0!important}
-body.stage-performance .track-actions{display:grid!important;grid-template-columns:repeat(5,1fr)!important;gap:7px!important}body.stage-performance .track-actions button{display:block!important;min-height:34px!important}
-body.stage-performance .track-controls{display:grid!important;grid-template-columns:1fr!important;gap:8px!important;margin-top:10px!important}
-body.stage-performance .track-controls label{display:grid!important;grid-template-columns:42px 1fr 28px!important;justify-items:stretch!important;min-height:34px!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;color:var(--neo-muted)!important}
-body.stage-performance .track-controls label:nth-child(n+3){display:grid!important}body.stage-performance .track-controls input[data-control="volume"],body.stage-performance .track-controls input[data-control="pan"]{width:100%!important;height:auto!important;writing-mode:horizontal-tb!important;direction:ltr!important;margin:0!important}
 body.stage-performance .lower-grid{display:grid!important;grid-template-columns:1.15fr .85fr!important;gap:18px!important;margin-top:18px!important}body.stage-performance .pedalboard{display:block!important}
 body.stage-performance .pedal,body.stage-performance .synth-panel{background:var(--neo-bg)!important;color:var(--neo-ink)!important;border:0!important;box-shadow:7px 7px 15px var(--neo-shadow),-7px -7px 15px var(--neo-light)!important}
 body.stage-performance .keyboard{height:150px!important;padding:0 12px 12px!important;overflow-x:auto!important}.stage-performance .key-white{background:linear-gradient(#e9fbf7,#a7d9ce)!important}.stage-performance .key-black{background:linear-gradient(#30383c,#080a0c)!important}
 body.stage-performance .utility-drawer{display:block!important;margin-top:24px!important}body.stage-performance .utility-drawer>summary{display:flex!important}
-@media(max-width:760px){body.stage-performance .topbar{grid-template-columns:1fr!important;padding:14px!important}.stage-performance #trackGrid{grid-template-columns:repeat(5,minmax(240px,1fr))!important;overflow-x:auto!important}.stage-performance .loop-track{min-height:0!important}.stage-performance .lower-grid{grid-template-columns:1fr!important}}
+@media(max-width:760px){body.stage-performance .topbar{grid-template-columns:1fr!important;padding:14px!important}.stage-performance .lower-grid{grid-template-columns:1fr!important}}
 
 /* Mobile-first performance layout: every lane gets a usable touch target. */
 @media(max-width:760px){
   body.stage-performance .transport{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:7px!important;overflow:visible!important}
   body.stage-performance .transport>*{min-width:0!important;min-height:52px!important}
   body.stage-performance .neusic-suite-next{grid-column:span 2!important}
-  body.stage-performance #trackGrid{display:flex!important;grid-template-columns:none!important;gap:12px!important;height:auto!important;min-height:0!important;max-height:none!important;overflow-x:auto!important;overflow-y:hidden!important;padding:12px 8px 22px!important;scroll-snap-type:x mandatory!important;scroll-padding-inline:8px!important;-webkit-overflow-scrolling:touch!important}
-  body.stage-performance .loop-track{flex:0 0 calc(100vw - 32px)!important;width:calc(100vw - 32px)!important;height:auto!important;min-height:560px!important;padding:14px!important;scroll-snap-align:start!important}
-  body.stage-performance .loop-track header{min-height:54px!important}
-  body.stage-performance .track-name{max-width:none!important;font-size:10px!important}
-  body.stage-performance .track-actions{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:6px!important}
-  body.stage-performance .track-actions button{min-height:46px!important;font-size:7px!important;grid-column:auto!important}
-  body.stage-performance .track-actions .record-action{min-height:46px!important}
-  body.stage-performance .track-controls label{grid-template-columns:48px 1fr 34px!important;min-height:38px!important;font-size:7px!important}
   body.stage-performance .stage-macro-deck{grid-template-columns:1fr!important;gap:10px!important;padding:10px!important}
   body.stage-performance .stage-macro-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
   body.stage-performance .stage-selected{grid-column:1/-1!important;min-height:42px!important;font-size:8px!important}
@@ -176,11 +158,6 @@ body.stage-performance .track-actions [data-action="edit"]{display:none!importan
    mobile composition: one lane per slide, never five lanes squeezed together. */
 @media (pointer:coarse) and (max-width:1100px){
   body.stage-performance .scene-strip{display:none!important}
-  body.stage-performance #trackGrid{display:flex!important;grid-template-columns:none!important;gap:18px!important;width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;overflow-x:auto!important;overflow-y:hidden!important;padding:18px 38px 24px!important;scroll-snap-type:x mandatory!important;scroll-padding-inline:38px!important;-webkit-overflow-scrolling:touch!important}
-  body.stage-performance .loop-track{flex:0 0 calc(100vw - 76px)!important;width:calc(100vw - 76px)!important;min-width:calc(100vw - 76px)!important;height:auto!important;min-height:780px!important;scroll-snap-align:start!important}
-  body.stage-performance .track-actions{grid-template-columns:repeat(5,minmax(0,1fr))!important}
-  body.stage-performance .track-actions [data-action="edit"]{display:block!important}
-  body.stage-performance .track-actions .danger{grid-column:1/-1!important}
 }
 
 /* Final touch-device override. This intentionally wins over every legacy
@@ -189,12 +166,6 @@ body.stage-performance .track-actions [data-action="edit"]{display:none!importan
   body.stage-performance .topbar{grid-template-columns:1fr!important;padding:10px!important}
   body.stage-performance .transport{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:7px!important;overflow:visible!important}
   body.stage-performance .transport>*{min-width:0!important;min-height:52px!important}
-  body.stage-performance #trackGrid{display:flex!important;grid-template-columns:none!important;gap:12px!important;height:auto!important;min-height:0!important;max-height:none!important;overflow-x:auto!important;overflow-y:hidden!important;padding:12px 8px 22px!important;scroll-snap-type:x mandatory!important;scroll-padding-inline:8px!important;-webkit-overflow-scrolling:touch!important}
-  body.stage-performance .loop-track{flex:0 0 calc(100vw - 32px)!important;width:calc(100vw - 32px)!important;height:auto!important;min-height:560px!important;padding:14px!important;scroll-snap-align:start!important}
-  body.stage-performance .track-actions{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:6px!important}
-  body.stage-performance .track-actions button{min-height:46px!important;font-size:7px!important}
-  body.stage-performance .track-actions .record-action{grid-column:1/-1!important;min-height:52px!important}
-  body.stage-performance .track-controls label{grid-template-columns:48px 1fr 34px!important;min-height:38px!important;font-size:7px!important}
   body.stage-performance .stage-macro-deck{grid-template-columns:1fr!important;gap:10px!important;padding:10px!important}
   body.stage-performance .stage-macro-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
   body.stage-performance .stage-macro-button{min-height:58px!important;font-size:7px!important}
@@ -216,22 +187,6 @@ body.stage-performance .track-actions [data-action="edit"]{display:none!importan
   body.stage-performance .transport .neusic-suite-next{flex-basis:118px!important;width:118px!important}
   body.stage-performance .top-actions{display:flex!important;justify-content:flex-start!important;gap:10px!important;width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;padding:4px 8px 10px!important;scroll-snap-type:x proximity!important;touch-action:pan-x!important;-webkit-overflow-scrolling:touch!important}
   body.stage-performance .top-actions a{flex:0 0 112px!important;width:112px!important;scroll-snap-align:start!important}
-  body.stage-performance .loop-deck>.panel-header{min-height:58px!important;padding:14px 18px!important}
-  body.stage-performance .loop-track{min-height:780px!important;border:1px solid #b9c4c9!important;border-radius:18px!important;background:var(--neo-bg)!important;box-shadow:10px 10px 22px var(--neo-shadow),-10px -10px 22px var(--neo-light)!important}
-  body.stage-performance .loop-track header{min-height:76px!important;padding:12px 4px!important;border-bottom:1px solid #7f8b9144!important}
-  body.stage-performance .track-number{width:44px!important;height:44px!important;font-size:14px!important;background:#071014!important}
-  body.stage-performance .track-name{font-size:24px!important;letter-spacing:.01em!important}
-  body.stage-performance .track-state{font-size:10px!important}
-  body.stage-performance .progress-control{width:150px!important;margin:30px auto 34px!important}
-  body.stage-performance .progress-center b{font-size:20px!important}
-  body.stage-performance .track-actions{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:10px!important;padding:16px!important;border:1px solid #7f8b9144!important;border-radius:14px!important}
-  body.stage-performance .track-actions button{min-height:72px!important;font-size:12px!important;border-radius:14px!important}
-  body.stage-performance .track-actions .record-action{border-radius:50%!important;min-height:88px!important;background:var(--neo-bg)!important;color:var(--neo-ink)!important;box-shadow:inset 3px 3px 7px var(--neo-shadow),inset -3px -3px 7px var(--neo-light),0 0 0 2px #b5c0c5!important}
-  body.stage-performance .track-actions .danger{grid-column:1/-1!important;border-radius:14px!important}
-  body.stage-performance .track-controls{margin-top:18px!important;padding-top:18px!important;border-top:1px solid #7f8b9144!important;gap:12px!important}
-  body.stage-performance .track-controls label{grid-template-columns:80px 1fr 42px!important;min-height:56px!important;font-size:11px!important}
-  body.stage-performance .track-controls input{height:18px!important}
-  body.stage-performance .autotune-control select{height:48px!important;border:0!important;border-radius:14px!important;background:var(--neo-bg)!important;box-shadow:inset 3px 3px 7px var(--neo-shadow),inset -3px -3px 7px var(--neo-light)!important;font-size:13px!important;padding:0 14px!important}
 }
 
 /* Match the generated performance deck to the light neumorphic UI. */
