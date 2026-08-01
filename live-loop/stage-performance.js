@@ -16,7 +16,7 @@
   function loadPerformancePolish() {
     if (document.querySelector('script[data-live-loop-polish]')) return;
     const script = document.createElement('script');
-    script.src = `mobile-performance-polish.js?v=8abc58a`;
+    script.src = 'mobile-performance-polish.js?v=a075552';
     script.dataset.liveLoopPolish = 'true';
     script.defer = true;
     document.head.appendChild(script);
