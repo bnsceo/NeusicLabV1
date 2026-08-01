@@ -29,6 +29,7 @@
   <link rel="stylesheet" href="../css/shared/neusic-agent.css?v=1">
   <link rel="stylesheet" href="mobile-release.css?v=1">
   <link rel="stylesheet" href="neusic-v3.css?v=17">
+  <link rel="stylesheet" href="live-loop-header-final.css?v=1">
 </head>
 <body class="stage-performance" data-neusic-product="live-loop">
   <div class="noise" aria-hidden="true"></div>
@@ -52,7 +53,8 @@
     </section>
 
     <section class="loop-deck panel" aria-labelledby="loopDeckTitle">
-      <header class="panel-header"><div><span class="eyebrow">PRIMARY PERFORMANCE SURFACE</span><h2 id="loopDeckTitle">Five synchronized loop lanes</h2></div><div class="legend"><span><i class="empty"></i>EMPTY</span><span><i class="recording"></i>RECORDING</span><span><i class="playing"></i>PLAYING</span><span><i class="muted"></i>MUTED</span></div></header>
+      <header class="panel-header loop-control-header"><h2 id="loopDeckTitle">Loop Control</h2><div class="system-status"><span class="status-dot"></span><span>System Status: <b>Active</b></span></div></header>
+      <div class="legend legend-caption"><span><i class="empty"></i>EMPTY</span><span><i class="recording"></i>RECORDING</span><span><i class="playing"></i>PLAYING</span><span><i class="muted"></i>MUTED</span></div>
       <div class="scene-strip" aria-label="Loop scenes"><button class="scene-button active" data-scene="0" type="button">A</button><button class="scene-button" data-scene="1" type="button">B</button><button class="scene-button" data-scene="2" type="button">C</button><button id="saveSceneBtn" class="scene-save" type="button">SAVE SCENE</button><button id="exportMixBtn" class="scene-save" type="button">EXPORT MIX</button></div>
       <div id="trackGrid" class="track-grid" aria-label="Five synchronized loop lanes"></div>
     </section>
