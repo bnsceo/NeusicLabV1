@@ -3,7 +3,7 @@ import {LookAheadScheduler} from './src/audio/Scheduler.js';
 import {TapeDelay} from './src/audio/effects/TapeDelay.js';
 import {SpatialReverb} from './src/audio/effects/SpatialReverb.js';
 import {PerformanceFx} from './src/audio/effects/PerformanceFx.js';
-import {PolySynth} from './src/audio/instruments/Synth.js';
+import {HybridInstrument} from './src/audio/instruments/Piano.js';
 import {MidiRouter} from './src/midi/MidiRouter.js';
 import {FiveTrackLooper,STATES} from './src/audio/Looper.js';
 import {sendToForge,downloadBuffer} from './src/storage/ForgeBridge.js';
@@ -321,7 +321,7 @@ async function setupEngine(){
   reverb.output.connect(workspace.master);
   const scheduler=new LookAheadScheduler(workspace.context);
   looper=new FiveTrackLooper(workspace,scheduler,delay,reverb);
-  synth=new PolySynth(workspace.context,workspace.master);
+  synth=new HybridInstrument(workspace.context,workspace.master);
   midi=new MidiRouter({
     record:index=>looper.toggleRecord(index).catch(error=>status(error.message)),
     mute:index=>looper.toggleMute(index),
