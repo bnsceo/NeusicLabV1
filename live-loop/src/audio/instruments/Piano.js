@@ -12,6 +12,13 @@ const SAMPLE_MAP = [
   {name:'A7',midi:105},{name:'C8',midi:108}
 ];
 
+const VOICE_PRESETS = {
+  grimy:{wave:'sawtooth',cutoff:1450,attack:.008,release:.28},
+  bounce:{wave:'square',cutoff:3200,attack:.004,release:.18},
+  space:{wave:'triangle',cutoff:5200,attack:.08,release:1.15},
+  pure:{wave:'sine',cutoff:10000,attack:.012,release:.55}
+};
+
 export class SamplePiano {
   constructor(context, output, basePath='assets/piano/'){
     this.context=context;
@@ -48,10 +55,7 @@ export class SamplePiano {
     return this.loadPromise;
   }
 
-  hasSample(note){
-    return this.buffers.has(this.nearestSample(note).midi);
-  }
-
+  hasSample(note){return this.buffers.has(this.nearestSample(note).midi);}
   setAttack(value){this.attack=Math.max(.002,value);}
   setRelease(value){this.release=Math.max(.05,value);}
 
@@ -90,20 +94,30 @@ export class SamplePiano {
 export class HybridInstrument {
   constructor(context,output,basePath){
     this.synth=new PolySynth(context,output);
-    this.synth.setWave('triangle');
-    this.synth.setCutoff(4200);
     this.piano=new SamplePiano(context,output,basePath);
     this.wave='piano';
     this.fallbackNotes=new Set();
     this.piano.load();
+    this.applyPreset('space');
   }
+
+  applyPreset(name){
+    const preset=VOICE_PRESETS[name];
+    if(!preset)return;
+    this.synth.setWave(preset.wave);
+    this.synth.setCutoff(preset.cutoff);
+    this.synth.setAttack(preset.attack);
+    this.synth.setRelease(preset.release);
+  }
+
   setWave(value){
     this.wave=value;
-    if(value!=='piano')this.synth.setWave(value);
+    if(value!=='piano')this.applyPreset(value);
   }
   setCutoff(value){this.synth.setCutoff(value);}
   setAttack(value){this.synth.setAttack(value);this.piano.setAttack(value);}
   setRelease(value){this.synth.setRelease(value);this.piano.setRelease(value);}
+
   noteOn(note,velocity){
     if(this.context?.state==='suspended')this.context.resume().catch(()=>{});
     if(this.wave!=='piano'){
@@ -115,6 +129,7 @@ export class HybridInstrument {
       this.synth.noteOn(note,velocity);
     }
   }
+
   noteOff(note){
     this.piano.noteOff(note);
     if(this.wave!=='piano'||this.fallbackNotes.has(note)){
@@ -122,5 +137,6 @@ export class HybridInstrument {
       this.fallbackNotes.delete(note);
     }
   }
+
   get context(){return this.synth.context;}
 }
