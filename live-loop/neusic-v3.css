@@ -96,8 +96,12 @@ body.stage-performance .neusic-suite-next b{color:var(--neo-coral)}
   body.stage-performance .neusic-suite-next b{font-size:6px}
   body.stage-performance .top-actions{grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
   body.stage-performance .top-actions a{min-height:42px;border-radius:13px;padding:4px 2px;font-size:5px}
-  body.stage-performance .neusic-suite-rail{grid-template-columns:1fr auto;padding:7px 10px}
+body.stage-performance .neusic-suite-rail{grid-template-columns:1fr auto;padding:7px 10px}
 }
+
+/* The product journey was removed from Live Loop; never let an old cached
+   script recreate its legacy dark strip. */
+body.stage-performance .neusic-suite-rail{display:none!important}
 
 /* Final Live Loop surface: this layer intentionally wins over the older stage/mobile skins. */
 body.stage-performance .topbar{background:rgba(223,229,232,.9)!important;color:var(--neo-ink)!important;grid-template-columns:minmax(150px,1fr) auto auto minmax(120px,1fr)!important;min-height:68px!important;padding:10px 20px!important;border:0!important;box-shadow:6px 6px 16px #b9c3caaa,-6px -6px 16px #fbfdffcc!important}
