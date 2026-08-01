@@ -10,6 +10,15 @@ export class PcmRecorder {
     this.recording = false;
     this.mode = 'none';
     this.watchdog = 0;
+    this.mediaRecorder = null;
+    this.mediaChunks = [];
+    this.mediaStopPromise = null;
+    this.mediaStopResolve = null;
+    this.mediaStopReject = null;
+  }
+
+  trace(stage, detail = {}) {
+    window.__neusicCaptureTrace?.(stage, {backend:this.mode, ...detail});
   }
 
   disconnectNode() {
@@ -20,6 +29,18 @@ export class PcmRecorder {
     if (this.node?.port) this.node.port.onmessage = null;
     this.node = null;
     this.source = null;
+  }
+
+  resetBackend() {
+    this.disconnectNode();
+    if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+      try { this.mediaRecorder.stop(); } catch (_) {}
+    }
+    this.mediaRecorder = null;
+    this.mediaChunks = [];
+    this.mediaStopPromise = null;
+    this.mediaStopResolve = null;
+    this.mediaStopReject = null;
     this.mode = 'none';
   }
 
@@ -53,11 +74,11 @@ export class PcmRecorder {
   }
 
   async attachWorklet(context) {
-    await context.audioWorklet.addModule(new URL('./LoopCaptureWorklet.js', import.meta.url));
+    await context.audioWorklet.addModule(new URL('./LoopCaptureWorklet.js?v=20', import.meta.url));
     const node = new AudioWorkletNode(context, 'neusic-loop-capture', {
-      numberOfInputs: 1,
-      numberOfOutputs: 1,
-      outputChannelCount: [1]
+      numberOfInputs:1,
+      numberOfOutputs:1,
+      outputChannelCount:[1]
     });
     node.port.onmessage = event => {
       if (event.data?.type !== 'pcm' || !this.recording) return;
@@ -67,6 +88,7 @@ export class PcmRecorder {
       if (left.length) {
         this.left.push(left);
         this.right.push(right.length ? right : left);
+        if (this.left.length === 1) this.trace('first-pcm-samples', {frames:left.length});
       }
     };
     this.workspace.micSource.connect(node);
@@ -76,44 +98,92 @@ export class PcmRecorder {
     this.mode = 'audio-worklet';
   }
 
-  async ensurePcm({forceCompatibility = false} = {}) {
-    const context = this.workspace.context;
-    this.context = context;
-    this.ensureSink(context);
-    if (this.node && this.source === this.workspace.micSource) return;
-    this.disconnectNode();
-    if (!forceCompatibility && context.audioWorklet && window.AudioWorkletNode) {
-      try {
-        await this.attachWorklet(context);
-        return;
-      } catch (error) {
-        console.warn('AudioWorklet capture unavailable; using compatibility PCM.', error);
-        this.disconnectNode();
-      }
-    }
-    this.attachScriptProcessor(context);
+  preferredMediaMime() {
+    if (!window.MediaRecorder) return '';
+    const choices = [
+      'audio/webm;codecs=opus',
+      'audio/webm',
+      'audio/ogg;codecs=opus',
+      'audio/mp4'
+    ];
+    return choices.find(type => !MediaRecorder.isTypeSupported || MediaRecorder.isTypeSupported(type)) || '';
   }
 
-  async start() {
-    await this.workspace.initMic();
-    await this.workspace.resume({required: true});
+  attachMediaRecorder(stream) {
+    if (!window.MediaRecorder) throw new Error('MediaRecorder is unavailable.');
+    const mimeType = this.preferredMediaMime();
+    const recorder = mimeType ? new MediaRecorder(stream, {mimeType}) : new MediaRecorder(stream);
+    this.mediaChunks = [];
+    this.mediaStopPromise = new Promise((resolve, reject) => {
+      this.mediaStopResolve = resolve;
+      this.mediaStopReject = reject;
+    });
+    recorder.ondataavailable = event => {
+      if (event.data?.size) {
+        this.mediaChunks.push(event.data);
+        if (this.mediaChunks.length === 1) this.trace('first-media-chunk', {bytes:event.data.size, mimeType:recorder.mimeType});
+      }
+    };
+    recorder.onerror = event => {
+      this.mediaStopReject?.(event.error || new Error('MediaRecorder failed.'));
+    };
+    recorder.onstop = () => this.mediaStopResolve?.();
+    recorder.start(200);
+    this.mediaRecorder = recorder;
+    this.mode = 'media-recorder';
+  }
+
+  isWebKitFamily() {
+    const ua = navigator.userAgent || '';
+    return /AppleWebKit/i.test(ua) && !/(Chrome|Chromium|CriOS|Edg|OPR|Firefox|FxiOS)/i.test(ua);
+  }
+
+  async chooseBackend(context, stream) {
+    this.resetBackend();
+    this.ensureSink(context);
+
+    const attempts = this.isWebKitFamily()
+      ? ['audio-worklet', 'media-recorder', 'script-processor']
+      : ['media-recorder', 'audio-worklet', 'script-processor'];
+
+    const errors = [];
+    for (const backend of attempts) {
+      try {
+        if (backend === 'audio-worklet') {
+          if (!context.audioWorklet || !window.AudioWorkletNode) throw new Error('AudioWorklet unavailable.');
+          await this.attachWorklet(context);
+        } else if (backend === 'media-recorder') {
+          this.attachMediaRecorder(stream);
+        } else {
+          this.attachScriptProcessor(context);
+        }
+        this.trace('recorder-backend-selected', {backend:this.mode});
+        return this.mode;
+      } catch (error) {
+        errors.push(`${backend}: ${error?.message || error}`);
+        this.resetBackend();
+      }
+    }
+    throw new Error(`No compatible recorder backend could start. ${errors.join(' | ')}`);
+  }
+
+  async start(stream=null) {
+    const liveStream = await this.workspace.prepareCapture(stream);
+    await this.workspace.resume({required:true});
     this.context = this.workspace.context;
     this.left = [];
     this.right = [];
     this.recording = true;
-    await this.ensurePcm();
-    this.node?.port?.postMessage?.({type: 'start'});
-    clearTimeout(this.watchdog);
-    this.watchdog = setTimeout(async () => {
-      if (!this.recording || this.left.length || this.mode !== 'audio-worklet') return;
-      try {
-        this.disconnectNode();
-        await this.ensurePcm({forceCompatibility: true});
-      } catch (error) {
-        console.warn('PCM compatibility fallback failed.', error);
-      }
-    }, 650);
-    return this.mode;
+    try {
+      await this.chooseBackend(this.context, liveStream);
+      if (this.mode === 'audio-worklet') this.node?.port?.postMessage?.({type:'start'});
+      this.trace('recording-started');
+      return this.mode;
+    } catch (error) {
+      this.recording = false;
+      this.resetBackend();
+      throw error;
+    }
   }
 
   applyEdgeFade(buffer) {
@@ -130,11 +200,21 @@ export class PcmRecorder {
     return buffer;
   }
 
-  async stop() {
-    if (!this.recording) return null;
-    clearTimeout(this.watchdog);
-    this.recording = false;
-    this.node?.port?.postMessage?.({type: 'stop'});
+  async stopMediaRecorder() {
+    const recorder = this.mediaRecorder;
+    if (!recorder) return null;
+    if (recorder.state !== 'inactive') recorder.stop();
+    await this.mediaStopPromise;
+    const blob = new Blob(this.mediaChunks, {type:recorder.mimeType || this.mediaChunks[0]?.type || 'audio/webm'});
+    if (!blob.size) throw new Error('The browser recorder returned no audio data.');
+    const arrayBuffer = await blob.arrayBuffer();
+    const decoded = await this.context.decodeAudioData(arrayBuffer.slice(0));
+    this.trace('recording-decoded', {frames:decoded.length, duration:decoded.duration, bytes:blob.size});
+    return decoded;
+  }
+
+  async stopPcm() {
+    if (this.mode === 'audio-worklet') this.node?.port?.postMessage?.({type:'stop'});
     await new Promise(resolve => setTimeout(resolve, 80));
     const frames = this.left.reduce((total, chunk) => total + chunk.length, 0);
     if (!frames) throw new Error('Microphone permission is enabled, but no audio samples reached the recorder.');
@@ -145,16 +225,41 @@ export class PcmRecorder {
       buffer.getChannelData(1).set(this.right[index] || this.left[index], offset);
       offset += this.left[index].length;
     }
-    this.left = [];
-    this.right = [];
-    return this.applyEdgeFade(buffer);
+    this.trace('recording-buffer-created', {frames, duration:buffer.duration});
+    return buffer;
+  }
+
+  async stop() {
+    if (!this.recording) return null;
+    this.recording = false;
+    const activeMode = this.mode;
+    try {
+      const buffer = activeMode === 'media-recorder' ? await this.stopMediaRecorder() : await this.stopPcm();
+      return this.applyEdgeFade(buffer);
+    } finally {
+      this.left = [];
+      this.right = [];
+      this.resetBackend();
+      this.trace('recording-stopped', {backend:activeMode});
+    }
   }
 
   cancel() {
-    this.node?.port?.postMessage?.({type: 'stop'});
-    clearTimeout(this.watchdog);
     this.recording = false;
     this.left = [];
     this.right = [];
+    this.resetBackend();
+    this.trace('recording-cancelled');
+  }
+
+  diagnostics() {
+    return {
+      mode:this.mode,
+      recording:this.recording,
+      pcmChunks:this.left.length,
+      pcmFrames:this.left.reduce((total, chunk) => total + chunk.length, 0),
+      mediaChunks:this.mediaChunks.length,
+      mediaState:this.mediaRecorder?.state || 'none'
+    };
   }
 }
