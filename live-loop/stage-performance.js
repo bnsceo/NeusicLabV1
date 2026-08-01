@@ -44,7 +44,7 @@
   }
 
   function loadEnhancements() {
-    loadScript('recording-touch-deduper.js?v=7beca03', 'data-live-loop-record-deduper');
+    // REC is owned entirely by app.js. Enhancement scripts must not intercept it.
     loadScript('mobile-performance-polish.js?v=ce76418', 'data-live-loop-polish');
     loadScript('autotune-engine-v5.js?v=ad1dca5', 'data-live-loop-pitch-v5');
     loadScript('scene-manager-v2.js?v=1b343dc', 'data-live-loop-scenes-v2');
