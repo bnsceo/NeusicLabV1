@@ -217,8 +217,6 @@ body.stage-performance .track-actions [data-action="edit"]{display:none!importan
   body.stage-performance .transport .neusic-suite-next{flex-basis:118px!important;width:118px!important}
   body.stage-performance .top-actions{display:flex!important;justify-content:flex-start!important;gap:10px!important;width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;padding:4px 8px 10px!important;scroll-snap-type:x proximity!important;touch-action:pan-x!important;-webkit-overflow-scrolling:touch!important}
   body.stage-performance .top-actions a{flex:0 0 112px!important;width:112px!important;scroll-snap-align:start!important}
-  body.stage-performance .loop-deck>.panel-header h2{font-size:0!important}
-  body.stage-performance .loop-deck>.panel-header h2:after{content:'LOOP CONTROL';font:700 20px/1 var(--display);letter-spacing:.04em}
   body.stage-performance .loop-deck>.panel-header{min-height:58px!important;padding:14px 18px!important}
   body.stage-performance .loop-track{min-height:780px!important;border:1px solid #b9c4c9!important;border-radius:18px!important;background:var(--neo-bg)!important;box-shadow:10px 10px 22px var(--neo-shadow),-10px -10px 22px var(--neo-light)!important}
   body.stage-performance .loop-track header{min-height:76px!important;padding:12px 4px!important;border-bottom:1px solid #7f8b9144!important}
