@@ -34,6 +34,7 @@
   }
 
   function loadEnhancements() {
+    loadScript('recording-touch-hotfix.js?v=e110118', 'data-live-loop-record-hotfix');
     loadScript('mobile-performance-polish.js?v=ce76418', 'data-live-loop-polish');
     loadScript('vocal-pitch-correction.js?v=653d420', 'data-live-loop-pitch');
     loadScript('scene-manager.js?v=fb1ffcd', 'data-live-loop-scenes');
