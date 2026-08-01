@@ -122,6 +122,30 @@ body.stage-performance .keyboard{height:150px!important;padding:0 12px 12px!impo
 body.stage-performance .utility-drawer{display:block!important;margin-top:24px!important}body.stage-performance .utility-drawer>summary{display:flex!important}
 @media(max-width:760px){body.stage-performance .topbar{grid-template-columns:1fr!important;padding:14px!important}.stage-performance #trackGrid{grid-template-columns:repeat(5,minmax(240px,1fr))!important;overflow-x:auto!important}.stage-performance .loop-track{min-height:0!important}.stage-performance .lower-grid{grid-template-columns:1fr!important}}
 
+/* Mobile-first performance layout: every lane gets a usable touch target. */
+@media(max-width:760px){
+  body.stage-performance .transport{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:7px!important;overflow:visible!important}
+  body.stage-performance .transport>*{min-width:0!important;min-height:52px!important}
+  body.stage-performance .neusic-suite-next{grid-column:span 2!important}
+  body.stage-performance #trackGrid{grid-template-columns:1fr!important;gap:14px!important;overflow:visible!important;padding:12px 8px 18px!important}
+  body.stage-performance .loop-track{width:100%!important;min-height:430px!important;padding:14px!important}
+  body.stage-performance .loop-track header{min-height:54px!important}
+  body.stage-performance .track-name{max-width:none!important;font-size:10px!important}
+  body.stage-performance .track-actions{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:6px!important}
+  body.stage-performance .track-actions button{min-height:46px!important;font-size:7px!important}
+  body.stage-performance .track-actions .record-action{grid-column:1/-1!important;min-height:52px!important}
+  body.stage-performance .track-controls label{grid-template-columns:48px 1fr 34px!important;min-height:38px!important;font-size:7px!important}
+  body.stage-performance .stage-macro-deck{grid-template-columns:1fr!important;gap:10px!important;padding:10px!important}
+  body.stage-performance .stage-macro-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+  body.stage-performance .stage-selected{grid-column:1/-1!important;min-height:42px!important;font-size:8px!important}
+  body.stage-performance .stage-macro-button{min-height:58px!important;font-size:7px!important}
+  body.stage-performance .stage-macro-button strong{font-size:9px!important}
+  body.stage-performance .stage-xy{min-height:190px!important;width:100%!important}
+  body.stage-performance .stage-xy header{font-size:9px!important;inset:12px 14px auto!important}
+  body.stage-performance .stage-xy footer{font-size:7px!important;inset:auto 14px 12px!important}
+  body.stage-performance .stage-xy-dot{width:30px!important;height:30px!important}
+}
+
 /* Unified palette: every legacy component uses the same light neumorphic surface. */
 body.stage-performance,body.stage-performance .topbar,body.stage-performance .panel,body.stage-performance .loop-track,body.stage-performance .utility-drawer>summary,body.stage-performance .session-tools{color:var(--neo-ink)!important;background:var(--neo-bg)!important}
 body.stage-performance .pedal,body.stage-performance .synth-panel,body.stage-performance .progress-center,body.stage-performance .status-message,body.stage-performance .track-controls label,body.stage-performance .track-actions button,body.stage-performance .hardware-button,body.stage-performance .lcd-control,body.stage-performance .switch-control,body.stage-performance .top-actions a{color:var(--neo-ink)!important;background:var(--neo-bg)!important;border:0!important;box-shadow:5px 5px 11px var(--neo-shadow),-5px -5px 11px var(--neo-light)!important}
