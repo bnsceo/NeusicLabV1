@@ -131,6 +131,10 @@ async function handleTrackAction(index,action){
       return;
     }
     await ensureEngine();
+    if(action==='edit'){
+      document.querySelector(`[data-index="${index}"] .track-controls input`)?.focus();
+      return;
+    }
     if(action==='mute')looper.toggleMute(index);
     if(action==='clear')looper.clear(index);
     if(action==='upload')$('fileInput').click();

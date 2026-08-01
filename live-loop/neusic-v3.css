@@ -204,6 +204,24 @@ body.stage-performance .neusic-agent-launcher{background:var(--neo-bg)!important
   body.stage-performance .transport .neusic-suite-next{flex-basis:118px!important;width:118px!important}
   body.stage-performance .top-actions{display:flex!important;justify-content:flex-start!important;gap:10px!important;width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;padding:4px 8px 10px!important;scroll-snap-type:x proximity!important;touch-action:pan-x!important;-webkit-overflow-scrolling:touch!important}
   body.stage-performance .top-actions a{flex:0 0 112px!important;width:112px!important;scroll-snap-align:start!important}
+  body.stage-performance .loop-deck>.panel-header h2{font-size:0!important}
+  body.stage-performance .loop-deck>.panel-header h2:after{content:'LOOP CONTROL';font:700 20px/1 var(--display);letter-spacing:.04em}
+  body.stage-performance .loop-deck>.panel-header{min-height:58px!important;padding:14px 18px!important}
+  body.stage-performance .loop-track{min-height:780px!important;border:1px solid #b9c4c9!important;border-radius:18px!important;background:var(--neo-bg)!important;box-shadow:10px 10px 22px var(--neo-shadow),-10px -10px 22px var(--neo-light)!important}
+  body.stage-performance .loop-track header{min-height:76px!important;padding:12px 4px!important;border-bottom:1px solid #7f8b9144!important}
+  body.stage-performance .track-number{width:44px!important;height:44px!important;font-size:14px!important;background:#071014!important}
+  body.stage-performance .track-name{font-size:24px!important;letter-spacing:.01em!important}
+  body.stage-performance .track-state{font-size:10px!important}
+  body.stage-performance .progress-control{width:150px!important;margin:30px auto 34px!important}
+  body.stage-performance .progress-center b{font-size:20px!important}
+  body.stage-performance .track-actions{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:10px!important;padding:16px!important;border:1px solid #7f8b9144!important;border-radius:14px!important}
+  body.stage-performance .track-actions button{min-height:72px!important;font-size:12px!important;border-radius:14px!important}
+  body.stage-performance .track-actions .record-action{border-radius:50%!important;min-height:88px!important;background:var(--neo-bg)!important;color:var(--neo-ink)!important;box-shadow:inset 3px 3px 7px var(--neo-shadow),inset -3px -3px 7px var(--neo-light),0 0 0 2px #b5c0c5!important}
+  body.stage-performance .track-actions .danger{grid-column:1/-1!important;border-radius:14px!important}
+  body.stage-performance .track-controls{margin-top:18px!important;padding-top:18px!important;border-top:1px solid #7f8b9144!important;gap:12px!important}
+  body.stage-performance .track-controls label{grid-template-columns:80px 1fr 42px!important;min-height:56px!important;font-size:11px!important}
+  body.stage-performance .track-controls input{height:18px!important}
+  body.stage-performance .autotune-control select{height:48px!important;border:0!important;border-radius:14px!important;background:var(--neo-bg)!important;box-shadow:inset 3px 3px 7px var(--neo-shadow),inset -3px -3px 7px var(--neo-light)!important;font-size:13px!important;padding:0 14px!important}
 }
 
 /* Match the generated performance deck to the light neumorphic UI. */
