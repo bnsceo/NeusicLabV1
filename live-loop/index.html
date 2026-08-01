@@ -17,14 +17,14 @@
   <div class="noise" aria-hidden="true"></div>
   <header class="topbar">
     <div class="master-display header-master-display"><div><small>MASTER LOOP</small><b id="masterLength">—</b></div><div><small>GLOBAL STATE</small><b id="globalState">READY</b></div><div class="master-meter"><span id="masterMeter"></span></div></div>
-    <div class="transport" aria-label="Live loop transport">
-      <button id="playBtn" class="hardware-button transport-play" type="button"><span>▶</span><b>START</b></button>
-      <button id="stopBtn" class="hardware-button" type="button"><span>■</span><b>STOP</b></button>
-      <label class="lcd-control"><small>BPM</small><input id="bpmInput" type="number" min="40" max="220" value="112"></label>
-      <label class="switch-control"><input id="quantizeToggle" type="checkbox" checked><span>SYNC</span></label>
-      <button id="midiBtn" class="hardware-button" type="button"><i class="led"></i><span>MIDI</span></button>
-    </div>
   </header>
+  <div class="transport transport-carousel" aria-label="Live loop transport">
+    <button id="playBtn" class="hardware-button transport-play" type="button"><span>▶</span><b>START</b></button>
+    <button id="stopBtn" class="hardware-button" type="button"><span>■</span><b>STOP</b></button>
+    <label class="lcd-control"><small>BPM</small><input id="bpmInput" type="number" min="40" max="220" value="112"></label>
+    <label class="switch-control"><input id="quantizeToggle" type="checkbox" checked><span>SYNC</span></label>
+    <button id="midiBtn" class="hardware-button" type="button"><i class="led"></i><span>MIDI</span></button>
+  </div>
   <button id="micBtn" type="button" hidden aria-hidden="true"></button>
   <button id="captureBtn" type="button" hidden aria-hidden="true"></button>
   <main class="performance-shell">
@@ -60,7 +60,7 @@
   <script src="iphone-record-bridge.js?v=1"></script>
   <script type="module" src="app.js?v=16"></script>
   <script src="loop-undo.js?v=1"></script>
-  <script src="stage-performance.js?v=4"></script>
+  <script src="stage-performance.js?v=5"></script>
   <script src="mobile-recording-feedback.js?v=1"></script>
   <script src="../scripts/shared/neusic-suite.js?v=3"></script>
   <script src="../scripts/shared/neusic-agent.js?v=1"></script>
