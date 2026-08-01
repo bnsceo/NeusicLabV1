@@ -134,3 +134,28 @@ body.stage-performance .key-white{background:linear-gradient(#e9fbf7,#a7d9ce)!im
 body.stage-performance .key-black{background:linear-gradient(#465158,#1f292e)!important;color:#f5fbfb!important;border-color:#1c2529!important}
 body.stage-performance .master-display{background:var(--neo-bg)!important;color:var(--neo-ink)!important;box-shadow:inset 3px 3px 7px var(--neo-shadow),inset -3px -3px 7px var(--neo-light)!important}
 body.stage-performance .neusic-agent-launcher{background:var(--neo-bg)!important;color:var(--neo-mint)!important;border:0!important;box-shadow:5px 5px 11px var(--neo-shadow),-5px -5px 11px var(--neo-light)!important}
+
+/* Match the generated performance deck to the light neumorphic UI. */
+body.stage-performance .stage-macro-deck{
+  border:0!important;background:var(--neo-bg)!important;
+  box-shadow:10px 10px 23px var(--neo-shadow),-10px -10px 23px var(--neo-light)!important;
+}
+body.stage-performance .stage-selected,
+body.stage-performance .stage-macro-button{
+  border:0!important;background:var(--neo-bg)!important;color:var(--neo-ink)!important;
+  box-shadow:5px 5px 11px var(--neo-shadow),-5px -5px 11px var(--neo-light)!important;
+}
+body.stage-performance .stage-selected b{color:var(--neo-coral)!important}
+body.stage-performance .stage-macro-button strong{color:var(--neo-ink)!important}
+body.stage-performance .stage-macro-button[data-stage-action="lofi"] strong{color:#d34c9b!important}
+body.stage-performance .stage-macro-button[data-stage-action="octave"] strong{color:#159db5!important}
+body.stage-performance .stage-macro-button[data-stage-action="download"] strong{color:var(--neo-mint)!important}
+body.stage-performance .stage-macro-button.danger{color:var(--neo-coral)!important}
+body.stage-performance .stage-macro-button.active{background:var(--neo-bg)!important;color:var(--neo-mint)!important;box-shadow:inset 3px 3px 7px var(--neo-shadow),inset -3px -3px 7px var(--neo-light)!important}
+body.stage-performance .stage-xy{
+  border:0!important;
+  background:linear-gradient(90deg,transparent 49.5%,#8d9ba333 50%,transparent 50.5%),linear-gradient(0deg,transparent 49.5%,#8d9ba333 50%,transparent 50.5%),var(--neo-bg)!important;
+  box-shadow:inset 4px 4px 9px var(--neo-shadow),inset -4px -4px 9px var(--neo-light)!important;
+}
+body.stage-performance .stage-xy header{color:var(--neo-ink)!important}
+body.stage-performance .stage-xy footer{color:var(--neo-muted)!important}
