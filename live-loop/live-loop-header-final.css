@@ -86,3 +86,14 @@ body.stage-performance .track-state{
 body.stage-performance .loop-track[data-state="Recording"] .track-state,
 body.stage-performance .loop-track[data-state="Overdubbing"] .track-state{ color: var(--neo-coral) !important; }
 body.stage-performance .loop-track[data-state="Playing"] .track-state{ color: var(--neo-mint) !important; }
+
+/* ---- Single-lane-at-a-time (belt-and-suspenders) ----
+   body.stage-performance selectors below (specificity 21) always outrank the
+   plain .loop-track / .track-grid selectors in mobile-performance*.css
+   (specificity 10), regardless of file load order or partial caching. This
+   guarantees exactly one lane shows on phones even if those files lag behind. */
+@media (max-width:760px){
+  body.stage-performance #trackGrid.track-grid{ display:block !important; }
+  body.stage-performance .loop-track{ display:none !important; }
+  body.stage-performance .loop-track.mobile-active{ display:block !important; }
+}
