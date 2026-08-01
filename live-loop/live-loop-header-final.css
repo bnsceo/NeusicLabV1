@@ -1,0 +1,88 @@
+/* Live Loop — final header rules.
+   Loaded LAST (after neusic-v3.css) so these declarations win outright,
+   at every width and every pointer type, over the older scattered rules
+   in styles.css / neusic-v3.css / mobile-lanes-*.css / mobile-performance*.css /
+   mobile-system.css / stage-performance.css. Nothing else on the page is
+   touched — only .loop-deck>.panel-header and .loop-track header.
+*/
+
+/* ---- Loop Control header (top of the 5-lane panel) ---- */
+body.stage-performance .loop-deck > .panel-header.loop-control-header{
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  min-height: 0 !important;
+  padding: 14px 18px !important;
+  background: transparent !important;
+  border-bottom: 1px solid #63747d2b !important;
+  flex-direction: row !important;
+}
+body.stage-performance .loop-control-header h2{
+  margin: 0 !important;
+  font: 700 18px/1 var(--display) !important;
+  letter-spacing: .04em !important;
+  color: var(--neo-ink) !important;
+  text-transform: uppercase;
+}
+body.stage-performance .system-status{
+  display: flex; align-items: center; gap: 6px;
+  font: 700 11px/1 var(--mono);
+  letter-spacing: .06em;
+  color: var(--neo-muted);
+  text-transform: uppercase;
+}
+body.stage-performance .system-status b{
+  color: var(--neo-ink);
+}
+body.stage-performance .system-status .status-dot{
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--neo-mint);
+  box-shadow: 0 0 6px var(--neo-mint);
+}
+/* legend caption row now lives below the header, not squeezed inside it */
+body.stage-performance .legend-caption{
+  padding: 0 18px 10px;
+}
+
+/* ---- Per-lane header ("03  LOOP 3   READY") ---- */
+body.stage-performance .loop-track header{
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  min-height: 44px !important;
+  padding: 4px 4px 10px !important;
+  border-bottom: 1px solid #7f8b9133 !important;
+  text-align: left !important;
+}
+body.stage-performance .loop-track header div{
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+body.stage-performance .track-number{
+  width: 30px !important;
+  height: 24px !important;
+  min-width: 30px;
+  border-radius: 7px !important;
+  background: var(--neo-ink) !important;
+  color: var(--neo-bg) !important;
+  font: 700 11px/1 var(--mono) !important;
+  display: grid !important;
+  place-items: center !important;
+}
+body.stage-performance .track-name{
+  max-width: none !important;
+  font: 700 13px/1 var(--mono) !important;
+  color: var(--neo-ink) !important;
+  letter-spacing: .01em !important;
+}
+body.stage-performance .track-state{
+  font: 700 10px/1 var(--mono) !important;
+  letter-spacing: .06em !important;
+  color: var(--neo-muted) !important;
+  text-transform: uppercase;
+}
+body.stage-performance .loop-track[data-state="Recording"] .track-state,
+body.stage-performance .loop-track[data-state="Overdubbing"] .track-state{ color: var(--neo-coral) !important; }
+body.stage-performance .loop-track[data-state="Playing"] .track-state{ color: var(--neo-mint) !important; }
