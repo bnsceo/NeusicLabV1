@@ -275,6 +275,7 @@ function buildKeyboard(){
     button.addEventListener('pointerdown',async event=>{
       event.preventDefault();
       button.setPointerCapture?.(event.pointerId);
+      workspace.unlockFromGesture();
       try{await ensureEngine();synth.noteOn(note,105);button.classList.add('active');}catch(error){status(error.message);}
     });
     const off=()=>{if(synth)synth.noteOff(note);button.classList.remove('active');};

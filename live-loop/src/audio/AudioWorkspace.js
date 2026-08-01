@@ -13,6 +13,19 @@ class AudioWorkspace {
     this.unlocked = false;
   }
 
+  // iOS requires resume() to be called directly from the trusted touch
+  // handler. Create/resume the context synchronously before async graph setup.
+  unlockFromGesture() {
+    if (!this.context) {
+      const Context = window.AudioContext || window.webkitAudioContext;
+      if (!Context) return null;
+      this.context = window.NeusicMobileMicPrimer?.context || new Context({latencyHint:'interactive'});
+      window.NeusicMobileMicPrimer?.adoptContext?.(this.context);
+    }
+    if (this.context.state !== 'running') this.context.resume().catch(()=>{});
+    return this.context;
+  }
+
   async init() {
     if (!this.context) {
       const Context = window.AudioContext || window.webkitAudioContext;
