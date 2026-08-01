@@ -5,22 +5,16 @@
     const output = document.getElementById('statusMessage');
     if (!output) return;
     const text = output.textContent.trim();
-    if (text === 'Five loop lanes are visible. Tap REC on any lane; MIDI is optional.') {
-      output.textContent = '';
-    }
+    if (text === 'Five loop lanes are visible. Tap REC on any lane; MIDI is optional.') output.textContent = '';
   };
 
   function normalizeLayout() {
     document.getElementById('stageMacroDeck')?.remove();
     document.querySelectorAll('.mobile-lane-nav,.mobile-performance-controls').forEach(element => element.remove());
-
     const lowerGrid = document.querySelector('.lower-grid');
     const piano = document.querySelector('.synth-panel');
     const effects = document.querySelector('.pedalboard');
-    if (lowerGrid && piano && effects && piano.nextElementSibling !== effects) {
-      lowerGrid.insertBefore(piano, effects);
-    }
-
+    if (lowerGrid && piano && effects && piano.nextElementSibling !== effects) lowerGrid.insertBefore(piano, effects);
     clearObsoleteStatus();
   }
 
@@ -36,8 +30,8 @@
   function loadEnhancements() {
     loadScript('recording-controller-v2.js?v=75f79f7', 'data-live-loop-record-controller');
     loadScript('mobile-performance-polish.js?v=ce76418', 'data-live-loop-polish');
-    loadScript('vocal-pitch-correction.js?v=653d420', 'data-live-loop-pitch');
-    loadScript('scene-manager.js?v=fb1ffcd', 'data-live-loop-scenes');
+    loadScript('vocal-pitch-correction-v2.js?v=610488c', 'data-live-loop-pitch-v2');
+    loadScript('scene-manager-v2.js?v=1b343dc', 'data-live-loop-scenes-v2');
   }
 
   if (document.readyState === 'loading') {
