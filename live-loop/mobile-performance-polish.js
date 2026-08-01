@@ -11,64 +11,90 @@
         z-index:90!important;
         display:grid!important;
         grid-template-columns:minmax(0,1fr)!important;
-        gap:6px!important;
-        padding:calc(6px + env(safe-area-inset-top)) 7px 7px!important;
-        background:#0d1218f2!important;
+        gap:4px!important;
+        padding:calc(4px + env(safe-area-inset-top)) 6px 5px!important;
+        background:#0d1218f4!important;
+        box-shadow:0 8px 18px #05080caa!important;
       }
       .header-master-display{
         min-width:0!important;
         width:100%!important;
-        padding:5px!important;
-        gap:5px!important;
-        border-radius:13px!important;
+        grid-template-columns:1fr 1fr auto!important;
+        align-items:center!important;
+        gap:4px!important;
+        padding:4px!important;
+        border-radius:11px!important;
+        box-shadow:4px 4px 9px #070a0e,-3px -3px 8px #1b2430!important;
       }
-      .master-display>div:not(.master-meter){padding:6px 8px!important;border-radius:9px!important}
-      .master-display small{font-size:5.5px!important}
-      .master-display b{margin-top:4px!important;font-size:11px!important}
-      .master-meter{height:6px!important;padding:1px!important}
+      .master-display>div:not(.master-meter){
+        padding:5px 7px!important;
+        border-radius:8px!important;
+      }
+      .master-display small{font-size:5px!important;letter-spacing:.08em!important}
+      .master-display b{margin-top:3px!important;font-size:10px!important}
+      .master-meter{
+        grid-column:auto!important;
+        width:42px!important;
+        height:7px!important;
+        padding:1px!important;
+      }
       .transport{
-        display:flex!important;
+        display:grid!important;
+        grid-template-columns:repeat(4,minmax(0,1fr))!important;
         width:100%!important;
-        gap:5px!important;
-        overflow-x:auto!important;
-        overscroll-behavior-x:contain!important;
-        scrollbar-width:none!important;
-        padding:2px 1px 5px!important;
-        justify-content:flex-start!important;
-        scroll-snap-type:x proximity;
+        gap:4px!important;
+        padding:0!important;
+        overflow:visible!important;
       }
-      .transport::-webkit-scrollbar{display:none!important}
-      .transport>*{flex:0 0 auto!important;scroll-snap-align:start}
+      .transport>*{min-width:0!important;width:100%!important}
       .transport .hardware-button,
       .transport .lcd-control,
       .transport .switch-control{
-        min-height:36px!important;
-        height:36px!important;
-        border-radius:11px!important;
-        padding-inline:10px!important;
-        box-shadow:5px 5px 11px #070a0e,-4px -4px 9px #1b2430!important;
-      }
-      .transport .hardware-button{min-width:68px!important;font-size:6.5px!important}
-      .transport .capture-button{min-width:88px!important}
-      .transport .lcd-control{min-width:65px!important;padding:4px 8px!important}
-      .transport .lcd-control input{width:48px!important;font-size:13px!important}
-      .transport .switch-control{min-width:62px!important}
-      .top-actions{
-        display:flex!important;
-        width:100%!important;
-        gap:5px!important;
-        overflow-x:auto!important;
-        scrollbar-width:none!important;
-        justify-content:flex-start!important;
-      }
-      .top-actions::-webkit-scrollbar{display:none!important}
-      .top-actions a{
-        flex:1 0 92px!important;
-        min-height:31px!important;
-        padding:0 8px!important;
-        border-radius:10px!important;
-        font-size:6px!important;
+        min-height:33px!important;
+        height:33px!important;
+        border-radius:9px!important;
+        padding:0 5px!important;
         box-shadow:4px 4px 9px #070a0e,-3px -3px 8px #1b2430!important;
+      }
+      #captureBtn,#playBtn,#stopBtn{grid-row:1}
+      #micBtn{grid-row:1}
+      .transport .hardware-button{font-size:6px!important;gap:4px!important}
+      .transport .hardware-button span,
+      .transport .hardware-button b{font-size:6px!important}
+      .transport .lcd-control{grid-column:1/2;grid-row:2;padding:3px 5px!important}
+      .transport .lcd-control small{font-size:4.5px!important}
+      .transport .lcd-control input{width:100%!important;font-size:11px!important;text-align:center!important}
+      .transport .switch-control{grid-column:2/3;grid-row:2;justify-content:center!important;font-size:6px!important}
+      #midiBtn{grid-column:3/4;grid-row:2}
+      .transport:after{
+        content:'LIVE LOOP';
+        grid-column:4/5;
+        grid-row:2;
+        display:grid;
+        place-items:center;
+        min-height:33px;
+        border:1px solid #26313d;
+        border-radius:9px;
+        background:#111720;
+        color:#66717e;
+        box-shadow:inset 3px 3px 7px #080b10,inset -3px -3px 7px #202a36;
+        font:800 5px/1 var(--mono);
+        letter-spacing:.1em;
+      }
+      .top-actions{
+        display:grid!important;
+        grid-template-columns:repeat(3,1fr)!important;
+        width:100%!important;
+        gap:4px!important;
+        overflow:visible!important;
+      }
+      .top-actions a{
+        min-width:0!important;
+        min-height:24px!important;
+        padding:0 4px!important;
+        border-radius:8px!important;
+        font-size:5.5px!important;
+        box-shadow:3px 3px 7px #070a0e,-2px -2px 6px #1b2430!important;
       }
       .keyboard{
         touch-action:none!important;
