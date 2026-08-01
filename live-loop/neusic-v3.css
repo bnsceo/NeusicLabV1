@@ -144,8 +144,8 @@ body.stage-performance .utility-drawer{display:block!important;margin-top:24px!i
   body.stage-performance .loop-track header{min-height:54px!important}
   body.stage-performance .track-name{max-width:none!important;font-size:10px!important}
   body.stage-performance .track-actions{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:6px!important}
-  body.stage-performance .track-actions button{min-height:46px!important;font-size:7px!important}
-  body.stage-performance .track-actions .record-action{grid-column:1/-1!important;min-height:52px!important}
+  body.stage-performance .track-actions button{min-height:46px!important;font-size:7px!important;grid-column:auto!important}
+  body.stage-performance .track-actions .record-action{min-height:46px!important}
   body.stage-performance .track-controls label{grid-template-columns:48px 1fr 34px!important;min-height:38px!important;font-size:7px!important}
   body.stage-performance .stage-macro-deck{grid-template-columns:1fr!important;gap:10px!important;padding:10px!important}
   body.stage-performance .stage-macro-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
@@ -190,6 +190,7 @@ body.stage-performance .neusic-agent-launcher{background:var(--neo-bg)!important
   body.stage-performance .stage-xy{min-height:190px!important;width:100%!important;border:0!important;background:linear-gradient(90deg,transparent 49.35%,#7f909966 49.7%,#7f909966 50.3%,transparent 50.65%),linear-gradient(0deg,transparent 49.35%,#7f909966 49.7%,#7f909966 50.3%,transparent 50.65%),#f3f6f5!important;box-shadow:inset 4px 4px 9px #c4cdd0,inset -4px -4px 9px #fff!important}
   body.stage-performance .stage-xy header{color:var(--neo-ink)!important}
   body.stage-performance .stage-xy footer{color:var(--neo-muted)!important}
+  body.stage-performance .mobile-recording-toast{top:auto!important;bottom:58px!important;background:var(--neo-bg)!important;color:var(--neo-ink)!important;border:0!important;box-shadow:5px 5px 11px var(--neo-shadow),-5px -5px 11px var(--neo-light)!important}
 }
 
 /* Match the generated performance deck to the light neumorphic UI. */
