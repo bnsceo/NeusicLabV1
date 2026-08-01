@@ -41,7 +41,7 @@
   function loadEnhancements() {
     loadScript('recording-touch-deduper.js?v=7beca03', 'data-live-loop-record-deduper');
     loadScript('mobile-performance-polish.js?v=ce76418', 'data-live-loop-polish');
-    loadScript('vocal-pitch-correction-v3.js?v=2a5da78', 'data-live-loop-pitch-v3');
+    loadScript('vocal-pitch-correction-v4.js?v=2033f98', 'data-live-loop-pitch-v4');
     loadScript('scene-manager-v2.js?v=1b343dc', 'data-live-loop-scenes-v2');
   }
 
