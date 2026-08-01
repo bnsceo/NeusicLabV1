@@ -1,7 +1,7 @@
 .mobile-lane-nav,.mobile-performance-controls{display:none}
 
 @media(max-width:760px){
-  html{scroll-padding-top:132px}
+  html{scroll-padding-top:120px}
   body{overflow-x:hidden;overscroll-behavior-x:none;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
   .topbar{position:relative!important;grid-template-columns:1fr!important;padding:8px!important;min-height:54px!important}
   .topbar .brand{justify-content:flex-start!important}
@@ -13,18 +13,7 @@
   .loop-deck>.panel-header{padding-bottom:8px!important}
   .loop-deck>.panel-header .legend{display:none!important}
 
-  .mobile-lane-nav{
-    display:grid;
-    position:sticky;
-    top:0;
-    z-index:76;
-    gap:8px;
-    padding:9px 9px 10px;
-    border-top:1px solid #263036;
-    border-bottom:1px solid #050607;
-    background:linear-gradient(#171d20,#090c0e);
-    box-shadow:0 10px 24px #000b,inset 0 1px #ffffff0c;
-  }
+  .mobile-lane-nav{display:grid;position:sticky;top:0;z-index:76;gap:8px;padding:9px 9px 10px;border-top:1px solid #263036;border-bottom:1px solid #050607;background:linear-gradient(#171d20,#090c0e);box-shadow:0 10px 24px #000b,inset 0 1px #ffffff0c}
   .mobile-lane-nav-head{display:flex;align-items:center;justify-content:space-between;gap:12px;color:#aab4b8;font:800 7px/1.2 var(--mono);letter-spacing:.09em}
   .mobile-lane-nav-head b{color:var(--gold2);font-size:8px}
   .mobile-lane-buttons{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
@@ -49,9 +38,9 @@
   .mobile-performance-secondary input[type="checkbox"]{accent-color:var(--gold)}
   .mobile-performance-controls p{margin:0;padding:8px 9px;border:1px solid #1f292e;border-radius:5px;background:#06090b;color:#9ba6ab;font:750 7px/1.45 var(--mono);letter-spacing:.04em;text-align:center}
 
-  .track-grid{display:block!important;width:100%!important;overflow:visible!important;padding:8px!important;touch-action:pan-y!important}
-  .loop-track{display:none!important;width:100%!important;max-width:none!important;min-height:0!important;margin:0!important;scroll-snap-align:none!important;padding:13px!important}
-  .loop-track.mobile-active{display:block!important;animation:mobileLaneIn .16s ease-out}
+  .track-grid{display:flex!important;grid-template-columns:none!important;gap:10px!important;width:100%!important;overflow-x:auto!important;overflow-y:visible!important;padding:10px 10px 16px!important;scroll-snap-type:x mandatory;scroll-padding-inline:10px;scrollbar-width:none;touch-action:pan-x pan-y!important;-webkit-overflow-scrolling:touch}
+  .track-grid::-webkit-scrollbar{display:none}
+  .loop-track,.loop-track.mobile-active{display:block!important;flex:0 0 calc(100vw - 20px)!important;width:calc(100vw - 20px)!important;max-width:480px!important;min-height:520px!important;margin:0!important;padding:14px!important;scroll-snap-align:center!important;scroll-snap-stop:always!important;animation:none!important}
   .progress-control{width:min(56vw,210px)!important;margin:8px auto 14px!important}
   .track-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px}
   .track-actions button{min-height:52px!important;font-size:7px!important}
@@ -73,13 +62,14 @@
   .mobile-performance-controls p{font-size:6.5px}
   .mobile-lane-button{min-height:49px}
   .mobile-lane-button small{display:none}
+  .loop-track,.loop-track.mobile-active{flex-basis:calc(100vw - 12px)!important;width:calc(100vw - 12px)!important;min-height:500px!important;padding:12px!important}
+  .track-grid{padding-inline:6px!important;scroll-padding-inline:6px!important}
 }
 
 @media(orientation:landscape) and (max-height:560px) and (max-width:950px){
   .mobile-lane-nav{position:relative}
   .mobile-performance-primary{grid-template-columns:repeat(4,minmax(0,1fr))}
-  .loop-track{max-width:720px!important;margin-inline:auto!important}
+  .loop-track,.loop-track.mobile-active{flex-basis:min(520px,82vw)!important;width:min(520px,82vw)!important;min-height:360px!important}
 }
 
-@keyframes mobileLaneIn{from{opacity:.45;transform:translateX(8px)}to{opacity:1;transform:none}}
-@media(prefers-reduced-motion:reduce){.loop-track.mobile-active{animation:none}}
+@media(prefers-reduced-motion:reduce){.track-grid{scroll-behavior:auto}}
