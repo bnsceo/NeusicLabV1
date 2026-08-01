@@ -1,11 +1,11 @@
-import {workspace} from './src/audio/AudioWorkspace.js';
+import {workspace} from './src/audio/AudioWorkspace.js?v=20';
 import {LookAheadScheduler} from './src/audio/Scheduler.js';
 import {TapeDelay} from './src/audio/effects/TapeDelay.js';
 import {SpatialReverb} from './src/audio/effects/SpatialReverb.js';
 import {PerformanceFx} from './src/audio/effects/PerformanceFx.js';
 import {HybridInstrument} from './src/audio/instruments/Piano.js';
 import {MidiRouter} from './src/midi/MidiRouter.js';
-import {FiveTrackLooper,STATES} from './src/audio/Looper.js';
+import {FiveTrackLooper,STATES} from './src/audio/Looper.js?v=20';
 import {sendToForge,downloadBuffer} from './src/storage/ForgeBridge.js';
 
 const $=id=>document.getElementById(id);
@@ -14,7 +14,10 @@ const template=$('trackTemplate');
 const keyMap={a:60,w:61,s:62,e:63,d:64,f:65,t:66,g:67,y:68,h:69,u:70,j:71};
 const heldKeys=new Set();
 const recordBusy=new Set();
+const recentRecordActivation=new WeakMap();
 const sceneSnapshots=[null,null,null];
+const captureEvents=[];
+const debugMode=new URLSearchParams(location.search).get('debug')==='1';
 let activeScene=0,currentKey=0,currentScale='major';
 const scaleIntervals={major:[0,2,4,5,7,9,11],minor:[0,2,3,5,7,8,10],pentatonic:[0,2,4,7,9]};
 
@@ -24,10 +27,24 @@ let midi=null;
 let delay=null;
 let reverb=null;
 let performanceFx=null;
-let enginePromise=null;
+let corePromise=null;
+let optionalPromise=null;
+let optionalTimer=0;
 let selected=0;
 let fxBypassed=false;
 let spaceFrozen=false;
+
+function trace(stage,detail={}){
+  const entry={time:performance.now(),stage,detail};
+  captureEvents.push(entry);
+  if(captureEvents.length>160)captureEvents.shift();
+  if(debugMode)console.info('[Neusic Capture]',stage,detail);
+  window.dispatchEvent(new CustomEvent('neusic:capture-trace',{detail:entry}));
+  renderDiagnostics();
+}
+window.__neusicCaptureTrace=trace;
+window.addEventListener('error',event=>trace('window-error',{message:event.message,source:event.filename,line:event.lineno}));
+window.addEventListener('unhandledrejection',event=>trace('unhandled-rejection',{message:event.reason?.message||String(event.reason)}));
 
 function status(message){
   const output=$('statusMessage');
@@ -52,9 +69,13 @@ function primeMicrophoneFromGesture(){
   return navigator.mediaDevices.getUserMedia({audio:true});
 }
 
-async function recordFromTrustedGesture(index,button=recordButtonFor(index)){
-  if(recordBusy.has(index))return;
+async function recordFromTrustedGesture(index,button=recordButtonFor(index),source='pointer'){
+  if(recordBusy.has(index)){
+    trace('record-activation-ignored',{index,source,reason:'busy'});
+    return;
+  }
   const context=workspace.unlockFromGesture();
+  trace('record-activation',{index,source,contextState:context?.state||'unavailable'});
   if(!context){status('Web Audio is unavailable in this browser.');return;}
 
   recordBusy.add(index);
@@ -66,28 +87,56 @@ async function recordFromTrustedGesture(index,button=recordButtonFor(index)){
       looper.activeRecording?.index===index||looper.arming?.index===index
     ));
     if(stoppingCurrentLane){
+      trace('record-stop-requested',{index,backend:looper.capture?.mode||'none'});
       await looper.toggleRecord(index);
       return;
     }
 
     status(`Preparing LOOP ${index+1}… Keep this page open.`);
     const microphonePromise=primeMicrophoneFromGesture();
-    const audioEnginePromise=ensureEngine();
-    const [readyLooper,stream]=await Promise.all([audioEnginePromise,microphonePromise]);
-
-    if(stream?.getAudioTracks?.().some(track=>track.readyState==='live')){
-      workspace.micStream=stream;
-    }
-    await workspace.initMic();
-    await workspace.resume({required:true});
+    const captureCorePromise=ensureCoreEngine();
+    const stream=await microphonePromise;
+    trace('microphone-permission-complete',{index,live:Boolean(stream?.getAudioTracks?.().some(track=>track.readyState==='live'))});
+    await workspace.prepareCapture(stream);
+    const readyLooper=await captureCorePromise;
     await readyLooper.toggleRecord(index);
+    trace('record-controller-armed',{index,state:readyLooper.tracks[index].state});
   }catch(error){
     console.error(error);
+    trace('record-start-failed',{index,message:error?.message||String(error)});
     status(error.message||'Recording could not start. Check microphone permission and tap REC again.');
   }finally{
     recordBusy.delete(index);
     if(button)delete button.dataset.recordBusy;
   }
+}
+
+function bindRecordButton(recordButton,index){
+  const activate=(event,source)=>{
+    if(event.button!==undefined&&event.button!==0)return;
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation?.();
+    recentRecordActivation.set(recordButton,performance.now());
+    recordFromTrustedGesture(index,recordButton,source);
+  };
+
+  if('PointerEvent'in window){
+    recordButton.addEventListener('pointerdown',event=>activate(event,`pointer:${event.pointerType||'unknown'}`),{passive:false});
+  }else{
+    recordButton.addEventListener('touchstart',event=>activate(event,'touch'),{passive:false});
+    recordButton.addEventListener('mousedown',event=>activate(event,'mouse'),{passive:false});
+  }
+
+  recordButton.addEventListener('click',event=>{
+    const last=recentRecordActivation.get(recordButton)||0;
+    if(performance.now()-last<900){
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    activate(event,event.detail===0?'keyboard':'click-fallback');
+  });
 }
 
 function buildTracks(){
@@ -107,20 +156,7 @@ function buildTracks(){
       await handleTrackAction(index,button.dataset.action);
     }));
 
-    const recordButton=card.querySelector('[data-action="record"]');
-    recordButton.addEventListener('pointerdown',event=>{
-      if(event.button!==0)return;
-      event.preventDefault();
-      event.stopPropagation();
-      event.stopImmediatePropagation();
-      recordFromTrustedGesture(index,recordButton);
-    },{passive:false});
-    recordButton.addEventListener('click',event=>{
-      event.preventDefault();
-      event.stopPropagation();
-      if(event.detail!==0)return;
-      recordFromTrustedGesture(index,recordButton);
-    });
+    bindRecordButton(card.querySelector('[data-action="record"]'),index);
 
     card.querySelectorAll('[data-control]').forEach(input=>input.addEventListener(input.tagName==='SELECT'?'change':'input',async()=>{
       const key=input.dataset.control;
@@ -222,7 +258,7 @@ function updateProgress(){
 }
 
 function bindGlobal(){
-  $('captureBtn').addEventListener('click',()=>recordFromTrustedGesture(selected,recordButtonFor(selected)));
+  $('captureBtn').addEventListener('click',()=>recordFromTrustedGesture(selected,recordButtonFor(selected),'capture-button'));
   $('saveSceneBtn').addEventListener('click',()=>saveScene(activeScene));
   document.querySelectorAll('.scene-button').forEach(button=>button.addEventListener('click',()=>launchScene(Number(button.dataset.scene))));
   $('keySelect').addEventListener('change',event=>{currentKey=Number(event.target.value);refreshKeyHighlight();});
@@ -231,10 +267,9 @@ function bindGlobal(){
   $('micBtn').addEventListener('click',async()=>{
     try{
       workspace.unlockFromGesture();
-      const microphonePromise=primeMicrophoneFromGesture();
+      const stream=await primeMicrophoneFromGesture();
+      await workspace.prepareCapture(stream);
       await ensureEngine();
-      const stream=await microphonePromise;
-      if(stream?.getAudioTracks?.().length)workspace.micStream=stream;
       await workspace.initMic();
       workspace.setMonitor(!$('micBtn').classList.contains('active'));
       $('micBtn').classList.toggle('active');
@@ -242,12 +277,12 @@ function bindGlobal(){
     }catch(error){status(error.message||'Microphone access failed. Check browser permission and tap MIC again.');}
   });
   $('playBtn').addEventListener('click',async()=>{try{await ensureEngine();looper.playing?looper.stop():looper.start();}catch(error){status(error.message);}});
-  $('stopBtn').addEventListener('click',async()=>{try{await ensureEngine();if(looper.activeRecording)await looper.stopRecording();looper.stop();}catch(error){status(error.message);}});
-  $('bpmInput').addEventListener('change',async event=>{try{await ensureEngine();looper.setBpm(event.target.value);}catch(error){status(error.message);}});
-  $('quantizeToggle').addEventListener('change',async event=>{try{await ensureEngine();looper.setQuantize(event.target.checked);}catch(error){status(error.message);}});
+  $('stopBtn').addEventListener('click',async()=>{try{await ensureCoreEngine();if(looper.activeRecording)await looper.stopRecording();looper.stop();}catch(error){status(error.message);}});
+  $('bpmInput').addEventListener('change',async event=>{try{await ensureCoreEngine();looper.setBpm(event.target.value);}catch(error){status(error.message);}});
+  $('quantizeToggle').addEventListener('change',async event=>{try{await ensureCoreEngine();looper.setQuantize(event.target.checked);}catch(error){status(error.message);}});
   $('uploadBtn').addEventListener('click',()=>$('fileInput').click());
   $('fileInput').addEventListener('change',async event=>{
-    try{await ensureEngine();}catch(error){status(error.message);return;}
+    try{await ensureCoreEngine();}catch(error){status(error.message);return;}
     for(const file of [...event.target.files]){
       try{status(`Decoding ${file.name}…`);await looper.importFile(selected,file);status(`${file.name} loaded into track ${selected+1}.`);}
       catch(error){console.error(error);status(`${file.name} could not be decoded by this browser.`);}
@@ -256,24 +291,24 @@ function bindGlobal(){
   });
   $('sendSelectedBtn').addEventListener('click',()=>sendTrack(selected).catch(error=>status(error.message)));
   $('downloadSelectedBtn').addEventListener('click',async()=>{
-    try{await ensureEngine();const track=looper.tracks[selected];if(!track.buffer){status('The selected track is empty.');return;}downloadBuffer(track.buffer,`${track.name.toLowerCase().replace(/\s+/g,'-')}.wav`);status(`${track.name} downloaded as WAV.`);}catch(error){status(error.message);}
+    try{await ensureCoreEngine();const track=looper.tracks[selected];if(!track.buffer){status('The selected track is empty.');return;}downloadBuffer(track.buffer,`${track.name.toLowerCase().replace(/\s+/g,'-')}.wav`);status(`${track.name} downloaded as WAV.`);}catch(error){status(error.message);}
   });
-  $('clearAllBtn').addEventListener('click',async()=>{try{await ensureEngine();if(confirm('Clear all five loop tracks?'))looper.clearAll();}catch(error){status(error.message);}});
+  $('clearAllBtn').addEventListener('click',async()=>{try{await ensureCoreEngine();if(confirm('Clear all five loop tracks?'))looper.clearAll();}catch(error){status(error.message);}});
   $('bypassFxBtn').addEventListener('click',async()=>{try{await ensureEngine();fxBypassed=!fxBypassed;looper.setFxBypass(fxBypassed);$('bypassFxBtn').textContent=fxBypassed?'FX BYPASSED':'FX ACTIVE';}catch(error){status(error.message);}});
-  $('reverseBtn').addEventListener('click',async()=>{try{await ensureEngine();looper.reverse(selected);status(`Reverse toggled on track ${selected+1}.`);}catch(error){status(error.message);}});
-  $('warpDownBtn').addEventListener('click',async()=>{try{await ensureEngine();looper.halfSpeed(selected);status(`Octave-down tape speed toggled on track ${selected+1}.`);}catch(error){status(error.message);}});
+  $('reverseBtn').addEventListener('click',async()=>{try{await ensureCoreEngine();looper.reverse(selected);status(`Reverse toggled on track ${selected+1}.`);}catch(error){status(error.message);}});
+  $('warpDownBtn').addEventListener('click',async()=>{try{await ensureCoreEngine();looper.halfSpeed(selected);status(`Octave-down tape speed toggled on track ${selected+1}.`);}catch(error){status(error.message);}});
   $('freezeBtn').addEventListener('click',async()=>{try{await ensureEngine();spaceFrozen=!spaceFrozen;reverb.freeze(spaceFrozen);$('freezeBtn').classList.toggle('active',spaceFrozen);$('freezeBtn').textContent=spaceFrozen?'RELEASE SPACE':'SPACE FREEZE';}catch(error){status(error.message);}});
-  const bindRange=(id,handler,formatValue)=>$(id).addEventListener('input',async event=>{
+  const bindRange=(id,handler,formatValue,coreOnly=false)=>$(id).addEventListener('input',async event=>{
     const value=Number(event.target.value);
     event.target.nextElementSibling.textContent=formatValue(value);
-    try{await ensureEngine();handler(value);}catch(error){status(error.message);}
+    try{await (coreOnly?ensureCoreEngine():ensureEngine());handler(value);}catch(error){status(error.message);}
   });
-  bindRange('delayTime',value=>delay.setTime(value/1000),value=>`${value}ms`);
-  bindRange('delayFeedback',value=>delay.setFeedback(value/100),value=>`${value}%`);
-  bindRange('delayMix',value=>delay.setMix(value/100),value=>`${value}%`);
-  bindRange('reverbSize',value=>reverb.setSize(value/100),value=>`${(value/100).toFixed(1)}s`);
-  bindRange('reverbTone',value=>reverb.setTone(value),value=>`${(value/1000).toFixed(1)}k`);
-  bindRange('reverbMix',value=>reverb.setMix(value/100),value=>`${value}%`);
+  bindRange('delayTime',value=>delay.setTime(value/1000),value=>`${value}ms`,true);
+  bindRange('delayFeedback',value=>delay.setFeedback(value/100),value=>`${value}%`,true);
+  bindRange('delayMix',value=>delay.setMix(value/100),value=>`${value}%`,true);
+  bindRange('reverbSize',value=>reverb.setSize(value/100),value=>`${(value/100).toFixed(1)}s`,true);
+  bindRange('reverbTone',value=>reverb.setTone(value),value=>`${(value/1000).toFixed(1)}k`,true);
+  bindRange('reverbMix',value=>reverb.setMix(value/100),value=>`${value}%`,true);
   $('synthWave').addEventListener('change',async event=>{try{await ensureEngine();synth.setWave(event.target.value);}catch(error){status(error.message);}});
   bindRange('synthCutoff',value=>synth.setCutoff(value),value=>`${(value/1000).toFixed(1)}k`);
   bindRange('synthAttack',value=>synth.setAttack(value/100),value=>`${(value/100).toFixed(2)}s`);
@@ -313,11 +348,11 @@ function bindKeyboard(){
   document.addEventListener('keydown',async event=>{
     if(event.target.matches('input,select,textarea,button'))return;
     try{
-      if(event.code==='Space'){event.preventDefault();await ensureEngine();looper.playing?looper.stop():looper.start();return;}
+      if(event.code==='Space'){event.preventDefault();await ensureCoreEngine();looper.playing?looper.stop():looper.start();return;}
       if(/^[1-5]$/.test(event.key)){
         event.preventDefault();
         const index=Number(event.key)-1;
-        await recordFromTrustedGesture(index,recordButtonFor(index));
+        await recordFromTrustedGesture(index,recordButtonFor(index),'keyboard-shortcut');
         return;
       }
       await ensureEngine();
@@ -331,39 +366,18 @@ function bindKeyboard(){
   });
 }
 
-async function setupEngine(){
-  await workspace.init();
-  performanceFx=new PerformanceFx(workspace.context);
-  await performanceFx.init();
-  try{workspace.master.disconnect(workspace.analyser);}catch(_){ }
-  workspace.master.connect(performanceFx.input);
-  performanceFx.output.connect(workspace.analyser);
-  delay=new TapeDelay(workspace.context);
-  reverb=new SpatialReverb(workspace.context);
-  delay.output.connect(workspace.master);
-  reverb.output.connect(workspace.master);
-  const scheduler=new LookAheadScheduler(workspace.context);
-  looper=new FiveTrackLooper(workspace,scheduler,delay,reverb);
-  synth=new HybridInstrument(workspace.context,workspace.master);
-  midi=new MidiRouter({
-    record:index=>looper.toggleRecord(index).catch(error=>status(error.message)),
-    mute:index=>looper.toggleMute(index),
-    volume:(index,value)=>looper.setTrackValue(index,'volume',value),
-    transport:()=>looper.playing?looper.stop():looper.start(),
-    noteOn:(note,velocity)=>synth.noteOn(note,velocity),
-    noteOff:note=>synth.noteOff(note)
-  });
-  looper.addEventListener('track',event=>renderTrack(event.detail.index));
-  looper.addEventListener('change',renderAll);
-  looper.addEventListener('transport',renderAll);
-  looper.addEventListener('status',event=>status(event.detail.message));
-  renderAll();
+function exposeCoreApi(){
   window.NeusicLiveLoop={
-    workspace,looper,synth,delay,reverb,performanceFx,
+    workspace,looper,
+    get synth(){return synth;},
+    get midi(){return midi;},
+    get delay(){return delay;},
+    get reverb(){return reverb;},
+    get performanceFx(){return performanceFx;},
     get selectedTrack(){return selected;},
     selectTrack,
-    record:index=>looper.toggleRecord(index),
-    toggleLoFi:()=>{const enabled=performanceFx.toggleLoFi();status(enabled?'Global lo-fi crusher engaged.':'Global lo-fi crusher released.');return enabled;},
+    record:index=>recordFromTrustedGesture(index,recordButtonFor(index),'api'),
+    toggleLoFi:async()=>{await ensureEngine();const enabled=performanceFx.toggleLoFi();status(enabled?'Global lo-fi crusher engaged.':'Global lo-fi crusher released.');return enabled;},
     toggleOctave:()=>{looper.halfSpeed(selected);status(`Octave-down tape speed toggled on track ${selected+1}.`);},
     toggleReverse:()=>{looper.reverse(selected);status(`Reverse toggled on track ${selected+1}.`);},
     toggleFreeze:()=>{$('freezeBtn').click();},
@@ -373,34 +387,122 @@ async function setupEngine(){
     diagnostics:()=>({
       contextState:workspace.context?.state||'not-created',
       microphoneLive:workspace.micIsLive?.()||false,
-      recorderMode:looper.capture?.mode||'none',
+      recorder:looper.capture?.diagnostics?.()||{mode:looper.capture?.mode||'none'},
       armingLane:looper.arming?.index??null,
       recordingLane:looper.activeRecording?.index??null,
-      busyLanes:[...recordBusy]
+      busyLanes:[...recordBusy],
+      coreReady:Boolean(looper),
+      optionalReady:Boolean(synth&&midi&&performanceFx),
+      events:captureEvents.slice(-40)
     }),
-    state:()=>({ready:true,selected,bpm:looper.bpm,masterLength:looper.masterLength,playing:looper.playing,lofi:performanceFx.lofi,lanes:looper.tracks.map(track=>({name:track.name,state:track.state,hasAudio:Boolean(track.buffer),muted:track.muted,volume:track.volume,pan:track.panValue,rate:track.rate,reverse:track.reverse}))})
+    state:()=>({ready:true,selected,bpm:looper.bpm,masterLength:looper.masterLength,playing:looper.playing,lofi:performanceFx?.lofi||false,lanes:looper.tracks.map(track=>({name:track.name,state:track.state,hasAudio:Boolean(track.buffer),muted:track.muted,volume:track.volume,pan:track.panValue,rate:track.rate,reverse:track.reverse}))})
   };
-  status('Live Loop ready. All five lanes are touch-ready. MIDI is optional.');
+}
+
+async function setupCoreEngine(){
+  trace('core-engine-start');
+  await workspace.init();
+  delay=new TapeDelay(workspace.context);
+  reverb=new SpatialReverb(workspace.context);
+  delay.output.connect(workspace.master);
+  reverb.output.connect(workspace.master);
+  const scheduler=new LookAheadScheduler(workspace.context);
+  looper=new FiveTrackLooper(workspace,scheduler,delay,reverb);
+  looper.addEventListener('track',event=>renderTrack(event.detail.index));
+  looper.addEventListener('change',renderAll);
+  looper.addEventListener('transport',renderAll);
+  looper.addEventListener('status',event=>status(event.detail.message));
+  exposeCoreApi();
+  renderAll();
+  trace('core-engine-ready');
   window.dispatchEvent(new CustomEvent('neusic:live-loop-ready'));
+  scheduleOptionalEngine();
   return looper;
 }
 
-function ensureEngine(){
+async function setupOptionalEngine(){
+  await ensureCoreEngine();
+  trace('optional-engine-start');
+  performanceFx=new PerformanceFx(workspace.context);
+  await performanceFx.init();
+  try{workspace.master.disconnect(workspace.analyser);}catch(_){}
+  workspace.master.connect(performanceFx.input);
+  performanceFx.output.connect(workspace.analyser);
+  synth=new HybridInstrument(workspace.context,workspace.master);
+  midi=new MidiRouter({
+    record:index=>looper.toggleRecord(index).catch(error=>status(error.message)),
+    mute:index=>looper.toggleMute(index),
+    volume:(index,value)=>looper.setTrackValue(index,'volume',value),
+    transport:()=>looper.playing?looper.stop():looper.start(),
+    noteOn:(note,velocity)=>synth.noteOn(note,velocity),
+    noteOff:note=>synth.noteOff(note)
+  });
+  trace('optional-engine-ready');
+  window.dispatchEvent(new CustomEvent('neusic:live-loop-full-ready'));
+  return looper;
+}
+
+function ensureCoreEngine(){
   if(looper)return Promise.resolve(looper);
-  if(!enginePromise){
-    enginePromise=setupEngine().catch(error=>{
-      enginePromise=null;
+  if(!corePromise){
+    corePromise=setupCoreEngine().catch(error=>{
+      corePromise=null;
       console.error(error);
-      status(error.message||'Audio could not initialize. Tap MIC or REC to retry.');
+      trace('core-engine-failed',{message:error?.message||String(error)});
+      status(error.message||'The recording engine could not initialize. Tap REC to retry.');
       throw error;
     });
   }
-  return enginePromise;
+  return corePromise;
+}
+
+function ensureOptionalEngine(){
+  if(synth&&midi&&performanceFx)return Promise.resolve(looper);
+  if(!optionalPromise){
+    optionalPromise=setupOptionalEngine().catch(error=>{
+      optionalPromise=null;
+      console.error(error);
+      trace('optional-engine-failed',{message:error?.message||String(error)});
+      throw error;
+    });
+  }
+  return optionalPromise;
+}
+
+function ensureEngine(){return ensureOptionalEngine();}
+
+function scheduleOptionalEngine(){
+  clearTimeout(optionalTimer);
+  optionalTimer=setTimeout(()=>{
+    if(looper?.activeRecording||looper?.arming){scheduleOptionalEngine();return;}
+    ensureOptionalEngine().catch(error=>console.warn('Optional Live Loop features will retry when used.',error));
+  },1500);
+}
+
+let diagnosticsPanel=null;
+function renderDiagnostics(){
+  if(!debugMode)return;
+  if(!diagnosticsPanel){
+    diagnosticsPanel=document.createElement('pre');
+    diagnosticsPanel.id='neusicCaptureDiagnostics';
+    diagnosticsPanel.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;max-height:42vh;overflow:auto;margin:0;padding:10px;background:#05080df2;color:#b9ffcf;border:1px solid #49665a;border-radius:10px;font:11px/1.35 ui-monospace,monospace;white-space:pre-wrap;pointer-events:none';
+    document.body.appendChild(diagnosticsPanel);
+  }
+  const recorder=looper?.capture?.diagnostics?.()||{};
+  const header={
+    userAgent:navigator.userAgent,
+    secure:window.isSecureContext,
+    context:workspace.context?.state||'not-created',
+    micLive:workspace.micIsLive?.()||false,
+    recorder,
+    lane:looper?.activeRecording?.index??looper?.arming?.index??null
+  };
+  diagnosticsPanel.textContent=JSON.stringify(header,null,2)+'\n\n'+captureEvents.slice(-18).map(item=>`${item.time.toFixed(0)} ${item.stage} ${JSON.stringify(item.detail)}`).join('\n');
 }
 
 function boot(){
   document.body.classList.add('stage-performance');
-  if(window.matchMedia('(pointer:coarse)').matches || window.matchMedia('(max-width:600px)').matches){
+  if(window.matchMedia('(pointer:coarse)').matches||window.matchMedia('(max-width:600px)').matches){
     document.querySelector('.utility-drawer')?.setAttribute('open','');
   }
   buildTracks();
@@ -409,6 +511,7 @@ function boot(){
   bindKeyboard();
   renderAll();
   updateProgress();
+  renderDiagnostics();
   status('Five loop lanes are visible. Tap REC on any lane; MIDI is optional.');
   window.dispatchEvent(new CustomEvent('neusic:live-loop-ui-ready',{detail:{lanes:5}}));
 }
