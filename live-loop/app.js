@@ -369,6 +369,9 @@ function ensureEngine(){
 
 function boot(){
   document.body.classList.add('stage-performance');
+  if(window.matchMedia('(pointer:coarse)').matches || window.matchMedia('(max-width:600px)').matches){
+    document.querySelector('.utility-drawer')?.setAttribute('open','');
+  }
   buildTracks();
   buildKeyboard();
   bindGlobal();
