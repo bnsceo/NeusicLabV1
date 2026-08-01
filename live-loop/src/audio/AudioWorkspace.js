@@ -11,42 +11,59 @@ class AudioWorkspace {
     this.pitchFrequency = 0;
     this.pitchConfidence = 0;
     this.unlocked = false;
+    this.pitchWorkletLoaded = false;
   }
 
-  // iOS requires resume() to be called directly from the trusted touch
-  // handler. Create/resume the context synchronously before async graph setup.
-  unlockFromGesture() {
-    if (!this.context) {
-      const Context = window.AudioContext || window.webkitAudioContext;
-      if (!Context) return null;
-      this.context = window.NeusicMobileMicPrimer?.context || new Context({latencyHint:'interactive'});
-      window.NeusicMobileMicPrimer?.adoptContext?.(this.context);
-    }
-    if (this.context.state !== 'running') this.context.resume().catch(()=>{});
+  createContext() {
+    if (this.context) return this.context;
+    const Context = window.AudioContext || window.webkitAudioContext;
+    if (!Context) return null;
+    this.context = window.NeusicMobileMicPrimer?.context || new Context({latencyHint:'interactive'});
+    window.NeusicMobileMicPrimer?.adoptContext?.(this.context);
     return this.context;
   }
 
-  async init() {
-    if (!this.context) {
-      const Context = window.AudioContext || window.webkitAudioContext;
-      if (!Context) throw new Error('Web Audio is not supported in this browser.');
-      this.context = window.NeusicMobileMicPrimer?.context || new Context({latencyHint:'interactive'});
-      window.NeusicMobileMicPrimer?.adoptContext?.(this.context);
-      this.master = this.context.createGain();
+  // iOS requires resume() to be called directly from the trusted touch handler.
+  // Only create/resume synchronously here; init() completes the graph afterward.
+  unlockFromGesture() {
+    const context = this.createContext();
+    if (!context) return null;
+    if (context.state !== 'running') context.resume().catch(()=>{});
+    return context;
+  }
+
+  async ensureGraph() {
+    const context = this.createContext();
+    if (!context) throw new Error('Web Audio is not supported in this browser.');
+
+    if (!this.master) {
+      this.master = context.createGain();
       this.master.gain.value = .82;
-      this.analyser = this.context.createAnalyser();
+    }
+    if (!this.analyser) {
+      this.analyser = context.createAnalyser();
       this.analyser.fftSize = 256;
       this.meterData = new Uint8Array(this.analyser.fftSize);
       this.master.connect(this.analyser);
-      this.analyser.connect(this.context.destination);
-      if(this.context.audioWorklet){try{await this.context.audioWorklet.addModule(new URL('./worklets/pitch-detector.js',import.meta.url));}catch(_){}}
+      this.analyser.connect(context.destination);
     }
+    if (context.audioWorklet && !this.pitchWorkletLoaded) {
+      try {
+        await context.audioWorklet.addModule(new URL('./worklets/pitch-detector.js',import.meta.url));
+        this.pitchWorkletLoaded = true;
+      } catch (_) {}
+    }
+    return this;
+  }
+
+  async init() {
+    await this.ensureGraph();
     await this.resume();
     return this;
   }
 
   async resume({required=false}={}) {
-    if (!this.context) return this.init();
+    if (!this.context) await this.ensureGraph();
     try {
       if (this.context.state !== 'running') {
         if (window.NeusicMobileMicPrimer?.context === this.context) await window.NeusicMobileMicPrimer.unlock();
@@ -162,7 +179,15 @@ class AudioWorkspace {
     if (this.micSource) return stream;
     this.releaseMicGraph();
     this.micSource = this.context.createMediaStreamSource(stream);
-    if(this.context.audioWorklet){try{this.pitchNode=new AudioWorkletNode(this.context,'neusic-pitch-detector');this.pitchNode.port.onmessage=event=>{this.pitchFrequency=event.data?.frequency||0;this.pitchConfidence=event.data?.confidence||0;};}catch(_){this.pitchNode=null;}}
+    if(this.context.audioWorklet && this.pitchWorkletLoaded){
+      try{
+        this.pitchNode=new AudioWorkletNode(this.context,'neusic-pitch-detector');
+        this.pitchNode.port.onmessage=event=>{
+          this.pitchFrequency=event.data?.frequency||0;
+          this.pitchConfidence=event.data?.confidence||0;
+        };
+      }catch(_){this.pitchNode=null;}
+    }
     this.monitor = this.context.createGain();
     this.monitor.gain.value = 0;
     if(this.pitchNode){this.micSource.connect(this.pitchNode);this.pitchNode.connect(this.monitor);}else this.micSource.connect(this.monitor);
