@@ -21,6 +21,11 @@
   function normalizeLayout() {
     document.getElementById('stageMacroDeck')?.remove();
     document.querySelectorAll('.mobile-lane-nav,.mobile-performance-controls').forEach(element => element.remove());
+    document.querySelectorAll('.track-actions [data-action="forge"]').forEach(button => {
+      button.hidden = true;
+      button.setAttribute('aria-hidden', 'true');
+      button.tabIndex = -1;
+    });
     const lowerGrid = document.querySelector('.lower-grid');
     const piano = document.querySelector('.synth-panel');
     const effects = document.querySelector('.pedalboard');
@@ -41,7 +46,7 @@
   function loadEnhancements() {
     loadScript('recording-touch-deduper.js?v=7beca03', 'data-live-loop-record-deduper');
     loadScript('mobile-performance-polish.js?v=ce76418', 'data-live-loop-polish');
-    loadScript('vocal-pitch-correction-v4.js?v=2033f98', 'data-live-loop-pitch-v4');
+    loadScript('autotune-engine-v5.js?v=ad1dca5', 'data-live-loop-pitch-v5');
     loadScript('scene-manager-v2.js?v=1b343dc', 'data-live-loop-scenes-v2');
   }
 
