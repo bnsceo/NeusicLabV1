@@ -1,13 +1,6 @@
 (() => {
   'use strict';
 
-  /**
-   * Live Loop now uses one interface for every viewport.
-   * This compatibility file intentionally does not create a second mobile or
-   * stage-performance control surface. It only removes stale injected markup
-   * left by older cached builds and keeps the real desktop panels in the
-   * intended responsive order.
-   */
   function normalizeLayout() {
     document.getElementById('stageMacroDeck')?.remove();
     document.querySelectorAll('.mobile-lane-nav,.mobile-performance-controls').forEach(element => element.remove());
@@ -20,10 +13,23 @@
     }
   }
 
+  function loadPerformancePolish() {
+    if (document.querySelector('script[data-live-loop-polish]')) return;
+    const script = document.createElement('script');
+    script.src = `mobile-performance-polish.js?v=8abc58a`;
+    script.dataset.liveLoopPolish = 'true';
+    script.defer = true;
+    document.head.appendChild(script);
+  }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', normalizeLayout, {once:true});
+    document.addEventListener('DOMContentLoaded', () => {
+      normalizeLayout();
+      loadPerformancePolish();
+    }, {once:true});
   } else {
     normalizeLayout();
+    loadPerformancePolish();
   }
 
   addEventListener('neusic:live-loop-ui-ready', normalizeLayout);
