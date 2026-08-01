@@ -171,6 +171,17 @@ body.stage-performance .key-black{background:linear-gradient(#465158,#1f292e)!im
 body.stage-performance .master-display{background:var(--neo-bg)!important;color:var(--neo-ink)!important;box-shadow:inset 3px 3px 7px var(--neo-shadow),inset -3px -3px 7px var(--neo-light)!important}
 body.stage-performance .neusic-agent-launcher{background:var(--neo-bg)!important;color:var(--neo-mint)!important;border:0!important;box-shadow:5px 5px 11px var(--neo-shadow),-5px -5px 11px var(--neo-light)!important}
 
+/* Reference-width mobile/tablet carousel. The 828px reference is still a
+   mobile composition: one lane per slide, never five lanes squeezed together. */
+@media (max-width:1100px){
+  body.stage-performance .loop-deck>.panel-header{display:none!important}
+  body.stage-performance .scene-strip{display:none!important}
+  body.stage-performance #trackGrid{display:flex!important;grid-template-columns:none!important;gap:18px!important;width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;overflow-x:auto!important;overflow-y:hidden!important;padding:18px 38px 24px!important;scroll-snap-type:x mandatory!important;scroll-padding-inline:38px!important;-webkit-overflow-scrolling:touch!important}
+  body.stage-performance .loop-track{flex:0 0 calc(100vw - 76px)!important;width:calc(100vw - 76px)!important;min-width:calc(100vw - 76px)!important;height:auto!important;min-height:780px!important;scroll-snap-align:start!important}
+  body.stage-performance .track-actions{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+  body.stage-performance .track-actions .danger{grid-column:1/-1!important}
+}
+
 /* Final touch-device override. This intentionally wins over every legacy
    desktop/stage rule, including browsers that expose a wide CSS viewport. */
 @media (pointer:coarse){
