@@ -140,7 +140,8 @@ body.stage-performance .utility-drawer{display:block!important;margin-top:24px!i
   body.stage-performance .transport>*{min-width:0!important;min-height:52px!important}
   body.stage-performance .neusic-suite-next{grid-column:span 2!important}
   body.stage-performance #trackGrid{grid-template-columns:1fr!important;gap:14px!important;overflow:visible!important;padding:12px 8px 18px!important}
-  body.stage-performance .loop-track{width:100%!important;min-height:430px!important;padding:14px!important}
+  body.stage-performance #trackGrid{height:auto!important;min-height:0!important;max-height:none!important}
+  body.stage-performance .loop-track{width:100%!important;height:auto!important;min-height:430px!important;padding:14px!important}
   body.stage-performance .loop-track header{min-height:54px!important}
   body.stage-performance .track-name{max-width:none!important;font-size:10px!important}
   body.stage-performance .track-actions{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:6px!important}
