@@ -34,12 +34,12 @@
     const script = document.createElement('script');
     script.src = src;
     script.setAttribute(marker, 'true');
-    script.defer = true;
+    script.async = false;
     document.head.appendChild(script);
   }
 
   function loadEnhancements() {
-    loadScript('recording-controller-v2.js?v=75f79f7', 'data-live-loop-record-controller');
+    // REC is intentionally owned by app.js. Do not add another pointer/click controller.
     loadScript('mobile-performance-polish.js?v=ce76418', 'data-live-loop-polish');
     loadScript('vocal-pitch-correction-v2.js?v=610488c', 'data-live-loop-pitch-v2');
     loadScript('scene-manager-v2.js?v=1b343dc', 'data-live-loop-scenes-v2');
