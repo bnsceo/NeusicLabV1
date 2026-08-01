@@ -1,7 +1,4 @@
-// Real piano playback — Salamander Grand Piano samples (Yamaha C5), recorded and
-// released by Alexander Holm under CC-BY 3.0 (http://creativecommons.org/licenses/by/3.0/).
-// Sampled every minor third across the keyboard; notes between samples are pitch-shifted
-// via playbackRate, which stays natural-sounding within +/-1.5 semitones.
+// Real piano playback with an always-audible oscillator fallback.
 import {PolySynth} from './Synth.js';
 
 const SAMPLE_MAP = [
@@ -42,13 +39,17 @@ export class SamplePiano {
         const response=await fetch(`${this.basePath}${entry.name}.mp3`);
         if(!response.ok) throw new Error(`${response.status}`);
         const arrayBuffer=await response.arrayBuffer();
-        const buffer=await this.context.decodeAudioData(arrayBuffer);
+        const buffer=await this.context.decodeAudioData(arrayBuffer.slice(0));
         this.buffers.set(entry.midi,buffer);
       }catch(error){
-        console.warn(`Piano sample ${entry.name} failed to load; nearby notes will fall back.`,error);
+        console.warn(`Piano sample ${entry.name} unavailable; using synth fallback.`,error);
       }
     }));
     return this.loadPromise;
+  }
+
+  hasSample(note){
+    return this.buffers.has(this.nearestSample(note).midi);
   }
 
   setAttack(value){this.attack=Math.max(.002,value);}
@@ -58,19 +59,20 @@ export class SamplePiano {
     this.noteOff(note);
     const sample=this.nearestSample(note);
     const buffer=this.buffers.get(sample.midi);
-    if(!buffer) return; // still loading or failed — silently skip rather than throw mid-performance
+    if(!buffer) return false;
     const now=this.context.currentTime;
     const source=this.context.createBufferSource();
     source.buffer=buffer;
     source.playbackRate.value=Math.pow(2,(note-sample.midi)/12);
     const gain=this.context.createGain();
     const peak=Math.max(.05,Math.min(1,velocity/127));
-    gain.gain.setValueAtTime(0,now);
-    gain.gain.linearRampToValueAtTime(peak,now+this.attack);
+    gain.gain.setValueAtTime(.0001,now);
+    gain.gain.exponentialRampToValueAtTime(peak,now+this.attack);
     source.connect(gain);
     gain.connect(this.output);
     source.start(now);
     this.voices.set(note,{source,gain});
+    return true;
   }
 
   noteOff(note){
@@ -85,20 +87,40 @@ export class SamplePiano {
   }
 }
 
-// Keeps app.js's existing synth.noteOn/noteOff/setWave/setCutoff/setAttack/setRelease
-// calls exactly as they are — 'piano' routes to real samples, every other wave value
-// keeps using the existing oscillator synth untouched.
 export class HybridInstrument {
   constructor(context,output,basePath){
     this.synth=new PolySynth(context,output);
+    this.synth.setWave('triangle');
+    this.synth.setCutoff(4200);
     this.piano=new SamplePiano(context,output,basePath);
     this.wave='piano';
+    this.fallbackNotes=new Set();
     this.piano.load();
   }
-  setWave(value){this.wave=value;if(value!=='piano')this.synth.setWave(value);}
+  setWave(value){
+    this.wave=value;
+    if(value!=='piano')this.synth.setWave(value);
+  }
   setCutoff(value){this.synth.setCutoff(value);}
   setAttack(value){this.synth.setAttack(value);this.piano.setAttack(value);}
   setRelease(value){this.synth.setRelease(value);this.piano.setRelease(value);}
-  noteOn(note,velocity){(this.wave==='piano'?this.piano:this.synth).noteOn(note,velocity);}
-  noteOff(note){(this.wave==='piano'?this.piano:this.synth).noteOff(note);}
+  noteOn(note,velocity){
+    if(this.context?.state==='suspended')this.context.resume().catch(()=>{});
+    if(this.wave!=='piano'){
+      this.synth.noteOn(note,velocity);
+      return;
+    }
+    if(!this.piano.noteOn(note,velocity)){
+      this.fallbackNotes.add(note);
+      this.synth.noteOn(note,velocity);
+    }
+  }
+  noteOff(note){
+    this.piano.noteOff(note);
+    if(this.wave!=='piano'||this.fallbackNotes.has(note)){
+      this.synth.noteOff(note);
+      this.fallbackNotes.delete(note);
+    }
+  }
+  get context(){return this.synth.context;}
 }
