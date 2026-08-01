@@ -13,6 +13,7 @@ const trackGrid=$('trackGrid');
 const template=$('trackTemplate');
 const keyMap={a:60,w:61,s:62,e:63,d:64,f:65,t:66,g:67,y:68,h:69,u:70,j:71};
 const heldKeys=new Set();
+const recordBusy=new Set();
 const sceneSnapshots=[null,null,null];
 let activeScene=0,currentKey=0,currentScale='major';
 const scaleIntervals={major:[0,2,4,5,7,9,11],minor:[0,2,3,5,7,8,10],pentatonic:[0,2,4,7,9]};
@@ -43,34 +44,49 @@ function refreshKeyHighlight(){document.querySelectorAll('#keyboard [data-note]'
 function saveScene(index){if(!looper)return;sceneSnapshots[index]=looper.tracks.map(track=>({buffer:track.buffer,name:track.name,muted:track.muted}));activeScene=index;document.querySelectorAll('.scene-button').forEach(button=>button.classList.toggle('active',Number(button.dataset.scene)===index));status(`Scene ${String.fromCharCode(65+index)} saved.`);}
 function launchScene(index){if(!looper)return;const snapshot=sceneSnapshots[index];if(!snapshot){saveScene(index);return;}snapshot.forEach((saved,i)=>{const track=looper.tracks[i];track.buffer=saved.buffer;track.name=saved.name;track.muted=saved.muted;track.state=track.muted?STATES.MUTED:track.buffer?(looper.playing?STATES.PLAYING:STATES.STOPPED):STATES.EMPTY;if(looper.playing)looper.restartTrack(track);});activeScene=index;document.querySelectorAll('.scene-button').forEach(button=>button.classList.toggle('active',Number(button.dataset.scene)===index));looper.emit('change');status(`Scene ${String.fromCharCode(65+index)} launched.`);}
 
+function recordButtonFor(index){return trackGrid?.querySelector(`[data-index="${index}"] [data-action="record"]`)||null;}
+
 function primeMicrophoneFromGesture(){
   if(window.NeusicMobileMicPrimer?.prime)return window.NeusicMobileMicPrimer.prime();
   if(!navigator.mediaDevices?.getUserMedia)return Promise.reject(new Error('Microphone capture is unavailable in this browser.'));
   return navigator.mediaDevices.getUserMedia({audio:true});
 }
 
-async function startRecordFromGesture(index,button){
-  if(button.dataset.recordBusy==='1')return;
-  button.dataset.recordBusy='1';
-  selectTrack(index);
-  status(`Preparing LOOP ${index+1}… Keep this page open.`);
+async function recordFromTrustedGesture(index,button=recordButtonFor(index)){
+  if(recordBusy.has(index))return;
+  const context=workspace.unlockFromGesture();
+  if(!context){status('Web Audio is unavailable in this browser.');return;}
 
-  const microphonePromise=primeMicrophoneFromGesture();
-  const audioEnginePromise=ensureEngine();
+  recordBusy.add(index);
+  if(button)button.dataset.recordBusy='1';
+  selectTrack(index);
 
   try{
-    const [readyLooper,stream]=await Promise.all([audioEnginePromise,microphonePromise]);
-    if(stream?.getAudioTracks?.().length){
-      workspace.micStream=stream;
-      await workspace.initMic();
+    const stoppingCurrentLane=Boolean(looper&&(
+      looper.activeRecording?.index===index||looper.arming?.index===index
+    ));
+    if(stoppingCurrentLane){
+      await looper.toggleRecord(index);
+      return;
     }
+
+    status(`Preparing LOOP ${index+1}… Keep this page open.`);
+    const microphonePromise=primeMicrophoneFromGesture();
+    const audioEnginePromise=ensureEngine();
+    const [readyLooper,stream]=await Promise.all([audioEnginePromise,microphonePromise]);
+
+    if(stream?.getAudioTracks?.().some(track=>track.readyState==='live')){
+      workspace.micStream=stream;
+    }
+    await workspace.initMic();
     await workspace.resume({required:true});
     await readyLooper.toggleRecord(index);
   }catch(error){
     console.error(error);
-    status(error.message||'The iPhone could not start this lane.');
+    status(error.message||'Recording could not start. Check microphone permission and tap REC again.');
   }finally{
-    delete button.dataset.recordBusy;
+    recordBusy.delete(index);
+    if(button)delete button.dataset.recordBusy;
   }
 }
 
@@ -85,17 +101,27 @@ function buildTracks(){
     card.dataset.index=String(index);
     card.querySelector('.track-number').textContent=String(index+1).padStart(2,'0');
     card.querySelector('.track-name').textContent=`LOOP ${index+1}`;
-    card.querySelectorAll('[data-action]').forEach(button=>button.addEventListener('click',async event=>{
+
+    card.querySelectorAll('[data-action]:not([data-action="record"])').forEach(button=>button.addEventListener('click',async event=>{
       event.stopPropagation();
       await handleTrackAction(index,button.dataset.action);
     }));
+
     const recordButton=card.querySelector('[data-action="record"]');
     recordButton.addEventListener('pointerdown',event=>{
-      if(event.pointerType==='mouse')return;
+      if(event.button!==0)return;
       event.preventDefault();
+      event.stopPropagation();
       event.stopImmediatePropagation();
-      startRecordFromGesture(index,recordButton);
+      recordFromTrustedGesture(index,recordButton);
     },{passive:false});
+    recordButton.addEventListener('click',event=>{
+      event.preventDefault();
+      event.stopPropagation();
+      if(event.detail!==0)return;
+      recordFromTrustedGesture(index,recordButton);
+    });
+
     card.querySelectorAll('[data-control]').forEach(input=>input.addEventListener(input.tagName==='SELECT'?'change':'input',async()=>{
       const key=input.dataset.control;
       const raw=input.tagName==='SELECT'?input.value:Number(input.value);
@@ -121,15 +147,6 @@ async function handleTrackAction(index,action){
   selectTrack(index);
   if(action==='select')return;
   try{
-    if(action==='record'){
-      const microphonePromise=primeMicrophoneFromGesture();
-      const readyLooper=await ensureEngine();
-      const stream=await microphonePromise;
-      if(stream?.getAudioTracks?.().length){workspace.micStream=stream;await workspace.initMic();}
-      await workspace.resume({required:true});
-      await readyLooper.toggleRecord(index);
-      return;
-    }
     await ensureEngine();
     if(action==='edit'){
       document.querySelector(`[data-index="${index}"] .track-controls input`)?.focus();
@@ -205,7 +222,7 @@ function updateProgress(){
 }
 
 function bindGlobal(){
-  $('captureBtn').addEventListener('click',async()=>{try{await ensureEngine();await workspace.initMic();await workspace.resume({required:true});await looper.toggleRecord(selected);}catch(error){status(error.message||'Capture could not start.');}});
+  $('captureBtn').addEventListener('click',()=>recordFromTrustedGesture(selected,recordButtonFor(selected)));
   $('saveSceneBtn').addEventListener('click',()=>saveScene(activeScene));
   document.querySelectorAll('.scene-button').forEach(button=>button.addEventListener('click',()=>launchScene(Number(button.dataset.scene))));
   $('keySelect').addEventListener('change',event=>{currentKey=Number(event.target.value);refreshKeyHighlight();});
@@ -213,6 +230,7 @@ function bindGlobal(){
   $('exportMixBtn').addEventListener('click',async()=>{try{await ensureEngine();const mix=looper.mixBuffer();if(!mix){status('Record or load a loop before exporting the mix.');return;}downloadBuffer(mix,'neusic-live-mix.wav');status('Full five-lane mix exported as WAV.');}catch(error){status(error.message||'Mix export failed.');}});
   $('micBtn').addEventListener('click',async()=>{
     try{
+      workspace.unlockFromGesture();
       const microphonePromise=primeMicrophoneFromGesture();
       await ensureEngine();
       const stream=await microphonePromise;
@@ -295,9 +313,14 @@ function bindKeyboard(){
   document.addEventListener('keydown',async event=>{
     if(event.target.matches('input,select,textarea,button'))return;
     try{
+      if(event.code==='Space'){event.preventDefault();await ensureEngine();looper.playing?looper.stop():looper.start();return;}
+      if(/^[1-5]$/.test(event.key)){
+        event.preventDefault();
+        const index=Number(event.key)-1;
+        await recordFromTrustedGesture(index,recordButtonFor(index));
+        return;
+      }
       await ensureEngine();
-      if(event.code==='Space'){event.preventDefault();looper.playing?looper.stop():looper.start();return;}
-      if(/^[1-5]$/.test(event.key)){event.preventDefault();await looper.toggleRecord(Number(event.key)-1);return;}
       const note=keyMap[event.key.toLowerCase()];
       if(note!==undefined&&!heldKeys.has(event.key)){heldKeys.add(event.key);synth.noteOn(note,100);document.querySelector(`[data-note="${note}"]`)?.classList.add('active');}
     }catch(error){status(error.message);}
@@ -347,6 +370,14 @@ async function setupEngine(){
     loadSelected:()=>$('fileInput').click(),
     sendSelected:()=>sendTrack(selected),
     clearSelected:()=>looper.clear(selected),
+    diagnostics:()=>({
+      contextState:workspace.context?.state||'not-created',
+      microphoneLive:workspace.micIsLive?.()||false,
+      recorderMode:looper.capture?.mode||'none',
+      armingLane:looper.arming?.index??null,
+      recordingLane:looper.activeRecording?.index??null,
+      busyLanes:[...recordBusy]
+    }),
     state:()=>({ready:true,selected,bpm:looper.bpm,masterLength:looper.masterLength,playing:looper.playing,lofi:performanceFx.lofi,lanes:looper.tracks.map(track=>({name:track.name,state:track.state,hasAudio:Boolean(track.buffer),muted:track.muted,volume:track.volume,pan:track.panValue,rate:track.rate,reverse:track.reverse}))})
   };
   status('Live Loop ready. All five lanes are touch-ready. MIDI is optional.');
