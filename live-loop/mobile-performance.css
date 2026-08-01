@@ -1,6 +1,7 @@
 /* Phone-first Live Loop performance layout.
    Keeps every looper lane available without compressing five cards into one viewport. */
 .mobile-lane-nav{display:none}
+.mobile-performance-controls{display:none}
 
 @media (max-width:760px){
   html{scroll-padding-top:150px}
