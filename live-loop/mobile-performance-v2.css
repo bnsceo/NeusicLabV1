@@ -8,10 +8,22 @@
   .topbar .brand-mark{width:34px!important;height:34px!important}
   .topbar .transport,.topbar .top-actions{display:none!important}
   .neusic-suite-rail{position:relative!important;margin-top:var(--neusic-credit-safe,0px)!important}
-  .performance-shell{width:100%;padding-top:0!important}
-  .loop-deck{border-inline:0;border-radius:0}
-  .loop-deck>.panel-header{padding-bottom:8px!important}
+
+  .performance-shell{width:100%;display:flex!important;flex-direction:column!important;padding-top:0!important}
+  .performance-head{display:none!important}
+  .loop-deck{order:1;display:flex!important;flex-direction:column!important;border-inline:0;border-radius:0}
+  .loop-deck>.panel-header{order:1;padding-bottom:8px!important}
   .loop-deck>.panel-header .legend{display:none!important}
+  .loop-deck>.legend{order:2}
+  .loop-deck>.scene-strip{order:3}
+  .loop-deck>.mobile-lane-nav{order:4}
+  .loop-deck>.track-grid{order:5}
+  .loop-deck>.mobile-performance-controls{order:6}
+  .utility-drawer{order:2;width:100%}
+  .utility-drawer>.lower-grid{display:flex!important;flex-direction:column!important}
+  .utility-drawer .synth-panel{order:1}
+  .utility-drawer .pedalboard{order:2}
+  .utility-drawer .session-tools{order:3}
 
   .mobile-lane-nav{display:grid;position:sticky;top:0;z-index:76;gap:8px;padding:9px 9px 10px;border-top:1px solid #263036;border-bottom:1px solid #050607;background:linear-gradient(#171d20,#090c0e);box-shadow:0 10px 24px #000b,inset 0 1px #ffffff0c}
   .mobile-lane-nav-head{display:flex;align-items:center;justify-content:space-between;gap:12px;color:#aab4b8;font:800 7px/1.2 var(--mono);letter-spacing:.09em}
@@ -47,7 +59,6 @@
   .track-actions .record-action{grid-column:span 2!important;font-size:10px!important}
   .track-controls{grid-template-columns:1fr 1fr!important;gap:8px}
   .track-controls label{min-width:0;min-height:68px!important}
-  .performance-head{margin-top:8px!important}
   .lower-grid,.pedal-grid{grid-template-columns:1fr}
   .session-tools{grid-template-columns:1fr}
   .tool-actions{display:grid;grid-template-columns:1fr}
