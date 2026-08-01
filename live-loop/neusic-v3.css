@@ -59,6 +59,34 @@ body.stage-performance .neusic-suite-next b{color:var(--neo-coral);font-size:8px
 body.stage-performance .top-actions{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-items:center}
 body.stage-performance .top-actions a{min-height:48px;display:grid;place-items:center;padding:0 12px;text-decoration:none;font-size:7px}
 body.stage-performance .neusic-suite-rail{display:none!important}
+/* If an older cached suite script still paints the rail, keep it in the same
+   light neumorphic language instead of exposing the legacy black strip. */
+body.stage-performance .neusic-suite-rail{
+  display:grid!important;
+  min-height:64px;
+  padding:8px 20px;
+  border:0;
+  border-top:1px solid #c7d0d5;
+  border-bottom:1px solid #c7d0d5;
+  background:var(--neo-bg);
+  box-shadow:6px 6px 16px #b9c3caaa,-6px -6px 16px #fbfdffcc;
+  color:var(--neo-ink);
+}
+body.stage-performance .neusic-suite-intro,
+body.stage-performance .neusic-suite-path>a,
+body.stage-performance .neusic-suite-next{color:var(--neo-muted)}
+body.stage-performance .neusic-suite-path>a[aria-current="page"]{
+  border-color:#c95770;
+  background:var(--neo-bg);
+  color:var(--neo-coral);
+  box-shadow:inset 3px 3px 7px var(--neo-shadow),inset -3px -3px 7px var(--neo-light);
+}
+body.stage-performance .neusic-suite-next{
+  border:0;
+  background:var(--neo-bg);
+  box-shadow:5px 5px 11px var(--neo-shadow),-5px -5px 11px var(--neo-light);
+}
+body.stage-performance .neusic-suite-next b{color:var(--neo-coral)}
 @media(max-width:760px){
   body.stage-performance .topbar{grid-template-columns:1fr!important;gap:8px!important;padding:10px!important}
   body.stage-performance .transport{grid-template-columns:repeat(8,minmax(0,1fr))!important;gap:4px!important;overflow:visible!important}
@@ -68,6 +96,7 @@ body.stage-performance .neusic-suite-rail{display:none!important}
   body.stage-performance .neusic-suite-next b{font-size:6px}
   body.stage-performance .top-actions{grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
   body.stage-performance .top-actions a{min-height:42px;border-radius:13px;padding:4px 2px;font-size:5px}
+  body.stage-performance .neusic-suite-rail{grid-template-columns:1fr auto;padding:7px 10px}
 }
 
 /* Final Live Loop surface: this layer intentionally wins over the older stage/mobile skins. */
