@@ -14,21 +14,29 @@ class AudioWorkspace {
     this.pitchWorkletLoaded = false;
   }
 
+  trace(stage, detail = {}) {
+    window.__neusicCaptureTrace?.(stage, detail);
+  }
+
   createContext() {
-    if (this.context) return this.context;
+    if (this.context && this.context.state !== 'closed') return this.context;
     const Context = window.AudioContext || window.webkitAudioContext;
     if (!Context) return null;
     this.context = window.NeusicMobileMicPrimer?.context || new Context({latencyHint:'interactive'});
     window.NeusicMobileMicPrimer?.adoptContext?.(this.context);
+    this.trace('context-created', {state:this.context.state, sampleRate:this.context.sampleRate});
     return this.context;
   }
 
-  // iOS requires resume() to be called directly from the trusted touch handler.
-  // Only create/resume synchronously here; init() completes the graph afterward.
   unlockFromGesture() {
     const context = this.createContext();
     if (!context) return null;
-    if (context.state !== 'running') context.resume().catch(()=>{});
+    this.trace('gesture-unlock-requested', {state:context.state});
+    if (context.state !== 'running') {
+      const result = context.resume();
+      result?.then?.(() => this.trace('context-running', {state:context.state}));
+      result?.catch?.(error => this.trace('context-resume-failed', {message:error?.message || String(error)}));
+    }
     return context;
   }
 
@@ -49,9 +57,11 @@ class AudioWorkspace {
     }
     if (context.audioWorklet && !this.pitchWorkletLoaded) {
       try {
-        await context.audioWorklet.addModule(new URL('./worklets/pitch-detector.js',import.meta.url));
+        await context.audioWorklet.addModule(new URL('./worklets/pitch-detector.js', import.meta.url));
         this.pitchWorkletLoaded = true;
-      } catch (_) {}
+      } catch (error) {
+        this.trace('pitch-worklet-skipped', {message:error?.message || String(error)});
+      }
     }
     return this;
   }
@@ -63,23 +73,22 @@ class AudioWorkspace {
   }
 
   async resume({required=false}={}) {
-    if (!this.context) await this.ensureGraph();
+    const context = this.createContext();
+    if (!context) throw new Error('Web Audio is not supported in this browser.');
     try {
-      if (this.context.state !== 'running') {
-        if (window.NeusicMobileMicPrimer?.context === this.context) await window.NeusicMobileMicPrimer.unlock();
-        else await this.context.resume();
-      }
-      if (this.context.state === 'running' && !this.unlocked) {
-        const pulse = this.context.createBufferSource();
-        pulse.buffer = this.context.createBuffer(1, 1, this.context.sampleRate);
-        pulse.connect(this.context.destination);
+      if (context.state !== 'running') await context.resume();
+      if (context.state === 'running' && !this.unlocked) {
+        const pulse = context.createBufferSource();
+        pulse.buffer = context.createBuffer(1, 1, context.sampleRate);
+        pulse.connect(context.destination);
         pulse.start(0);
         this.unlocked = true;
       }
     } catch (error) {
+      this.trace('context-resume-failed', {message:error?.message || String(error)});
       if (required) throw new Error(error?.message || 'Audio is still locked. Tap REC again to unlock it.');
     }
-    if (required && this.context.state !== 'running') {
+    if (required && context.state !== 'running') {
       throw new Error('Audio is still locked. Tap REC again to unlock it.');
     }
     return this;
@@ -89,14 +98,18 @@ class AudioWorkspace {
     return Boolean(stream?.getAudioTracks?.().some(track => track.readyState === 'live' && track.enabled));
   }
 
-  releaseMicGraph() {
-    try { this.micSource?.disconnect(); } catch (_) {}
+  releaseMonitorGraph() {
     try { this.monitor?.disconnect(); } catch (_) {}
     try { this.pitchNode?.disconnect(); } catch (_) {}
-    if(this.pitchNode?.port)this.pitchNode.port.onmessage=null;
-    this.micSource = null;
+    if (this.pitchNode?.port) this.pitchNode.port.onmessage = null;
     this.monitor = null;
     this.pitchNode = null;
+  }
+
+  releaseMicSource() {
+    this.releaseMonitorGraph();
+    try { this.micSource?.disconnect(); } catch (_) {}
+    this.micSource = null;
   }
 
   microphoneError(error) {
@@ -110,7 +123,7 @@ class AudioWorkspace {
       return new Error('The microphone is busy in another app. Close the other app and tap REC again.');
     }
     if (error?.name === 'AbortError') {
-      return new Error('The phone interrupted microphone startup. Tap REC again.');
+      return new Error('The browser interrupted microphone startup. Tap REC again.');
     }
     return new Error(error?.message || 'The microphone could not be opened.');
   }
@@ -147,50 +160,72 @@ class AudioWorkspace {
     }
   }
 
-  async initMic() {
+  // Minimal recording path. It intentionally does not initialize effects,
+  // instruments, MIDI, pitch detection, or the full output graph.
+  async prepareCapture(stream=null) {
     if (!window.isSecureContext) {
       throw new Error('Microphone recording requires HTTPS. Open the secure Neusic Live Loop page and tap REC again.');
     }
     if (!navigator.mediaDevices?.getUserMedia) {
-      throw new Error('Microphone capture is unavailable in this browser. Open Neusic Live Loop in Safari or Chrome.');
+      throw new Error('Microphone capture is unavailable in this browser. Open Neusic Live Loop in Safari, Chrome, Edge, or Firefox.');
     }
 
-    await this.init();
+    const context = this.createContext();
+    if (!context) throw new Error('Web Audio is not supported in this browser.');
     await this.resume({required:true});
 
-    let stream = this.micIsLive() ? this.micStream : null;
-    if (!stream) {
-      this.releaseMicGraph();
-      this.micStream?.getTracks?.().forEach(track => track.stop());
-      stream = await this.requestMicStream();
-      if (!this.micIsLive(stream)) {
-        stream?.getTracks?.().forEach(item => item.stop());
-        throw new Error('The phone granted microphone permission but no live audio reached Neusic.');
-      }
-      this.micStream = stream;
-      const track = stream.getAudioTracks()[0];
-      track.enabled = true;
-      track.addEventListener('ended', () => {
-        this.releaseMicGraph();
-        if (this.micStream === stream) this.micStream = null;
-      }, {once:true});
+    let nextStream = this.micIsLive(stream) ? stream : (this.micIsLive() ? this.micStream : null);
+    if (!nextStream) {
+      this.trace('microphone-requested');
+      nextStream = await this.requestMicStream();
+    }
+    if (!this.micIsLive(nextStream)) {
+      nextStream?.getTracks?.().forEach(item => item.stop());
+      throw new Error('The browser granted microphone permission but no live audio track reached Neusic.');
     }
 
-    if (this.micSource) return stream;
-    this.releaseMicGraph();
-    this.micSource = this.context.createMediaStreamSource(stream);
-    if(this.context.audioWorklet && this.pitchWorkletLoaded){
-      try{
-        this.pitchNode=new AudioWorkletNode(this.context,'neusic-pitch-detector');
-        this.pitchNode.port.onmessage=event=>{
-          this.pitchFrequency=event.data?.frequency||0;
-          this.pitchConfidence=event.data?.confidence||0;
+    const changed = this.micStream !== nextStream;
+    this.micStream = nextStream;
+    const track = nextStream.getAudioTracks()[0];
+    track.enabled = true;
+    if (changed || !this.micSource) {
+      this.releaseMicSource();
+      this.micSource = context.createMediaStreamSource(nextStream);
+      track.addEventListener?.('ended', () => {
+        if (this.micStream === nextStream) {
+          this.releaseMicSource();
+          this.micStream = null;
+        }
+      }, {once:true});
+    }
+    this.trace('microphone-live', {readyState:track.readyState, label:track.label || ''});
+    return nextStream;
+  }
+
+  async initMic() {
+    const stream = await this.prepareCapture();
+    await this.ensureGraph();
+    this.releaseMonitorGraph();
+
+    if (this.context.audioWorklet && this.pitchWorkletLoaded) {
+      try {
+        this.pitchNode = new AudioWorkletNode(this.context, 'neusic-pitch-detector');
+        this.pitchNode.port.onmessage = event => {
+          this.pitchFrequency = event.data?.frequency || 0;
+          this.pitchConfidence = event.data?.confidence || 0;
         };
-      }catch(_){this.pitchNode=null;}
+      } catch (_) {
+        this.pitchNode = null;
+      }
     }
     this.monitor = this.context.createGain();
     this.monitor.gain.value = 0;
-    if(this.pitchNode){this.micSource.connect(this.pitchNode);this.pitchNode.connect(this.monitor);}else this.micSource.connect(this.monitor);
+    if (this.pitchNode) {
+      this.micSource.connect(this.pitchNode);
+      this.pitchNode.connect(this.monitor);
+    } else {
+      this.micSource.connect(this.monitor);
+    }
     this.monitor.connect(this.master);
     return stream;
   }
