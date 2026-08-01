@@ -190,7 +190,7 @@ body.stage-performance .neusic-agent-launcher{background:var(--neo-bg)!important
   body.stage-performance .stage-xy{min-height:190px!important;width:100%!important;border:0!important;background:linear-gradient(90deg,transparent 49.35%,#7f909966 49.7%,#7f909966 50.3%,transparent 50.65%),linear-gradient(0deg,transparent 49.35%,#7f909966 49.7%,#7f909966 50.3%,transparent 50.65%),#f3f6f5!important;box-shadow:inset 4px 4px 9px #c4cdd0,inset -4px -4px 9px #fff!important}
   body.stage-performance .stage-xy header{color:var(--neo-ink)!important}
   body.stage-performance .stage-xy footer{color:var(--neo-muted)!important}
-  body.stage-performance .mobile-recording-toast{top:auto!important;bottom:58px!important;background:var(--neo-bg)!important;color:var(--neo-ink)!important;border:0!important;box-shadow:5px 5px 11px var(--neo-shadow),-5px -5px 11px var(--neo-light)!important}
+  body.stage-performance .mobile-recording-toast{display:none!important}
 }
 
 /* Match the generated performance deck to the light neumorphic UI. */
