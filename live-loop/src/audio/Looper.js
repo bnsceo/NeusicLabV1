@@ -29,7 +29,7 @@ export class FiveTrackLooper extends EventTarget {
     const pan=this.context.createStereoPanner();
     const delaySend=this.context.createGain();
     const reverbSend=this.context.createGain();
-    gain.gain.value=.9;
+    gain.gain.value=.68;
     pan.pan.value=0;
     delaySend.gain.value=.22;
     reverbSend.gain.value=.18;
@@ -39,7 +39,7 @@ export class FiveTrackLooper extends EventTarget {
     pan.connect(reverbSend);
     delaySend.connect(this.delay.input);
     reverbSend.connect(this.reverb.input);
-    return{index,name:`LOOP ${index+1}`,state:STATES.EMPTY,buffer:null,source:null,gain,pan,delaySend,reverbSend,volume:.9,panValue:0,delay:.22,reverb:.18,autotune:'off',muted:false,rate:1,reverse:false,recording:null};
+    return{index,name:`LOOP ${index+1}`,state:STATES.EMPTY,buffer:null,source:null,sourceGain:null,gain,pan,delaySend,reverbSend,volume:.68,panValue:0,delay:.22,reverb:.18,autotune:'off',muted:false,rate:1,reverse:false,recording:null};
   }
 
   emit(type,detail={}){this.dispatchEvent(new CustomEvent(type,{detail}));}
@@ -96,8 +96,8 @@ export class FiveTrackLooper extends EventTarget {
       const left=track.buffer.getChannelData(0);
       const right=track.buffer.getChannelData(Math.min(1,track.buffer.numberOfChannels-1));
       const pan=track.panValue||0;
-      const leftGain=Math.cos((pan+1)*Math.PI/4)*(track.volume??.9);
-      const rightGain=Math.sin((pan+1)*Math.PI/4)*(track.volume??.9);
+      const leftGain=Math.cos((pan+1)*Math.PI/4)*(track.volume??.68);
+      const rightGain=Math.sin((pan+1)*Math.PI/4)*(track.volume??.68);
       const dstL=out.getChannelData(0);
       const dstR=out.getChannelData(1);
       for(let i=0;i<frames;i++){
@@ -262,25 +262,49 @@ export class FiveTrackLooper extends EventTarget {
     if(!track.buffer||track.muted)return;
     this.stopSource(track);
     const source=this.context.createBufferSource();
+    const sourceGain=this.context.createGain();
     source.buffer=track.buffer;
     source.loop=true;
     source.playbackRate.value=track.rate;
-    source.connect(track.gain);
-    const elapsed=this.playing&&this.masterLength?Math.max(0,this.context.currentTime-this.transportStart):0;
+    source.connect(sourceGain);
+    sourceGain.connect(track.gain);
+    const startTime=Math.max(this.context.currentTime,when);
+    const elapsed=this.playing&&this.masterLength?Math.max(0,startTime-this.transportStart):0;
     const offset=this.masterLength?(elapsed%this.masterLength):0;
-    source.start(Math.max(this.context.currentTime,when),offset);
+    sourceGain.gain.setValueAtTime(0,startTime);
+    sourceGain.gain.linearRampToValueAtTime(1,startTime+.008);
+    source.start(startTime,offset);
     track.source=source;
+    track.sourceGain=sourceGain;
     track.state=STATES.PLAYING;
   }
 
   stopSource(track){
-    try{track.source?.stop();}catch(_){}
-    track.source?.disconnect();
+    const source=track.source;
+    const sourceGain=track.sourceGain;
     track.source=null;
+    track.sourceGain=null;
+    if(!source)return;
+    const now=this.context.currentTime;
+    try{
+      if(sourceGain){
+        sourceGain.gain.cancelScheduledValues(now);
+        sourceGain.gain.setValueAtTime(Math.max(0,sourceGain.gain.value),now);
+        sourceGain.gain.linearRampToValueAtTime(0,now+.008);
+      }
+      source.stop(now+.012);
+      source.onended=()=>{
+        try{source.disconnect();}catch(_){}
+        try{sourceGain?.disconnect();}catch(_){}
+      };
+    }catch(_){
+      try{source.disconnect();}catch(__){}
+      try{sourceGain?.disconnect();}catch(__){}
+    }
   }
   restartTrack(track){if(this.playing)this.startTrack(track,this.context.currentTime+.02);}
   toggleMute(index){const track=this.tracks[index];track.muted=!track.muted;track.gain.gain.setTargetAtTime(track.muted?0:track.volume,this.context.currentTime,.02);track.state=track.muted?STATES.MUTED:(this.playing&&track.buffer?STATES.PLAYING:track.buffer?STATES.STOPPED:STATES.EMPTY);this.emit('track',{index});}
-  clear(index){const track=this.tracks[index];this.stopSource(track);track.buffer=null;track.state=STATES.EMPTY;track.muted=false;track.rate=1;track.reverse=false;track.name=`LOOP ${index+1}`;if(!this.tracks.some(item=>item.buffer))this.masterLength=0;this.emit('track',{index});this.emit('change');}
+  clear(index){const track=this.tracks[index];this.stopSource(track);track.buffer=null;track.state=STATES.EMPTY;track.muted=false;track.rate=1;track.reverse=false;track.name=`LOOP ${index+1}`;track.gain.gain.setTargetAtTime(track.volume,this.context.currentTime,.01);if(!this.tracks.some(item=>item.buffer))this.masterLength=0;this.emit('track',{index});this.emit('change');}
   clearAll(){this.capture.cancel();if(this.arming)this.arming.cancelled=true;this.arming=null;this.activeRecording=null;this.stop();this.tracks.forEach((_,index)=>this.clear(index));this.masterLength=0;this.emit('change');}
   reverse(index){const track=this.tracks[index];if(!track.buffer)return;const clone=this.context.createBuffer(track.buffer.numberOfChannels,track.buffer.length,track.buffer.sampleRate);for(let channel=0;channel<clone.numberOfChannels;channel++)clone.copyToChannel(Float32Array.from(track.buffer.getChannelData(channel)).reverse(),channel);track.buffer=clone;track.reverse=!track.reverse;this.restartTrack(track);this.emit('track',{index});}
   halfSpeed(index){const track=this.tracks[index];if(!track.buffer)return;track.rate=track.rate===.5?1:.5;this.restartTrack(track);this.emit('track',{index});}
