@@ -3,6 +3,8 @@ class AudioWorkspace {
     this.context = null;
     this.master = null;
     this.analyser = null;
+    this.limiter = null;
+    this.outputGain = null;
     this.meterData = null;
     this.micStream = null;
     this.micSource = null;
@@ -52,8 +54,23 @@ class AudioWorkspace {
       this.analyser = context.createAnalyser();
       this.analyser.fftSize = 256;
       this.meterData = new Uint8Array(this.analyser.fftSize);
+    }
+    if (!this.limiter) {
+      this.limiter = context.createDynamicsCompressor();
+      this.limiter.threshold.value = -6;
+      this.limiter.knee.value = 0;
+      this.limiter.ratio.value = 20;
+      this.limiter.attack.value = .003;
+      this.limiter.release.value = .14;
+    }
+    if (!this.outputGain) {
+      this.outputGain = context.createGain();
+      this.outputGain.gain.value = .93;
       this.master.connect(this.analyser);
-      this.analyser.connect(context.destination);
+      this.analyser.connect(this.limiter);
+      this.limiter.connect(this.outputGain);
+      this.outputGain.connect(context.destination);
+      this.trace('master-protection-ready', {threshold:-6, ratio:20, outputGain:.93});
     }
     if (context.audioWorklet && !this.pitchWorkletLoaded) {
       try {
