@@ -1,11 +1,11 @@
-import {workspace} from './src/audio/AudioWorkspace.js?v=20';
+import {workspace} from './src/audio/AudioWorkspace.js?v=21';
 import {LookAheadScheduler} from './src/audio/Scheduler.js';
-import {TapeDelay} from './src/audio/effects/TapeDelay.js';
-import {SpatialReverb} from './src/audio/effects/SpatialReverb.js';
+import {TapeDelay} from './src/audio/effects/TapeDelay.js?v=21';
+import {SpatialReverb} from './src/audio/effects/SpatialReverb.js?v=21';
 import {PerformanceFx} from './src/audio/effects/PerformanceFx.js';
 import {HybridInstrument} from './src/audio/instruments/Piano.js';
 import {MidiRouter} from './src/midi/MidiRouter.js';
-import {FiveTrackLooper,STATES} from './src/audio/Looper.js?v=20';
+import {FiveTrackLooper,STATES} from './src/audio/Looper.js?v=21';
 import {sendToForge,downloadBuffer} from './src/storage/ForgeBridge.js';
 
 const $=id=>document.getElementById(id);
