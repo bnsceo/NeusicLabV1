@@ -1,0 +1,233 @@
+/* NeusicWave — "In Transit": the page is a sealed carton with its shipping label */
+@font-face {
+  font-family: "Archivo";
+  src: url("/assets/fonts/archivo-latin.woff2") format("woff2");
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Barcode128";
+  src: url("/assets/fonts/barcode128-text.woff2") format("woff2");
+  font-display: block;
+}
+
+:root {
+  --kraft: #b07f50;
+  --kraft-deep: #8e6239;
+  --kraft-ink: #2a1a0c;
+  --label: #f6f4ee;
+  --ink: #121110;
+  --ghost: #6e6963;
+  --stamp: #b8180f;
+  --tape: rgba(222, 200, 152, .58);
+  --f: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --out: cubic-bezier(.16, 1, .3, 1);
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9 .05' numOctaves='3' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .2 0 0 0 0 .12 0 0 0 0 .05 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+  --speck: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.6' numOctaves='2' seed='9'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1.6 1.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--kraft); scrollbar-color: var(--kraft-deep) var(--kraft); }
+body {
+  font: 500 17px/1.45 var(--f);
+  color: var(--ink);
+  background-color: var(--kraft);
+  background-image: var(--grain);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  caret-color: var(--stamp);
+}
+::selection { background: var(--stamp); color: var(--label); }
+:focus-visible { outline: 3px solid var(--stamp); outline-offset: 3px; }
+a { color: inherit; text-underline-offset: 3px; text-decoration-thickness: 2px; }
+a:hover { color: var(--stamp); }
+img { display: block; max-width: 100%; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- The carton ---------- */
+.carton {
+  position: relative; min-height: 100svh;
+  display: grid; align-items: center;
+  padding: 72px clamp(16px, 7vw, 120px);
+  overflow: hidden;
+}
+.tape {
+  position: absolute; top: 0; bottom: 0; left: 64%; width: clamp(90px, 9vw, 140px);
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.22), transparent 18%, transparent 82%, rgba(90,60,20,.12)),
+    var(--tape);
+  box-shadow: inset 1px 0 rgba(255,255,255,.35), inset -1px 0 rgba(80,50,15,.18);
+}
+
+/* ---------- The shipping label ---------- */
+.label {
+  position: relative; z-index: 2;
+  width: min(620px, 100%);
+  background: var(--label);
+  padding: 26px 28px 24px;
+  transform: rotate(-1.2deg);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, .2), 0 18px 32px -14px rgba(0, 0, 0, .45);
+  animation: print 1.1s var(--out) both;
+}
+.label::after { /* thermal print is never perfectly even */
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image: var(--speck); opacity: .05; mix-blend-mode: multiply;
+}
+.sticker {
+  position: absolute; top: -46px; right: -42px; width: 128px; height: 128px;
+  border-radius: 50%; border: 6px solid var(--label); background: #03040a;
+  transform: rotate(9deg);
+  box-shadow: 0 6px 14px -6px rgba(0, 0, 0, .55);
+}
+.label-row { display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 3px solid var(--ink); }
+.label-row p { font-weight: 600; }
+.k {
+  display: block; font-size: 13px; font-weight: 800; font-stretch: 75%;
+  text-transform: uppercase; letter-spacing: .04em; color: var(--ink);
+}
+.from { padding-top: 0; align-items: baseline; padding-right: 92px; }
+.from p { font-size: 20px; font-weight: 800; font-stretch: 85%; }
+.from .k { display: inline; margin-right: 8px; font-size: 13px; }
+.svc { font-size: 15px !important; padding: 2px 8px; background: var(--ink); color: var(--label); }
+.ship { flex-direction: column; gap: 2px; }
+.ship p:last-child { font-size: 17px; max-width: 36ch; }
+.label h1 {
+  font-size: clamp(44px, 5.2vw, 78px); font-weight: 860; font-stretch: 72%;
+  line-height: .9; letter-spacing: -0.02em; text-wrap: balance;
+  padding: 18px 0 16px; border-bottom: 3px solid var(--ink);
+}
+.facts p { display: flex; gap: 10px; align-items: baseline; }
+.facts .k { display: inline; }
+
+.track { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; padding: 16px 0 6px; position: relative; }
+.track li { position: relative; padding-top: 26px; font-weight: 800; font-stretch: 80%; font-size: 16px; }
+.track li::before { /* the node */
+  content: ""; position: absolute; top: 0; left: 0; width: 16px; height: 16px; background: var(--ink); z-index: 1;
+}
+.track li::after { /* the line to the next node */
+  content: ""; position: absolute; top: 7px; left: 16px; right: 0; height: 2px; background: var(--ink);
+}
+.track li:last-child::after { display: none; }
+.track .now::after { background: none; height: 0; border-top: 2px dashed var(--ink); }
+.track .now::before { border-radius: 50%; background: var(--stamp); animation: blink 1.6s steps(1) infinite; }
+.track .ghost { color: var(--ghost); }
+.track .ghost::before { background: transparent; border: 2px dashed var(--ghost); }
+.track .done::before { -webkit-mask: none; }
+.track .done span { display: none; }
+
+.barcode {
+  font-family: "Barcode128", var(--f); font-size: 62px; line-height: 1; letter-spacing: 0;
+  color: var(--ink); padding: 12px 0 4px; white-space: nowrap; overflow: hidden;
+}
+
+.notify { border-top: 3px solid var(--ink); padding-top: 14px; }
+.notify-row { display: flex; gap: 8px; margin-top: 8px; }
+.notify input {
+  flex: 1; min-width: 0; min-height: 50px; padding: 0 14px;
+  font: 600 17px var(--f); color: var(--ink); background: #fff;
+  border: 2px solid var(--ink); border-radius: 0;
+}
+.notify input::placeholder { color: #6b665e; }
+.notify input:focus { outline: none; box-shadow: inset 0 0 0 2px var(--stamp); border-color: var(--stamp); }
+.notify button {
+  min-height: 50px; padding: 0 22px; border: 0; border-radius: 0; cursor: pointer;
+  font: 800 17px var(--f); font-stretch: 85%; background: var(--ink); color: var(--label);
+  transition: background-color .2s var(--out), transform .12s var(--out);
+}
+.notify button:hover { background: var(--stamp); }
+.notify button:active { transform: translateY(1px) scale(.98); }
+.notify button:disabled { background: #6c675f; cursor: progress; }
+.notify-note { margin-top: 10px; font-size: 14px; font-weight: 700; }
+.form-status { font-size: 14px; font-weight: 700; min-height: 1.3em; margin-top: 4px; }
+.form-status.err { color: var(--stamp); }
+
+/* ---------- The stamp ---------- */
+.stamp {
+  position: absolute; z-index: 3; right: clamp(16px, 6vw, 110px); top: 18%;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 10px 22px 14px; border: 8px solid var(--stamp); border-radius: 6px;
+  color: var(--stamp); font-weight: 900; font-stretch: 62%; text-transform: uppercase;
+  font-size: clamp(44px, 6.6vw, 112px); line-height: .86; letter-spacing: -0.01em;
+  transform: rotate(-11deg);
+  -webkit-mask-image: var(--speck); mask-image: var(--speck); mask-size: 300px;
+  animation: slam .55s var(--out) 1.05s both;
+}
+.handle {
+  position: absolute; right: clamp(16px, 6vw, 110px); bottom: 40px;
+  font-weight: 900; font-stretch: 62%; text-transform: uppercase; font-size: clamp(22px, 2.2vw, 34px);
+  color: var(--kraft-ink); letter-spacing: .02em;
+}
+
+/* ---------- Packing slip ---------- */
+.slip { padding: 48px clamp(16px, 7vw, 120px) 40px; }
+.slip-paper {
+  max-width: 1180px; background: #fbfaf6; padding: 32px 36px 28px;
+  transform: rotate(.5deg);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, .18), 0 16px 30px -16px rgba(0, 0, 0, .4);
+}
+.slip h2 { font-size: clamp(32px, 3.4vw, 48px); font-weight: 860; font-stretch: 72%; line-height: 1; padding-bottom: 14px; border-bottom: 3px solid var(--ink); }
+.slip table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.slip th { text-align: left; font-size: 13px; font-weight: 800; font-stretch: 75%; text-transform: uppercase; letter-spacing: .04em; padding: 14px 12px 8px 0; border-bottom: 2px solid var(--ink); }
+.slip td { padding: 16px 12px 16px 0; border-bottom: 1px solid #cfc9bd; vertical-align: middle; font-weight: 600; }
+.slip td strong { display: block; font-size: 18px; font-weight: 800; font-stretch: 85%; }
+.slip td span span, .slip td > span { display: block; font-size: 15px; color: #4a453e; font-weight: 500; }
+.slip .num { text-align: right; white-space: nowrap; }
+.slip td:last-child { text-align: right; white-space: nowrap; }
+.slip .sealed { color: #4a453e; }
+.book-cell { display: flex; gap: 14px; align-items: center; }
+.book-cell img { width: 56px; height: auto; box-shadow: 0 4px 10px -4px rgba(0,0,0,.4); }
+.slip a { font-weight: 800; }
+.slip .buy { display: inline-block; padding: 10px 16px; background: var(--ink); color: var(--label); text-decoration: none; transition: background-color .2s var(--out); }
+.slip .buy:hover { background: var(--stamp); color: var(--label); }
+.slip-foot { margin-top: 18px; font-weight: 700; }
+
+/* ---------- Bottom of the box ---------- */
+.bottom { position: relative; padding: 96px clamp(16px, 7vw, 120px) 32px; color: var(--kraft-ink); }
+.bottom .tape { top: 24px; bottom: auto; left: 0; right: 0; width: auto; height: 46px; background: linear-gradient(180deg, rgba(255,255,255,.22), transparent 30%, transparent 75%, rgba(90,60,20,.12)), var(--tape); }
+.track-line { font-size: clamp(22px, 2.4vw, 34px); font-weight: 800; font-stretch: 80%; line-height: 1.15; max-width: 30ch; }
+.track-line a { color: var(--ink); }
+.fine { margin-top: 28px; font-size: 14px; font-weight: 700; }
+
+/* ---------- Motion: the label feeds out of the printer, then the stamp lands ---------- */
+@keyframes print {
+  from { clip-path: inset(0 0 100% 0); transform: rotate(-1.2deg) translateY(-24px); }
+  to { clip-path: inset(-90px -90px -90px -90px); transform: rotate(-1.2deg); }
+}
+@keyframes slam {
+  from { opacity: 0; transform: rotate(-11deg) scale(1.7); filter: blur(6px); }
+  to { opacity: 1; transform: rotate(-11deg) scale(1); filter: blur(0); }
+}
+@keyframes blink { 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) {
+  .label, .stamp, .track .now::before { animation: none; }
+}
+
+/* ---------- Narrow screens ---------- */
+@media (max-width: 860px) {
+  .carton { align-items: start; padding: 132px 16px 96px; }
+  .tape { left: auto; right: 14%; }
+  .stamp { top: 22px; right: 16px; font-size: 44px; border-width: 6px; padding: 6px 14px 10px; }
+  .handle { bottom: 28px; right: 16px; }
+  .label { transform: rotate(-.6deg); padding: 22px 18px 20px; }
+  @keyframes print {
+    from { clip-path: inset(0 0 100% 0); transform: rotate(-.6deg) translateY(-24px); }
+    to { clip-path: inset(-90px -90px -90px -90px); transform: rotate(-.6deg); }
+  }
+  .sticker { width: 96px; height: 96px; top: -40px; right: -10px; }
+  .from { padding-right: 84px; }
+  .label h1 { font-size: 13vw; }
+  .barcode { font-size: 50px; }
+  .slip { padding: 24px 16px 96px; }
+  .slip-paper { padding: 22px 16px; transform: none; }
+  .slip thead { display: none; }
+  .slip tr { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 14px 0; border-bottom: 1px solid #cfc9bd; }
+  .slip td { border: 0; padding: 0; }
+  .slip td:first-child { grid-column: 1 / -1; }
+  .slip td:nth-child(2) { font-size: 15px; }
+  .slip td:last-child { grid-column: 1 / -1; text-align: left; margin-top: 6px; }
+}
+@media (max-width: 420px) {
+  .notify-row { flex-direction: column; }
+  .notify button { width: 100%; }
+}

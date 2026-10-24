@@ -30,3 +30,7 @@ node_modules/
 # Original rules preserved
 *.log
 ```
+.taste-skill/
+.impeccable/
+PRODUCT.md
+DESIGN.md
