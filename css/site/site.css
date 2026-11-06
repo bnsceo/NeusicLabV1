@@ -231,3 +231,8 @@ img { display: block; max-width: 100%; }
   .notify-row { flex-direction: column; }
   .notify button { width: 100%; }
 }
+
+/* Invite request: the optional note, the bot trap, and the privacy line. */
+.notify #note{width:100%;margin-top:.5rem}
+.notify .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none}
+.notify .fine-print{font-size:.78rem;opacity:.8;margin-top:.35rem}

@@ -5,19 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#b07f50" />
   <title>NeusicWave — something new is arriving</title>
-  <meta name="description" content="Something new is arriving from NeusicWave. Ask to be notified on delivery, and read Monetize Your Music: Stop performing. Start owning." />
+  <meta name="description" content="Something new is arriving from NeusicWave. Request an invite to the private preview, and read Monetize Your Music: Stop performing. Start owning." />
   <link rel="canonical" href="https://neusicwave.com/" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="NeusicWave" />
   <meta property="og:url" content="https://neusicwave.com/" />
   <meta property="og:title" content="NeusicWave — something new is arriving" />
-  <meta property="og:description" content="Contents undisclosed. In transit. Ask to be notified on delivery." />
+  <meta property="og:description" content="Contents undisclosed. In transit. Request an invite to the private preview." />
   <meta name="twitter:card" content="summary" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="icon" href="/favicon.png" type="image/png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="preload" href="/assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/css/site/site.css?v=3" />
+  <link rel="stylesheet" href="/css/site/site.css?v=4" />
 </head>
 <body>
   <main>
@@ -45,16 +45,16 @@
           <li class="ghost">Arriving</li>
         </ol>
         <p class="barcode" aria-hidden="true">ÌNEUSICWAVECÎ</p>
-        <form class="notify" action="https://formsubmit.co/ajax/neusicwave@gmail.com" method="POST" novalidate>
-          <input type="hidden" name="_subject" value="New NeusicWave Waitlist Signup" />
-          <input type="hidden" name="_captcha" value="false" />
-          <input type="hidden" name="_template" value="table" />
-          <label class="k" for="email">Notify me on delivery</label>
+        <form class="notify" action="https://studio.neusicwave.com/_api/request-invite" method="POST" novalidate>
+          <label class="k" for="email">Request an invite</label>
           <div class="notify-row">
             <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required />
-            <button type="submit">Notify me</button>
+            <button type="submit">Request invite</button>
           </div>
-          <p class="notify-note">Early access. Quiet updates. No noise.</p>
+          <input id="note" name="note" type="text" maxlength="300" autocomplete="off" placeholder="What do you make? (optional)" aria-label="What do you make? (optional)" />
+          <input class="hp" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <p class="notify-note">Private preview. Invites go out a few at a time.</p>
+          <p class="notify-note fine-print">We keep your email, your note and your country for up to 90 days, only to send you an invite. Ask us to delete it any time.</p>
           <p class="form-status" role="status" aria-live="polite"></p>
         </form>
       </article>
@@ -75,7 +75,7 @@
               <td><strong>Something new</strong><span>Contents undisclosed</span></td>
               <td>In transit</td>
               <td class="num">—</td>
-              <td><a href="#email">Notify me</a></td>
+              <td><a href="#email">Request an invite</a></td>
             </tr>
             <tr>
               <td class="book-cell">
@@ -99,6 +99,6 @@
     <p class="fine">© <span id="year">2026</span> NeusicWave</p>
   </footer>
 
-  <script src="/scripts/site/home.js?v=3" defer></script>
+  <script src="/scripts/site/home.js?v=4" defer></script>
 </body>
 </html>
