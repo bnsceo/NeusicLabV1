@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#e4e7ec" />
+  <title>Neusic Studio: haz un beat en tu navegador | NeusicWave</title>
+  <meta name="description" content="Neusic Studio es un estudio de música que funciona en tu navegador: patrones de batería, 18 géneros para empezar, grabación y exportación en WAV, en teléfono, tableta o computadora. Hacer música es gratis." />
+  <link rel="canonical" href="https://neusicwave.com/es/" />
+  <link rel="alternate" hreflang="en" href="https://neusicwave.com/" />
+  <link rel="alternate" hreflang="es" href="https://neusicwave.com/es/" />
+  <link rel="alternate" hreflang="x-default" href="https://neusicwave.com/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="NeusicWave" />
+  <meta property="og:locale" content="es_LA" />
+  <meta property="og:url" content="https://neusicwave.com/es/" />
+  <meta property="og:title" content="Neusic Studio: haz un beat en tu navegador" />
+  <meta property="og:description" content="Un estudio de música en tu navegador. Sin instalar nada. Hacer música es gratis." />
+  <meta property="og:image" content="https://neusicwave.com/social/neusicwave-share-v5.jpg" />
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="NeusicWave" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Neusic Studio: haz un beat en tu navegador" />
+  <meta name="twitter:description" content="Un estudio de música en tu navegador. Sin instalar nada. Hacer música es gratis." />
+  <meta name="twitter:image" content="https://neusicwave.com/social/neusicwave-share-v5.jpg" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/favicon.png" type="image/png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="preload" href="/assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/css/site/launch.css?v=2" />
+</head>
+<body>
+  <a class="skip" href="#main">Saltar al contenido</a>
+  <header class="top">
+    <a class="brand" href="/es/"><img src="/assets/site/logo.jpg" alt="" width="40" height="40" /><span>NeusicWave</span></a>
+    <nav aria-label="Main"><a href="#inside">Qué trae</a><a href="#prices">Precios</a><a href="/books/">Libros</a></nav>
+    <a class="lang" href="/" hreflang="en" lang="en">English</a>
+    <a class="btn go" href="#invite">Pide una invitación</a>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="title">
+      <div class="say">
+        <p class="kicker">Neusic Studio</p>
+        <h1 id="title">Haz un beat aquí mismo.</h1>
+        <p class="lead">Toca los pads y dale a reproducir. Este tablero es una probadita. Neusic Studio es el estudio completo, en tu navegador, sin instalar nada.</p>
+        <p class="acts"><a class="btn go" href="#invite">Pide una invitación</a><a class="btn" href="#prices">Ver los precios</a></p>
+      </div>
+      <div class="board">
+        <div class="well">
+          <canvas id="pads" aria-hidden="true"></canvas>
+          <p class="nogl">El tablero necesita WebGL, que este navegador tiene apagado.</p>
+          <ol class="rows" aria-hidden="true"><li>Bombo</li><li>Caja</li><li>Hi-hat</li><li>Aro</li></ol>
+        </div>
+        <p class="keys"><button id="play" class="btn round" type="button" aria-pressed="false" data-play="Reproducir" data-stop="Parar"><i aria-hidden="true"></i><span>Reproducir</span></button><button id="clear" class="btn" type="button">Borrar</button><span class="hint">Ocho pasos, cuatro tambores. Toca cualquier pad.</span></p>
+      </div>
+    </section>
+
+    <section class="invite" id="invite" aria-labelledby="invite-h">
+      <h2 id="invite-h">Por ahora es solo con invitación.</h2>
+      <p class="lead">Neusic Studio está en vista previa privada. Deja tu correo y te llega un enlace de invitación cuando haya lugar.</p>
+      <form class="notify" action="https://studio.neusicwave.com/_api/request-invite" method="POST" novalidate data-bad="Ese correo parece incompleto. Revísalo e inténtalo otra vez." data-off="Parece que no tienes conexión. Conéctate e inténtalo otra vez." data-send="Enviando…" data-fail="No pudimos enviarlo ahora. Inténtalo en un minuto." data-ok="Gracias. Cuando haya lugar, tu enlace de invitación llegará por correo.">
+        <div class="field"><input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="tu@correo.com" aria-label="Email" required /><button class="btn go" type="submit">Pide una invitación</button></div>
+        <div class="field"><input id="note" name="note" type="text" maxlength="300" autocomplete="off" placeholder="¿Qué música haces? (opcional)" aria-label="¿Qué música haces? (opcional)" /></div>
+        <input class="hp" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <p class="fine">Guardamos tu correo, tu nota y tu país hasta 90 días, solo para enviarte la invitación. Pídenos borrarlo cuando quieras. <a href="https://studio.neusicwave.com/privacy">Privacidad</a> (en inglés)</p>
+        <p class="form-status" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section class="inside" id="inside" aria-labelledby="inside-h">
+      <h2 id="inside-h">Qué trae el estudio</h2>
+      <ul><li><b>Géneros para empezar</b><span>Dieciocho. Elige reguetón, bachata, salsa, hip hop, dancehall u otro, y ya suena un beat.</span></li><li><b>Patrones de batería</b><span>Cuadrículas de pasos como la de arriba, para cada pista de batería.</span></li><li><b>Arregla y graba</b><span>Ordena las partes en una línea de tiempo y graba tu voz o un instrumento encima.</span></li><li><b>Sonidos reales</b><span>Trae un bajo y un piano vertical sampleados, y puedes cargar tus propios archivos SoundFont.</span></li><li><b>Exporta</b><span>Tu tema terminado en un archivo WAV. Lo que haces es tuyo.</span></li><li><b>Cualquier pantalla</b><span>Teléfono, tableta o computadora. Se abre en el navegador que ya tienes.</span></li></ul>
+    </section>
+
+    <section class="prices" id="prices" aria-labelledby="prices-h">
+      <h2 id="prices-h">Hacer es gratis. Guardar se paga.</h2>
+      <div class="plans"><article><h3>Gratis</h3><p class="price">$0</p><ul><li>Todos los instrumentos, patrones, géneros y la grabación</li><li>Nada se guarda al cerrar</li><li>Sin exportar</li></ul></article><article><h3>Pase de sesión</h3><p class="price">$5 <small>por 24 horas</small></p><ul><li>Guarda, reabre y exporta durante un día</li><li>Al terminar, tus proyectos quedan en tu navegador, bloqueados, hasta que tengas otro pase o Studio</li></ul></article><article class="best"><h3>Studio</h3><p class="price">$50 <small>una sola vez</small></p><ul><li>Guarda y reabre tus proyectos</li><li>Exporta cuando quieras</li><li>Todas las actualizaciones</li><li>$45 si compraste un pase en los últimos 30 días</li></ul></article></div>
+      <p class="acts"><a class="btn go" href="#invite">Pide una invitación</a></p>
+      <p class="fine">Precios en dólares de EE. UU. Pago seguro con Stripe. Reembolsos dentro de 14 días: mira los <a href="https://studio.neusicwave.com/terms">Términos de uso</a> (en inglés).</p>
+    </section>
+
+    <section class="book" aria-labelledby="book-h">
+      <h2 id="book-h">También de NeusicWave</h2>
+      <p><b>Monetize Your Music.</b> Deja de actuar. Empieza a ser dueño. <a href="/books/">Sobre el libro</a> · <a href="https://www.amazon.com/dp/B0H962CWC6" rel="noopener">En Amazon</a> (en inglés)</p>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>NeusicWave · <a href="mailto:hello@neusicwave.com">hello@neusicwave.com</a></p>
+    <p><a href="https://studio.neusicwave.com/terms">Términos de uso</a><a href="https://studio.neusicwave.com/privacy">Política de privacidad</a><a href="https://www.tiktok.com/@neusicwave1" rel="me noopener">TikTok</a><a href="https://www.instagram.com/neusicwave/" rel="me noopener">Instagram</a></p>
+  </footer>
+  <script type="module" src="/scripts/site/pads.js?v=2"></script>
+  <script src="/scripts/site/invite.js?v=1" defer></script>
+</body>
+</html>
