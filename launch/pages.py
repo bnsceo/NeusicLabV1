@@ -27,7 +27,7 @@ T = {
   inv_fine='We keep your email, your note and your country for up to 90 days, only to send you an invite. Ask us to delete it any time. <a href="https://studio.neusicwave.com/privacy">Privacy</a>',
   m_bad='That email address looks incomplete. Check it and try again.', m_off='You seem to be offline. Reconnect and try again.', m_send='Sending…', m_fail='We could not send that just now. Try again in a minute.', m_ok='Thanks. When there is room, your invite link will arrive by email.',
   bk_h='Also from NeusicWave', bk='<b>Monetize Your Music.</b> Stop performing. Start owning. <a href="/books/">About the book</a> · <a href="https://www.amazon.com/dp/B0H962CWC6" rel="noopener">On Amazon</a>',
-  terms='Terms of Use', privacy='Privacy Policy'),
+  terms='Terms of Use', privacy='Privacy Policy', made='made by Anderson Paulino'),
  'es': dict(path='es/index.html', url='https://neusicwave.com/es/', other=('/', 'English', 'en'), locale='es_LA',
   title='Neusic Studio: haz un beat en tu navegador | NeusicWave',
   desc='Neusic Studio es un estudio de música que funciona en tu navegador: patrones de batería, 18 géneros para empezar, grabación y exportación en WAV, en teléfono, tableta o computadora. Hacer música es gratis.',
@@ -49,7 +49,7 @@ T = {
   inv_fine='Guardamos tu correo, tu nota y tu país hasta 90 días, solo para enviarte la invitación. Pídenos borrarlo cuando quieras. <a href="https://studio.neusicwave.com/privacy">Privacidad</a> (en inglés)',
   m_bad='Ese correo parece incompleto. Revísalo e inténtalo otra vez.', m_off='Parece que no tienes conexión. Conéctate e inténtalo otra vez.', m_send='Enviando…', m_fail='No pudimos enviarlo ahora. Inténtalo en un minuto.', m_ok='Gracias. Cuando haya lugar, tu enlace de invitación llegará por correo.',
   bk_h='También de NeusicWave', bk='<b>Monetize Your Music.</b> Deja de actuar. Empieza a ser dueño. <a href="/books/">Sobre el libro</a> · <a href="https://www.amazon.com/dp/B0H962CWC6" rel="noopener">En Amazon</a> (en inglés)',
-  terms='Términos de uso', privacy='Política de privacidad'),
+  terms='Términos de uso', privacy='Política de privacidad', made='hecho por Anderson Paulino'),
 }
 def page(lang, t):
     go = f'<a class="btn go" href="{STUDIO}">{t["open"]}</a>' if OPEN else f'<a class="btn go" href="#invite">{t["ask"]}</a>'
@@ -153,7 +153,7 @@ def page(lang, t):
   </main>
 
   <footer class="foot">
-    <p>NeusicWave · <a href="mailto:hello@neusicwave.com">hello@neusicwave.com</a></p>
+    <p>NeusicWave · {t["made"]} · <a href="mailto:hello@neusicwave.com">hello@neusicwave.com</a></p>
     <p><a href="https://studio.neusicwave.com/terms">{t["terms"]}</a><a href="https://studio.neusicwave.com/privacy">{t["privacy"]}</a><a href="https://www.tiktok.com/@neusicwave1" rel="me noopener">TikTok</a><a href="https://www.instagram.com/neusicwave/" rel="me noopener">Instagram</a></p>
   </footer>
   <script type="module" src="/scripts/site/pads.js?v=2"></script>{inv_js}
