@@ -2,7 +2,7 @@
 """Writes the landing page in English (/) and Spanish (/es/). Run: python3 launch/pages.py
 OPEN = False while Neusic Studio is invite-only (the page asks for an invite); set it to True on launch day and run again."""
 import os
-OPEN = False
+OPEN = True
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 STUDIO = 'https://studio.neusicwave.com/'
 T = {
@@ -92,15 +92,15 @@ def page(lang, t):
   <meta property="og:url" content="{t["url"]}" />
   <meta property="og:title" content="{t["og_t"]}" />
   <meta property="og:description" content="{t["og_d"]}" />
-  <meta property="og:image" content="https://neusicwave.com/social/neusicwave-share-v5.jpg" />
+  <meta property="og:image" content="https://neusicwave.com/social/neusicwave-share-v6.jpg" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="NeusicWave" />
+  <meta property="og:image:alt" content="{t["og_t"]}" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="{t["og_t"]}" />
   <meta name="twitter:description" content="{t["og_d"]}" />
-  <meta name="twitter:image" content="https://neusicwave.com/social/neusicwave-share-v5.jpg" />
+  <meta name="twitter:image" content="https://neusicwave.com/social/neusicwave-share-v6.jpg" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="icon" href="/favicon.png" type="image/png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
