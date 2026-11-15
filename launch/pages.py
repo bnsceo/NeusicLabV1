@@ -79,7 +79,7 @@ def page(lang, t):
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#e4e7ec" />
+  <meta name="theme-color" content="#11131e" />
   <title>{t["title"]}</title>
   <meta name="description" content="{t["desc"]}" />
   <link rel="canonical" href="{t["url"]}" />
@@ -105,7 +105,7 @@ def page(lang, t):
   <link rel="icon" href="/favicon.png" type="image/png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="preload" href="/assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/css/site/launch.css?v=2" />
+  <link rel="stylesheet" href="/css/site/launch.css?v=3" />
 </head>
 <body>
   <a class="skip" href="#main">{t["skip"]}</a>
@@ -156,7 +156,7 @@ def page(lang, t):
     <p>NeusicWave · {t["made"]} · <a href="mailto:hello@neusicwave.com">hello@neusicwave.com</a></p>
     <p><a href="https://studio.neusicwave.com/terms">{t["terms"]}</a><a href="https://studio.neusicwave.com/privacy">{t["privacy"]}</a><a href="https://www.tiktok.com/@neusicwave1" rel="me noopener">TikTok</a><a href="https://www.instagram.com/neusicwave/" rel="me noopener">Instagram</a></p>
   </footer>
-  <script type="module" src="/scripts/site/pads.js?v=2"></script>{inv_js}
+  <script type="module" src="/scripts/site/pads.js?v=3"></script>{inv_js}
 </body>
 </html>
 '''

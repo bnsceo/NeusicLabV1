@@ -16,6 +16,8 @@ function start() {
   renderer.toneMapping = THREE.NoToneMapping;
   const css = getComputedStyle(document.documentElement);
   const base = new THREE.Color(css.getPropertyValue('--bg').trim() || '#e4e7ec'), led = new THREE.Color(css.getPropertyValue('--led').trim() || '#00b3c7');
+  // how strong the light-edge highlights and grain are: 1 on a light surface, about 0.1 on a dark one (set --pad-lift in the CSS)
+  const lift = (parseFloat(css.getPropertyValue('--pad-lift')) || 1).toFixed(4);
   const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(24, 2, 0.1, 100);
   const press = new Float32Array(N), hit = new Float32Array(N), on = Float32Array.from(pattern);
   const U = { uBase: { value: base }, uLed: { value: led }, uPress: { value: press }, uTime: { value: 0 } };
@@ -41,8 +43,8 @@ function start() {
           sh = max(sh, (1.0 - smoothstep(-0.03, soft, sdRound(gp - c - off, vec2(0.4), 0.13))) * h);
           hi = max(hi, (1.0 - smoothstep(-0.03, soft, sdRound(gp - c + off, vec2(0.4), 0.13))) * h);
         }
-        vec3 col = uBase * (1.0 - 0.3 * sh) + vec3(0.22) * hi * (1.0 - sh);
-        col += (hash(gl_FragCoord.xy) - 0.5) * 0.012;
+        vec3 col = uBase * (1.0 - 0.3 * sh) + vec3(0.22 * ${lift}) * hi * (1.0 - sh);
+        col += (hash(gl_FragCoord.xy) - 0.5) * 0.012 * ${lift};
         // the board melts into the page: no visible canvas edge
         float edge = sdRound(vW.xz, vec2(${COLS / 2}.0 + 0.5, ${ROWS / 2}.0 + 0.5), 0.6);
         gl_FragColor = vec4(col, 1.0 - smoothstep(0.0, 1.1, edge));
@@ -63,17 +65,17 @@ function start() {
         void main(){
           vec3 n = normalize(vN); float top = smoothstep(0.75, 0.97, n.y);
           float lit = dot(n.xz, vec2(-0.7071)); // up-left faces are lit, down-right faces are in shade
-          vec3 col = uBase * (1.0 + 0.2 * lit * (1.0 - top)) + vec3(0.1) * max(lit, 0.0) * (1.0 - top);
+          vec3 col = uBase * (1.0 + 0.2 * lit * (1.0 - top)) + vec3(0.1 * ${lift}) * max(lit, 0.0) * (1.0 - top);
           // on: the top turns into a shallow dish (dark on its up-left inner wall, light on its down-right one)
           float d = sdRound(vL.xz, vec2(0.31), 0.09), dish = smoothstep(-0.2, -0.03, d) * step(d, 0.0); // strongest near the rim of the dish, nothing in its middle
           float side = dot(normalize(vL.xz + 1e-4), vec2(-0.7071));
-          col -= uBase * 0.3 * dish * max(side, 0.0) * uOn * top; col += vec3(0.2) * dish * max(-side, 0.0) * uOn * top;
+          col -= uBase * 0.3 * dish * max(side, 0.0) * uOn * top; col += vec3(0.2 * ${lift}) * dish * max(-side, 0.0) * uOn * top;
           // the lamp: a small soft dot, brighter for an instant when the step plays
           float lamp = (1.0 - smoothstep(0.045, 0.075, length(vL.xz - vec2(0.0, -0.2)))) * top;
           col = mix(col, mix(uBase * 0.82, uLed, uOn), lamp);
           col += uLed * (1.0 - smoothstep(0.0, 0.36, length(vL.xz - vec2(0.0, -0.2)))) * top * uOn * (0.1 + 0.55 * uHit);
-          col += vec3(0.05) * uHit * top;
-          col += (hash(gl_FragCoord.xy) - 0.5) * 0.012;
+          col += vec3(0.05 * ${lift}) * uHit * top;
+          col += (hash(gl_FragCoord.xy) - 0.5) * 0.012 * ${lift};
           gl_FragColor = vec4(col, 1.0);
           #include <colorspace_fragment>
         }`,
