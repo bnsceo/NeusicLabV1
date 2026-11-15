@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>NeusicWave Records — Human-made. AI-run.</title>
+<meta name="description" content="The Release Pack for artists who need help developing: cover artwork, bio, promo clips, rollout calendar and release metadata for one flat price. A person approves everything before it goes out.">
+<meta name="theme-color" content="#11131e">
+<link rel="preload" href="/assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+/* Same Archivo file the NeusicWave site already ships. */
+@font-face{font-family:Archivo;font-weight:100 900;font-stretch:62% 125%;font-display:swap;src:url(/assets/fonts/archivo-latin.woff2) format('woff2')}
+
+/* ==========================================================
+   SECTION 2 — TUNING BLOCK
+   Palette sampled from the NeusicWave logo (black vinyl,
+   brushed chrome wordmark, cyan > violet > pink neon ring
+   and waveform). Every visual choice is a named token here.
+   ========================================================== */
+:root{
+  /* surfaces (logo background + vinyl) */
+  --nw-black:#11131e;   /* the one surface colour: black vinyl, lifted just enough for shadows to read */
+  --nw-vinyl:#11131e;
+  --nw-sh:#05060b;      /* neumorphic shadow (down-right) */
+  --nw-hi:#242839;      /* neumorphic highlight (up-left) */
+  --nw-edge:rgba(255,255,255,.09);
+  --nw-well:#11131e;
+  /* chrome (wordmark) */
+  --nw-chrome-hi:#f4f4f7;
+  --nw-chrome-mid:#c9c9d0;
+  --nw-chrome-lo:#8e8e98;
+  /* neon (ring + waveform) */
+  --nw-cyan:#5fd0ff;
+  --nw-violet:#a070ee;
+  --nw-pink:#ff6fb0;
+  --nw-neon:linear-gradient(90deg,var(--nw-cyan),var(--nw-violet) 52%,var(--nw-pink));
+  --nw-chrome:linear-gradient(180deg,var(--nw-chrome-hi),var(--nw-chrome-mid) 55%,var(--nw-chrome-lo));
+  /* text + status */
+  --nw-text:#eceef5;
+  --nw-dim:#9aa1b8;
+  --nw-led-off:#232638;
+  --nw-err:#ff5d7a;
+  /* depth */
+  --nw-lift:8px 8px 18px var(--nw-sh),-8px -8px 18px var(--nw-hi);
+  --nw-lift-s:4px 4px 10px var(--nw-sh),-4px -4px 10px var(--nw-hi);
+  --nw-recess:inset 5px 5px 11px var(--nw-sh),inset -5px -5px 11px var(--nw-hi);
+  --nw-glow-cyan:0 0 18px color-mix(in srgb,var(--nw-cyan) 35%,transparent);
+  --nw-glow-pink:0 0 18px color-mix(in srgb,var(--nw-pink) 30%,transparent);
+  /* type */
+  --f:Archivo,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --fs-h1:clamp(2.6rem,11vw,4.6rem);
+  --fs-h2:clamp(1.8rem,6.5vw,2.9rem);
+  --fs-h3:1.3rem;
+  --fs-body:1.0625rem;
+  --fs-label:.72rem;
+  --lh-body:1.55;
+  --track-label:.2em;
+  /* layout */
+  --maxw:1080px;
+  --pad:clamp(16px,5vw,32px);
+  --gap:16px;
+  --gap-lg:clamp(52px,10vw,104px);
+  --radius:16px;
+  --radius-sm:10px;
+  --tap:48px;
+  /* motion */
+  --t-fast:.15s;
+  --t-led:.5s;
+}
+
+/* ==========================================================
+   SECTION 1 — STRUCTURE (mobile-first; widens at 760px)
+   ========================================================== */
+*{box-sizing:border-box}
+html{color-scheme:dark;-webkit-text-size-adjust:100%;scroll-behavior:smooth;background:var(--nw-black)}
+body{
+  margin:0;color:var(--nw-text);font:400 var(--fs-body)/var(--lh-body) var(--f);
+  background:
+    radial-gradient(620px 420px at 0% -60px,color-mix(in srgb,var(--nw-cyan) 13%,transparent),transparent 70%),
+    radial-gradient(620px 420px at 100% -60px,color-mix(in srgb,var(--nw-pink) 12%,transparent),transparent 70%),
+    var(--nw-black);
+  background-repeat:no-repeat;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+img{max-width:100%;display:block}
+a{color:inherit}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad)}
+section{padding-top:var(--gap-lg)}
+h1,h2,h3{margin:0;font-weight:800;line-height:1;text-transform:uppercase;letter-spacing:.01em}
+h2{font-size:var(--fs-h2);background:var(--nw-chrome);-webkit-background-clip:text;background-clip:text;color:transparent}
+h3{font-size:var(--fs-h3);line-height:1.1;color:var(--nw-chrome-hi)}
+p{margin:0}
+.label{display:inline-flex;align-items:center;gap:10px;font:700 var(--fs-label)/1 var(--f);font-stretch:80%;letter-spacing:var(--track-label);text-transform:uppercase;color:var(--nw-dim)}
+.sec-head .label::before{content:"";width:22px;height:2px;border-radius:1px;background:var(--nw-neon)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:2px solid var(--nw-cyan);outline-offset:3px}
+
+/* shared parts */
+.panel{background:var(--nw-black);border-radius:var(--radius);box-shadow:var(--nw-lift)}
+.well{background:var(--nw-well);border-radius:var(--radius-sm);box-shadow:var(--nw-recess)}
+.led{width:9px;height:9px;border-radius:50%;background:var(--nw-led-off);box-shadow:inset 1px 1px 2px var(--nw-sh),inset -1px -1px 2px var(--nw-hi);flex:none;transition:background var(--t-led),box-shadow var(--t-led)}
+.led.on{background:var(--nw-cyan);box-shadow:var(--nw-glow-cyan),0 0 4px var(--nw-cyan)}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:var(--tap);padding:0 26px;
+  font:700 .95rem/1 var(--f);letter-spacing:.14em;text-transform:uppercase;text-decoration:none;color:var(--nw-chrome-hi);
+  border:0;border-radius:999px;cursor:pointer;
+  background:var(--nw-black);box-shadow:var(--nw-lift-s);transition:box-shadow var(--t-fast),transform var(--t-fast);
+}
+.btn::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--nw-cyan);box-shadow:0 0 0 3px rgba(95,208,255,.16),0 0 12px 2px rgba(95,208,255,.7);flex:none}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{box-shadow:var(--nw-recess);transform:none}
+.btn.ghost{color:var(--nw-chrome-mid)}.btn.ghost::before{display:none}
+
+/* header */
+header{padding:calc(14px + env(safe-area-inset-top)) 0 14px}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+.brand img{width:44px;height:44px;border-radius:50%}
+.brand .label{color:var(--nw-chrome-mid)}
+header .btn{min-height:40px;padding:0 18px;font-size:.8rem}
+
+/* hero */
+.hero{padding-top:clamp(8px,4vw,40px)}
+.hero-grid{display:grid;gap:22px}
+.disc{width:clamp(180px,56vw,300px);aspect-ratio:1;justify-self:start;border-radius:50%;overflow:hidden;
+  box-shadow:0 0 60px color-mix(in srgb,var(--nw-cyan) 14%,transparent),0 0 90px color-mix(in srgb,var(--nw-pink) 14%,transparent)}
+.disc img{width:100%;height:100%;object-fit:cover}
+.status{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+h1{font-size:var(--fs-h1)}
+h1 .l1{display:block;background:var(--nw-chrome);-webkit-background-clip:text;background-clip:text;color:transparent}
+h1 .l2{display:block;background:var(--nw-neon);-webkit-background-clip:text;background-clip:text;color:transparent}
+.rule-bar{height:7px;max-width:520px;margin-top:20px;border-radius:99px;background:var(--nw-chrome);box-shadow:0 0 18px rgba(95,208,255,.25)}
+.wave{display:flex;align-items:center;gap:2px;height:72px;max-width:520px;margin-top:14px}
+.wave span{flex:1 1 0;max-width:4px;min-width:1px;height:100%;border-radius:2px;background:var(--c);box-shadow:0 0 6px var(--c);transform:scaleY(var(--s));animation:wv 2s ease-in-out infinite;animation-delay:calc(var(--i)*-.09s)}
+@keyframes wv{0%,100%{transform:scaleY(calc(var(--s)*.35))}50%{transform:scaleY(var(--s))}}
+.lede{margin-top:22px;color:var(--nw-dim);max-width:34em}
+.lede strong{color:var(--nw-text);font-weight:600}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+
+/* cards */
+.sec-head{display:grid;gap:12px;margin-bottom:26px}
+.hint{color:var(--nw-dim);font-size:.95rem}
+.rules{display:grid;gap:var(--gap)}
+.rule{padding:20px}
+.rule .label{margin-bottom:14px;color:var(--nw-cyan)}
+.rule h3{margin-bottom:8px}
+.rule p{color:var(--nw-dim);font-size:1rem}
+.path{list-style:none;margin:0;padding:0;display:grid;gap:var(--gap)}
+.mod{padding:18px;display:grid;gap:8px;position:relative}
+.mod-top{display:flex;align-items:center;gap:10px}
+.mod-top .num{font:700 var(--fs-label)/1 var(--f);font-stretch:80%;letter-spacing:var(--track-label);color:var(--nw-dim)}
+.mod p{color:var(--nw-dim);font-size:1rem}
+.tag{justify-self:start;display:inline-block;font:700 .66rem/1 var(--f);font-stretch:80%;letter-spacing:.16em;text-transform:uppercase;padding:7px 9px;border-radius:999px;box-shadow:inset 2px 2px 5px var(--nw-sh),inset -2px -2px 5px var(--nw-hi);background:var(--nw-well);color:var(--nw-chrome-mid)}
+
+
+/* form */
+form{padding:20px;display:grid;gap:18px}
+.field{display:grid;gap:8px}
+.field > label,legend{font:700 var(--fs-label)/1 var(--f);font-stretch:80%;letter-spacing:var(--track-label);text-transform:uppercase;color:var(--nw-chrome-mid)}
+input[type=text],input[type=email],input[type=url],select,textarea{
+  width:100%;min-height:var(--tap);padding:12px 14px;color:var(--nw-text);font:inherit;
+  background:var(--nw-well);border:0;border-radius:var(--radius-sm);box-shadow:var(--nw-recess);
+}
+input::placeholder,textarea::placeholder{color:var(--nw-dim);opacity:1}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--nw-cyan);outline-offset:2px;box-shadow:var(--nw-recess),var(--nw-glow-cyan)}
+textarea{min-height:110px;resize:vertical}
+select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--nw-cyan) 50%),linear-gradient(135deg,var(--nw-cyan) 50%,transparent 50%);background-position:calc(100% - 20px) 50%,calc(100% - 14px) 50%;background-size:6px 6px;background-repeat:no-repeat}
+fieldset{border:0;margin:0;padding:0;display:grid;gap:10px;min-width:0}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chk{display:flex;align-items:center;gap:10px;min-height:var(--tap);padding:0 12px;background:var(--nw-well);border:0;border-radius:var(--radius-sm);box-shadow:var(--nw-recess);font-size:.95rem;cursor:pointer}
+.chk input{accent-color:var(--nw-pink);width:18px;height:18px;margin:0}
+.chk.full{grid-column:1/-1}
+.honey{position:absolute;left:-9999px;opacity:0;pointer-events:none}
+#status{min-height:1.4em;font-size:.9rem;line-height:1.4;color:var(--nw-dim)}
+#status.ok{color:var(--nw-cyan)}
+#status.err{color:var(--nw-err)}
+
+footer{padding:var(--gap-lg) 0 36px}
+footer .wrap{display:grid;gap:10px;color:var(--nw-dim);font-size:.9rem}
+footer a{color:var(--nw-chrome-mid)}
+
+/* widen */
+@media (min-width:760px){
+  header .btn{min-height:var(--tap);padding:0 26px;font-size:.9rem}
+  .hero-grid{grid-template-columns:1.5fr 1fr;align-items:center;gap:48px}
+  .hero-grid .disc{order:2;justify-self:end;width:min(100%,420px)}
+  .rules{grid-template-columns:repeat(4,1fr)}
+  .path{grid-template-columns:repeat(3,1fr)}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .form-grid .span2{grid-column:1/-1}
+  .checks{grid-template-columns:repeat(3,1fr)}
+  form,#submit .sec-head{max-width:820px;margin-inline:auto}
+  form{padding:32px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .wave span{animation:none}
+  .led{transition:none}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="NeusicWave home">
+      <!-- Official logo, used exactly as supplied. Do not redraw. -->
+      <img src="/assets/icons/neusicwave-logo-hd.png" width="44" height="44" alt="NEUSICWAVE" onerror="this.style.visibility='hidden'">
+      <span class="label">Records</span>
+    </a>
+    <a class="btn" href="#submit">Get the pack</a>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="disc" aria-hidden="true">
+        <img src="/assets/icons/neusicwave-logo-hd.png" alt="" width="420" height="420" onerror="this.style.visibility='hidden'">
+      </div>
+      <div>
+        <div class="status"><span class="led on" aria-hidden="true"></span><span class="label">Taking requests</span></div>
+        <h1><span class="l1">Human&#8209;made.</span><span class="l2">AI-run.</span></h1>
+        <div class="rule-bar" aria-hidden="true"></div>
+        <div class="wave" id="wave" aria-hidden="true"></div>
+        <p class="lede">For artists who need help developing. <strong>You make the music.</strong> Agents build the artwork, bio, promo clips and rollout calendar &mdash; and a person approves everything before it goes out.</p>
+        <div class="cta">
+          <a class="btn" href="#submit">Get the Release Pack</a>
+          <a class="btn ghost" href="#pack">See what&rsquo;s in it</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="rules">
+    <div class="wrap">
+      <div class="sec-head"><span class="label">House rules</span><h2>Four things that don&rsquo;t bend</h2></div>
+      <div class="rules">
+        <article class="panel rule"><span class="label">01</span><h3>One flat price</h3><p>You pay once and you keep everything: the rights and the earnings.</p></article>
+        <article class="panel rule"><span class="label">02</span><h3>You approve it</h3><p>Nothing goes out that you haven&rsquo;t approved, and a person reviews it first.</p></article>
+        <article class="panel rule"><span class="label">03</span><h3>AI use is disclosed</h3><p>Every track lists AI involvement by element &mdash; vocals, instruments, composition, post, lyrics.</p></article>
+        <article class="panel rule"><span class="label">04</span><h3>No voice clones</h3><p>No cloned voices. No &ldquo;feat.&rdquo; credits for artists who didn&rsquo;t agree to it. Ever.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section id="pack">
+    <div class="wrap">
+      <div class="sec-head"><span class="label">Release Pack</span><h2>For artists who need help developing</h2><p class="hint">You have the music. We build the pieces a release needs around it.</p></div>
+      <ul class="path">
+        <li class="panel mod"><div class="mod-top"><span class="led on"></span><span class="num">INCLUDED</span></div><h3>Cover artwork</h3><p>Three directions built from your sound and look, plus the crops every platform needs.</p></li>
+        <li class="panel mod"><div class="mod-top"><span class="led on"></span><span class="num">INCLUDED</span></div><h3>Bio + press kit</h3><p>Written from facts you confirm. Nothing goes out that you haven&rsquo;t approved.</p></li>
+        <li class="panel mod"><div class="mod-top"><span class="led on"></span><span class="num">INCLUDED</span></div><h3>Promo clips</h3><p>Short vertical clips and caption drafts for TikTok, Reels and Shorts.</p></li>
+        <li class="panel mod"><div class="mod-top"><span class="led on"></span><span class="num">INCLUDED</span></div><h3>Rollout calendar</h3><p>A dated checklist from three weeks before release to two weeks after.</p></li>
+        <li class="panel mod"><div class="mod-top"><span class="led on"></span><span class="num">INCLUDED</span></div><h3>Release metadata</h3><p>Track metadata and credits, with the AI-credit fields filled in.</p></li>
+        <li class="panel mod"><div class="mod-top"><span class="led on"></span><span class="num">PRICE</span></div><h3>$98 flat</h3><p>One price. You keep everything.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="submit">
+    <div class="wrap" id="submit-wrap">
+      <div class="sec-head"><span class="label">Request</span><h2>Ask for the pack</h2><p class="hint">One track is enough. A person reads every request.</p></div>
+      <form class="panel" id="demoForm" method="POST" action="https://formsubmit.co/YOUR_FORMSUBMIT_ID" novalidate>
+        <input type="hidden" name="_subject" value="NeusicWave Records — new Release Pack request">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_captcha" value="false">
+        <input class="honey" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <div class="form-grid">
+          <div class="field"><label for="f-name">Artist name</label><input id="f-name" name="artist" type="text" autocomplete="nickname" required></div>
+          <div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email" required></div>
+          <div class="field span2"><label for="f-link">Link to the track</label><input id="f-link" name="track_link" type="url" inputmode="url" placeholder="https://" required><span class="hint">Private SoundCloud, Drive or Dropbox link is fine.</span></div>
+          <div class="field span2"><label for="f-nw">Made in NeusicWave?</label>
+            <select id="f-nw" name="made_in_neusicwave" required>
+              <option value="" selected disabled>Choose one</option>
+              <option>Entirely</option><option>Partly</option><option>No, another tool</option>
+            </select>
+          </div>
+          <fieldset class="span2"><legend>AI involvement in this track</legend>
+            <div class="checks">
+              <label class="chk full"><input type="checkbox" name="ai_none" value="None" id="ai-none"> None &mdash; no AI used</label>
+              <label class="chk"><input type="checkbox" class="ai" name="ai_vocals" value="Vocals"> Vocals</label>
+              <label class="chk"><input type="checkbox" class="ai" name="ai_instrumentation" value="Instrumentation"> Instruments</label>
+              <label class="chk"><input type="checkbox" class="ai" name="ai_composition" value="Composition"> Composition</label>
+              <label class="chk"><input type="checkbox" class="ai" name="ai_post" value="Post-production"> Post-production</label>
+              <label class="chk"><input type="checkbox" class="ai" name="ai_lyrics" value="Lyrics"> Lyrics</label>
+            </div>
+            <span class="hint">Stem separation, mastering assistants and similar tools count as post-production.</span>
+          </fieldset>
+          <div class="field span2"><label for="f-msg">Anything else <span class="sr">(optional)</span></label><textarea id="f-msg" name="message" placeholder="Optional"></textarea></div>
+          <label class="chk span2"><input type="checkbox" name="rights_confirm" value="yes" id="f-rights" required> I made this, I control the rights, there are no uncleared samples and no cloned voices.</label>
+        </div>
+        <button class="btn" type="submit">Request the pack</button>
+        <div id="status" role="status" aria-live="polite"></div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="label">NeusicWave Records</span>
+    <span>Part of <a href="/">NeusicWave</a>. Requesting the pack doesn&rsquo;t sign you to anything.</span>
+  </div>
+</footer>
+
+<script>
+/* Set the form action to the same formsubmit address your waitlist form already uses. */
+const FORM_ACTION = document.getElementById('demoForm').getAttribute('action');
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* waveform: centered spikes, colored cyan > violet > pink like the logo */
+(function(){
+  const box = document.getElementById('wave');
+  const css = getComputedStyle(document.documentElement);
+  const stops = ['--nw-cyan','--nw-violet','--nw-pink'].map(n => css.getPropertyValue(n).trim());
+  const hex = h => [1,3,5].map(i => parseInt(h.slice(i,i+2),16));
+  const rgb = stops.map(hex);
+  const mix = t => {
+    const k = t < .5 ? 0 : 1, u = t < .5 ? t*2 : (t-.5)*2;
+    return 'rgb(' + [0,1,2].map(i => Math.round(rgb[k][i] + (rgb[k+1][i]-rgb[k][i])*u)).join(',') + ')';
+  };
+  const N = 72;
+  for (let i = 0; i < N; i++){
+    const t = i/(N-1);
+    const env = .25 + .75*Math.abs(Math.sin(t*Math.PI*3.2 + .6));   /* swelling peaks, like the logo */
+    const s = Math.max(.08, Math.min(1, env*(.35 + Math.random()*.65)));
+    const b = document.createElement('span');
+    b.style.setProperty('--i', i);
+    b.style.setProperty('--s', s.toFixed(2));
+    b.style.setProperty('--c', mix(t));
+    box.appendChild(b);
+  }
+})();
+
+/* "None" and the AI elements are mutually exclusive */
+(function(){
+  const none = document.getElementById('ai-none');
+  const els = [...document.querySelectorAll('.ai')];
+  none.addEventListener('change', () => { if (none.checked) els.forEach(e => e.checked = false); });
+  els.forEach(e => e.addEventListener('change', () => { if (e.checked) none.checked = false; }));
+})();
+
+/* submit */
+(function(){
+  const form = document.getElementById('demoForm');
+  const status = document.getElementById('status');
+  const say = (msg, cls) => { status.textContent = msg; status.className = cls || ''; };
+  form.addEventListener('submit', async ev => {
+    ev.preventDefault();
+    if (!form.artist.value.trim() || !form.email.validity.valid || !form.track_link.validity.valid || !form.track_link.value) return say('Check artist name, email and track link.', 'err');
+    if (!form.made_in_neusicwave.value) return say('Choose whether it was made in NeusicWave.', 'err');
+    const anyAI = document.getElementById('ai-none').checked || document.querySelector('.ai:checked');
+    if (!anyAI) return say('Tell us about AI involvement (or tick None).', 'err');
+    if (!document.getElementById('f-rights').checked) return say('Please confirm the rights statement.', 'err');
+    if (FORM_ACTION.includes('YOUR_FORMSUBMIT_ID')) return say('Form not connected yet: set the formsubmit address in the form action.', 'err');
+    say('Sending…');
+    try {
+      const res = await fetch(FORM_ACTION.replace('formsubmit.co/', 'formsubmit.co/ajax/'), {method:'POST', body:new FormData(form), headers:{Accept:'application/json'}});
+      if (!res.ok) throw new Error(res.status);
+      form.reset();
+      say('Received. A person reads every request.', 'ok');
+    } catch (e) {
+      say('Could not send. Try again in a minute.', 'err');
+    }
+  });
+})();
+</script>
+</body>
+</html>
