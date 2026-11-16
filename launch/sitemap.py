@@ -7,6 +7,8 @@ SITE = 'https://neusicwave.com'
 PAGES = [('/', 'index.html', True), ('/es/', 'es/index.html', True), ('/books/', 'books/index.html', False),
          ('/release-pack/', 'release-pack/index.html', False), ('/release-pack/privacy/', 'release-pack/privacy/index.html', False)]
 def lastmod(path):
+    if subprocess.run(['git', 'diff', '--quiet', 'HEAD', '--', path], cwd=ROOT).returncode != 0:  # changed and not committed yet
+        return subprocess.run(['date', '-u', '+%F'], capture_output=True, text=True).stdout.strip()
     out = subprocess.run(['git', 'log', '-1', '--format=%cs', '--', path], cwd=ROOT, capture_output=True, text=True).stdout.strip()
     return out or subprocess.run(['date', '-u', '+%F'], capture_output=True, text=True).stdout.strip()
 rows = []

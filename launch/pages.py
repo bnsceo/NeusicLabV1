@@ -9,7 +9,7 @@ T = {
  'en': dict(path='index.html', url='https://neusicwave.com/', other=('/es/', 'Español', 'es'), locale='en_US',
   title='Neusic Studio: make a beat in your browser | NeusicWave',
   desc='A music studio in your browser: drum patterns, 18 genre starters, recording and WAV export on any phone, tablet or computer. Free to make music.',
-  og_t='Neusic Studio: make a beat in your browser', og_d='A music studio in your browser. Nothing to install. Free to make music.',
+  og_t='Neusic Studio: make a beat in your browser', og_d='A music studio in your browser. Nothing to install. Free to make music. Made by Anderson Paulino.',
   skip='Skip to content', nav=('What is inside', 'Prices', 'Books', 'Release Pack'), books='/books/', open='Open Neusic Studio', ask='Request an invite', see='See the prices',
   h1='Make a beat right here.', lead='Tap the pads, press play. This small board is a taste. Neusic Studio is the whole music studio, in your browser, with nothing to install.',
   nogl='The pad board needs WebGL, which this browser has turned off.', rows=('Kick', 'Snare', 'Hat', 'Rim'), play='Play', stop='Stop', clear='Clear', hint='Eight steps, four drums. Tap any pad.',
@@ -31,7 +31,7 @@ T = {
  'es': dict(path='es/index.html', url='https://neusicwave.com/es/', other=('/', 'English', 'en'), locale='es_LA',
   title='Neusic Studio: haz un beat en tu navegador | NeusicWave',
   desc='Un estudio de música en tu navegador: patrones de batería, 18 géneros para empezar, grabación y exportación WAV. Gratis para hacer música.',
-  og_t='Neusic Studio: haz un beat en tu navegador', og_d='Un estudio de música en tu navegador. Sin instalar nada. Hacer música es gratis.',
+  og_t='Neusic Studio: haz un beat en tu navegador', og_d='Un estudio de música en tu navegador. Sin instalar nada. Hacer música es gratis. Hecho por Anderson Paulino.',
   skip='Saltar al contenido', nav=('Qué trae', 'Precios', 'Libros', 'Release Pack'), books='/books/', open='Abrir Neusic Studio', ask='Pide una invitación', see='Ver los precios',
   h1='Haz un beat aquí mismo.', lead='Toca los pads y dale a reproducir. Este tablero es una probadita. Neusic Studio es el estudio completo, en tu navegador, sin instalar nada.',
   nogl='El tablero necesita WebGL, que este navegador tiene apagado.', rows=('Bombo', 'Caja', 'Hi-hat', 'Aro'), play='Reproducir', stop='Parar', clear='Borrar', hint='Ocho pasos, cuatro tambores. Toca cualquier pad.',
@@ -78,9 +78,9 @@ def page(lang, t):
     home = '/' if lang == 'en' else '/es/'
     alt_locale = 'es_LA' if lang == 'en' else 'en_US'
     ld_graph = {'@context': 'https://schema.org', '@graph': [
-        {'@type': 'Organization', '@id': 'https://neusicwave.com/#org', 'name': 'NeusicWave', 'url': 'https://neusicwave.com/', 'logo': 'https://neusicwave.com/apple-touch-icon.png', 'sameAs': ['https://www.tiktok.com/@neusicwave1', 'https://www.instagram.com/neusicwave/']},
+        {'@type': 'Organization', '@id': 'https://neusicwave.com/#org', 'name': 'NeusicWave', 'url': 'https://neusicwave.com/', 'logo': 'https://neusicwave.com/apple-touch-icon.png', 'founder': {'@type': 'Person', 'name': 'Anderson Paulino'}, 'sameAs': ['https://www.tiktok.com/@neusicwave1', 'https://www.instagram.com/neusicwave/']},
         {'@type': 'WebSite', '@id': 'https://neusicwave.com/#website', 'url': 'https://neusicwave.com/', 'name': 'NeusicWave', 'inLanguage': ['en', 'es'], 'publisher': {'@id': 'https://neusicwave.com/#org'}},
-        {'@type': 'SoftwareApplication', 'name': 'Neusic Studio', 'url': t['url'], 'applicationCategory': 'MultimediaApplication', 'operatingSystem': 'Any (web browser)', 'inLanguage': lang, 'description': t['desc'], 'publisher': {'@id': 'https://neusicwave.com/#org'}},
+        {'@type': 'SoftwareApplication', 'name': 'Neusic Studio', 'url': t['url'], 'applicationCategory': 'MultimediaApplication', 'operatingSystem': 'Any (web browser)', 'inLanguage': lang, 'description': t['desc'], 'author': {'@type': 'Person', 'name': 'Anderson Paulino'}, 'publisher': {'@id': 'https://neusicwave.com/#org'}},
     ]}
     ld_json = json.dumps(ld_graph, ensure_ascii=False, separators=(',', ':'))
     return f'''<!doctype html>
@@ -92,6 +92,7 @@ def page(lang, t):
   <title>{t["title"]}</title>
   <meta name="description" content="{t["desc"]}" />
   <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="author" content="Anderson Paulino" />
   <link rel="canonical" href="{t["url"]}" />
   <link rel="alternate" hreflang="en" href="https://neusicwave.com/" />
   <link rel="alternate" hreflang="es" href="https://neusicwave.com/es/" />
@@ -103,15 +104,15 @@ def page(lang, t):
   <meta property="og:url" content="{t["url"]}" />
   <meta property="og:title" content="{t["og_t"]}" />
   <meta property="og:description" content="{t["og_d"]}" />
-  <meta property="og:image" content="https://neusicwave.com/social/neusicwave-share-v6.jpg" />
+  <meta property="og:image" content="https://neusicwave.com/social/neusicwave-share-v7.jpg" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="{t["og_t"]}" />
+  <meta property="og:image:alt" content="{t["og_t"]}, {t["made"]}" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="{t["og_t"]}" />
   <meta name="twitter:description" content="{t["og_d"]}" />
-  <meta name="twitter:image" content="https://neusicwave.com/social/neusicwave-share-v6.jpg" />
+  <meta name="twitter:image" content="https://neusicwave.com/social/neusicwave-share-v7.jpg" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="icon" href="/favicon.png" type="image/png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
