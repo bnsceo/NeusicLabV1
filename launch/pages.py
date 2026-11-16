@@ -26,7 +26,7 @@ T = {
   inv_ph='you@example.com', inv_note='What do you make? (optional)',
   inv_fine='We keep your email, your note and your country for up to 90 days, only to send you an invite. Ask us to delete it any time. <a href="https://studio.neusicwave.com/privacy">Privacy</a>',
   m_bad='That email address looks incomplete. Check it and try again.', m_off='You seem to be offline. Reconnect and try again.', m_send='Sending…', m_fail='We could not send that just now. Try again in a minute.', m_ok='Thanks. When there is room, your invite link will arrive by email.',
-  bk_h='Also from NeusicWave', pk_h='Release Pack', pk_p='For artists who need help developing. You make the music; we build the pieces a release needs around it. A person approves everything before it goes out.', pk_flat='flat', pk_keep='One price for the pack. You keep everything.', pk_btn='See the Release Pack', pk_note='', pk_items=(('Cover artwork', 'Three directions built from your sound and look, plus the crops every platform needs.'), ('Bio + press kit', 'Written from facts you confirm.'), ('Promo clips', 'Short vertical clips and caption drafts for TikTok, Reels and Shorts.'), ('Search presence (SEO), optional +$62', 'We improve how you show up in search, using the information you send.')), bk='<b>Monetize Your Music.</b> Stop performing. Start owning. <a href="/books/">About the book</a> · <a href="https://www.amazon.com/dp/B0H962CWC6" rel="noopener">On Amazon</a>',
+  bk_h='Also from NeusicWave', pk_h='Release Pack', pk_tag='The pack', pk_addon_tag='Optional add-on', pk_addon_h='Search presence (SEO)', pk_addon_price='+$62', pk_addon_p='We improve how you show up in search, using the information you send. The more you send, the more we can do.', pk_p='For artists who need help developing. You make the music; we build the pieces a release needs around it. A person approves everything before it goes out.', pk_flat='flat', pk_keep='One price for the pack. You keep everything.', pk_btn='See the Release Pack', pk_note='', pk_items=(('Cover artwork', 'Three directions built from your sound and look, plus the crops every platform needs.'), ('Bio + press kit', 'Written from facts you confirm.'), ('Promo clips', 'Short vertical clips and caption drafts for TikTok, Reels and Shorts.')), bk='<b>Monetize Your Music.</b> Stop performing. Start owning. <a href="/books/">About the book</a> · <a href="https://www.amazon.com/dp/B0H962CWC6" rel="noopener">On Amazon</a>',
   terms='Terms of Use', privacy='Privacy Policy', made='made by Anderson Paulino'),
  'es': dict(path='es/index.html', url='https://neusicwave.com/es/', other=('/', 'English', 'en'), locale='es_LA',
   title='Neusic Studio: haz un beat en tu navegador | NeusicWave',
@@ -48,7 +48,7 @@ T = {
   inv_ph='tu@correo.com', inv_note='¿Qué música haces? (opcional)',
   inv_fine='Guardamos tu correo, tu nota y tu país hasta 90 días, solo para enviarte la invitación. Pídenos borrarlo cuando quieras. <a href="https://studio.neusicwave.com/privacy">Privacidad</a> (en inglés)',
   m_bad='Ese correo parece incompleto. Revísalo e inténtalo otra vez.', m_off='Parece que no tienes conexión. Conéctate e inténtalo otra vez.', m_send='Enviando…', m_fail='No pudimos enviarlo ahora. Inténtalo en un minuto.', m_ok='Gracias. Cuando haya lugar, tu enlace de invitación llegará por correo.',
-  bk_h='También de NeusicWave', pk_h='Release Pack', pk_p='Para artistas que necesitan ayuda para desarrollarse. Tú haces la música; nosotros armamos lo que un lanzamiento necesita a su alrededor. Una persona aprueba todo antes de que salga.', pk_flat='precio único', pk_keep='Un solo precio por el pack. Todo sigue siendo tuyo.', pk_btn='Ver el Release Pack', pk_note='La página del Release Pack está en inglés.', pk_items=(('Arte de portada', 'Tres direcciones basadas en tu sonido y tu estilo, más los recortes que pide cada plataforma.'), ('Bio y kit de prensa', 'Escritos con datos que tú confirmas.'), ('Clips promocionales', 'Clips verticales cortos y borradores de textos para TikTok, Reels y Shorts.'), ('Presencia en buscadores (SEO), opcional +$62', 'Mejoramos cómo apareces en las búsquedas, con la información que nos envías.')), bk='<b>Monetize Your Music.</b> Deja de actuar. Empieza a ser dueño. <a href="/books/">Sobre el libro</a> · <a href="https://www.amazon.com/dp/B0H962CWC6" rel="noopener">En Amazon</a> (en inglés)',
+  bk_h='También de NeusicWave', pk_h='Release Pack', pk_tag='El pack', pk_addon_tag='Opcional', pk_addon_h='Presencia en buscadores (SEO)', pk_addon_price='+$62', pk_addon_p='Mejoramos cómo apareces en las búsquedas, con la información que nos envías. Mientras más nos envíes, más podemos hacer.', pk_p='Para artistas que necesitan ayuda para desarrollarse. Tú haces la música; nosotros armamos lo que un lanzamiento necesita a su alrededor. Una persona aprueba todo antes de que salga.', pk_flat='precio único', pk_keep='Un solo precio por el pack. Todo sigue siendo tuyo.', pk_btn='Ver el Release Pack', pk_note='La página del Release Pack está en inglés.', pk_items=(('Arte de portada', 'Tres direcciones basadas en tu sonido y tu estilo, más los recortes que pide cada plataforma.'), ('Bio y kit de prensa', 'Escritos con datos que tú confirmas.'), ('Clips promocionales', 'Clips verticales cortos y borradores de textos para TikTok, Reels y Shorts.')), bk='<b>Monetize Your Music.</b> Deja de actuar. Empieza a ser dueño. <a href="/books/">Sobre el libro</a> · <a href="https://www.amazon.com/dp/B0H962CWC6" rel="noopener">En Amazon</a> (en inglés)',
   terms='Términos de uso', privacy='Política de privacidad', made='hecho por Anderson Paulino'),
 }
 def page(lang, t):
@@ -107,7 +107,7 @@ def page(lang, t):
   <link rel="icon" href="/favicon.png" type="image/png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="preload" href="/assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/css/site/launch.css?v=4" />
+  <link rel="stylesheet" href="/css/site/launch.css?v=5" />
 </head>
 <body>
   <a class="skip" href="#main">{t["skip"]}</a>
@@ -153,11 +153,16 @@ def page(lang, t):
       <p class="lead">{t["pk_p"]}</p>
       <div class="pack-card">
         <div class="pack-buy">
+          <p class="pack-tag">{t["pk_tag"]}</p>
           <p class="price">$125 <small>{t["pk_flat"]}</small></p>
           <p>{t["pk_keep"]}</p>
           <p class="acts"><a class="btn go" href="/release-pack/">{t["pk_btn"]}</a></p>{pack_note}
         </div>
         <ul>{pack_items}</ul>
+      </div>
+      <div class="pack-addon">
+        <p class="pack-addon-head"><span>{t["pk_addon_tag"]}</span><b>{t["pk_addon_h"]}</b><em>{t["pk_addon_price"]}</em></p>
+        <p>{t["pk_addon_p"]}</p>
       </div>
     </section>
 

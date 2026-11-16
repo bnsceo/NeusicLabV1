@@ -138,6 +138,10 @@ h1 .l2{display:block;background:var(--nw-neon);-webkit-background-clip:text;back
 .cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
 
 /* cards */
+.offer-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;margin:0 0 18px}
+.offer-head.addon{margin-top:clamp(40px,7vw,64px)}
+.offer-price{margin:0;font:800 clamp(2rem,6vw,2.8rem)/1 var(--f);text-transform:uppercase;background:var(--nw-chrome);-webkit-background-clip:text;background-clip:text;color:transparent}
+.offer-price small{font-size:.36em;font-weight:700;letter-spacing:.16em;-webkit-text-fill-color:var(--nw-dim);color:var(--nw-dim)}
 .sec-head{display:grid;gap:12px;margin-bottom:26px}
 .hint{color:var(--nw-dim);font-size:.95rem}
 .rules{display:grid;gap:var(--gap)}
@@ -186,7 +190,7 @@ footer a{color:var(--nw-chrome-mid)}
   .hero-grid .disc{order:2;justify-self:end;width:min(100%,420px)}
   .rules{grid-template-columns:repeat(4,1fr)}
   .path{grid-template-columns:repeat(3,1fr)}
-  .mod.wide{grid-column:span 2}
+  .mod.wide{grid-column:1/-1}
   .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
   .form-grid .span2{grid-column:1/-1}
   .checks{grid-template-columns:repeat(3,1fr)}
@@ -248,12 +252,15 @@ footer a{color:var(--nw-chrome-mid)}
   <section id="pack">
     <div class="wrap">
       <div class="sec-head"><span class="label">Release Pack</span><h2>For artists who need help developing</h2><p class="hint">You have the music. We build the pieces a release needs around it.</p></div>
+      <div class="offer-head"><span class="label">The pack</span><p class="offer-price">$125 <small>flat</small></p><p class="hint">One price for the three things below. You keep everything.</p></div>
       <ul class="path">
         <li class="panel mod"><div class="mod-top"><span class="led on"></span><span class="num">INCLUDED</span></div><h3>Cover artwork</h3><p>Three directions built from your sound and look, plus the crops every platform needs.</p></li>
         <li class="panel mod"><div class="mod-top"><span class="led on"></span><span class="num">INCLUDED</span></div><h3>Bio + press kit</h3><p>Written from facts you confirm. Nothing goes out that you haven&rsquo;t approved.</p></li>
         <li class="panel mod"><div class="mod-top"><span class="led on"></span><span class="num">INCLUDED</span></div><h3>Promo clips</h3><p>Short vertical clips and caption drafts for TikTok, Reels and Shorts.</p></li>
-        <li class="panel mod wide"><div class="mod-top"><span class="led"></span><span class="num">ADD-ON</span></div><h3>Search presence (SEO) &middot; +$62</h3><p>We improve how you show up in search, using the information you send. The more you send, the more we can do.</p></li>
-        <li class="panel mod"><div class="mod-top"><span class="led on"></span><span class="num">PRICE</span></div><h3>$125 flat</h3><p>The pack: artwork, bio + press kit and promo clips. You keep everything.</p></li>
+      </ul>
+      <div class="offer-head addon"><span class="label">Optional add-on</span><p class="offer-price">+$62</p><p class="hint">Not part of the pack. Tick it on the request form to add it.</p></div>
+      <ul class="path">
+        <li class="panel mod wide"><div class="mod-top"><span class="led"></span><span class="num">ADD-ON</span></div><h3>Search presence (SEO)</h3><p>We improve how you show up in search, using the information you send. The more you send, the more we can do.</p></li>
       </ul>
     </div>
   </section>
