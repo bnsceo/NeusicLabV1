@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>NeusicWave Records — Human-made. AI-run.</title>
-<meta name="description" content="The Release Pack for artists who need help developing: cover artwork, bio, promo clips, rollout calendar and release metadata for one flat price. A person approves everything before it goes out.">
+<meta name="description" content="The Release Pack for artists who need help developing: cover artwork, bio + press kit and promo clips for one flat price, plus optional search-engine (SEO) work. A person approves everything before it goes out.">
 <meta name="theme-color" content="#11131e">
 <link rel="preload" href="/assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -186,6 +186,7 @@ footer a{color:var(--nw-chrome-mid)}
   .hero-grid .disc{order:2;justify-self:end;width:min(100%,420px)}
   .rules{grid-template-columns:repeat(4,1fr)}
   .path{grid-template-columns:repeat(3,1fr)}
+  .mod.wide{grid-column:span 2}
   .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
   .form-grid .span2{grid-column:1/-1}
   .checks{grid-template-columns:repeat(3,1fr)}
@@ -223,7 +224,7 @@ footer a{color:var(--nw-chrome-mid)}
         <h1><span class="l1">Human&#8209;made.</span><span class="l2">AI-run.</span></h1>
         <div class="rule-bar" aria-hidden="true"></div>
         <div class="wave" id="wave" aria-hidden="true"></div>
-        <p class="lede">For artists who need help developing. <strong>You make the music.</strong> Agents build the artwork, bio, promo clips and rollout calendar &mdash; and a person approves everything before it goes out.</p>
+        <p class="lede">For artists who need help developing. <strong>You make the music.</strong> Agents build the artwork, bio + press kit and promo clips &mdash; and a person approves everything before it goes out.</p>
         <div class="cta">
           <a class="btn" href="#submit">Get the Release Pack</a>
           <a class="btn ghost" href="#pack">See what&rsquo;s in it</a>
@@ -236,7 +237,7 @@ footer a{color:var(--nw-chrome-mid)}
     <div class="wrap">
       <div class="sec-head"><span class="label">House rules</span><h2>Four things that don&rsquo;t bend</h2></div>
       <div class="rules">
-        <article class="panel rule"><span class="label">01</span><h3>One flat price</h3><p>You pay once and you keep everything: the rights and the earnings.</p></article>
+        <article class="panel rule"><span class="label">01</span><h3>Flat prices</h3><p>You pay once per item and you keep everything: the rights and the earnings.</p></article>
         <article class="panel rule"><span class="label">02</span><h3>You approve it</h3><p>Nothing goes out that you haven&rsquo;t approved, and a person reviews it first.</p></article>
         <article class="panel rule"><span class="label">03</span><h3>AI use is disclosed</h3><p>Every track lists AI involvement by element &mdash; vocals, instruments, composition, post, lyrics.</p></article>
         <article class="panel rule"><span class="label">04</span><h3>No voice clones</h3><p>No cloned voices. No &ldquo;feat.&rdquo; credits for artists who didn&rsquo;t agree to it. Ever.</p></article>
@@ -251,9 +252,8 @@ footer a{color:var(--nw-chrome-mid)}
         <li class="panel mod"><div class="mod-top"><span class="led on"></span><span class="num">INCLUDED</span></div><h3>Cover artwork</h3><p>Three directions built from your sound and look, plus the crops every platform needs.</p></li>
         <li class="panel mod"><div class="mod-top"><span class="led on"></span><span class="num">INCLUDED</span></div><h3>Bio + press kit</h3><p>Written from facts you confirm. Nothing goes out that you haven&rsquo;t approved.</p></li>
         <li class="panel mod"><div class="mod-top"><span class="led on"></span><span class="num">INCLUDED</span></div><h3>Promo clips</h3><p>Short vertical clips and caption drafts for TikTok, Reels and Shorts.</p></li>
-        <li class="panel mod"><div class="mod-top"><span class="led on"></span><span class="num">INCLUDED</span></div><h3>Rollout calendar</h3><p>A dated checklist from three weeks before release to two weeks after.</p></li>
-        <li class="panel mod"><div class="mod-top"><span class="led on"></span><span class="num">INCLUDED</span></div><h3>Release metadata</h3><p>Track metadata and credits, with the AI-credit fields filled in.</p></li>
-        <li class="panel mod"><div class="mod-top"><span class="led on"></span><span class="num">PRICE</span></div><h3>$98 flat</h3><p>One price. You keep everything.</p></li>
+        <li class="panel mod wide"><div class="mod-top"><span class="led"></span><span class="num">ADD-ON</span></div><h3>Search presence (SEO) &middot; +$62</h3><p>We improve how you show up in search, using the information you send. The more you send, the more we can do.</p></li>
+        <li class="panel mod"><div class="mod-top"><span class="led on"></span><span class="num">PRICE</span></div><h3>$125 flat</h3><p>The pack: artwork, bio + press kit and promo clips. You keep everything.</p></li>
       </ul>
     </div>
   </section>
@@ -288,6 +288,7 @@ footer a{color:var(--nw-chrome-mid)}
             <span class="hint">Stem separation, mastering assistants and similar tools count as post-production.</span>
           </fieldset>
           <div class="field span2"><label for="f-msg">Anything else <span class="sr">(optional)</span></label><textarea id="f-msg" name="message" placeholder="Optional"></textarea></div>
+          <label class="chk span2"><input type="checkbox" name="add_seo" value="Yes, +$62"> Add search presence (SEO), +$62</label>
           <label class="chk span2"><input type="checkbox" name="rights_confirm" value="yes" id="f-rights" required> I made this, I control the rights, there are no uncleared samples and no cloned voices.</label>
         </div>
         <button class="btn" type="submit">Request the pack</button>
