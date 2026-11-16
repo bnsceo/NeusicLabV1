@@ -26,7 +26,7 @@ T = {
   inv_ph='you@example.com', inv_note='What do you make? (optional)',
   inv_fine='We keep your email, your note and your country for up to 90 days, only to send you an invite. Ask us to delete it any time. <a href="https://studio.neusicwave.com/privacy">Privacy</a>',
   m_bad='That email address looks incomplete. Check it and try again.', m_off='You seem to be offline. Reconnect and try again.', m_send='Sending…', m_fail='We could not send that just now. Try again in a minute.', m_ok='Thanks. When there is room, your invite link will arrive by email.',
-  bk_h='Also from NeusicWave', lab='<b>NeusicWave Records.</b> The Release Pack for artists who need help developing. <a href="/release-pack/">See the Release Pack</a>', bk='<b>Monetize Your Music.</b> Stop performing. Start owning. <a href="/books/">About the book</a> · <a href="https://www.amazon.com/dp/B0H962CWC6" rel="noopener">On Amazon</a>',
+  bk_h='Also from NeusicWave', pk_h='Release Pack', pk_p='For artists who need help developing. You make the music; we build the pieces a release needs around it. A person approves everything before it goes out.', pk_flat='flat', pk_keep='One price. You keep everything.', pk_btn='See the Release Pack', pk_note='', pk_items=(('Cover artwork', 'Three directions built from your sound and look, plus the crops every platform needs.'), ('Bio + press kit', 'Written from facts you confirm.'), ('Promo clips', 'Short vertical clips and caption drafts for TikTok, Reels and Shorts.'), ('Rollout calendar', 'A dated checklist from three weeks before release to two weeks after.'), ('Release metadata', 'Track metadata and credits, with the AI-credit fields filled in.')), bk='<b>Monetize Your Music.</b> Stop performing. Start owning. <a href="/books/">About the book</a> · <a href="https://www.amazon.com/dp/B0H962CWC6" rel="noopener">On Amazon</a>',
   terms='Terms of Use', privacy='Privacy Policy', made='made by Anderson Paulino'),
  'es': dict(path='es/index.html', url='https://neusicwave.com/es/', other=('/', 'English', 'en'), locale='es_LA',
   title='Neusic Studio: haz un beat en tu navegador | NeusicWave',
@@ -48,7 +48,7 @@ T = {
   inv_ph='tu@correo.com', inv_note='¿Qué música haces? (opcional)',
   inv_fine='Guardamos tu correo, tu nota y tu país hasta 90 días, solo para enviarte la invitación. Pídenos borrarlo cuando quieras. <a href="https://studio.neusicwave.com/privacy">Privacidad</a> (en inglés)',
   m_bad='Ese correo parece incompleto. Revísalo e inténtalo otra vez.', m_off='Parece que no tienes conexión. Conéctate e inténtalo otra vez.', m_send='Enviando…', m_fail='No pudimos enviarlo ahora. Inténtalo en un minuto.', m_ok='Gracias. Cuando haya lugar, tu enlace de invitación llegará por correo.',
-  bk_h='También de NeusicWave', lab='<b>NeusicWave Records.</b> El Release Pack para artistas que necesitan ayuda para desarrollarse. <a href="/release-pack/">Ver el Release Pack</a> (en inglés)', bk='<b>Monetize Your Music.</b> Deja de actuar. Empieza a ser dueño. <a href="/books/">Sobre el libro</a> · <a href="https://www.amazon.com/dp/B0H962CWC6" rel="noopener">En Amazon</a> (en inglés)',
+  bk_h='También de NeusicWave', pk_h='Release Pack', pk_p='Para artistas que necesitan ayuda para desarrollarse. Tú haces la música; nosotros armamos lo que un lanzamiento necesita a su alrededor. Una persona aprueba todo antes de que salga.', pk_flat='precio único', pk_keep='Un solo precio. Todo sigue siendo tuyo.', pk_btn='Ver el Release Pack', pk_note='La página del Release Pack está en inglés.', pk_items=(('Arte de portada', 'Tres direcciones basadas en tu sonido y tu estilo, más los recortes que pide cada plataforma.'), ('Bio y kit de prensa', 'Escritos con datos que tú confirmas.'), ('Clips promocionales', 'Clips verticales cortos y borradores de textos para TikTok, Reels y Shorts.'), ('Calendario de lanzamiento', 'Una lista con fechas desde tres semanas antes del lanzamiento hasta dos semanas después.'), ('Metadatos del lanzamiento', 'Metadatos y créditos del tema, con los campos de crédito de IA completados.')), bk='<b>Monetize Your Music.</b> Deja de actuar. Empieza a ser dueño. <a href="/books/">Sobre el libro</a> · <a href="https://www.amazon.com/dp/B0H962CWC6" rel="noopener">En Amazon</a> (en inglés)',
   terms='Términos de uso', privacy='Política de privacidad', made='hecho por Anderson Paulino'),
 }
 def page(lang, t):
@@ -59,6 +59,8 @@ def page(lang, t):
         small = f' <small>{s}</small>' if s else ''
         return f'<article{best}><h3>{n}</h3><p class="price">{p}{small}</p><ul>' + ''.join(f'<li>{x}</li>' for x in li) + '</ul></article>'
     plans = ''.join(plan(i, *x) for i, x in enumerate(t['plans']))
+    pack_items = ''.join(f'<li><b>{a}</b> {b}</li>' for a, b in t['pk_items'])
+    pack_note = f'<p class="fine">{t["pk_note"]}</p>' if t['pk_note'] else ''
     invite = '' if OPEN else f'''
     <section class="invite" id="invite" aria-labelledby="invite-h">
       <h2 id="invite-h">{t["inv_h"]}</h2>
@@ -105,7 +107,7 @@ def page(lang, t):
   <link rel="icon" href="/favicon.png" type="image/png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="preload" href="/assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/css/site/launch.css?v=3" />
+  <link rel="stylesheet" href="/css/site/launch.css?v=4" />
 </head>
 <body>
   <a class="skip" href="#main">{t["skip"]}</a>
@@ -146,10 +148,22 @@ def page(lang, t):
       <p class="fine">{t["fine"]}</p>
     </section>
 
+    <section class="pack" id="release-pack" aria-labelledby="pack-h">
+      <h2 id="pack-h">{t["pk_h"]}</h2>
+      <p class="lead">{t["pk_p"]}</p>
+      <div class="pack-card">
+        <div class="pack-buy">
+          <p class="price">$98 <small>{t["pk_flat"]}</small></p>
+          <p>{t["pk_keep"]}</p>
+          <p class="acts"><a class="btn go" href="/release-pack/">{t["pk_btn"]}</a></p>{pack_note}
+        </div>
+        <ul>{pack_items}</ul>
+      </div>
+    </section>
+
     <section class="book" aria-labelledby="book-h">
       <h2 id="book-h">{t["bk_h"]}</h2>
       <p>{t["bk"]}</p>
-      <p>{t["lab"]}</p>
     </section>
   </main>
 

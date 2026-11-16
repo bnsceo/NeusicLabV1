@@ -45,7 +45,7 @@ html.gl .rows{display:flex}
 .keys{margin:22px 0 0;display:flex;align-items:center;flex-wrap:wrap;gap:14px}
 .hint{color:var(--dim);font-size:15px}
 
-.inside,.prices,.book{padding:clamp(40px,7vh,88px) 0}
+.inside,.prices,.book,.pack{padding:clamp(40px,7vh,88px) 0}
 .inside ul{list-style:none;margin:36px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
 .inside li{display:grid;gap:6px;padding:22px 24px;border-radius:var(--r);box-shadow:var(--up)}
 .inside li:nth-child(4n+2),.inside li:nth-child(4n+3){box-shadow:var(--in)}
@@ -62,6 +62,12 @@ html.gl .rows{display:flex}
 .best li::before{background:var(--led);box-shadow:0 0 8px rgba(95,208,255,.8)}
 .fine{margin:22px 0 0;color:var(--dim);font-size:15px}
 .book p{margin:14px 0 0;color:var(--dim)}.book b{color:var(--ink)}
+.pack .lead{max-width:52ch}
+.pack-card{margin-top:36px;display:grid;grid-template-columns:5fr 6fr;gap:32px;align-items:center;padding:32px;border-radius:var(--r);box-shadow:var(--up)}
+.pack-card p{margin:0}.pack-buy{display:grid;gap:14px;justify-items:start}.pack-buy .acts{margin:6px 0 0}.pack-buy .fine{margin:0}
+.pack-card ul{margin:0;padding:0;list-style:none;display:grid;gap:14px;color:var(--dim)}
+.pack-card li{padding-left:22px;position:relative}.pack-card li b{display:block;color:var(--ink)}
+.pack-card li::before{content:'';position:absolute;left:2px;top:.6em;width:7px;height:7px;border-radius:50%;background:var(--led);box-shadow:0 0 8px rgba(95,208,255,.8)}
 .foot{margin-top:24px;padding:28px var(--m) 40px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 24px;color:var(--dim);font-size:15px}
 .foot p{margin:0;display:flex;flex-wrap:wrap;gap:6px 20px}
 
@@ -71,6 +77,7 @@ html.gl .rows{display:flex}
   .well{padding-left:10px;aspect-ratio:16/10}.rows{display:none!important}
   .inside ul{grid-template-columns:1fr}.inside li:nth-child(n){box-shadow:var(--up)}.inside li:nth-child(even){box-shadow:var(--in)}
   .plans{grid-template-columns:1fr}
+  .pack-card{grid-template-columns:1fr;padding:24px}
 }
 @media (max-width:420px){.brand span{display:none}.btn{padding:14px 18px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
