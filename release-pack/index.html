@@ -168,6 +168,17 @@ input[type=text],input[type=email],input[type=url],select,textarea{
 input::placeholder,textarea::placeholder{color:var(--nw-dim);opacity:1}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--nw-cyan);outline-offset:2px;box-shadow:var(--nw-recess),var(--nw-glow-cyan)}
 textarea{min-height:110px;resize:vertical}
+input[type=file]{width:100%;padding:14px;color:transparent;font:inherit;background:var(--nw-well);border:2px dashed var(--nw-edge);border-radius:var(--radius-sm);box-shadow:var(--nw-recess);cursor:pointer}
+input[type=file]::file-selector-button{margin-right:14px;min-height:40px;padding:0 20px;font:700 .8rem/1 var(--f);letter-spacing:.14em;text-transform:uppercase;color:var(--nw-chrome-hi);background:var(--nw-black);border:0;border-radius:999px;box-shadow:var(--nw-lift-s);cursor:pointer}
+input[type=file]:focus-visible{outline:2px solid var(--nw-cyan);outline-offset:2px}
+.files{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.files li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center;padding:10px 12px;background:var(--nw-well);border-radius:var(--radius-sm);box-shadow:var(--nw-recess);font-size:.95rem}
+.files .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.files .meta{color:var(--nw-dim);font-size:.85rem;margin-left:8px}
+.files .rm{min-width:var(--tap);min-height:36px;border:0;border-radius:999px;background:var(--nw-black);box-shadow:var(--nw-lift-s);color:var(--nw-chrome-mid);font:700 1rem/1 var(--f);cursor:pointer}
+.files .rm:disabled{opacity:.4;cursor:default}
+.files .prog{grid-column:1/-1;height:6px;border-radius:3px;background:var(--nw-led-off);overflow:hidden}
+.files .prog i{display:block;height:100%;width:0;background:var(--nw-neon);transition:width .2s}
 select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--nw-cyan) 50%),linear-gradient(135deg,var(--nw-cyan) 50%,transparent 50%);background-position:calc(100% - 20px) 50%,calc(100% - 14px) 50%;background-size:6px 6px;background-repeat:no-repeat}
 fieldset{border:0;margin:0;padding:0;display:grid;gap:10px;min-width:0}
 .checks{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -267,7 +278,7 @@ footer a{color:var(--nw-chrome-mid)}
 
   <section id="submit">
     <div class="wrap" id="submit-wrap">
-      <div class="sec-head"><span class="label">Request</span><h2>Ask for the pack</h2><p class="hint">One track is enough. A person reads every request.</p></div>
+      <div class="sec-head"><span class="label">Request</span><h2>Ask for the pack</h2><p class="hint">Send your music, files and facts. The more you send, the more we can do. A person reads every request. <a href="/release-pack/privacy/">How we handle what you send</a>.</p></div>
       <form class="panel" id="demoForm" method="POST" action="https://formsubmit.co/neusicwave@gmail.com" novalidate>
         <input type="hidden" name="_subject" value="NeusicWave Records — new Release Pack request">
         <input type="hidden" name="_template" value="table">
@@ -276,7 +287,13 @@ footer a{color:var(--nw-chrome-mid)}
         <div class="form-grid">
           <div class="field"><label for="f-name">Artist name</label><input id="f-name" name="artist" type="text" autocomplete="nickname" required></div>
           <div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email" required></div>
-          <div class="field span2"><label for="f-link">Link to the track</label><input id="f-link" name="track_link" type="url" inputmode="url" placeholder="https://" required><span class="hint">Private SoundCloud, Drive or Dropbox link is fine.</span></div>
+          <div class="field span2" id="uploadField" hidden><label for="f-files">Your files</label>
+            <input id="f-files" type="file" multiple accept=".wav,.mp3,.flac,.aif,.aiff,.m4a,.aac,.ogg,.opus,.mp4,.mov,.webm,.zip,.rar,.7z,.png,.jpg,.jpeg,.webp,.gif,.heic,.tif,.tiff,.psd,.pdf,.txt,.md,.doc,.docx,.rtf,.odt">
+            <span class="hint">Tracks, stems, artwork, photos, press or lyrics documents. Up to 2 GB per file. Choose several at once, or drop them on the box.</span>
+            <span class="hint">Your files are stored privately. We keep them until your project is done, then delete them unless you ask us to keep them.</span>
+            <ul class="files" id="fileList" aria-live="polite"></ul>
+          </div>
+          <div class="field span2"><label for="f-link" id="linkLabel">Link to your music</label><input id="f-link" name="track_link" type="url" inputmode="url" placeholder="https://"><span class="hint" id="linkHint">Private SoundCloud, Drive or Dropbox link is fine.</span></div>
           <div class="field span2"><label for="f-nw">Made in NeusicWave?</label>
             <select id="f-nw" name="made_in_neusicwave" required>
               <option value="" selected disabled>Choose one</option>
@@ -294,6 +311,8 @@ footer a{color:var(--nw-chrome-mid)}
             </div>
             <span class="hint">Stem separation, mastering assistants and similar tools count as post-production.</span>
           </fieldset>
+          <div class="field span2"><label for="f-bio">Facts for your bio</label><textarea id="f-bio" name="bio_facts" placeholder="Where you are from, genre, influences, releases, shows, press, anything people should know"></textarea></div>
+          <div class="field span2"><label for="f-links">Your links</label><textarea id="f-links" name="links" placeholder="Instagram, TikTok, Spotify, YouTube, website"></textarea></div>
           <div class="field span2"><label for="f-msg">Anything else <span class="sr">(optional)</span></label><textarea id="f-msg" name="message" placeholder="Optional"></textarea></div>
           <label class="chk span2"><input type="checkbox" name="add_seo" value="Yes, +$62"> Add search presence (SEO), +$62</label>
           <label class="chk span2"><input type="checkbox" name="rights_confirm" value="yes" id="f-rights" required> I made this, I control the rights, there are no uncleared samples and no cloned voices.</label>
@@ -308,7 +327,7 @@ footer a{color:var(--nw-chrome-mid)}
 <footer>
   <div class="wrap">
     <span class="label">NeusicWave Records</span>
-    <span>Part of <a href="/">NeusicWave</a>. Requesting the pack doesn&rsquo;t sign you to anything.</span>
+    <span>Part of <a href="/">NeusicWave</a>. Requesting the pack doesn&rsquo;t sign you to anything. <a href="/release-pack/privacy/">Privacy</a></span>
   </div>
 </footer>
 
@@ -348,28 +367,119 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   els.forEach(e => e.addEventListener('change', () => { if (e.checked) none.checked = false; }));
 })();
 
-/* submit */
+/* files + submit */
 (function(){
+  /* Where the private upload service lives (see neusicwave-uploads). Local test: the Worker on :8788. */
+  const API = ['127.0.0.1','localhost'].includes(location.hostname) ? 'http://127.0.0.1:8788' : 'https://up.neusicwave.com';
+  const LIMIT = {file: 2*1024**3, files: 40, total: 8*1024**3};
+  const OK_EXT = new Set('wav mp3 flac aif aiff m4a aac ogg opus mp4 mov webm zip rar 7z png jpg jpeg webp gif heic tif tiff psd pdf txt md doc docx rtf odt'.split(' '));
   const form = document.getElementById('demoForm');
   const status = document.getElementById('status');
+  const input = document.getElementById('f-files');
+  const list = document.getElementById('fileList');
+  const btn = form.querySelector('button[type=submit]');
   const say = (msg, cls) => { status.textContent = msg; status.className = cls || ''; };
+  const fmt = n => n < 1048576 ? Math.max(1, Math.round(n/1024)) + ' KB' : n < 1073741824 ? (n/1048576).toFixed(1) + ' MB' : (n/1073741824).toFixed(2) + ' GB';
+  const ext = n => n.includes('.') ? n.split('.').pop().toLowerCase() : '';
+  let uploadUp = false; /* the upload service answers: show the upload field */
+  fetch(API + '/api/ping').then(res => res.ok ? res.json() : Promise.reject()).then(j => {
+    if (!j.ok) return; uploadUp = true; document.getElementById('uploadField').hidden = false;
+    document.getElementById('linkLabel').textContent = 'Or a link to your music (optional)';
+    document.getElementById('linkHint').textContent = 'Private SoundCloud, Drive or Dropbox link is fine. Optional if you uploaded files.';
+  }).catch(() => {});
+  let files = [];      /* {file, li, bar} */
+  let finished = null; /* {id} once the files and details are stored, so a retry does not upload twice */
+
+  function draw(item){
+    const li = document.createElement('li');
+    li.innerHTML = '<span class="nm"></span><button type="button" class="rm">&times;</button><span class="prog" aria-hidden="true"><i></i></span>';
+    const nm = li.querySelector('.nm'); nm.textContent = item.file.name;
+    const meta = document.createElement('span'); meta.className = 'meta'; meta.textContent = fmt(item.file.size); nm.appendChild(meta);
+    const rm = li.querySelector('.rm'); rm.setAttribute('aria-label', 'Remove ' + item.file.name);
+    rm.addEventListener('click', () => { files = files.filter(f => f !== item); li.remove(); finished = null; });
+    item.li = li; item.bar = li.querySelector('.prog i'); item.rm = rm; list.appendChild(li);
+  }
+  input.addEventListener('change', () => {
+    say('');
+    for (const file of input.files) {
+      if (!OK_EXT.has(ext(file.name))) { say('“' + file.name + '” is not a file type we accept (audio, images, video, zip, pdf, text and Office documents are).', 'err'); continue; }
+      if (file.size < 1) { say('“' + file.name + '” is empty.', 'err'); continue; }
+      if (file.size > LIMIT.file) { say('“' + file.name + '” is over 2 GB. Send it as a link instead.', 'err'); continue; }
+      if (files.some(f => f.file.name === file.name && f.file.size === file.size)) continue;
+      if (files.length >= LIMIT.files) { say('Up to ' + LIMIT.files + ' files per request.', 'err'); break; }
+      if (files.reduce((s, f) => s + f.file.size, 0) + file.size > LIMIT.total) { say('Up to 8 GB in total per request. Send the rest as a link.', 'err'); continue; }
+      const item = {file}; files.push(item); draw(item); finished = null;
+    }
+    input.value = '';
+  });
+
+  async function post(path, body){
+    const res = await fetch(API + path, {method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify(body)});
+    const out = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(out.error || res.status);
+    return out;
+  }
+  function putPart(url, blob, onProgress){
+    return new Promise((resolve, reject) => {
+      const x = new XMLHttpRequest(); x.open('PUT', url);
+      x.upload.onprogress = e => e.lengthComputable && onProgress(e.loaded);
+      x.onload = () => { try { const j = JSON.parse(x.responseText); x.status === 200 ? resolve(j) : reject(new Error(j.error || x.status)); } catch (e) { reject(new Error(x.status)); } };
+      x.onerror = () => reject(new Error('network'));
+      x.send(blob);
+    });
+  }
+  async function uploadFile(id, item){
+    const file = item.file, set = f => { item.bar.style.width = Math.round(f*100) + '%'; };
+    const s = await post('/api/file/start', {id, name:file.name, size:file.size, type:file.type});
+    const parts = []; let done = 0;
+    for (let n = 1, off = 0; off < file.size; n++, off += s.partSize) {
+      const blob = file.slice(off, Math.min(off + s.partSize, file.size));
+      let tries = 0, res;
+      for (;;) {
+        try { res = await putPart(API + '/api/file/part?id=' + id + '&key=' + encodeURIComponent(s.key) + '&uploadId=' + s.uploadId + '&n=' + n, blob, l => set((done + l) / file.size)); break; }
+        catch (e) { if (++tries >= 3) throw e; await new Promise(r => setTimeout(r, 1000 * tries)); }
+      }
+      parts.push({partNumber:res.partNumber, etag:res.etag}); done += blob.size; set(done / file.size);
+    }
+    await post('/api/file/complete', {id, key:s.key, uploadId:s.uploadId, parts});
+  }
+
   form.addEventListener('submit', async ev => {
     ev.preventDefault();
-    if (!form.artist.value.trim() || !form.email.validity.valid || !form.track_link.validity.valid || !form.track_link.value) return say('Check artist name, email and track link.', 'err');
+    if (!form.artist.value.trim() || !form.email.validity.valid || !form.email.value || !form.track_link.validity.valid) return say('Check artist name, email and link.', 'err');
+    if (!files.length && !form.track_link.value) return say(uploadUp ? 'Add your files or a link to your music.' : 'Add a link to your music.', 'err');
     if (!form.made_in_neusicwave.value) return say('Choose whether it was made in NeusicWave.', 'err');
     const anyAI = document.getElementById('ai-none').checked || document.querySelector('.ai:checked');
     if (!anyAI) return say('Tell us about AI involvement (or tick None).', 'err');
     if (!document.getElementById('f-rights').checked) return say('Please confirm the rights statement.', 'err');
-    say('Sending…');
+    btn.disabled = true; files.forEach(f => f.rm.disabled = true);
+    const data = new FormData(form);
     try {
-      const res = await fetch(FORM_ACTION.replace('formsubmit.co/', 'formsubmit.co/ajax/'), {method:'POST', body:new FormData(form), headers:{Accept:'application/json'}});
-      const out = await res.json().catch(() => ({}));
-      if (!res.ok || String(out.success) !== 'true') throw new Error(out.message || res.status); // formsubmit answers 200 even when it did not deliver
-      form.reset();
-      say('Received. A person reads every request.', 'ok');
-    } catch (e) {
-      say('Could not send. Try again in a minute.', 'err');
-    }
+      if (files.length && !finished) {
+        try {
+          say('Uploading… keep this page open.');
+          const {id} = await post('/api/start', {});
+          for (let i = 0; i < files.length; i++) { say('Uploading file ' + (i + 1) + ' of ' + files.length + '… keep this page open.'); await uploadFile(id, files[i]); }
+          const ai = [...form.querySelectorAll('input[name^=ai_]:checked')].map(x => x.value).join(', ');
+          await post('/api/finish', {id, fields:{artist:form.artist.value, email:form.email.value, track_link:form.track_link.value, made_in_neusicwave:form.made_in_neusicwave.value,
+            bio_facts:form.bio_facts.value, links:form.links.value, message:form.message.value, add_seo:form.add_seo.checked ? 'Yes, +$62' : '', ai_involvement:ai, rights_confirm:'yes'}});
+          finished = {id};
+        } catch (e) {
+          return say('The upload did not finish (' + e.message + '). Your files are still selected: check your connection and press the button again.', 'err');
+        }
+      }
+      if (finished) { data.append('submission_id', finished.id); data.append('uploaded_files', files.map(f => f.file.name + ' (' + fmt(f.file.size) + ')').join('; ')); }
+      say('Sending…');
+      try {
+        const res = await fetch(FORM_ACTION.replace('formsubmit.co/', 'formsubmit.co/ajax/'), {method:'POST', body:data, headers:{Accept:'application/json'}});
+        const out = await res.json().catch(() => ({}));
+        if (!res.ok || String(out.success) !== 'true') throw new Error(out.message || res.status); // formsubmit answers 200 even when it did not deliver
+      } catch (e) {
+        return say(finished ? 'Your files arrived, but the request could not be sent. Press the button again in a minute (nothing will upload twice).' : 'Could not send. Try again in a minute.', 'err');
+      }
+      const n = files.length; form.reset(); files = []; list.textContent = ''; finished = null;
+      say(n ? 'Received. ' + n + (n === 1 ? ' file' : ' files') + ' uploaded. A person reads every request.' : 'Received. A person reads every request.', 'ok');
+    } finally { btn.disabled = false; files.forEach(f => f.rm.disabled = false); }
   });
 })();
 </script>
