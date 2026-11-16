@@ -188,6 +188,7 @@ def page(lang, t):
     <p><a href="https://studio.neusicwave.com/terms">{t["terms"]}</a><a href="https://studio.neusicwave.com/privacy">{t["privacy"]}</a><a href="https://www.tiktok.com/@neusicwave1" rel="me noopener">TikTok</a><a href="https://www.instagram.com/neusicwave/" rel="me noopener">Instagram</a></p>
   </footer>
   <script type="module" src="/scripts/site/pads.js?v=3"></script>{inv_js}
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{{"token": "68c7ef0c25164ef5bee363e8338dc61b"}}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
 '''
