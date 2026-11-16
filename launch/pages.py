@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """Writes the landing page in English (/) and Spanish (/es/). Run: python3 launch/pages.py
 OPEN = False while Neusic Studio is invite-only (the page asks for an invite); set it to True on launch day and run again."""
-import os
+import os, json
 OPEN = True
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 STUDIO = 'https://studio.neusicwave.com/'
 T = {
  'en': dict(path='index.html', url='https://neusicwave.com/', other=('/es/', 'Español', 'es'), locale='en_US',
   title='Neusic Studio: make a beat in your browser | NeusicWave',
-  desc='Neusic Studio is a music studio that runs in your browser: drum patterns, 18 genre starters, recording and WAV export, on a phone, tablet or computer. Free to make music.',
+  desc='A music studio in your browser: drum patterns, 18 genre starters, recording and WAV export on any phone, tablet or computer. Free to make music.',
   og_t='Neusic Studio: make a beat in your browser', og_d='A music studio in your browser. Nothing to install. Free to make music.',
   skip='Skip to content', nav=('What is inside', 'Prices', 'Books', 'Release Pack'), books='/books/', open='Open Neusic Studio', ask='Request an invite', see='See the prices',
   h1='Make a beat right here.', lead='Tap the pads, press play. This small board is a taste. Neusic Studio is the whole music studio, in your browser, with nothing to install.',
@@ -30,7 +30,7 @@ T = {
   terms='Terms of Use', privacy='Privacy Policy', made='made by Anderson Paulino'),
  'es': dict(path='es/index.html', url='https://neusicwave.com/es/', other=('/', 'English', 'en'), locale='es_LA',
   title='Neusic Studio: haz un beat en tu navegador | NeusicWave',
-  desc='Neusic Studio es un estudio de música que funciona en tu navegador: patrones de batería, 18 géneros para empezar, grabación y exportación en WAV, en teléfono, tableta o computadora. Hacer música es gratis.',
+  desc='Un estudio de música en tu navegador: patrones de batería, 18 géneros para empezar, grabación y exportación WAV. Gratis para hacer música.',
   og_t='Neusic Studio: haz un beat en tu navegador', og_d='Un estudio de música en tu navegador. Sin instalar nada. Hacer música es gratis.',
   skip='Saltar al contenido', nav=('Qué trae', 'Precios', 'Libros', 'Release Pack'), books='/books/', open='Abrir Neusic Studio', ask='Pide una invitación', see='Ver los precios',
   h1='Haz un beat aquí mismo.', lead='Toca los pads y dale a reproducir. Este tablero es una probadita. Neusic Studio es el estudio completo, en tu navegador, sin instalar nada.',
@@ -76,6 +76,13 @@ def page(lang, t):
 '''
     inv_js = '' if OPEN else '\n  <script src="/scripts/site/invite.js?v=1" defer></script>'
     home = '/' if lang == 'en' else '/es/'
+    alt_locale = 'es_LA' if lang == 'en' else 'en_US'
+    ld_graph = {'@context': 'https://schema.org', '@graph': [
+        {'@type': 'Organization', '@id': 'https://neusicwave.com/#org', 'name': 'NeusicWave', 'url': 'https://neusicwave.com/', 'logo': 'https://neusicwave.com/apple-touch-icon.png', 'sameAs': ['https://www.tiktok.com/@neusicwave1', 'https://www.instagram.com/neusicwave/']},
+        {'@type': 'WebSite', '@id': 'https://neusicwave.com/#website', 'url': 'https://neusicwave.com/', 'name': 'NeusicWave', 'inLanguage': ['en', 'es'], 'publisher': {'@id': 'https://neusicwave.com/#org'}},
+        {'@type': 'SoftwareApplication', 'name': 'Neusic Studio', 'url': t['url'], 'applicationCategory': 'MultimediaApplication', 'operatingSystem': 'Any (web browser)', 'inLanguage': lang, 'description': t['desc'], 'publisher': {'@id': 'https://neusicwave.com/#org'}},
+    ]}
+    ld_json = json.dumps(ld_graph, ensure_ascii=False, separators=(',', ':'))
     return f'''<!doctype html>
 <html lang="{lang}">
 <head>
@@ -84,6 +91,7 @@ def page(lang, t):
   <meta name="theme-color" content="#11131e" />
   <title>{t["title"]}</title>
   <meta name="description" content="{t["desc"]}" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
   <link rel="canonical" href="{t["url"]}" />
   <link rel="alternate" hreflang="en" href="https://neusicwave.com/" />
   <link rel="alternate" hreflang="es" href="https://neusicwave.com/es/" />
@@ -91,6 +99,7 @@ def page(lang, t):
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="NeusicWave" />
   <meta property="og:locale" content="{t["locale"]}" />
+  <meta property="og:locale:alternate" content="{alt_locale}" />
   <meta property="og:url" content="{t["url"]}" />
   <meta property="og:title" content="{t["og_t"]}" />
   <meta property="og:description" content="{t["og_d"]}" />
@@ -108,6 +117,7 @@ def page(lang, t):
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="preload" href="/assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="/css/site/launch.css?v=5" />
+  <script type="application/ld+json">{ld_json}</script>
 </head>
 <body>
   <a class="skip" href="#main">{t["skip"]}</a>
