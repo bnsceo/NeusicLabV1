@@ -261,7 +261,7 @@ footer a{color:var(--nw-chrome-mid)}
   <section id="submit">
     <div class="wrap" id="submit-wrap">
       <div class="sec-head"><span class="label">Request</span><h2>Ask for the pack</h2><p class="hint">One track is enough. A person reads every request.</p></div>
-      <form class="panel" id="demoForm" method="POST" action="https://formsubmit.co/YOUR_FORMSUBMIT_ID" novalidate>
+      <form class="panel" id="demoForm" method="POST" action="https://formsubmit.co/neusicwave@gmail.com" novalidate>
         <input type="hidden" name="_subject" value="NeusicWave Records — new Release Pack request">
         <input type="hidden" name="_template" value="table">
         <input type="hidden" name="_captcha" value="false">
@@ -305,7 +305,6 @@ footer a{color:var(--nw-chrome-mid)}
 </footer>
 
 <script>
-/* Set the form action to the same formsubmit address your waitlist form already uses. */
 const FORM_ACTION = document.getElementById('demoForm').getAttribute('action');
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -353,11 +352,11 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const anyAI = document.getElementById('ai-none').checked || document.querySelector('.ai:checked');
     if (!anyAI) return say('Tell us about AI involvement (or tick None).', 'err');
     if (!document.getElementById('f-rights').checked) return say('Please confirm the rights statement.', 'err');
-    if (FORM_ACTION.includes('YOUR_FORMSUBMIT_ID')) return say('Form not connected yet: set the formsubmit address in the form action.', 'err');
     say('Sending…');
     try {
       const res = await fetch(FORM_ACTION.replace('formsubmit.co/', 'formsubmit.co/ajax/'), {method:'POST', body:new FormData(form), headers:{Accept:'application/json'}});
-      if (!res.ok) throw new Error(res.status);
+      const out = await res.json().catch(() => ({}));
+      if (!res.ok || String(out.success) !== 'true') throw new Error(out.message || res.status); // formsubmit answers 200 even when it did not deliver
       form.reset();
       say('Received. A person reads every request.', 'ok');
     } catch (e) {
