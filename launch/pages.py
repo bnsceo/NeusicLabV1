@@ -10,7 +10,7 @@ T = {
   title='Neusic Studio: make a beat in your browser | NeusicWave',
   desc='Neusic Studio is a music studio that runs in your browser: drum patterns, 18 genre starters, recording and WAV export, on a phone, tablet or computer. Free to make music.',
   og_t='Neusic Studio: make a beat in your browser', og_d='A music studio in your browser. Nothing to install. Free to make music.',
-  skip='Skip to content', nav=('What is inside', 'Prices', 'Books'), books='/books/', open='Open Neusic Studio', ask='Request an invite', see='See the prices',
+  skip='Skip to content', nav=('What is inside', 'Prices', 'Books', 'Release Pack'), books='/books/', open='Open Neusic Studio', ask='Request an invite', see='See the prices',
   h1='Make a beat right here.', lead='Tap the pads, press play. This small board is a taste. Neusic Studio is the whole music studio, in your browser, with nothing to install.',
   nogl='The pad board needs WebGL, which this browser has turned off.', rows=('Kick', 'Snare', 'Hat', 'Rim'), play='Play', stop='Stop', clear='Clear', hint='Eight steps, four drums. Tap any pad.',
   in_h='What is inside the studio',
@@ -26,13 +26,13 @@ T = {
   inv_ph='you@example.com', inv_note='What do you make? (optional)',
   inv_fine='We keep your email, your note and your country for up to 90 days, only to send you an invite. Ask us to delete it any time. <a href="https://studio.neusicwave.com/privacy">Privacy</a>',
   m_bad='That email address looks incomplete. Check it and try again.', m_off='You seem to be offline. Reconnect and try again.', m_send='Sending…', m_fail='We could not send that just now. Try again in a minute.', m_ok='Thanks. When there is room, your invite link will arrive by email.',
-  bk_h='Also from NeusicWave', bk='<b>Monetize Your Music.</b> Stop performing. Start owning. <a href="/books/">About the book</a> · <a href="https://www.amazon.com/dp/B0H962CWC6" rel="noopener">On Amazon</a>',
+  bk_h='Also from NeusicWave', lab='<b>NeusicWave Records.</b> The Release Pack for artists who need help developing. <a href="/release-pack/">See the Release Pack</a>', bk='<b>Monetize Your Music.</b> Stop performing. Start owning. <a href="/books/">About the book</a> · <a href="https://www.amazon.com/dp/B0H962CWC6" rel="noopener">On Amazon</a>',
   terms='Terms of Use', privacy='Privacy Policy', made='made by Anderson Paulino'),
  'es': dict(path='es/index.html', url='https://neusicwave.com/es/', other=('/', 'English', 'en'), locale='es_LA',
   title='Neusic Studio: haz un beat en tu navegador | NeusicWave',
   desc='Neusic Studio es un estudio de música que funciona en tu navegador: patrones de batería, 18 géneros para empezar, grabación y exportación en WAV, en teléfono, tableta o computadora. Hacer música es gratis.',
   og_t='Neusic Studio: haz un beat en tu navegador', og_d='Un estudio de música en tu navegador. Sin instalar nada. Hacer música es gratis.',
-  skip='Saltar al contenido', nav=('Qué trae', 'Precios', 'Libros'), books='/books/', open='Abrir Neusic Studio', ask='Pide una invitación', see='Ver los precios',
+  skip='Saltar al contenido', nav=('Qué trae', 'Precios', 'Libros', 'Release Pack'), books='/books/', open='Abrir Neusic Studio', ask='Pide una invitación', see='Ver los precios',
   h1='Haz un beat aquí mismo.', lead='Toca los pads y dale a reproducir. Este tablero es una probadita. Neusic Studio es el estudio completo, en tu navegador, sin instalar nada.',
   nogl='El tablero necesita WebGL, que este navegador tiene apagado.', rows=('Bombo', 'Caja', 'Hi-hat', 'Aro'), play='Reproducir', stop='Parar', clear='Borrar', hint='Ocho pasos, cuatro tambores. Toca cualquier pad.',
   in_h='Qué trae el estudio',
@@ -48,7 +48,7 @@ T = {
   inv_ph='tu@correo.com', inv_note='¿Qué música haces? (opcional)',
   inv_fine='Guardamos tu correo, tu nota y tu país hasta 90 días, solo para enviarte la invitación. Pídenos borrarlo cuando quieras. <a href="https://studio.neusicwave.com/privacy">Privacidad</a> (en inglés)',
   m_bad='Ese correo parece incompleto. Revísalo e inténtalo otra vez.', m_off='Parece que no tienes conexión. Conéctate e inténtalo otra vez.', m_send='Enviando…', m_fail='No pudimos enviarlo ahora. Inténtalo en un minuto.', m_ok='Gracias. Cuando haya lugar, tu enlace de invitación llegará por correo.',
-  bk_h='También de NeusicWave', bk='<b>Monetize Your Music.</b> Deja de actuar. Empieza a ser dueño. <a href="/books/">Sobre el libro</a> · <a href="https://www.amazon.com/dp/B0H962CWC6" rel="noopener">En Amazon</a> (en inglés)',
+  bk_h='También de NeusicWave', lab='<b>NeusicWave Records.</b> El Release Pack para artistas que necesitan ayuda para desarrollarse. <a href="/release-pack/">Ver el Release Pack</a> (en inglés)', bk='<b>Monetize Your Music.</b> Deja de actuar. Empieza a ser dueño. <a href="/books/">Sobre el libro</a> · <a href="https://www.amazon.com/dp/B0H962CWC6" rel="noopener">En Amazon</a> (en inglés)',
   terms='Términos de uso', privacy='Política de privacidad', made='hecho por Anderson Paulino'),
 }
 def page(lang, t):
@@ -111,7 +111,7 @@ def page(lang, t):
   <a class="skip" href="#main">{t["skip"]}</a>
   <header class="top">
     <a class="brand" href="{home}"><img src="/assets/site/logo.jpg" alt="" width="40" height="40" /><span>NeusicWave</span></a>
-    <nav aria-label="Main"><a href="#inside">{t["nav"][0]}</a><a href="#prices">{t["nav"][1]}</a><a href="{t["books"]}">{t["nav"][2]}</a></nav>
+    <nav aria-label="Main"><a href="#inside">{t["nav"][0]}</a><a href="#prices">{t["nav"][1]}</a><a href="{t["books"]}">{t["nav"][2]}</a><a href="/release-pack/">{t["nav"][3]}</a></nav>
     <a class="lang" href="{t["other"][0]}" hreflang="{t["other"][2]}" lang="{t["other"][2]}">{t["other"][1]}</a>
     {go}
   </header>
@@ -149,6 +149,7 @@ def page(lang, t):
     <section class="book" aria-labelledby="book-h">
       <h2 id="book-h">{t["bk_h"]}</h2>
       <p>{t["bk"]}</p>
+      <p>{t["lab"]}</p>
     </section>
   </main>
 
