@@ -339,6 +339,7 @@ footer a{color:var(--nw-chrome-mid)}
           <label class="chk span2"><input type="checkbox" name="add_seo" value="Yes, +$62"> Add search presence (SEO), +$62</label>
           <label class="chk span2"><input type="checkbox" name="rights_confirm" value="yes" id="f-rights" required> I made this, I control the rights, there are no uncleared samples and no cloned voices.</label>
         </div>
+        <div class="field" id="captchaBox" hidden><div id="captcha"></div></div>
         <button class="btn" type="submit">Request the pack</button>
         <div id="status" role="status" aria-live="polite"></div>
       </form>
@@ -404,8 +405,25 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const fmt = n => n < 1048576 ? Math.max(1, Math.round(n/1024)) + ' KB' : n < 1073741824 ? (n/1048576).toFixed(1) + ' MB' : (n/1073741824).toFixed(2) + ' GB';
   const ext = n => n.includes('.') ? n.split('.').pop().toLowerCase() : '';
   let uploadUp = false; /* the upload service answers: show the upload field */
+  let captchaKey = '', captchaToken = '', captchaWidget = null, captchaScript = null; /* Cloudflare Turnstile, only when the service says it is enforced */
+  function loadTurnstile(){
+    if (!captchaScript) captchaScript = new Promise((resolve, reject) => {
+      const el = document.createElement('script'); el.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'; el.async = true;
+      el.onload = () => resolve(window.turnstile); el.onerror = () => { captchaScript = null; reject(new Error('captcha-script')); }; document.head.appendChild(el);
+    });
+    return captchaScript;
+  }
+  async function showCaptcha(){
+    if (!captchaKey || captchaWidget !== null) return;
+    captchaWidget = -1;
+    try {
+      const ts = await loadTurnstile(); document.getElementById('captchaBox').hidden = false;
+      captchaWidget = ts.render('#captcha', {sitekey:captchaKey, theme:'dark', callback:t => { captchaToken = t; }, 'expired-callback':() => { captchaToken = ''; }, 'error-callback':() => { captchaToken = ''; }});
+    } catch (e) { captchaWidget = null; }
+  }
+  const resetCaptcha = () => { captchaToken = ''; if (window.turnstile && captchaWidget !== null && captchaWidget !== -1) window.turnstile.reset(captchaWidget); };
   fetch(API + '/api/ping').then(res => res.ok ? res.json() : Promise.reject()).then(j => {
-    if (!j.ok) return; uploadUp = true; document.getElementById('uploadField').hidden = false;
+    if (!j.ok) return; uploadUp = true; captchaKey = j.captcha || ''; document.getElementById('uploadField').hidden = false;
     document.getElementById('linkLabel').textContent = 'Or a link to your music (optional)';
     document.getElementById('linkHint').textContent = 'Private SoundCloud, Drive or Dropbox link is fine. Optional if you uploaded files.';
   }).catch(() => {});
@@ -433,6 +451,7 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
       const item = {file}; files.push(item); draw(item); finished = null;
     }
     input.value = '';
+    if (files.length) showCaptcha();
   });
 
   async function post(path, body){
@@ -479,15 +498,19 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     try {
       if (files.length && !finished) {
         try {
+          if (captchaKey) {
+            if (captchaWidget === null || captchaWidget === -1) { showCaptcha(); return say('The security check is still loading. Press the button again in a moment. If it never appears, allow challenges.cloudflare.com or send a link instead.', 'err'); }
+            if (!captchaToken) return say('Please complete the security check above the button.', 'err');
+          }
           say('Uploading… keep this page open.');
-          const {id} = await post('/api/start', {});
+          const {id} = await post('/api/start', {captcha:captchaToken}).finally(resetCaptcha);
           for (let i = 0; i < files.length; i++) { say('Uploading file ' + (i + 1) + ' of ' + files.length + '… keep this page open.'); await uploadFile(id, files[i]); }
           const ai = [...form.querySelectorAll('input[name^=ai_]:checked')].map(x => x.value).join(', ');
           await post('/api/finish', {id, fields:{artist:form.artist.value, email:form.email.value, track_link:form.track_link.value, made_in_neusicwave:form.made_in_neusicwave.value,
             bio_facts:form.bio_facts.value, links:form.links.value, message:form.message.value, add_seo:form.add_seo.checked ? 'Yes, +$62' : '', ai_involvement:ai, rights_confirm:'yes'}});
           finished = {id};
         } catch (e) {
-          return say('The upload did not finish (' + e.message + '). Your files are still selected: check your connection and press the button again.', 'err');
+          return say(e.message === 'captcha' ? 'The security check did not pass. Complete it again and press the button.' : 'The upload did not finish (' + e.message + '). Your files are still selected: check your connection and press the button again.', 'err');
         }
       }
       if (finished) { data.append('submission_id', finished.id); data.append('uploaded_files', files.map(f => f.file.name + ' (' + fmt(f.file.size) + ')').join('; ')); }
