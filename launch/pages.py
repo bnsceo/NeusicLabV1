@@ -124,11 +124,12 @@ def page(lang, t):
   <link rel="icon" href="/favicon.png" type="image/png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="preload" href="/assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/css/site/launch.css?v=7" />
+  <link rel="stylesheet" href="/css/site/launch.css?v=8" />
   <script type="application/ld+json">{ld_json}</script>
 </head>
 <body>
   <a class="skip" href="#main">{t["skip"]}</a>
+  <canvas id="light" aria-hidden="true"></canvas>
   <header class="top">
     <a class="brand" href="{home}"><img src="/assets/site/logo.jpg" alt="" width="40" height="40" /><span>NeusicWave</span></a>
     <nav aria-label="Main"><a href="#inside">{t["nav"][0]}</a><a href="#prices">{t["nav"][1]}</a><a href="{t["books"]}">{t["nav"][2]}</a><a href="/release-pack/">{t["nav"][3]}</a></nav>
@@ -163,7 +164,7 @@ def page(lang, t):
       <h2 id="dj-h">{t["dj_h"]}</h2>
       <p class="lead">{t["dj_p"]}</p>
       <div class="pack-card dj-card">
-        <div class="dj-deck" aria-hidden="true"><i class="plat"></i><i class="xf"></i><i class="plat"></i></div>
+        <div class="dj-deck" aria-hidden="true"><i class="plat"></i><i class="xf"></i><i class="plat"></i><canvas id="decks"></canvas></div>
         <ul>{dj_li}</ul>
       </div>
       <p class="fine">{t["dj_not"]}</p>
@@ -206,7 +207,7 @@ def page(lang, t):
     <p><a href="https://studio.neusicwave.com/terms">{t["terms"]}</a><a href="https://studio.neusicwave.com/privacy">{t["privacy"]}</a><a href="https://www.tiktok.com/@neusicwave1" rel="me noopener">TikTok</a><a href="https://www.instagram.com/neusicwave/" rel="me noopener">Instagram</a></p>
   </footer>
   {REF_JS}
-  <script type="module" src="/scripts/site/pads.js?v=3"></script>{inv_js}
+  <script type="module" src="/scripts/site/main.js?v=4"></script>{inv_js}
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{{"token": "68c7ef0c25164ef5bee363e8338dc61b"}}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>

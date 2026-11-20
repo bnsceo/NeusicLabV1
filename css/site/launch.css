@@ -111,3 +111,18 @@ html.gl .rows{display:flex}
 .notify .fine{margin:0}
 @media (max-width:900px){.lang{margin-left:auto}.top .btn{margin-left:0}}
 @media (max-width:520px){.top{gap:10px;padding:14px var(--m)}.top .btn{padding:11px 13px;font-size:14px}.lang{padding:9px 11px}}
+
+/* v8: the hero light (WebGL, behind the headline), the 3D DJ decks (the CSS drawing stays until they run) and the motion below the hero */
+#light{position:absolute;left:0;top:0;width:100%;height:clamp(640px,112svh,1100px);z-index:-1;pointer-events:none;display:none}
+html.gl-light #light{display:block}
+#decks{display:none;width:100%;height:100%}
+html.gl-decks .dj-deck{display:block;max-width:none;aspect-ratio:16/11}
+html.gl-decks .dj-deck>i{display:none}
+html.gl-decks #decks{display:block}
+.js-reveal [data-r]{opacity:0;transform:translateY(24px);transition:opacity .7s cubic-bezier(.2,.7,.2,1) var(--d,0ms),transform .7s cubic-bezier(.2,.7,.2,1) var(--d,0ms)}
+.js-reveal [data-r].in{opacity:1;transform:none}
+.hl{position:relative}
+.hl::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .3s;background:radial-gradient(240px circle at var(--mx,50%) var(--my,50%),rgba(95,208,255,.1),transparent 70%)}
+.hl:hover::after{opacity:1}
+.js-reveal h2[data-r].in{background:linear-gradient(100deg,#f1f1f5 38%,#fff 50%,#f1f1f5 62%) 100% 0/260% 100% no-repeat;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:sheen 1.6s .2s ease-out both}
+@keyframes sheen{from{background-position:100% 0}to{background-position:0 0}}

@@ -32,11 +32,12 @@
   <link rel="icon" href="/favicon.png" type="image/png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="preload" href="/assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/css/site/launch.css?v=7" />
+  <link rel="stylesheet" href="/css/site/launch.css?v=8" />
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://neusicwave.com/#org","name":"NeusicWave","url":"https://neusicwave.com/","logo":"https://neusicwave.com/apple-touch-icon.png","founder":{"@type":"Person","name":"Anderson Paulino"},"sameAs":["https://www.tiktok.com/@neusicwave1","https://www.instagram.com/neusicwave/"]},{"@type":"WebSite","@id":"https://neusicwave.com/#website","url":"https://neusicwave.com/","name":"NeusicWave","inLanguage":["en","es"],"publisher":{"@id":"https://neusicwave.com/#org"}},{"@type":"SoftwareApplication","name":"Neusic Studio","url":"https://neusicwave.com/es/","applicationCategory":"MultimediaApplication","operatingSystem":"Any (web browser)","inLanguage":"es","description":"Un estudio de música en tu navegador: patrones de batería, 18 géneros para empezar, grabación y exportación WAV. Gratis para hacer música.","author":{"@type":"Person","name":"Anderson Paulino"},"publisher":{"@id":"https://neusicwave.com/#org"}}]}</script>
 </head>
 <body>
   <a class="skip" href="#main">Saltar al contenido</a>
+  <canvas id="light" aria-hidden="true"></canvas>
   <header class="top">
     <a class="brand" href="/es/"><img src="/assets/site/logo.jpg" alt="" width="40" height="40" /><span>NeusicWave</span></a>
     <nav aria-label="Main"><a href="#inside">Qué trae</a><a href="#prices">Precios</a><a href="/books/">Libros</a><a href="/release-pack/">Release Pack</a></nav>
@@ -71,7 +72,7 @@
       <h2 id="dj-h">Nuevo: la vista DJ</h2>
       <p class="lead">Dos platos, una mezcladora, 16 pads de muestras y una botonera de sonidos, dentro de Neusic Studio.</p>
       <div class="pack-card dj-card">
-        <div class="dj-deck" aria-hidden="true"><i class="plat"></i><i class="xf"></i><i class="plat"></i></div>
+        <div class="dj-deck" aria-hidden="true"><i class="plat"></i><i class="xf"></i><i class="plat"></i><canvas id="decks"></canvas></div>
         <ul><li><b>Tempo, cuadrícula de pulsos y tonalidad</b><span>Cada pista que cargas los recibe de forma automática.</span></li><li><b>Gratis en el estudio</b><span>Sincronizar, puntos de cue, bucles y salto de pulsos.</span></li><li><b>Una botonera para meter sonidos</b><span>Bocina, scratch, rewind, caída de bajo, rimshot y más, listos para tocar. Añade tus propios sonidos.</span></li><li><b>Studio añade</b><span>Sets grabados, AutoMIX, mapeo de controladores MIDI y cue en auriculares.</span></li></ul>
       </div>
       <p class="fine">Todavía no: bloqueo de tonalidad, más de dos platos y scratch con la rueda.</p>
@@ -114,7 +115,7 @@
     <p><a href="https://studio.neusicwave.com/terms">Términos de uso</a><a href="https://studio.neusicwave.com/privacy">Política de privacidad</a><a href="https://www.tiktok.com/@neusicwave1" rel="me noopener">TikTok</a><a href="https://www.instagram.com/neusicwave/" rel="me noopener">Instagram</a></p>
   </footer>
   <script>(function(){var r=new URLSearchParams(location.search).get('ref');if(!/^[A-Za-z0-9_-]{3,24}$/.test(r||''))return;document.querySelectorAll('a[href^="https://studio.neusicwave.com"],a[href="/"],a[href="/es/"]').forEach(function(a){var u=new URL(a.href,location.href);u.searchParams.set('ref',r);a.href=u.href})})()</script>
-  <script type="module" src="/scripts/site/pads.js?v=3"></script>
+  <script type="module" src="/scripts/site/main.js?v=4"></script>
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "68c7ef0c25164ef5bee363e8338dc61b"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
