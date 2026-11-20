@@ -5,6 +5,7 @@ import os, json
 OPEN = True
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 STUDIO = 'https://studio.neusicwave.com/'
+DJ = STUDIO + 'dj'
 T = {
  'en': dict(path='index.html', url='https://neusicwave.com/', other=('/es/', 'Español', 'es'), locale='en_US',
   title='Neusic Studio: make a beat in your browser | NeusicWave',
@@ -17,6 +18,7 @@ T = {
   inside=[('Genre starters', 'Eighteen of them. Pick reggaeton, bachata, salsa, hip hop, dancehall or another, and a beat is playing.'), ('Drum patterns', 'Step grids like the one above, for every drum track.'),
           ('Arrange and record', 'Lay parts out on a timeline, and record your voice or an instrument over them.'), ('Real sounds', 'A sampled bass and upright piano are built in, and you can load your own SoundFont files.'),
           ('Export', 'Your finished track as a WAV file. What you make is yours.'), ('Any screen', 'Phone, tablet or computer. It opens in the browser you already have.')],
+  dj_h='New: the DJ view', dj_p='Two decks, a mixer and 16 sampler pads, inside Neusic Studio. Every track you load gets its tempo, beat grid and key worked out for you. Sync, hot cues, loops and beat jump are free.', dj_more='Studio adds recorded sets, AutoMIX, MIDI controller mapping and headphone cue.', dj_not='Not there yet: key lock, more than two decks, and scratching with a jog wheel.', dj_btn='See the DJ view',
   pr_h='Free to make. Pay to keep.',
   plans=[('Free', '$0', '', ['Every instrument, pattern, genre and recording tool', 'Nothing is saved when you close it', 'No export']),
          ('Session Pass', '$5', 'for 24 hours', ['Save, reopen and export for a day', 'When it ends, your projects stay in your browser, locked, until you get another pass or Studio']),
@@ -39,6 +41,7 @@ T = {
   inside=[('Géneros para empezar', 'Dieciocho. Elige reguetón, bachata, salsa, hip hop, dancehall u otro, y ya suena un beat.'), ('Patrones de batería', 'Cuadrículas de pasos como la de arriba, para cada pista de batería.'),
           ('Arregla y graba', 'Ordena las partes en una línea de tiempo y graba tu voz o un instrumento encima.'), ('Sonidos reales', 'Trae un bajo y un piano vertical sampleados, y puedes cargar tus propios archivos SoundFont.'),
           ('Exporta', 'Tu tema terminado en un archivo WAV. Lo que haces es tuyo.'), ('Cualquier pantalla', 'Teléfono, tableta o computadora. Se abre en el navegador que ya tienes.')],
+  dj_h='Nuevo: la vista DJ', dj_p='Dos platos, una mezcladora y 16 pads de muestras, dentro de Neusic Studio. Cada pista que cargas recibe su tempo, su cuadrícula de pulsos y su tonalidad de forma automática. Sincronizar, puntos de cue, bucles y salto de pulsos son gratis.', dj_more='Studio añade sets grabados, AutoMIX, mapeo de controladores MIDI y cue en auriculares.', dj_not='Todavía no: bloqueo de tonalidad, más de dos platos y scratch con la rueda.', dj_btn='Ver la vista DJ',
   pr_h='Hacer es gratis. Guardar se paga.',
   plans=[('Gratis', '$0', '', ['Todos los instrumentos, patrones, géneros y la grabación', 'Nada se guarda al cerrar', 'Sin exportar']),
          ('Pase de sesión', '$5', 'por 24 horas', ['Guarda, reabre y exporta durante un día', 'Al terminar, tus proyectos quedan en tu navegador, bloqueados, hasta que tengas otro pase o Studio']),
@@ -117,7 +120,7 @@ def page(lang, t):
   <link rel="icon" href="/favicon.png" type="image/png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="preload" href="/assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/css/site/launch.css?v=5" />
+  <link rel="stylesheet" href="/css/site/launch.css?v=6" />
   <script type="application/ld+json">{ld_json}</script>
 </head>
 <body>
@@ -150,6 +153,14 @@ def page(lang, t):
     <section class="inside" id="inside" aria-labelledby="inside-h">
       <h2 id="inside-h">{t["in_h"]}</h2>
       <ul>{inside}</ul>
+    </section>
+
+    <section class="dj" id="dj" aria-labelledby="dj-h">
+      <h2 id="dj-h">{t["dj_h"]}</h2>
+      <p class="lead">{t["dj_p"]}</p>
+      <p>{t["dj_more"]}</p>
+      <p class="fine">{t["dj_not"]}</p>
+      <p class="acts"><a class="btn" href="{DJ}">{t["dj_btn"]}</a></p>
     </section>
 
     <section class="prices" id="prices" aria-labelledby="prices-h">
