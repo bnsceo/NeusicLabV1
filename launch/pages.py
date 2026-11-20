@@ -54,6 +54,9 @@ T = {
   bk_h='También de NeusicWave', pk_h='Release Pack', pk_tag='El pack', pk_addon_tag='Opcional', pk_addon_h='Presencia en buscadores (SEO)', pk_addon_price='+$62', pk_addon_p='Mejoramos cómo apareces en las búsquedas, con la información que nos envías. Mientras más nos envíes, más podemos hacer.', pk_p='Para artistas que necesitan ayuda para desarrollarse. Tú haces la música; nosotros armamos lo que un lanzamiento necesita a su alrededor. Una persona aprueba todo antes de que salga.', pk_flat='precio único', pk_keep='Un solo precio por el pack. Todo sigue siendo tuyo.', pk_btn='Ver el Release Pack', pk_note='La página del Release Pack está en inglés.', pk_items=(('Arte de portada', 'Tres direcciones basadas en tu sonido y tu estilo, más los recortes que pide cada plataforma.'), ('Bio y kit de prensa', 'Escritos con datos que tú confirmas.'), ('Clips promocionales', 'Clips verticales cortos y borradores de textos para TikTok, Reels y Shorts.')), bk='<b>Monetize Your Music.</b> Deja de actuar. Empieza a ser dueño. <a href="/books/">Sobre el libro</a> · <a href="https://www.amazon.com/dp/B0H962CWC6" rel="noopener">En Amazon</a> (en inglés)',
   terms='Términos de uso', privacy='Política de privacidad', made='hecho por Anderson Paulino'),
 }
+# A partner's link (/?ref=code) keeps its code on the links that lead on (the studio, the other language), so the studio can credit them. Nothing is stored on this site.
+REF_JS = """<script>(function(){var r=new URLSearchParams(location.search).get('ref');if(!/^[A-Za-z0-9_-]{3,24}$/.test(r||''))return;document.querySelectorAll('a[href^="https://studio.neusicwave.com"],a[href="/"],a[href="/es/"]').forEach(function(a){var u=new URL(a.href,location.href);u.searchParams.set('ref',r);a.href=u.href})})()</script>"""
+
 def page(lang, t):
     go = f'<a class="btn go" href="{STUDIO}">{t["open"]}</a>' if OPEN else f'<a class="btn go" href="#invite">{t["ask"]}</a>'
     inside = ''.join(f'<li><b>{a}</b><span>{b}</span></li>' for a, b in t['inside'])
@@ -202,6 +205,7 @@ def page(lang, t):
     <p>NeusicWave · {t["made"]} · <a href="mailto:hello@neusicwave.com">hello@neusicwave.com</a></p>
     <p><a href="https://studio.neusicwave.com/terms">{t["terms"]}</a><a href="https://studio.neusicwave.com/privacy">{t["privacy"]}</a><a href="https://www.tiktok.com/@neusicwave1" rel="me noopener">TikTok</a><a href="https://www.instagram.com/neusicwave/" rel="me noopener">Instagram</a></p>
   </footer>
+  {REF_JS}
   <script type="module" src="/scripts/site/pads.js?v=3"></script>{inv_js}
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{{"token": "68c7ef0c25164ef5bee363e8338dc61b"}}'></script><!-- End Cloudflare Web Analytics -->
 </body>
