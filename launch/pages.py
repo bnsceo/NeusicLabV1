@@ -18,7 +18,7 @@ T = {
   inside=[('Genre starters', 'Eighteen of them. Pick reggaeton, bachata, salsa, hip hop, dancehall or another, and a beat is playing.'), ('Drum patterns', 'Step grids like the one above, for every drum track.'),
           ('Arrange and record', 'Lay parts out on a timeline, and record your voice or an instrument over them.'), ('Real sounds', 'A sampled bass and upright piano are built in, and you can load your own SoundFont files.'),
           ('Export', 'Your finished track as a WAV file. What you make is yours.'), ('Any screen', 'Phone, tablet or computer. It opens in the browser you already have.')],
-  dj_h='New: the DJ view', dj_p='Two decks, a mixer and 16 sampler pads, inside Neusic Studio. Every track you load gets its tempo, beat grid and key worked out for you. Sync, hot cues, loops and beat jump are free.', dj_more='Studio adds recorded sets, AutoMIX, MIDI controller mapping and headphone cue.', dj_not='Not there yet: key lock, more than two decks, and scratching with a jog wheel.', dj_btn='See the DJ view',
+  dj_h='New: the DJ view', dj_p='Two decks, a mixer and 16 sampler pads, inside Neusic Studio.', dj_pts=(('Tempo, beat grid and key', 'Every track you load gets them worked out for you.'), ('Free in the studio', 'Sync, hot cues, loops and beat jump.'), ('Studio adds', 'Recorded sets, AutoMIX, MIDI controller mapping and headphone cue.')), dj_not='Not there yet: key lock, more than two decks, and scratching with a jog wheel.', dj_btn='See the DJ view',
   pr_h='Free to make. Pay to keep.',
   plans=[('Free', '$0', '', ['Every instrument, pattern, genre and recording tool', 'Nothing is saved when you close it', 'No export']),
          ('Session Pass', '$5', 'for 24 hours', ['Save, reopen and export for a day', 'When it ends, your projects stay in your browser, locked, until you get another pass or Studio']),
@@ -41,7 +41,7 @@ T = {
   inside=[('Géneros para empezar', 'Dieciocho. Elige reguetón, bachata, salsa, hip hop, dancehall u otro, y ya suena un beat.'), ('Patrones de batería', 'Cuadrículas de pasos como la de arriba, para cada pista de batería.'),
           ('Arregla y graba', 'Ordena las partes en una línea de tiempo y graba tu voz o un instrumento encima.'), ('Sonidos reales', 'Trae un bajo y un piano vertical sampleados, y puedes cargar tus propios archivos SoundFont.'),
           ('Exporta', 'Tu tema terminado en un archivo WAV. Lo que haces es tuyo.'), ('Cualquier pantalla', 'Teléfono, tableta o computadora. Se abre en el navegador que ya tienes.')],
-  dj_h='Nuevo: la vista DJ', dj_p='Dos platos, una mezcladora y 16 pads de muestras, dentro de Neusic Studio. Cada pista que cargas recibe su tempo, su cuadrícula de pulsos y su tonalidad de forma automática. Sincronizar, puntos de cue, bucles y salto de pulsos son gratis.', dj_more='Studio añade sets grabados, AutoMIX, mapeo de controladores MIDI y cue en auriculares.', dj_not='Todavía no: bloqueo de tonalidad, más de dos platos y scratch con la rueda.', dj_btn='Ver la vista DJ',
+  dj_h='Nuevo: la vista DJ', dj_p='Dos platos, una mezcladora y 16 pads de muestras, dentro de Neusic Studio.', dj_pts=(('Tempo, cuadrícula de pulsos y tonalidad', 'Cada pista que cargas los recibe de forma automática.'), ('Gratis en el estudio', 'Sincronizar, puntos de cue, bucles y salto de pulsos.'), ('Studio añade', 'Sets grabados, AutoMIX, mapeo de controladores MIDI y cue en auriculares.')), dj_not='Todavía no: bloqueo de tonalidad, más de dos platos y scratch con la rueda.', dj_btn='Ver la vista DJ',
   pr_h='Hacer es gratis. Guardar se paga.',
   plans=[('Gratis', '$0', '', ['Todos los instrumentos, patrones, géneros y la grabación', 'Nada se guarda al cerrar', 'Sin exportar']),
          ('Pase de sesión', '$5', 'por 24 horas', ['Guarda, reabre y exporta durante un día', 'Al terminar, tus proyectos quedan en tu navegador, bloqueados, hasta que tengas otro pase o Studio']),
@@ -57,6 +57,7 @@ T = {
 def page(lang, t):
     go = f'<a class="btn go" href="{STUDIO}">{t["open"]}</a>' if OPEN else f'<a class="btn go" href="#invite">{t["ask"]}</a>'
     inside = ''.join(f'<li><b>{a}</b><span>{b}</span></li>' for a, b in t['inside'])
+    dj_li = ''.join(f'<li><b>{a}</b><span>{b}</span></li>' for a, b in t['dj_pts'])
     def plan(i, n, p, s, li):
         best = ' class="best"' if i == 2 else ''
         small = f' <small>{s}</small>' if s else ''
@@ -120,7 +121,7 @@ def page(lang, t):
   <link rel="icon" href="/favicon.png" type="image/png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="preload" href="/assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/css/site/launch.css?v=6" />
+  <link rel="stylesheet" href="/css/site/launch.css?v=7" />
   <script type="application/ld+json">{ld_json}</script>
 </head>
 <body>
@@ -158,7 +159,10 @@ def page(lang, t):
     <section class="dj" id="dj" aria-labelledby="dj-h">
       <h2 id="dj-h">{t["dj_h"]}</h2>
       <p class="lead">{t["dj_p"]}</p>
-      <p>{t["dj_more"]}</p>
+      <div class="pack-card dj-card">
+        <div class="dj-deck" aria-hidden="true"><i class="plat"></i><i class="xf"></i><i class="plat"></i></div>
+        <ul>{dj_li}</ul>
+      </div>
       <p class="fine">{t["dj_not"]}</p>
       <p class="acts"><a class="btn" href="{DJ}">{t["dj_btn"]}</a></p>
     </section>
