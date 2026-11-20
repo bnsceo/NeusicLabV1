@@ -2,7 +2,7 @@
 // Nothing is hidden unless this script runs, and with "reduce motion" nothing moves.
 const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-if (!still && 'IntersectionObserver' in window) {
+if ('IntersectionObserver' in window) {
   const io = new IntersectionObserver((entries) => {
     for (const e of entries) if (e.isIntersecting || e.boundingClientRect.bottom < 0) { e.target.classList.add('in'); io.unobserve(e.target); }
   }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
@@ -12,7 +12,8 @@ if (!still && 'IntersectionObserver' in window) {
       el.setAttribute('data-r', ''); el.style.setProperty('--d', Math.min(i, 5) * 70 + 'ms'); io.observe(el);
     });
   });
-  document.documentElement.classList.add('js-reveal'); // hiding starts only now, after every part is marked and watched
+  document.documentElement.classList.add('js-reveal'); if (still) document.documentElement.classList.add('fade'); // "reduce motion": parts fade in, nothing travels
+  // hiding starts only now, after every part is marked and watched
 }
 
 if (!still && matchMedia('(hover: hover)').matches) {

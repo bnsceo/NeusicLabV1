@@ -146,8 +146,12 @@ function start() {
   }
   document.documentElement.classList.add('gl-decks'); // first: a hidden canvas has no size to measure
   resize(); if ('ResizeObserver' in window) new ResizeObserver(resize).observe(cv); else addEventListener('resize', resize);
-  if (still) { draw(3); return true; }
   onBeat((row) => { pulse = Math.max(pulse, row === 0 ? 1 : 0.55); });
+  if (still) { // "reduce motion": nothing spins; the mixer lights still answer a drum, for a moment
+    draw(3); let busy = false;
+    onBeat(() => { if (busy) return; busy = true; let n = 0; const f = () => { draw(0.016); if (++n < 50) requestAnimationFrame(f); else busy = false; }; f(); });
+    return true;
+  }
   if (matchMedia('(hover: hover)').matches) {
     addEventListener('pointermove', (e) => {
       const b = cv.getBoundingClientRect(), inside = e.clientX > b.left && e.clientX < b.right && e.clientY > b.top && e.clientY < b.bottom;

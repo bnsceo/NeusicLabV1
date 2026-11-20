@@ -6,9 +6,13 @@ import './motion.js';
 
 const deck = document.querySelector('.dj-deck');
 if (deck) {
-  const load = () => import('./decks.js');
+  let tries = 0; // a phone changing network can drop the fetch: try again a few times
+  const load = () => import('./decks.js').catch(() => { if (++tries < 4) setTimeout(load, 2500); });
+  let started = false;
+  const go = () => { if (!started) { started = true; load(); } };
   if ('IntersectionObserver' in window) {
-    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); load(); } }, { rootMargin: '100% 0px' });
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); go(); } }, { rootMargin: '100% 0px' });
     io.observe(deck);
-  } else load();
+    setTimeout(go, 5000); // in case the observer is slow (a busy phone or tablet): the chunk is 4 KB gzipped
+  } else go();
 }

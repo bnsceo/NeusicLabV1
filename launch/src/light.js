@@ -6,7 +6,8 @@ import { on as onBeat } from './beat.js';
 const cv = document.getElementById('light');
 const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const small = innerWidth < 700;
-const weak = (navigator.hardwareConcurrency || 8) <= 2 || (navigator.deviceMemory || 8) <= 2;
+// a phone or tablet that reports few cores or little memory gets a cheaper light (fewer noise layers, smaller drawing), never none
+const lowEnd = small || (navigator.hardwareConcurrency || 8) <= 2 || (navigator.deviceMemory || 8) <= 2;
 
 function start() {
   let renderer;
@@ -16,13 +17,13 @@ function start() {
   // sRGB values straight from the page's neon, written out as they are (no colour conversion in this shader)
   const rgb = (v, d) => { const s = (css.getPropertyValue(v).trim() || d).replace('#', ''); return new THREE.Vector3(...[0, 2, 4].map((i) => parseInt(s.slice(i, i + 2), 16) / 255)); };
   const hits = Array.from({ length: 8 }, () => new THREE.Vector4(0, 0, -100, 0));
-  const U = { uTime: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) }, uHit: { value: hits }, uMouse: { value: new THREE.Vector3(0.5, 0.7, 0) },
+  const U = { uTime: { value: 0 }, uAur: { value: 40 }, uRes: { value: new THREE.Vector2(1, 1) }, uHit: { value: hits }, uMouse: { value: new THREE.Vector3(0.5, 0.7, 0) },
     uLed: { value: rgb('--led', '#5fd0ff') }, uViolet: { value: rgb('--violet', '#a070ee') }, uPink: { value: rgb('--pink', '#ff6fb0') } };
   const mat = new THREE.ShaderMaterial({
-    uniforms: U, defines: { OCT: small ? 3 : 5 }, blending: THREE.NoBlending, depthTest: false, depthWrite: false,
+    uniforms: U, defines: { OCT: lowEnd ? 3 : 5 }, blending: THREE.NoBlending, depthTest: false, depthWrite: false,
     vertexShader: /* glsl */ `void main(){ gl_Position = vec4(position.xy, 0.0, 1.0); }`,
     fragmentShader: /* glsl */ `
-      uniform float uTime; uniform vec2 uRes; uniform vec4 uHit[8]; uniform vec3 uMouse, uLed, uViolet, uPink;
+      uniform float uTime, uAur; uniform vec2 uRes; uniform vec4 uHit[8]; uniform vec3 uMouse, uLed, uViolet, uPink;
       float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
       float noise(vec2 p){ vec2 i = floor(p), f = fract(p), u = f * f * (3.0 - 2.0 * f);
         return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y); }
@@ -30,8 +31,8 @@ function start() {
       void main(){
         vec2 uv = gl_FragCoord.xy / uRes; float asp = uRes.x / uRes.y; vec2 p = vec2(uv.x * asp, uv.y); float t = uTime;
         // slow aurora: noise bent by noise, tinted along the page's cyan, violet, pink
-        vec2 q = vec2(fbm(p * 1.6 + vec2(t * 0.025, 0.0)), fbm(p * 1.6 + vec2(5.2, 1.3) - t * 0.02));
-        float n = fbm(p * 1.3 + 3.0 * q + vec2(0.0, t * 0.03));
+        vec2 q = vec2(fbm(p * 1.6 + vec2(uAur * 0.025, 0.0)), fbm(p * 1.6 + vec2(5.2, 1.3) - uAur * 0.02));
+        float n = fbm(p * 1.3 + 3.0 * q + vec2(0.0, uAur * 0.03));
         vec3 tint = mix(uLed, uViolet, smoothstep(0.15, 0.8, uv.x + q.x * 0.5));
         tint = mix(tint, uPink, smoothstep(0.55, 1.0, uv.x + q.y * 0.4) * 0.6);
         float top = smoothstep(0.0, 0.8, uv.y) * (0.5 + 0.5 * uv.y);
@@ -59,19 +60,21 @@ function start() {
   const scene = new THREE.Scene(); scene.add(quad); const cam = new THREE.Camera();
   const t0 = performance.now() / 1000, T = () => performance.now() / 1000 - t0;
   let raf = 0, visible = true, last = 0, h = 0; const mouse = U.uMouse.value, mouseTo = new THREE.Vector3(0.5, 0.7, 0);
-  const scale = (small ? 0.45 : 0.6) * Math.min(devicePixelRatio || 1, 1.5);
+  const scale = (lowEnd ? 0.45 : 0.6) * Math.min(devicePixelRatio || 1, 1.5);
   function resize() { renderer.setPixelRatio(scale); renderer.setSize(cv.clientWidth || 1, cv.clientHeight || 1, false); renderer.getDrawingBufferSize(U.uRes.value); }
-  function draw(t) { U.uTime.value = t; renderer.render(scene, cam); }
+  function draw(t) { U.uTime.value = t; U.uAur.value = still ? 40 : t; renderer.render(scene, cam); } // with "reduce motion" the colour field stands still; only the rings of a played drum move
+  let until = 0; // "reduce motion": the light draws only for a few seconds after a drum plays
   function frame() {
+    const t = T(); if (still && t > until) { raf = 0; return; }
     raf = requestAnimationFrame(frame);
-    const t = T(); if (document.hidden || !visible || (small && t - last < 1 / 30)) return; last = t;
+    if (document.hidden || !visible || (small && t - last < 1 / 30)) return; last = t;
     mouse.lerp(mouseTo, 0.08); draw(t);
   }
   document.documentElement.classList.add('gl-light'); // first: a hidden canvas has no size to measure
   resize(); if ('ResizeObserver' in window) new ResizeObserver(resize).observe(cv); else addEventListener('resize', resize);
-  if (still) { draw(40); return; } // a single quiet frame
-  onBeat((row, col, x, y) => { if (!visible) return; const b = cv.getBoundingClientRect(); hits[h].set((x - b.left) / b.width, 1 - (y - b.top) / b.height, T(), row); h = (h + 1) % hits.length; });
-  if (matchMedia('(hover: hover)').matches) {
+  if (still) draw(T()); // one quiet frame
+  onBeat((row, col, x, y) => { if (!visible) return; const b = cv.getBoundingClientRect(); hits[h].set((x - b.left) / b.width, 1 - (y - b.top) / b.height, T(), row); h = (h + 1) % hits.length; if (still) { until = T() + 3.2; if (!raf) raf = requestAnimationFrame(frame); } });
+  if (!still && matchMedia('(hover: hover)').matches) {
     addEventListener('pointermove', (e) => { const b = cv.getBoundingClientRect(); mouseTo.set((e.clientX - b.left) / b.width, 1 - (e.clientY - b.top) / b.height, 1); });
     document.documentElement.addEventListener('pointerleave', () => { mouseTo.z = 0; });
   }
@@ -79,7 +82,7 @@ function start() {
   cv.addEventListener('webglcontextlost', (e) => { e.preventDefault(); cancelAnimationFrame(raf); document.documentElement.classList.remove('gl-light'); });
   cv.addEventListener('webglcontextrestored', () => { document.documentElement.classList.add('gl-light'); resize(); raf = requestAnimationFrame(frame); });
   addEventListener('pagehide', () => { cancelAnimationFrame(raf); renderer.dispose(); });
-  raf = requestAnimationFrame(frame);
+  if (!still) raf = requestAnimationFrame(frame);
   window.__light = { renderer, hits };
 }
-if (cv && !weak) start();
+if (cv) start();

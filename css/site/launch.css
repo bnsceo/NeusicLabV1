@@ -124,5 +124,7 @@ html.gl-decks #decks{display:block}
 .hl{position:relative}
 .hl::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .3s;background:radial-gradient(240px circle at var(--mx,50%) var(--my,50%),rgba(95,208,255,.1),transparent 70%)}
 .hl:hover::after{opacity:1}
-.js-reveal h2[data-r].in{background:linear-gradient(100deg,#f1f1f5 38%,#fff 50%,#f1f1f5 62%) 100% 0/260% 100% no-repeat;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:sheen 1.6s .2s ease-out both}
+.js-reveal:not(.fade) h2[data-r].in{background:linear-gradient(100deg,#f1f1f5 38%,#fff 50%,#f1f1f5 62%) 100% 0/260% 100% no-repeat;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:sheen 1.6s .2s ease-out both}
 @keyframes sheen{from{background-position:100% 0}to{background-position:0 0}}
+.js-reveal.fade [data-r]{transform:none}
+@media (prefers-reduced-motion:reduce){.js-reveal.fade [data-r]{transition:opacity .7s ease var(--d,0ms)!important}}

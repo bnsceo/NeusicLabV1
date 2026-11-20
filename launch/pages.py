@@ -124,7 +124,7 @@ def page(lang, t):
   <link rel="icon" href="/favicon.png" type="image/png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="preload" href="/assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/css/site/launch.css?v=8" />
+  <link rel="stylesheet" href="/css/site/launch.css?v=9" />
   <script type="application/ld+json">{ld_json}</script>
 </head>
 <body>
@@ -207,7 +207,7 @@ def page(lang, t):
     <p><a href="https://studio.neusicwave.com/terms">{t["terms"]}</a><a href="https://studio.neusicwave.com/privacy">{t["privacy"]}</a><a href="https://www.tiktok.com/@neusicwave1" rel="me noopener">TikTok</a><a href="https://www.instagram.com/neusicwave/" rel="me noopener">Instagram</a></p>
   </footer>
   {REF_JS}
-  <script type="module" src="/scripts/site/main.js?v=4"></script>{inv_js}
+  <script type="module" src="/scripts/site/main.js?v=7"></script>{inv_js}
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{{"token": "68c7ef0c25164ef5bee363e8338dc61b"}}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
