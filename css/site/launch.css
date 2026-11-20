@@ -45,7 +45,7 @@ html.gl .rows{display:flex}
 .keys{margin:22px 0 0;display:flex;align-items:center;flex-wrap:wrap;gap:14px}
 .hint{color:var(--dim);font-size:15px}
 
-.inside,.prices,.book,.pack{padding:clamp(40px,7vh,88px) 0}
+.inside,.prices,.book,.pack,.dj{padding:clamp(40px,7vh,88px) 0}
 .inside ul{list-style:none;margin:36px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
 .inside li{display:grid;gap:6px;padding:22px 24px;border-radius:var(--r);box-shadow:var(--up)}
 .inside li:nth-child(4n+2),.inside li:nth-child(4n+3){box-shadow:var(--in)}
@@ -61,6 +61,7 @@ html.gl .rows{display:flex}
 .plans li::before{content:'';position:absolute;left:2px;top:.6em;width:7px;height:7px;border-radius:50%;background:var(--bg);box-shadow:inset 1px 1px 2px var(--sh),inset -1px -1px 2px var(--hi)}
 .best li::before{background:var(--led);box-shadow:0 0 8px rgba(95,208,255,.8)}
 .fine{margin:22px 0 0;color:var(--dim);font-size:15px}
+.dj p{margin:14px 0 0;color:var(--dim)}.dj .lead{max-width:52ch}.dj .acts{margin-top:22px}
 .book p{margin:14px 0 0;color:var(--dim)}.book b{color:var(--ink)}
 .pack .lead{max-width:52ch}
 .pack-card{margin-top:36px;display:grid;grid-template-columns:5fr 6fr;gap:32px;align-items:center;padding:32px;border-radius:var(--r);box-shadow:var(--up)}
