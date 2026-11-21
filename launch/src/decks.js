@@ -131,11 +131,12 @@ function start() {
     place(); camera.updateProjectionMatrix();
   }
   function draw(dt) {
-    time += dt; pulse *= Math.exp(-5 * dt);
+    time += dt * (still ? 0.25 : 1); pulse *= Math.exp(-5 * dt);
     T.uTime.value = time; T.uPulse.value = pulse;
+    // reduce motion: platters and screens run at a quarter speed, never stopped
     const k = 1 - Math.exp(-4 * dt); tilt[0] += (tiltTo[0] - tilt[0]) * k; tilt[1] += (tiltTo[1] - tilt[1]) * k; place();
     if (!pointer) lightTo.set(Math.cos(time * 0.3) * 3, Math.sin(time * 0.3) * 3); light.lerp(lightTo, 1 - Math.exp(-5 * dt));
-    for (const m of decks) { const d = m.userData.d; spin[d] += still ? 0 : dt * RPM[d]; m.userData.u.uSpin.value = spin[d]; m.userData.u.uLightA.value = Math.atan2(light.y - PLAT[d][1], light.x - PLAT[d][0]); }
+    for (const m of decks) { const d = m.userData.d; spin[d] += dt * RPM[d] * (still ? 0.25 : 1); m.userData.u.uSpin.value = spin[d]; m.userData.u.uLightA.value = Math.atan2(light.y - PLAT[d][1], light.x - PLAT[d][0]); }
     renderer.render(scene, camera);
   }
   function frame() {
@@ -147,12 +148,7 @@ function start() {
   document.documentElement.classList.add('gl-decks'); // first: a hidden canvas has no size to measure
   resize(); if ('ResizeObserver' in window) new ResizeObserver(resize).observe(cv); else addEventListener('resize', resize);
   onBeat((row) => { pulse = Math.max(pulse, row === 0 ? 1 : 0.55); });
-  if (still) { // "reduce motion": nothing spins; the mixer lights still answer a drum, for a moment
-    draw(3); let busy = false;
-    onBeat(() => { if (busy) return; busy = true; let n = 0; const f = () => { draw(0.016); if (++n < 50) requestAnimationFrame(f); else busy = false; }; f(); });
-    return true;
-  }
-  if (matchMedia('(hover: hover)').matches) {
+  if (!still && matchMedia('(hover: hover)').matches) {
     addEventListener('pointermove', (e) => {
       const b = cv.getBoundingClientRect(), inside = e.clientX > b.left && e.clientX < b.right && e.clientY > b.top && e.clientY < b.bottom;
       tiltTo[0] = Math.max(-1, Math.min(1, ((e.clientX - b.left) / b.width - 0.5) * 2)); tiltTo[1] = Math.max(-1, Math.min(1, ((e.clientY - b.top) / b.height - 0.5) * 2));
